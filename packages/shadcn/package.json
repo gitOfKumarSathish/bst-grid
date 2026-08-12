@@ -1,0 +1,100 @@
+{
+  "name": "@bloomskill/table-shadcn",
+  "version": "0.32.0",
+  "description": "Bst-Table shadcn/Radix style adapter — Radix primitives + shadcn-style CSS around the @bloomskill/table-engine grid body.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gitOfKumarSathish/bst-grid.git",
+    "directory": "packages/shadcn"
+  },
+  "homepage": "https://github.com/gitOfKumarSathish/bst-grid/tree/main/packages/shadcn#readme",
+  "bugs": "https://github.com/gitOfKumarSathish/bst-grid/issues",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./styles.css": "./styles/shadcn.css",
+    "./icons/lucide": {
+      "types": "./dist/icons/lucide.d.ts",
+      "import": "./dist/icons/lucide.js"
+    },
+    "./icons/tabler": {
+      "types": "./dist/icons/tabler.d.ts",
+      "import": "./dist/icons/tabler.js"
+    },
+    "./icons/hugeicons": {
+      "types": "./dist/icons/hugeicons.d.ts",
+      "import": "./dist/icons/hugeicons.js"
+    },
+    "./icons/phosphor": {
+      "types": "./dist/icons/phosphor.d.ts",
+      "import": "./dist/icons/phosphor.js"
+    },
+    "./icons/remix": {
+      "types": "./dist/icons/remix.d.ts",
+      "import": "./dist/icons/remix.js"
+    }
+  },
+  "files": [
+    "dist",
+    "styles"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "peerDependencies": {
+    "@bloomskill/table-engine": "^0.32.0",
+    "@hugeicons/core-free-icons": "*",
+    "@hugeicons/react": "*",
+    "@phosphor-icons/react": "*",
+    "@radix-ui/react-dropdown-menu": ">=2",
+    "@remixicon/react": "*",
+    "@tabler/icons-react": "*",
+    "lucide-react": "*",
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "lucide-react": {
+      "optional": true
+    },
+    "@tabler/icons-react": {
+      "optional": true
+    },
+    "@hugeicons/react": {
+      "optional": true
+    },
+    "@hugeicons/core-free-icons": {
+      "optional": true
+    },
+    "@phosphor-icons/react": {
+      "optional": true
+    },
+    "@remixicon/react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@bloomskill/table-engine": "^0.32.0",
+    "@hugeicons/core-free-icons": "^4.2.3",
+    "@hugeicons/react": "^1.1.9",
+    "@phosphor-icons/react": "^2.1.10",
+    "@radix-ui/react-dropdown-menu": "^2.1.0",
+    "@remixicon/react": "^4.9.0",
+    "@tabler/icons-react": "^3.46.0",
+    "@tanstack/react-table": "^9.1.2",
+    "lucide-react": "^0.400.0"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
+}

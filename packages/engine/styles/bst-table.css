@@ -1,0 +1,1132 @@
+/* Bst-Table base styles — the theme surface is CSS custom properties (--bst-table-*).
+   Adapters (MUI, shadcn) set these vars to reskin the grid without touching the
+   engine. Defaults below are a neutral light theme; a dark set follows. */
+
+.bst-table-root {
+  --bst-table-bg: #ffffff;
+  --bst-table-fg: #1f2328;
+  --bst-table-muted: #6b7280;
+  --bst-table-border: #e5e7eb;
+  --bst-table-header-bg: #f9fafb;
+  --bst-table-header-fg: #374151;
+  --bst-table-row-hover: #f3f4f6;
+  --bst-table-accent: #3b82f6;
+  --bst-table-radius: 8px;
+  --bst-table-cell-pad-y: 8px;
+  --bst-table-cell-pad-x: 12px;
+  --bst-table-font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  color: var(--bst-table-fg);
+  background: var(--bst-table-bg);
+  font-family: var(--bst-table-font);
+}
+
+.bst-table-root[data-bst-table-theme='dark'] {
+  --bst-table-bg: #0f1115;
+  --bst-table-fg: #e6e8eb;
+  --bst-table-muted: #9aa4b2;
+  --bst-table-border: #2a2f37;
+  --bst-table-header-bg: #161a20;
+  --bst-table-header-fg: #c7cdd6;
+  --bst-table-row-hover: #171b21;
+  --bst-table-accent: #60a5fa;
+}
+
+.bst-table-scroll {
+  overflow: auto;
+  border: 1px solid var(--bst-table-border);
+  border-radius: var(--bst-table-radius);
+  background: var(--bst-table-bg);
+}
+
+.bst-table-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  /* fixed layout makes the explicit column widths authoritative — without it the
+     browser sizes columns to content and drag-resize appears to do nothing. The
+     table's own width is set inline from the summed column sizes. */
+  table-layout: fixed;
+  min-width: 100%;
+  font-size: 14px;
+  color: var(--bst-table-fg);
+}
+
+.bst-table-th {
+  position: relative;
+  text-align: left;
+  background: var(--bst-table-header-bg);
+  color: var(--bst-table-muted);
+  border-bottom: 1px solid var(--bst-table-border);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding: 0;
+}
+
+.bst-table-th-content {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 38px;
+  padding: 6px var(--bst-table-cell-pad-x);
+  outline: none;
+}
+.bst-table-th-content.bst-table-sortable {
+  cursor: pointer;
+}
+.bst-table-th-content.bst-table-sortable:hover {
+  color: var(--bst-table-fg);
+}
+.bst-table-th-content.bst-table-sortable:hover .bst-table-sort-ind {
+  opacity: 1;
+}
+.bst-table-th-content:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--bst-table-accent);
+}
+.bst-table-th-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* faint until hovered/sorted, so headers read cleanly at rest */
+.bst-table-sort-ind {
+  color: currentColor;
+  font-size: 9px;
+  line-height: 1;
+  opacity: 0.35;
+  transition: opacity 0.1s;
+}
+.bst-table-th[aria-sort] {
+  color: var(--bst-table-fg);
+}
+.bst-table-th[aria-sort] .bst-table-sort-ind {
+  color: var(--bst-table-accent);
+  opacity: 1;
+}
+
+.bst-table-td {
+  padding: var(--bst-table-cell-pad-y) var(--bst-table-cell-pad-x);
+  border-bottom: 1px solid color-mix(in srgb, var(--bst-table-border) 60%, transparent);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: background-color 0.1s ease;
+}
+
+.bst-table-tr:hover .bst-table-td {
+  background: var(--bst-table-row-hover);
+}
+.bst-table-tr:last-child .bst-table-td {
+  border-bottom: 0;
+}
+
+.bst-table-resizer {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 5px;
+  cursor: col-resize;
+  user-select: none;
+  touch-action: none;
+}
+.bst-table-resizer:hover,
+.bst-table-resizer.bst-table-resizing {
+  background: var(--bst-table-accent);
+}
+
+/* Row resize (G2) — a thin drag zone along each data cell's bottom edge; tiled
+   across the row they form a full-width handle. Drag to set the row height (grows
+   the row); double-click resets. Shown on row hover. */
+.bst-rowresize-handle {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 6px;
+  cursor: row-resize;
+  user-select: none;
+  touch-action: none;
+  z-index: 2;
+}
+.bst-rowresize-handle::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 3px;
+  height: 2px;
+  background: var(--bst-table-accent);
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+.bst-table-tr:hover .bst-rowresize-handle:hover::after {
+  opacity: 0.6;
+}
+/* A resized row clips content that overflows its set height, top-aligned. */
+.bst-row-resized > .bst-table-td {
+  overflow: hidden;
+  vertical-align: top;
+}
+
+.bst-table-empty {
+  padding: 44px 12px;
+  text-align: center;
+  color: var(--bst-table-muted);
+  font-size: 13px;
+}
+
+/* Cell spanning (A5) — merged col/row cells sit at the top-left of their block. */
+.bst-table-td.bst-spanned {
+  vertical-align: top;
+}
+
+/* Master-detail (A4) — leading expander column + detail panel rows. */
+.bst-expander-th,
+.bst-expander-td {
+  width: 40px;
+  min-width: 40px;
+  padding: 0;
+  text-align: center;
+  vertical-align: middle;
+}
+.bst-expander-btn {
+  border: 0;
+  background: transparent;
+  color: var(--bst-table-muted);
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  padding: 6px;
+  border-radius: 4px;
+  transition: color 0.12s, background 0.12s;
+}
+.bst-expander-btn:hover {
+  color: var(--bst-table-fg);
+  background: var(--bst-table-row-hover);
+}
+.bst-table-tr.bst-row-expanded > .bst-table-td,
+.bst-table-tr.bst-row-expanded > .bst-expander-td {
+  background: var(--bst-table-row-hover);
+}
+.bst-detail-tr > .bst-detail-td {
+  padding: 12px 16px;
+  background: var(--bst-table-header-bg);
+  border-bottom: 1px solid var(--bst-table-border);
+  font-size: 13px;
+  color: var(--bst-table-fg);
+}
+
+/* Row pinning (G1) — pin column + frozen top/bottom rows. */
+.bst-pin-th,
+.bst-pin-td {
+  width: 36px;
+  min-width: 36px;
+  padding: 0;
+  text-align: center;
+  vertical-align: middle;
+}
+.bst-pin-btn {
+  border: 0;
+  background: transparent;
+  color: var(--bst-table-muted);
+  cursor: pointer;
+  opacity: 0.3;
+  font-size: 12px;
+  line-height: 1;
+  padding: 5px;
+  border-radius: 4px;
+  transition: opacity 0.12s, background 0.12s;
+}
+.bst-table-tr:hover .bst-pin-btn {
+  opacity: 0.7;
+}
+.bst-pin-btn:hover {
+  opacity: 1;
+  background: var(--bst-table-row-hover);
+}
+.bst-pin-btn.is-pinned {
+  opacity: 1;
+}
+/* Frozen rows stick to the top/bottom of the scroll container and read above the
+   scrolling body. Each cell (incl. the leading pin/select/expander cells) is made
+   sticky so the whole row freezes. */
+.bst-table-tr.bst-row-pinned-top > td,
+.bst-table-tr.bst-row-pinned-bottom > td {
+  position: sticky;
+  z-index: 3;
+  background: var(--bst-table-header-bg);
+}
+.bst-table-tr.bst-row-pinned-top > td {
+  top: 0;
+  box-shadow: inset 0 -1px 0 var(--bst-table-border);
+}
+.bst-table-tr.bst-row-pinned-bottom > td {
+  bottom: 0;
+  box-shadow: inset 0 1px 0 var(--bst-table-border);
+}
+/* On hover the generic row-hover rule outranks the opaque backing above; a
+   translucent adapter tint (MUI) would let scrolled rows bleed through the
+   frozen row, so composite it over the opaque base inside the cell. */
+.bst-table-tr.bst-row-pinned-top:hover .bst-table-td,
+.bst-table-tr.bst-row-pinned-bottom:hover .bst-table-td {
+  background:
+    linear-gradient(var(--bst-table-row-hover), var(--bst-table-row-hover)),
+    var(--bst-table-header-bg);
+}
+
+/* Grouping (E4) — collapsible group-header rows + aggregates. */
+.bst-group-tr > td {
+  background: var(--bst-table-header-bg);
+  border-bottom: 1px solid var(--bst-table-border);
+  font-size: 13px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+.bst-group-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: var(--bst-table-fg);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+}
+.bst-group-caret {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  color: var(--bst-table-muted);
+  font-size: 11px;
+}
+.bst-group-count {
+  color: var(--bst-table-muted);
+  font-weight: 500;
+  background: var(--bst-table-row-hover);
+  border-radius: 999px;
+  padding: 0 8px;
+  font-size: 12px;
+}
+.bst-group-agg {
+  font-variant-numeric: tabular-nums;
+  color: var(--bst-table-fg);
+  font-weight: 500;
+}
+
+/* Conditional-format builder (K3) — mirrors the filter builder layout. */
+.bst-cf-builder {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 360px;
+  padding: 4px;
+  color: var(--bst-table-fg);
+  font-size: 13px;
+}
+.bst-cf-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.bst-cf-scope {
+  flex: 0 0 64px;
+  min-width: 0;
+}
+.bst-cf-col {
+  flex: 0 0 22%;
+  min-width: 0;
+}
+.bst-cf-op {
+  flex: 0 0 20%;
+  min-width: 0;
+}
+.bst-cf-val {
+  flex: 1 1 90px;
+  min-width: 0;
+}
+.bst-cf-style {
+  flex: 0 0 86px;
+  min-width: 0;
+}
+.bst-cf-custom {
+  flex: 1 1 auto;
+  color: var(--bst-table-muted);
+  font-size: 12px;
+}
+
+/* In-cell visualization — M1 sparklines + M2 KPI cells (dep-free inline SVG). */
+.bst-cell-sparkline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  vertical-align: middle;
+}
+.bst-cell-sparkline svg {
+  display: block;
+}
+.bst-spark-val {
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  color: var(--bst-table-muted);
+}
+.bst-cell-kpi {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.bst-kpi-value {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.bst-kpi-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  padding: 1px 6px;
+  border-radius: 999px;
+}
+.bst-kpi-delta.is-up {
+  color: #166534;
+  background: color-mix(in srgb, #22c55e 16%, transparent);
+}
+.bst-kpi-delta.is-down {
+  color: #991b1b;
+  background: color-mix(in srgb, #ef4444 16%, transparent);
+}
+.bst-kpi-delta.is-flat {
+  color: var(--bst-table-muted);
+  background: var(--bst-table-row-hover);
+}
+.bst-cell-muted {
+  color: var(--bst-table-muted);
+}
+
+/* ------------------------------------------------------------ Phase 2: cells */
+
+.bst-table-root {
+  --bst-table-danger: #dc2626;
+  --bst-table-warning: #d97706;
+  --bst-table-dirty: #f59e0b;
+  --bst-table-editing-bg: color-mix(in srgb, var(--bst-table-accent) 8%, var(--bst-table-bg));
+}
+.bst-table-root[data-bst-table-theme='dark'] {
+  --bst-table-danger: #f87171;
+  --bst-table-warning: #fbbf24;
+  --bst-table-dirty: #fbbf24;
+}
+
+.bst-table-td {
+  position: relative;
+}
+.bst-table-td.bst-editable {
+  cursor: text;
+}
+/* access control (F3/F4) — disabled cell: muted + non-interactive affordance */
+.bst-table-td.bst-disabled {
+  color: var(--bst-table-muted);
+  background: color-mix(in srgb, var(--bst-table-muted) 8%, transparent);
+  cursor: not-allowed;
+}
+.bst-table-tr:hover .bst-table-td.bst-disabled {
+  background: color-mix(in srgb, var(--bst-table-muted) 8%, transparent);
+}
+.bst-align-right {
+  text-align: right;
+}
+.bst-align-center {
+  text-align: center;
+}
+
+/* dirty / validation states (K1–K3, L1–L3) */
+.bst-table-td.bst-dirty::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-width: 5px;
+  border-style: solid;
+  border-color: var(--bst-table-dirty) transparent transparent var(--bst-table-dirty);
+}
+.bst-table-td.bst-error {
+  box-shadow: inset 0 0 0 2px var(--bst-table-danger);
+  background: color-mix(in srgb, var(--bst-table-danger) 8%, transparent);
+}
+.bst-table-td.bst-warning {
+  box-shadow: inset 0 0 0 2px var(--bst-table-warning);
+}
+.bst-cell-error-msg {
+  display: block;
+  color: var(--bst-table-danger);
+  font-size: 11px;
+  margin-top: 2px;
+  white-space: normal;
+}
+
+/* inline editors */
+.bst-cell-editor {
+  display: flex;
+  align-items: center;
+  min-height: 100%;
+}
+.bst-input {
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  color: var(--bst-table-fg);
+  background: var(--bst-table-bg);
+  border: 1px solid var(--bst-table-accent);
+  border-radius: 4px;
+  padding: 4px 6px;
+  outline: none;
+}
+.bst-input:focus {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--bst-table-accent) 30%, transparent);
+}
+.bst-textarea {
+  resize: vertical;
+  min-height: 54px;
+}
+.bst-input-number {
+  text-align: right;
+}
+.bst-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--bst-table-accent);
+}
+.bst-select {
+  appearance: auto;
+}
+/* Multi-select editor (B7) — trigger + fixed checkbox popup. The popup reuses
+   .bst-row-menu for its opaque themed surface; items are checkbox label rows. */
+.bst-msel-trigger {
+  display: flex;
+  align-items: center;
+  text-align: left;
+  cursor: pointer;
+}
+.bst-msel-value {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bst-msel-value.is-empty {
+  color: var(--bst-table-muted);
+}
+.bst-msel-menu {
+  max-height: 244px;
+  overflow-y: auto;
+}
+.bst-msel-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  user-select: none;
+}
+.bst-msel-item:hover {
+  background: var(--bst-table-row-hover);
+}
+.bst-msel-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+.bst-msel-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bst-radio-group {
+  display: flex;
+  gap: 8px 14px;
+  flex-wrap: wrap;
+}
+.bst-radio-group.is-vertical {
+  flex-direction: column;
+}
+.bst-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+}
+
+/* read-mode cell renderers */
+.bst-cell-text,
+.bst-cell-longtext {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bst-cell-longtext {
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+.bst-cell-number,
+.bst-cell-date {
+  font-variant-numeric: tabular-nums;
+}
+.bst-cell-muted {
+  color: var(--bst-table-muted);
+}
+.bst-cell-bool.is-on {
+  color: #16a34a;
+  font-weight: 700;
+}
+.bst-cell-bool.is-off {
+  color: var(--bst-table-muted);
+}
+
+/* QR / barcode display cells (B1) — always dark-on-light for scannability */
+.bst-cell-qr,
+.bst-cell-barcode {
+  display: inline-flex;
+  align-items: center;
+}
+.bst-cell-qr svg {
+  display: block;
+  border-radius: 2px;
+}
+.bst-barcode-svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Rich-text (J2) — read preview (one line) + neutral inline contentEditable editor */
+.bst-cell-richtext {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* `cellMeta.render: 'html'` — show the formatted rich text inside the cell.
+   Reset block margins so paragraphs/lists/headings sit tidily in a row. */
+.bst-cell-richtext-html {
+  white-space: normal;
+  overflow: hidden;
+}
+.bst-cell-richtext-html > :first-child {
+  margin-top: 0;
+}
+.bst-cell-richtext-html > :last-child {
+  margin-bottom: 0;
+}
+.bst-cell-richtext-html p,
+.bst-cell-richtext-html ul,
+.bst-cell-richtext-html ol,
+.bst-cell-richtext-html blockquote,
+.bst-cell-richtext-html pre {
+  margin: 0.15em 0;
+}
+.bst-cell-richtext-html ul,
+.bst-cell-richtext-html ol {
+  padding-left: 1.2em;
+}
+.bst-cell-richtext-html h1,
+.bst-cell-richtext-html h2,
+.bst-cell-richtext-html h3 {
+  margin: 0.2em 0;
+  font-size: 1em;
+}
+.bst-richtext-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 220px;
+}
+.bst-richtext-toolbar {
+  display: flex;
+  gap: 2px;
+}
+.bst-richtext-btn {
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--bst-table-fg);
+  background: var(--bst-table-bg);
+  border: 1px solid var(--bst-table-border);
+  border-radius: 4px;
+  cursor: pointer;
+}
+.bst-richtext-btn:hover {
+  background: var(--bst-table-row-hover);
+}
+.bst-richtext-area {
+  min-height: 60px;
+  max-height: 200px;
+  overflow: auto;
+  text-align: left;
+  white-space: normal;
+  cursor: text;
+}
+.bst-richtext-area:focus-visible {
+  outline: 2px solid var(--bst-table-accent);
+  outline-offset: -1px;
+}
+.bst-richtext-area ul,
+.bst-richtext-area ol {
+  margin: 2px 0;
+  padding-left: 20px;
+}
+.bst-cell-link {
+  color: var(--bst-table-accent);
+  text-decoration: none;
+}
+.bst-cell-link:hover {
+  text-decoration: underline;
+}
+.bst-cell-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+/* colored single-select → a soft status pill */
+.bst-cell-option.is-tinted {
+  padding: 2px 9px 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  background: color-mix(in srgb, var(--opt-color) 13%, transparent);
+  color: color-mix(in srgb, var(--opt-color) 62%, var(--bst-table-fg));
+  border: 1px solid color-mix(in srgb, var(--opt-color) 26%, transparent);
+}
+.bst-option-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  background: var(--opt-color, var(--bst-table-muted));
+}
+.bst-option-avatar {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.bst-cell-chips {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: nowrap;
+}
+.bst-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px;
+  border: 1px solid var(--bst-table-border);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  background: color-mix(in srgb, var(--bst-table-muted) 7%, transparent);
+}
+.bst-chip.is-tinted {
+  background: color-mix(in srgb, var(--opt-color) 13%, transparent);
+  border-color: color-mix(in srgb, var(--opt-color) 26%, transparent);
+  color: color-mix(in srgb, var(--opt-color) 62%, var(--bst-table-fg));
+}
+.bst-chip-more {
+  color: var(--bst-table-muted);
+  border-style: dashed;
+  background: transparent;
+  font-weight: 600;
+}
+/* Width-aware chips (B7 `cellMeta.fitChips`): the visible row fills the cell and
+   clips; the ghost row is measured off-flow so widths stay known while chips are
+   hidden. Placed after `.bst-cell-chips` so its `display: flex` wins. */
+.bst-cell-chips-fit {
+  position: relative;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+/* Render visible chips at natural width (matching the measured ghost) — no flex
+   shrink/grow — so the fit is exact and the overflow simply clips. */
+.bst-cell-chips-fit > .bst-chip {
+  flex: 0 0 auto;
+}
+.bst-cell-chips-measure {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: inline-flex;
+  gap: 4px;
+  visibility: hidden;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.bst-cell-files {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.bst-file {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.bst-file-thumb {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  object-fit: cover;
+  border: 1px solid var(--bst-table-border);
+}
+.bst-file-icon {
+  font-size: 16px;
+  color: var(--bst-table-muted);
+}
+
+/* Injectable body icons render as inline SVG — center them, drop the baseline gap. */
+.bst-table-sort-ind svg,
+.bst-group-caret svg,
+.bst-cell-bool svg,
+.bst-file-icon svg,
+.bst-expander-btn svg,
+.bst-pin-btn svg,
+.bst-filter-remove svg,
+.bst-kpi-delta svg {
+  display: block;
+  flex: none;
+}
+.bst-cell-bool,
+.bst-expander-btn,
+.bst-pin-btn,
+.bst-filter-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.bst-file-name {
+  font-size: 12px;
+  color: var(--bst-table-muted);
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* action column (B10) */
+.bst-cell-actions {
+  display: inline-flex;
+  gap: 6px;
+}
+.bst-action {
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 6px;
+  border: 1px solid var(--bst-table-border);
+  background: var(--bst-table-bg);
+  color: var(--bst-table-muted);
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+.bst-action:hover:not(:disabled) {
+  border-color: var(--bst-table-accent);
+  color: var(--bst-table-fg);
+  background: color-mix(in srgb, var(--bst-table-accent) 8%, transparent);
+}
+.bst-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.bst-action-primary {
+  background: var(--bst-table-accent);
+  border-color: var(--bst-table-accent);
+  color: #fff;
+}
+.bst-action-danger {
+  color: var(--bst-table-danger);
+  border-color: color-mix(in srgb, var(--bst-table-danger) 40%, var(--bst-table-border));
+}
+
+/* Row overflow ("⋯") action — a compact icon button + its popup menu (actionMenu cell). */
+.bst-action-kebab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 6px;
+  line-height: 0;
+  color: var(--bst-table-muted);
+}
+.bst-row-menu {
+  min-width: 160px;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bst-table-bg);
+  color: var(--bst-table-fg);
+  border: 1px solid var(--bst-table-border);
+  border-radius: 8px;
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.12),
+    0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  z-index: 70;
+}
+.bst-row-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.bst-row-menu-item:hover:not(:disabled) {
+  background: var(--bst-table-row-hover);
+}
+.bst-row-menu-item:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.bst-row-menu-danger {
+  color: var(--bst-table-danger);
+}
+.bst-row-menu-danger:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--bst-table-danger) 12%, transparent);
+}
+
+/* ---------------------------------------------- Phase 3: selection & keyboard */
+
+/* Range selection fill. Raised specificity (…-tr …-td) so it wins over the
+   row-hover background rule above. */
+.bst-table-tr .bst-table-td.bst-selected {
+  background: color-mix(in srgb, var(--bst-table-accent) 12%, transparent);
+}
+
+/* The active (focused) cell — accent ring + a soft tint. The ring IS the focus
+   affordance, so the browser's own outline is removed. */
+.bst-table-tr .bst-table-td.bst-active {
+  background: color-mix(in srgb, var(--bst-table-accent) 16%, transparent);
+  box-shadow: inset 0 0 0 2px var(--bst-table-accent);
+}
+.bst-table-td.bst-active:focus,
+.bst-table-td.bst-active:focus-visible {
+  outline: none;
+}
+
+/* Keep the danger ring when a cell is both active and in error. */
+.bst-table-tr .bst-table-td.bst-active.bst-error {
+  box-shadow: inset 0 0 0 2px var(--bst-table-danger);
+}
+
+/* The table itself is the keyboard entry point (roving tabindex) — no outline. */
+.bst-table-table:focus {
+  outline: none;
+}
+
+/* row-selection checkbox column (Phase 3) */
+.bst-select-th,
+.bst-select-td {
+  width: 40px;
+  text-align: center;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--bst-table-border);
+}
+.bst-select-th {
+  background: var(--bst-table-header-bg);
+}
+.bst-table-tr.bst-row-selected .bst-table-td,
+.bst-table-tr.bst-row-selected .bst-select-td {
+  background: color-mix(in srgb, var(--bst-table-accent) 12%, transparent);
+}
+
+/* column pinning (Phase 3) — sticky columns need an ALWAYS-OPAQUE background so
+   horizontally-scrolled cells never show through, plus a raised z-index. The
+   render layer sets the sticky `left` (start) / `right` (end) offset inline. */
+.bst-table-td.bst-pinned-left,
+.bst-table-td.bst-pinned-right,
+.bst-select-td.bst-pinned-left,
+.bst-expander-td.bst-pinned-left,
+.bst-pin-td.bst-pinned-left,
+.bst-colfilter-th.bst-pinned-left {
+  position: sticky;
+  z-index: 1;
+}
+.bst-table-th.bst-pinned-left,
+.bst-table-th.bst-pinned-right,
+.bst-select-th.bst-pinned-left,
+.bst-expander-th.bst-pinned-left,
+.bst-pin-th.bst-pinned-left {
+  position: sticky;
+  z-index: 2;
+}
+
+/* Opaque backing. A pinned cell paints OVER the cells scrolling beneath it, so
+   any translucency — row stripes, the selection/active tint, a disabled cell, a
+   consumer's `rgba(...)` row style — lets that content bleed through. Give
+   pinned cells a solid base and OPAQUE variants of every state tint, at a
+   specificity that wins over BOTH a consumer `.foo .bst-table-td { background }`
+   (0,2,0) AND the engine's own translucent state rules (0,3,0). */
+.bst-table-tr .bst-table-td.bst-pinned-left,
+.bst-table-tr .bst-table-td.bst-pinned-right,
+.bst-select-td.bst-pinned-left,
+.bst-expander-td.bst-pinned-left,
+.bst-pin-td.bst-pinned-left {
+  background: var(--bst-table-bg);
+}
+.bst-table-th.bst-pinned-left,
+.bst-table-th.bst-pinned-right,
+.bst-select-th.bst-pinned-left,
+.bst-expander-th.bst-pinned-left,
+.bst-pin-th.bst-pinned-left,
+.bst-colfilter-th.bst-pinned-left {
+  background: var(--bst-table-header-bg);
+}
+/* Hover: adapters may supply a TRANSLUCENT hover tint (MUI's
+   `theme.palette.action.hover` is rgba(0,0,0,0.04)), so layer it over the
+   opaque base inside the cell instead of using it as the background. */
+.bst-table-tr:hover .bst-table-td.bst-pinned-left,
+.bst-table-tr:hover .bst-table-td.bst-pinned-right {
+  background:
+    linear-gradient(var(--bst-table-row-hover), var(--bst-table-row-hover)),
+    var(--bst-table-bg);
+}
+.bst-table-tr.bst-row-selected .bst-table-td.bst-pinned-left,
+.bst-table-tr.bst-row-selected .bst-table-td.bst-pinned-right,
+.bst-table-tr.bst-row-selected .bst-select-td.bst-pinned-left {
+  background: color-mix(in srgb, var(--bst-table-accent) 12%, var(--bst-table-bg));
+}
+.bst-table-tr .bst-table-td.bst-pinned-left.bst-disabled,
+.bst-table-tr .bst-table-td.bst-pinned-right.bst-disabled {
+  background: color-mix(in srgb, var(--bst-table-muted) 8%, var(--bst-table-bg));
+}
+.bst-table-tr .bst-table-td.bst-pinned-left.bst-error,
+.bst-table-tr .bst-table-td.bst-pinned-right.bst-error {
+  background: color-mix(in srgb, var(--bst-table-danger) 8%, var(--bst-table-bg));
+}
+.bst-table-tr .bst-table-td.bst-pinned-left.bst-selected,
+.bst-table-tr .bst-table-td.bst-pinned-right.bst-selected {
+  background: color-mix(in srgb, var(--bst-table-accent) 12%, var(--bst-table-bg));
+}
+.bst-table-tr .bst-table-td.bst-pinned-left.bst-active,
+.bst-table-tr .bst-table-td.bst-pinned-right.bst-active {
+  background: color-mix(in srgb, var(--bst-table-accent) 16%, var(--bst-table-bg));
+}
+/* Edge shadow marking the frozen boundary. */
+.bst-table-td.bst-pinned-left {
+  box-shadow: 1px 0 0 var(--bst-table-border);
+}
+.bst-table-td.bst-pinned-right {
+  box-shadow: -1px 0 0 var(--bst-table-border);
+}
+
+/* density (Phase 3) — the adapter sets data-bst-density on .bst-table-root */
+.bst-table-root[data-bst-density='compact'] {
+  --bst-table-cell-pad-y: 3px;
+}
+.bst-table-root[data-bst-density='comfortable'] {
+  --bst-table-cell-pad-y: 14px;
+}
+
+/* per-column filter row (Phase 3, "dual filter") */
+.bst-colfilter-th {
+  padding: 4px 6px;
+  background: var(--bst-table-header-bg);
+  border-bottom: 1px solid var(--bst-table-border);
+}
+.bst-colfilter {
+  width: 100%;
+  height: 28px;
+  box-sizing: border-box;
+  padding: 2px 8px;
+  font: inherit;
+  font-size: 12px;
+  color: var(--bst-table-fg);
+  background: var(--bst-table-bg);
+  border: 1px solid var(--bst-table-border);
+  border-radius: 6px;
+  transition: border-color 0.1s, box-shadow 0.1s;
+}
+.bst-colfilter::placeholder {
+  color: var(--bst-table-muted);
+}
+.bst-colfilter:focus {
+  outline: none;
+  border-color: var(--bst-table-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--bst-table-accent) 22%, transparent);
+}
+
+/* column drag-to-reorder handle */
+.bst-table-th-content[draggable='true'] {
+  cursor: grab;
+}
+.bst-table-th-content[draggable='true']:active {
+  cursor: grabbing;
+}
+
+/* filter builder (Phase 3, E3) */
+.bst-filter-builder {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 320px;
+  padding: 4px;
+  color: var(--bst-table-fg);
+  font-size: 13px;
+}
+.bst-filter-empty {
+  color: var(--bst-table-muted);
+  padding: 4px 2px;
+}
+.bst-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.bst-filter-col {
+  flex: 0 0 34%;
+  min-width: 0;
+}
+.bst-filter-op {
+  flex: 0 0 26%;
+  min-width: 0;
+}
+.bst-filter-val {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.bst-filter-and {
+  color: var(--bst-table-muted);
+  font-size: 12px;
+}
+.bst-filter-remove {
+  flex: none;
+  padding: 3px 7px;
+}
+.bst-filter-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 2px;
+}

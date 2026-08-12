@@ -1,0 +1,582 @@
+/* shadcn/Radix skin for Bst-Table. Provides the chrome styles (.sc-*) and maps
+   the shadcn palette onto the engine's --bst-table-* vars so the grid body matches.
+   Import alongside @bloomskill/table-engine/styles.css. */
+
+/* Theme tokens. Shared by the card AND any portaled surface: Radix renders
+   menus/popovers through a Portal at <body>, i.e. OUTSIDE .sc-card, so those
+   surfaces must carry the --sc-* tokens themselves or every var(--sc-*) resolves
+   to nothing (transparent background, collapsed border). Keep .sc-menu (and any
+   future portaled surface) in these selectors, and pass `sc-dark` to it too. */
+/* Three theme modes, all resolving the same --sc-* tokens the chrome + grid body
+   read:
+   • zinc (default): self-contained shadcn "zinc" palette. Light by default; dark
+     when `.sc-dark` (dark prop) OR an ancestor `.dark` / [data-theme="dark"]
+     (next-themes / shadcn) is present — unless `.sc-light` forces light.
+   • inherit (theme="inherit"): tokens come from the HOST shadcn variables, so the
+     grid tracks the app's theme automatically (the host's own `.dark` flips those
+     variables — no separate dark set needed here). Two token formats:
+       – default (HSL channels, shadcn CLI globals.css):  hsl(var(--background))
+       – .sc-fmt-color (tokenFormat="oklch", Tailwind v4):  var(--background)
+   Portaled Radix surfaces (.sc-menu) carry the same classes so var(--sc-*)
+   resolves outside .sc-card. */
+
+/* zinc — light */
+.sc-card:not(.sc-inherit),
+.sc-menu:not(.sc-inherit) {
+  --sc-bg: #ffffff;
+  --sc-fg: #09090b;
+  --sc-muted: #71717a;
+  --sc-border: #e4e4e7;
+  --sc-input: #e4e4e7;
+  --sc-accent: #f4f4f5;
+  --sc-ring: #a1a1aa;
+  --sc-radius: 8px;
+  --sc-primary: #18181b;
+  --sc-primary-fg: #fafafa;
+  --sc-blue: #3b82f6;
+  --sc-header-bg: #fafafa;
+}
+/* zinc — dark: forced (.sc-dark) or ambient (.dark / [data-theme=dark]),
+   unless explicitly lit (.sc-light) */
+.sc-card.sc-dark:not(.sc-inherit),
+.sc-menu.sc-dark:not(.sc-inherit),
+:where(.dark, [data-theme="dark"]) .sc-card:not(.sc-inherit):not(.sc-light),
+:where(.dark, [data-theme="dark"]) .sc-menu:not(.sc-inherit):not(.sc-light) {
+  --sc-bg: #09090b;
+  --sc-fg: #fafafa;
+  --sc-muted: #a1a1aa;
+  --sc-border: #27272a;
+  --sc-input: #27272a;
+  --sc-accent: #18181b;
+  --sc-ring: #52525b;
+  --sc-primary: #fafafa;
+  --sc-primary-fg: #18181b;
+  --sc-blue: #60a5fa;
+  --sc-header-bg: #131316;
+}
+/* inherit — host shadcn tokens (HSL-channel form) */
+.sc-card.sc-inherit,
+.sc-menu.sc-inherit {
+  --sc-bg: hsl(var(--card, var(--background)));
+  --sc-fg: hsl(var(--card-foreground, var(--foreground)));
+  --sc-muted: hsl(var(--muted-foreground, var(--foreground)));
+  --sc-border: hsl(var(--border));
+  --sc-input: hsl(var(--input, var(--border)));
+  --sc-accent: hsl(var(--accent));
+  --sc-ring: hsl(var(--ring));
+  --sc-primary: hsl(var(--primary));
+  --sc-primary-fg: hsl(var(--primary-foreground));
+  --sc-blue: hsl(var(--ring, var(--primary)));
+  --sc-header-bg: hsl(var(--muted, var(--card, var(--background))));
+  --sc-radius: var(--radius, 8px);
+  font-family: inherit;
+}
+/* inherit — full-color / OKLCH form (Tailwind v4 / newer shadcn; also rgb/hex) */
+.sc-card.sc-inherit.sc-fmt-color,
+.sc-menu.sc-inherit.sc-fmt-color {
+  --sc-bg: var(--card, var(--background));
+  --sc-fg: var(--card-foreground, var(--foreground));
+  --sc-muted: var(--muted-foreground, var(--foreground));
+  --sc-border: var(--border);
+  --sc-input: var(--input, var(--border));
+  --sc-accent: var(--accent);
+  --sc-ring: var(--ring);
+  --sc-primary: var(--primary);
+  --sc-primary-fg: var(--primary-foreground);
+  --sc-blue: var(--ring, var(--primary));
+  --sc-header-bg: var(--muted, var(--card, var(--background)));
+  --sc-radius: var(--radius, 8px);
+}
+
+.sc-card {
+  border: 1px solid var(--sc-border);
+  border-radius: calc(var(--sc-radius) + 2px);
+  background: var(--sc-bg);
+  color: var(--sc-fg);
+  overflow: hidden;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.06),
+    0 1px 2px rgba(0, 0, 0, 0.04);
+}
+/* Flatter shadow in any dark context (forced or ambient) */
+.sc-card.sc-dark,
+:where(.dark, [data-theme="dark"]) .sc-card:not(.sc-light) {
+  box-shadow: none;
+}
+
+/* Map the resolved --sc-* palette → engine grid body vars. This drives the body
+   in every theme mode, so the body needs no data-bst-table-theme attribute. */
+.sc-card .bst-table-root {
+  --bst-table-bg: var(--sc-bg);
+  --bst-table-fg: var(--sc-fg);
+  --bst-table-muted: var(--sc-muted);
+  --bst-table-border: var(--sc-border);
+  --bst-table-header-bg: var(--sc-header-bg);
+  --bst-table-header-fg: var(--sc-fg);
+  --bst-table-row-hover: var(--sc-accent);
+  --bst-table-accent: var(--sc-blue);
+  --bst-table-radius: 0px;
+  font-family: inherit;
+}
+/* The engine keys danger/warning/dirty dark values on [data-bst-table-theme];
+   we theme via --sc-* instead, so replicate them in every dark context. */
+.sc-card.sc-dark .bst-table-root,
+:where(.dark, [data-theme="dark"]) .sc-card:not(.sc-light) .bst-table-root {
+  --bst-table-danger: #f87171;
+  --bst-table-warning: #fbbf24;
+  --bst-table-dirty: #fbbf24;
+}
+.sc-card .bst-table-scroll {
+  border-left: 0;
+  border-right: 0;
+  border-radius: 0;
+}
+
+.sc-toolbar,
+.sc-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+}
+.sc-toolbar {
+  border-bottom: 1px solid var(--sc-border);
+}
+.sc-footer {
+  border-top: 1px solid var(--sc-border);
+}
+.sc-title {
+  font-weight: 600;
+  font-size: 14px;
+  margin-right: 4px;
+}
+.sc-muted {
+  color: var(--sc-muted);
+  font-size: 13px;
+}
+
+.sc-input {
+  height: 34px;
+  min-width: 220px;
+  padding: 0 10px;
+  font-size: 14px;
+  color: var(--sc-fg);
+  background: var(--sc-bg);
+  border: 1px solid var(--sc-input);
+  border-radius: var(--sc-radius);
+  outline: none;
+}
+.sc-input:focus-visible {
+  border-color: var(--sc-ring);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--sc-ring) 55%, transparent);
+}
+.sc-input::placeholder {
+  color: var(--sc-muted);
+}
+
+/* Search box: a leading icon inside the input (shadcn convention) */
+.sc-search {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.sc-search-icon {
+  position: absolute;
+  left: 10px;
+  color: var(--sc-muted);
+  pointer-events: none;
+}
+.sc-search .sc-input {
+  padding-left: 32px;
+}
+
+.sc-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--sc-fg);
+  background: var(--sc-bg);
+  border: 1px solid var(--sc-input);
+  border-radius: var(--sc-radius);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  transition:
+    background 0.1s,
+    border-color 0.1s;
+}
+.sc-btn:hover {
+  background: var(--sc-accent);
+  border-color: var(--sc-muted);
+}
+.sc-btn:focus-visible {
+  outline: none;
+  border-color: var(--sc-ring);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--sc-ring) 55%, transparent);
+}
+.sc-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.sc-btn.sc-icon {
+  width: 34px;
+  padding: 0;
+  justify-content: center;
+  font-size: 18px;
+  line-height: 1;
+}
+/* Keep icons from shrinking inside flex chrome, regardless of icon library. */
+.sc-btn svg,
+.sc-menu-item svg,
+.sc-menu-btn svg,
+.sc-search-icon {
+  flex: none;
+}
+
+.sc-select {
+  height: 34px;
+  padding: 0 8px;
+  font-size: 14px;
+  color: var(--sc-fg);
+  background: var(--sc-bg);
+  border: 1px solid var(--sc-input);
+  border-radius: var(--sc-radius);
+}
+
+.sc-menu {
+  min-width: 180px;
+  background: var(--sc-bg);
+  color: var(--sc-fg);
+  border: 1px solid var(--sc-border);
+  border-radius: var(--sc-radius);
+  padding: 4px;
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  z-index: 50;
+}
+.sc-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 8px;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+}
+.sc-menu-item[data-highlighted] {
+  background: var(--sc-accent);
+}
+.sc-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  color: var(--sc-fg);
+}
+.sc-menu-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  font-size: 13px;
+  line-height: 1;
+  color: var(--sc-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.sc-menu-btn:hover {
+  background: var(--sc-bg);
+  border-color: var(--sc-input);
+}
+.sc-menu-btn.is-active {
+  color: var(--bst-table-accent, #2563eb);
+  border-color: color-mix(in srgb, var(--bst-table-accent, #2563eb) 40%, var(--sc-input));
+}
+.sc-filter-panel {
+  padding: 12px;
+  border-bottom: 1px solid var(--sc-border);
+  background: var(--sc-bg);
+}
+
+/* ------------------------------------------------------- Phase 2: editing UI */
+
+.sc-btn-primary {
+  background: var(--sc-primary);
+  border-color: transparent;
+  color: var(--sc-primary-fg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+.sc-btn-primary:hover {
+  background: color-mix(in srgb, var(--sc-primary) 88%, var(--sc-muted));
+  border-color: transparent;
+}
+.sc-btn-danger {
+  color: #dc2626;
+  border-color: color-mix(in srgb, #dc2626 40%, var(--sc-border));
+}
+.sc-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: color-mix(in srgb, #f59e0b 22%, var(--sc-bg));
+  color: #92400e;
+  border: 1px solid color-mix(in srgb, #f59e0b 40%, var(--sc-border));
+}
+.sc-card.sc-dark .sc-badge {
+  color: #fcd34d;
+}
+.sc-muted {
+  color: var(--sc-muted);
+  font-size: 13px;
+}
+
+/* lightweight dependency-free modal (popup editors: longText, files) */
+.sc-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+}
+.sc-modal {
+  width: min(520px, 92vw);
+  max-height: 82vh;
+  overflow: auto;
+  background: var(--sc-bg);
+  color: var(--sc-fg);
+  border: 1px solid var(--sc-border);
+  border-radius: calc(var(--sc-radius) + 2px);
+  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.35);
+}
+.sc-modal-title {
+  font-weight: 600;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--sc-border);
+}
+.sc-modal-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sc-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--sc-border);
+}
+.sc-file-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sc-file-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sc-richtext-toolbar {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.sc-richtext-btn {
+  min-width: 30px;
+  height: 30px;
+  padding: 0 8px;
+}
+
+/* ------------------------------------- settings sheet (right slide-over, §12) */
+.sc-sheet-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: flex-end;
+  z-index: 70;
+  animation: sc-sheet-fade 0.15s ease;
+}
+.sc-sheet {
+  width: min(360px, 92vw);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--sc-bg);
+  color: var(--sc-fg);
+  border-left: 1px solid var(--sc-border);
+  box-shadow: -12px 0 40px -12px rgba(0, 0, 0, 0.35);
+  animation: sc-sheet-slide 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes sc-sheet-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes sc-sheet-slide {
+  from {
+    transform: translateX(100%);
+  }
+}
+.sc-sheet-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--sc-border);
+}
+.sc-sheet-title {
+  flex: 1;
+  font-weight: 600;
+  font-size: 15px;
+}
+.sc-sheet-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+.sc-sheet-group {
+  padding: 4px 0 8px;
+}
+.sc-sheet-group-label {
+  padding: 8px 16px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--sc-muted);
+}
+.sc-sheet-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+.sc-sheet-row:hover {
+  background: var(--sc-accent);
+}
+.sc-sheet-row-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+}
+.sc-sheet-hint {
+  font-size: 12px;
+  color: var(--sc-muted);
+}
+.sc-sheet-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--sc-border);
+}
+
+/* ------------------------- review-changes sheet (unsaved edits, old → new) */
+.sc-change-rowlabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.sc-change-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 7px 16px;
+}
+.sc-change-row:hover {
+  background: var(--sc-accent);
+}
+.sc-change-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.sc-change-col {
+  font-size: 13px;
+  font-weight: 600;
+}
+.sc-change-diff {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 13px;
+}
+.sc-change-old {
+  color: var(--sc-muted);
+  text-decoration: line-through;
+  overflow-wrap: anywhere;
+}
+.sc-change-arrow {
+  flex: none;
+  color: var(--sc-muted);
+}
+.sc-change-new {
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.sc-change-error {
+  font-size: 12px;
+  color: #dc2626;
+}
+
+/* CSS-only switch (used by the settings sheet) */
+.sc-switch-input {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  flex: none;
+  width: 36px;
+  height: 20px;
+  margin: 0;
+  border-radius: 999px;
+  background: var(--sc-input);
+  border: 1px solid var(--sc-border);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.sc-switch-input::before {
+  content: "";
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s ease;
+}
+.sc-switch-input:checked {
+  background: var(--sc-blue);
+  border-color: var(--sc-blue);
+}
+.sc-switch-input:checked::before {
+  transform: translateX(16px);
+}
+.sc-switch-input:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--sc-blue) 35%, transparent);
+}

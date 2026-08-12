@@ -1,0 +1,49 @@
+{
+  "name": "@bloomskill/table-mui",
+  "version": "0.32.0",
+  "description": "Bst-Table MUI style adapter — Material UI toolbar/menus/pagination around the @bloomskill/table-engine grid body.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gitOfKumarSathish/bst-grid.git",
+    "directory": "packages/mui"
+  },
+  "homepage": "https://github.com/gitOfKumarSathish/bst-grid/tree/main/packages/mui#readme",
+  "bugs": "https://github.com/gitOfKumarSathish/bst-grid/issues",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18",
+    "@bloomskill/table-engine": "^0.32.0",
+    "@mui/material": ">=6",
+    "@mui/icons-material": ">=6",
+    "@emotion/react": ">=11",
+    "@emotion/styled": ">=11"
+  },
+  "devDependencies": {
+    "@bloomskill/table-engine": "^0.32.0",
+    "@mui/material": "^9.3.1",
+    "@mui/icons-material": "^9.3.1",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@tanstack/react-table": "^9.1.2"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
+}

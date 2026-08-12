@@ -1,0 +1,10 @@
+node_modules/
+dist/
+*.tgz
+.vite/
+coverage/
+.DS_Store
+scripts/.consumer-tmp/
+
+# Claude Code local (personal) settings
+.claude/settings.local.json
