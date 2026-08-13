@@ -116,6 +116,54 @@ export interface BstTableShadcnProps<TData extends RowData> extends UseBstTableO
  * no-ops when its underlying `enable*` behaviour is off. Import
  * "@bloomskill/table-shadcn/styles.css".
  */
+/**
+ * Minimal focus trap for the dependency-free slide-over sheets (#20). While
+ * `active`, it moves focus into the sheet, cycles Tab within it, and on close
+ * restores focus to whatever held it before. (Escape-to-close is wired
+ * separately; MUI's Drawer does all of this natively, so only the shadcn skin
+ * needs it.) Returns a ref to attach to the sheet's container.
+ */
+function useFocusTrap(active: boolean) {
+  const ref = React.useRef<HTMLElement | null>(null)
+  React.useEffect(() => {
+    const node = ref.current
+    if (!active || !node) return
+    const previous = document.activeElement as HTMLElement | null
+    const focusable = () =>
+      Array.from(
+        node.querySelectorAll<HTMLElement>(
+          'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])',
+        ),
+      )
+    ;(focusable()[0] ?? node).focus()
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return
+      const items = focusable()
+      if (items.length === 0) {
+        e.preventDefault()
+        node.focus()
+        return
+      }
+      const first = items[0]
+      const last = items[items.length - 1]
+      const el = document.activeElement
+      if (e.shiftKey && (el === first || !node.contains(el))) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && (el === last || !node.contains(el))) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
+    node.addEventListener('keydown', onKeyDown)
+    return () => {
+      node.removeEventListener('keydown', onKeyDown)
+      previous?.focus?.()
+    }
+  }, [active])
+  return ref
+}
+
 export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps<TData>) {
   // Runtime settings sheet: overrides applied to `props` up front so every §12
   // `enable*`/`show*` toggle downstream reflects the user's choices (§12 chrome).
@@ -246,7 +294,17 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
   }, [dirtyCount])
 
   const searchOn = showSearch && (rest.enableGlobalFilter ?? true)
-  const colsMenuOn = showColumnsMenu && (rest.enableHiding ?? true)
+  const hidingOn = rest.enableHiding ?? true
+  // The Columns menu also hosts pin / reorder / group / copy controls, so it must
+  // stay available whenever ANY of those is on — not only when column hiding is
+  // enabled. Otherwise turning hiding off strands an already-pinned/grouped grid
+  // with no UI to undo it (#16).
+  const colsMenuOn =
+    showColumnsMenu &&
+    (hidingOn ||
+      !!rest.enableColumnPinning ||
+      !!rest.enableColumnOrdering ||
+      !!rest.enableGrouping)
   const editingOn = !!rest.enableEditing
   const rowActionsOn = !!rest.enableRowActions
   const rowSelectionOn = !!rest.enableRowSelection
@@ -290,6 +348,11 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
   }, [rest.columns])
   const settingsOn = settingsEnabled && settings.items.length > 0
   const settingsTitle = settingsOptions?.title ?? 'Table settings'
+
+  // Focus-trap the dependency-free slide-over sheets (#20): focus enters on open,
+  // Tab cycles within, and focus is restored to the opener on close.
+  const settingsTrapRef = useFocusTrap(settingsOn && settingsOpen)
+  const changesTrapRef = useFocusTrap(changesSheetOn && changesOpen)
   const activeFilterCount = (table.state.columnFilters ?? []).length
   const paginationEnabled = rest.pagination !== false
   const paginationBarOn = (showPagination ?? paginationEnabled) && paginationEnabled
@@ -489,7 +552,7 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
                       key={col.id}
                       className="sc-menu-item"
                       checked={col.getIsVisible()}
-                      onCheckedChange={() => col.toggleVisibility()}
+                      onCheckedChange={() => hidingOn && col.toggleVisibility()}
                       onSelect={(e) => e.preventDefault()}
                     >
                       <span className="sc-check">
@@ -600,10 +663,12 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
       {settingsOn && settingsOpen && (
         <div className="sc-sheet-overlay" onClick={() => setSettingsOpen(false)}>
           <aside
+            ref={settingsTrapRef}
             className="sc-sheet"
             role="dialog"
             aria-modal="true"
             aria-label={settingsTitle}
+            tabIndex={-1}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="sc-sheet-header">
@@ -660,10 +725,12 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
       {changesSheetOn && changesOpen && (
         <div className="sc-sheet-overlay" onClick={() => setChangesOpen(false)}>
           <aside
+            ref={changesTrapRef}
             className="sc-sheet"
             role="dialog"
             aria-modal="true"
             aria-label="Unsaved changes"
+            tabIndex={-1}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="sc-sheet-header">
