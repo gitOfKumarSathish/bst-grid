@@ -10,6 +10,26 @@ this project uses [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+## [0.33.1] — 2026-08-13
+### Fixed — coordinate-space refactor (Tier 2; `@bloomskill/table-engine`)
+- Cell selection / keyboard nav / paste now build their coordinate space from the **painted**
+  body-row order (top → center → bottom under row pinning) and skip grouped / aggregated / phantom
+  rows via a single `isDataRow` guard consulted by `isCellEditable`, `moveActive` and the paste loop.
+  Fixes: Enter on a group header no longer kills the keyboard; arrow-nav and multi-row paste no
+  longer write into the wrong records with rows pinned; navigating onto a group row no longer loses
+  the active cell or empties the clipboard; a paste crossing a group boundary no longer fires a
+  no-op `onDataChange` + undo entry. (Audit defects #3 / #9 / #21 / #22 / #23.) Tested
+  (`tier2CoordSpace.test.tsx`).
+
+### Docs & packaging
+- Corrected the **virtualization (D1)** status across the root + engine READMEs — it shipped in
+  0.33.0, so the "🟡 not yet released" banner and the "Not built yet" entry are gone (the genuine
+  remaining gaps are I5 live merge, I4 backend write-back, and the B5 in-cell PDF thumbnail).
+- Engine README documents **`@tanstack/react-virtual`** as a bundled dependency (it was still
+  claiming "only `@tanstack/react-table`").
+- Added **`keywords`** to `@bloomskill/table-engine` / `-mui` / `-shadcn` `package.json` (were empty;
+  `-mcp` already had them).
+
 ## [0.33.0] — 2026-08-13
 ### Added — DataSource file verbs (I3, formal): `uploadFile` / `deleteFile` / `getFileUrl`
 - The **`DataSource` contract** (`@bloomskill/table-engine`) gains three optional file verbs
