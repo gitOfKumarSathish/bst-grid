@@ -1,5 +1,7 @@
 import * as React from 'react'
 import { flexRender } from '@tanstack/react-table'
+import { useVirtualizer } from '@tanstack/react-virtual'
+import { virtualizationBypassReason } from './virtualization.js'
 import { getBstRuntime } from './useBstTable.js'
 import type { BstRuntimeHandle } from './useBstTable.js'
 import { cellKey } from './interaction/store.js'
@@ -185,7 +187,11 @@ export function BstTable({
     const ct = registry.get(meta.type)
     const header = col.columnDef?.header
     const texts: string[] = [typeof header === 'string' ? header : '']
-    for (const row of bodyRows) {
+    // Sample at most ~250 rows — with virtualization (and no pagination) bodyRows
+    // can be the whole 1M-row dataset; measuring every one on a double-click would
+    // freeze the tab. D3 was always a sampled strategy (Plan.md §2.7b).
+    const sample = bodyRows.length > 250 ? bodyRows.slice(0, 250) : bodyRows
+    for (const row of sample) {
       const v = row.getValue(colId)
       texts.push(ct.format ? ct.format(v, meta) : v == null ? '' : String(v))
     }
@@ -229,10 +235,24 @@ export function BstTable({
     table.setColumnOrder(order)
   }
 
+  // A keyboard/clipboard event that originates inside one of the grid's own form
+  // controls (a column-filter input, an open cell editor, a <select>) belongs to
+  // that control and must reach it natively; the table-level handlers only own
+  // events from the cell-navigation surface (a focusable <td>, or the table
+  // itself). Without this guard the filter row is a hard keyboard trap and Enter
+  // is swallowed for every focusable control in the grid (#12/#17/#18).
+  const isFromGridFormControl = (e: React.SyntheticEvent) => {
+    const t = e.target as HTMLElement | null
+    if (!t || t === e.currentTarget) return false
+    const tag = t.tagName
+    return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || t.isContentEditable
+  }
+
   // Phase 3 — keyboard navigation. Attached at the table so the active cell's
   // key events bubble up to one handler (§2.4). No-ops unless cell selection is
   // on, and yields entirely to an active editor.
   const onKeyDown = (e: React.KeyboardEvent) => {
+    if (isFromGridFormControl(e)) return
     const st = runtime.store.getState()
     const shift = e.shiftKey
     const mod = e.ctrlKey || e.metaKey
@@ -330,6 +350,7 @@ export function BstTable({
   // work with zero key-combo guessing) targeting the focused active cell.
   const onCopy = (e: React.ClipboardEvent) => {
     if (!handle.enableClipboard) return
+    if (isFromGridFormControl(e)) return
     const text = runtime.getSelectionClipboardText()
     if (text == null) return
     e.clipboardData?.setData('text/plain', text)
@@ -337,6 +358,7 @@ export function BstTable({
   }
   const onPaste = (e: React.ClipboardEvent) => {
     if (!handle.enableClipboard) return
+    if (isFromGridFormControl(e)) return
     const text = e.clipboardData?.getData('text/plain')
     if (!text) return
     runtime.pasteFromText(text)
@@ -451,11 +473,131 @@ export function BstTable({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [handle.enableResponsive, handle.fitColumns, utilityWidth, columnOrderKey])
 
+  // ── Virtualization (D1) ────────────────────────────────────────────────────
+  // Render only the rows (and, with column virtualization, columns) inside the
+  // scroll viewport. Opt-in; a few features whose DOM shape a windowed body can't
+  // represent make it yield (render un-windowed) rather than corrupt the layout.
+  const virt = handle.virtualization
+  const bypassReason = virt.enabled ? virtualizationBypassReason(handle) : null
+  const rowVirtActive = virt.enabled && !bypassReason
+  React.useEffect(() => {
+    if (virt.enabled && bypassReason && typeof console !== 'undefined') {
+      console.warn(
+        `[bst-table] Virtualization is off because ${bypassReason} is active — that feature needs the full row model in the DOM. Turn it off to virtualize.`,
+      )
+    }
+  }, [virt.enabled, bypassReason])
+
+  const visibleLeaf = table.getVisibleLeafColumns() as any[]
+  // Column virtualization only where header ↔ body ↔ filter columns stay aligned:
+  // a single (flat) header group, no pinning/fit (which reorder or fix widths).
+  const colVirtActive =
+    rowVirtActive &&
+    virt.columns &&
+    (table.getHeaderGroups() as any[]).length === 1 &&
+    !handle.fitColumns &&
+    !handle.enableColumnPinning
+
+  // Hooks run every render (never conditional); `count: 0` makes them inert for a
+  // non-virtualized grid — virtual-core no-ops without a scroll element / RO.
+  const rowVirtualizer = useVirtualizer({
+    count: rowVirtActive ? bodyRows.length : 0,
+    // Null when inactive → virtual-core observes nothing, so a non-virtualized
+    // grid creates no ResizeObserver (and can't perturb other RO consumers).
+    getScrollElement: () => (rowVirtActive ? scrollRef.current : null),
+    estimateSize: () => virt.estimateRowSize,
+    overscan: virt.overscan,
+    getItemKey: (i) => (bodyRows[i]?.id as string) ?? i,
+    measureElement:
+      typeof window !== 'undefined'
+        ? (el) => (el as HTMLElement).getBoundingClientRect().height
+        : undefined,
+  })
+  const colVirtualizer = useVirtualizer({
+    horizontal: true,
+    count: colVirtActive ? visibleLeaf.length : 0,
+    getScrollElement: () => (colVirtActive ? scrollRef.current : null),
+    estimateSize: (i) =>
+      widthOf(visibleLeaf[i]?.id, visibleLeaf[i]?.getSize?.() as number) ?? virt.estimateColumnSize,
+    overscan: virt.overscan,
+    getItemKey: (i) => (visibleLeaf[i]?.id as string) ?? i,
+  })
+
+  const rowItems = rowVirtActive ? rowVirtualizer.getVirtualItems() : []
+  const rowsToRender: Array<{ row: any; rowIndex: number; vIndex?: number }> = rowVirtActive
+    ? rowItems.map((vi) => ({ row: bodyRows[vi.index], rowIndex: vi.index, vIndex: vi.index }))
+    : bodyRows.map((row, rowIndex) => ({ row, rowIndex }))
+  const rowPadTop = rowVirtActive && rowItems.length ? rowItems[0].start : 0
+  const rowPadBottom =
+    rowVirtActive && rowItems.length
+      ? rowVirtualizer.getTotalSize() - rowItems[rowItems.length - 1].end
+      : 0
+
+  const colItems = colVirtActive ? colVirtualizer.getVirtualItems() : []
+  const colWindow =
+    colVirtActive && colItems.length
+      ? {
+          indices: colItems.map((c) => c.index),
+          leftPad: colItems[0].start,
+          rightPad: colVirtualizer.getTotalSize() - colItems[colItems.length - 1].end,
+        }
+      : null
+
+  // Wrap a header/filter/body column row: render all columns, or (column virt)
+  // a real spacer <th>/<td> + the windowed columns + a trailing spacer, so a
+  // fixed-layout table keeps header ↔ body alignment.
+  const windowCols = <T,>(
+    items: T[],
+    render: (item: T, idx: number) => React.ReactNode,
+    tag: 'th' | 'td',
+  ): React.ReactNode => {
+    if (!colWindow) return items.map(render)
+    const spacer = (key: string, w: number) => {
+      if (w <= 0) return null
+      const p: any = { key, className: 'bst-virtual-colspacer', style: { width: w }, 'aria-hidden': true }
+      return tag === 'th' ? <th {...p} /> : <td {...p} />
+    }
+    return (
+      <>
+        {spacer('__lpad', colWindow.leftPad)}
+        {colWindow.indices.map((i) => render(items[i], i))}
+        {spacer('__rpad', colWindow.rightPad)}
+      </>
+    )
+  }
+
+  // A2 infinite scroll — fire once when the last rendered row is within
+  // `endReachedThreshold` of the end; re-arm after the user scrolls back up.
+  const endThreshold = handle.endReachedThreshold ?? 8
+  const lastFiredRef = React.useRef(-1)
+  const lastVisibleIndex = rowItems.length ? rowItems[rowItems.length - 1].index : -1
+  React.useEffect(() => {
+    if (!rowVirtActive || !handle.onReachEnd || bodyRows.length === 0) return
+    if (lastVisibleIndex >= bodyRows.length - endThreshold) {
+      if (lastFiredRef.current !== bodyRows.length) {
+        lastFiredRef.current = bodyRows.length
+        handle.onReachEnd()
+      }
+    } else if (lastVisibleIndex >= 0 && lastVisibleIndex < bodyRows.length - endThreshold - 1) {
+      lastFiredRef.current = -1
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rowVirtActive, lastVisibleIndex, bodyRows.length, endThreshold])
+
+  // Keep keyboard-nav's active cell rendered: scroll its row into the window.
+  const activeRowId = useStoreSelector(runtime.store, (s) => s.activeCell?.rowId ?? null)
+  React.useEffect(() => {
+    if (!rowVirtActive || !activeRowId) return
+    const idx = bodyRows.findIndex((r) => (r.id as string) === activeRowId)
+    if (idx >= 0) rowVirtualizer.scrollToIndex(idx, { align: 'auto' })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rowVirtActive, activeRowId])
+
   return (
     <BstIconsContext.Provider value={I}>
     <div
       ref={scrollRef}
-      className={cx('bst-table-scroll', className, classNames?.root)}
+      className={cx('bst-table-scroll', rowVirtActive && 'bst-virtualized', className, classNames?.root)}
       style={{ ...(handle.fitColumns ? { overflowX: 'hidden' as const } : null), ...styles?.root }}
     >
       <table
@@ -506,7 +648,7 @@ export function BstTable({
                   aria-label="Pin"
                 />
               ) : null}
-              {hg.headers.map((header: any) => {
+              {windowCols(hg.headers, (header: any) => {
                 const col = header.column
                 const canSort = col.getCanSort?.()
                 const sorted = col.getIsSorted?.()
@@ -554,6 +696,18 @@ export function BstTable({
                         'bst-table-th-content' + (canSort ? ' bst-table-sortable' : '')
                       }
                       onClick={canSort ? col.getToggleSortingHandler?.() : undefined}
+                      onKeyDown={
+                        canSort
+                          ? (e) => {
+                              // A role="button" control must also toggle on
+                              // Enter/Space, not just click (WCAG 2.1.1 — #19).
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault()
+                                col.getToggleSortingHandler?.()?.(e)
+                              }
+                            }
+                          : undefined
+                      }
                       role={canSort ? 'button' : undefined}
                       tabIndex={canSort ? 0 : undefined}
                       draggable={canReorder || undefined}
@@ -604,7 +758,7 @@ export function BstTable({
                     )}
                   </th>
                 )
-              })}
+              }, 'th')}
             </tr>
           ))}
           {handle.enableColumnFilterRow && (
@@ -640,24 +794,41 @@ export function BstTable({
                   style={handle.enableColumnPinning ? { left: pinColLeft } : undefined}
                 />
               ) : null}
-              {table.getVisibleLeafColumns().map((col: any) => {
-                const pinnedLeft = col.getIsPinned?.() === 'start'
-                const pinLeft = pinnedLeft ? (pinLeftById.get(col.id) ?? 0) : 0
-                return (
-                  <th
-                    key={col.id}
-                    className={'bst-colfilter-th' + (pinnedLeft ? ' bst-pinned-left' : '')}
-                    style={{ width: widthOf(col.id, col.getSize?.()), ...(pinnedLeft ? { left: pinLeft } : {}) }}
-                  >
-                    <ColumnFilterCell column={col} />
-                  </th>
-                )
-              })}
+              {windowCols(
+                table.getVisibleLeafColumns() as any[],
+                (col: any) => {
+                  const pinnedLeft = col.getIsPinned?.() === 'start'
+                  const pinLeft = pinnedLeft ? (pinLeftById.get(col.id) ?? 0) : 0
+                  return (
+                    <th
+                      key={col.id}
+                      className={'bst-colfilter-th' + (pinnedLeft ? ' bst-pinned-left' : '')}
+                      style={{ width: widthOf(col.id, col.getSize?.()), ...(pinnedLeft ? { left: pinLeft } : {}) }}
+                    >
+                      <ColumnFilterCell column={col} />
+                    </th>
+                  )
+                },
+                'th',
+              )}
             </tr>
           )}
         </thead>
         <tbody className={classNames?.body} style={styles?.body}>
-          {bodyRows.map((row: any, rowIndex: number) => {
+          {rowVirtActive && rowPadTop > 0 && (
+            <tr className="bst-virtual-spacer" aria-hidden="true">
+              <td
+                colSpan={
+                  visibleCount +
+                  (handle.enableRowSelection ? 1 : 0) +
+                  (handle.enableExpanding ? 1 : 0) +
+                  (handle.enableRowPinning ? 1 : 0)
+                }
+                style={{ height: rowPadTop, padding: 0, border: 0 }}
+              />
+            </tr>
+          )}
+          {rowsToRender.map(({ row, rowIndex, vIndex }: { row: any; rowIndex: number; vIndex?: number }) => {
             // Grouping (E4) — a grouped row renders a collapsible header with
             // aggregates instead of the normal leaf-cell layout.
             if (handle.enableGrouping && row.getIsGrouped?.()) {
@@ -696,6 +867,8 @@ export function BstTable({
             return (
               <React.Fragment key={row.id}>
                 <tr
+                  ref={vIndex != null ? rowVirtualizer.measureElement : undefined}
+                  data-index={vIndex}
                   className={cx(
                     'bst-table-tr',
                     handle.enableRowSelection && row.getIsSelected() && 'bst-row-selected',
@@ -790,7 +963,9 @@ export function BstTable({
               ) : null}
               {(() => {
                 const cells = row.getVisibleCells() as any[]
-                return cells.map((cell: any, cellIdx: number) => {
+                return windowCols(
+                  cells,
+                  (cell: any, cellIdx: number) => {
                   const col = cell.column
                   // Cell spanning — a covered cell renders nothing; an origin cell
                   // carries its colSpan/rowSpan and (for colSpan) the summed width.
@@ -825,13 +1000,28 @@ export function BstTable({
                       onRowResizeReset={handle.enableRowResize ? onRowResizeReset : undefined}
                     />
                   )
-                })
+                  },
+                  'td',
+                )
               })()}
                 </tr>
                 {detailRow}
               </React.Fragment>
             )
           })}
+          {rowVirtActive && rowPadBottom > 0 && (
+            <tr className="bst-virtual-spacer" aria-hidden="true">
+              <td
+                colSpan={
+                  visibleCount +
+                  (handle.enableRowSelection ? 1 : 0) +
+                  (handle.enableExpanding ? 1 : 0) +
+                  (handle.enableRowPinning ? 1 : 0)
+                }
+                style={{ height: rowPadBottom, padding: 0, border: 0 }}
+              />
+            </tr>
+          )}
           {bodyRows.length === 0 && (
             <tr>
               <td
@@ -1308,8 +1498,17 @@ function CellEditorHost({
     cancel: doCancel,
   }
 
+  // A row/batch session always stores the in-progress draft on Enter/blur (the
+  // real persist is deferred to Save/commitAll); a plain cell edit auto-persists
+  // only on the triggers the consumer opted into via `saveOn`. Previously both
+  // triggers were hardcoded, so `saveOn: 'explicit'` could not suppress the blur
+  // commit (#4).
+  const commitsOn = (trigger: 'enter' | 'blur') =>
+    isRowSession || runtime.saveOn.includes(trigger)
+
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !cellType.capturesArrowKeys) {
+      if (!commitsOn('enter')) return
       e.preventDefault()
       doCommit()
     } else if (e.key === 'Escape') {
@@ -1321,6 +1520,7 @@ function CellEditorHost({
   const onBlur = (e: React.FocusEvent) => {
     // Commit only when focus actually leaves this editor wrapper.
     if (e.currentTarget.contains(e.relatedTarget as Node | null)) return
+    if (!commitsOn('blur')) return
     doCommit()
   }
 

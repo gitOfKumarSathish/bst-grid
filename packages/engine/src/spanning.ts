@@ -119,13 +119,41 @@ export function computeCellSpans(
         const colSpan = clampSpan(span.colSpan, nCols - ci)
         const rowSpan = clampSpan(span.rowSpan, nRows - ri)
         if (colSpan === 1 && rowSpan === 1) continue
-        origin.set(k, { colSpan, rowSpan })
+
+        // The cells this block wants to occupy (its footprint minus the origin).
+        const footprint: string[] = []
         for (let dr = 0; dr < rowSpan; dr++) {
           for (let dc = 0; dc < colSpan; dc++) {
             if (dr === 0 && dc === 0) continue
-            covered.add(cellKey(rows[ri + dr].id, cols[ci + dc].id))
+            footprint.push(cellKey(rows[ri + dr].id, cols[ci + dc].id))
           }
         }
+
+        // A pass-1 group block may already be anchored at this exact origin; the
+        // explicit span replaces it (explicit wins for a given origin), so those
+        // covered cells are ours to reclaim — but no others'.
+        const prev = origin.get(k)
+        const ownCovered = new Set<string>()
+        if (prev) {
+          for (let dr = 0; dr < prev.rowSpan; dr++) {
+            for (let dc = 0; dc < prev.colSpan; dc++) {
+              if (dr === 0 && dc === 0) continue
+              ownCovered.add(cellKey(rows[ri + dr].id, cols[ci + dc].id))
+            }
+          }
+        }
+
+        // Never double-book: if the footprint would swallow another origin (e.g. a
+        // group merge) or a cell already covered by a DIFFERENT block, refuse the
+        // span rather than render the row one <td> short (#24).
+        const collides = footprint.some(
+          (fk) => origin.has(fk) || (covered.has(fk) && !ownCovered.has(fk)),
+        )
+        if (collides) continue
+
+        for (const oc of ownCovered) covered.delete(oc)
+        origin.set(k, { colSpan, rowSpan })
+        for (const fk of footprint) covered.add(fk)
       }
     }
   }

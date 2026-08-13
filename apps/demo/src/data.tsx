@@ -1,4 +1,5 @@
 import type { BstTableColumn, FieldError } from '@bloomskill/table-engine'
+import { verhoeffChecksum, gstinCheckDigit } from '@bloomskill/table-engine'
 
 export type Person = {
   id: string
@@ -247,6 +248,82 @@ export const serverPeople: Person[] = Array.from({ length: 2000 }, (_, i) => {
     active: i % 3 !== 0,
     joined: `20${18 + (i % 8)}-0${1 + (i % 9)}-15`,
   }
+})
+
+/**
+ * ERP field formats (B1/B2) — a vendor-KYC grid whose text/number cells carry a
+ * `cellMeta.pattern` preset (Aadhaar, PAN, GSTIN, IFSC, …). Seed values are built
+ * VALID via the exported checksum helpers so the grid loads clean; edit a cell to
+ * an invalid value to see the format's validation + message.
+ */
+export type ErpVendor = {
+  id: string
+  name: string
+  pan: string
+  aadhaar: number | null
+  gstin: string
+  ifsc: string
+  email: string
+  phone: string
+  pincode: string
+  passport: string
+  pf: string
+  esic: string
+  iban: string
+  swift: string
+  card: string
+}
+const aadhaarOf = (body11: string) => Number(body11 + verhoeffChecksum(body11))
+const gstinOf = (first14: string) => first14 + gstinCheckDigit(first14)
+export const erpVendors: ErpVendor[] = [
+  { id: 'v1', name: 'Acme Traders', pan: 'AAPFU0939F', aadhaar: aadhaarOf('23456789012'), gstin: gstinOf('27AAPFU0939F1Z'), ifsc: 'HDFC0001234', email: 'accounts@acme.io', phone: '9876543210', pincode: '560001', passport: 'A1234567', pf: '100234567890', esic: '31001234567890123', iban: 'DE89370400440532013000', swift: 'DEUTDEFF', card: '4111111111111111' },
+  { id: 'v2', name: 'Bharat Supplies', pan: 'BCDPK1432M', aadhaar: aadhaarOf('34567890121'), gstin: gstinOf('29BCDPK1432M1Z'), ifsc: 'ICIC0004567', email: 'gst@bharat.co', phone: '9812345678', pincode: '110001', passport: 'B7654321', pf: '100987654321', esic: '51009876543210987', iban: 'GB29NWBK60161331926819', swift: 'NWBKGB2L', card: '5500005555555559' },
+  { id: 'v3', name: 'Chetan Exports', pan: 'CFGHJ7654P', aadhaar: aadhaarOf('45678901219'), gstin: gstinOf('24CFGHJ7654P1Z'), ifsc: 'SBIN0011223', email: 'exports@chetan.in', phone: '9700011122', pincode: '400001', passport: 'C1122334', pf: '100112233445', esic: '41005566778899001', iban: 'FR1420041010050500013M02606', swift: 'BNPAFRPP', card: '4012888888881881' },
+]
+export const erpColumns: BstTableColumn<ErpVendor>[] = [
+  { id: 'name', accessorKey: 'name', header: 'Vendor', size: 150, meta: { type: 'text', editable: true, cellMeta: { required: true } } },
+  { id: 'pan', accessorKey: 'pan', header: 'PAN', size: 120, meta: { type: 'text', editable: true, cellMeta: { pattern: 'pan', required: true } } },
+  { id: 'aadhaar', accessorKey: 'aadhaar', header: 'Aadhaar', size: 160, meta: { type: 'number', editable: true, align: 'left', cellMeta: { pattern: 'aadhaar' } } },
+  { id: 'gstin', accessorKey: 'gstin', header: 'GSTIN', size: 170, meta: { type: 'text', editable: true, cellMeta: { pattern: 'gstin' } } },
+  { id: 'ifsc', accessorKey: 'ifsc', header: 'IFSC', size: 130, meta: { type: 'text', editable: true, cellMeta: { pattern: 'ifsc' } } },
+  { id: 'email', accessorKey: 'email', header: 'Email', size: 190, meta: { type: 'text', editable: true, cellMeta: { pattern: 'email' } } },
+  { id: 'phone', accessorKey: 'phone', header: 'Mobile', size: 130, meta: { type: 'text', editable: true, cellMeta: { pattern: 'phone' } } },
+  { id: 'pincode', accessorKey: 'pincode', header: 'PIN', size: 90, meta: { type: 'text', editable: true, cellMeta: { pattern: 'pincode' } } },
+  { id: 'passport', accessorKey: 'passport', header: 'Passport', size: 120, meta: { type: 'text', editable: true, cellMeta: { pattern: 'passport' } } },
+  { id: 'pf', accessorKey: 'pf', header: 'PF UAN', size: 140, meta: { type: 'text', editable: true, cellMeta: { pattern: 'pf' } } },
+  { id: 'esic', accessorKey: 'esic', header: 'ESIC', size: 170, meta: { type: 'text', editable: true, cellMeta: { pattern: 'esic' } } },
+  { id: 'iban', accessorKey: 'iban', header: 'IBAN', size: 240, meta: { type: 'text', editable: true, cellMeta: { pattern: 'iban' } } },
+  { id: 'swift', accessorKey: 'swift', header: 'SWIFT', size: 120, meta: { type: 'text', editable: true, cellMeta: { pattern: 'swift' } } },
+  { id: 'card', accessorKey: 'card', header: 'Card', size: 170, meta: { type: 'text', editable: true, cellMeta: { pattern: 'creditCard' } } },
+]
+
+/**
+ * Virtualization (D1) — a big, WIDE dataset (20,000 rows × 42 columns). With
+ * `enableVirtualization` + `enableColumnVirtualization` the grid keeps only the
+ * rows and columns inside the viewport in the DOM, so it scrolls at 60fps and the
+ * DOM node count stays bounded no matter how large the data grows.
+ */
+export type WideRow = { id: string; name: string; city: string } & Record<string, number>
+const VIRTUAL_CITIES = ['London', 'Paris', 'Tokyo', 'Berlin', 'Mumbai', 'Austin', 'Oslo', 'Lima']
+export const wideVirtualColumns: BstTableColumn<WideRow>[] = [
+  { id: 'name', accessorKey: 'name', header: 'Name', size: 160, meta: { type: 'text' } },
+  { id: 'city', accessorKey: 'city', header: 'City', size: 130, meta: { type: 'text' } },
+  ...Array.from({ length: 40 }, (_, c) => ({
+    id: `m${c}`,
+    accessorKey: `m${c}`,
+    header: `Metric ${c + 1}`,
+    size: 110,
+    meta: { type: 'number' as const, align: 'right' as const },
+  })),
+]
+export const wideVirtualRows: WideRow[] = Array.from({ length: 20000 }, (_, i) => {
+  const row = {
+    id: `w${i}`,
+    name: `${SERVER_FIRST[i % SERVER_FIRST.length]} ${i + 1}`,
+    city: VIRTUAL_CITIES[i % VIRTUAL_CITIES.length],
+  } as WideRow
+  for (let c = 0; c < 40; c++) row[`m${c}`] = (i * (c + 3)) % 1000
+  return row
 })
 
 /** Read-oriented column subset for the server-driven grid (sortable + filterable). */

@@ -16,6 +16,8 @@ import type { BstRuntime, CommitPolicy, RuntimeCtx, SaveTrigger } from './runtim
 import { createDefaultRegistry } from './registry/defaults.js'
 import type { CellTypeRegistry } from './registry/registry.js'
 import type { BstColumnMeta } from './registry/types.js'
+import { resolveVirtualization } from './virtualization.js'
+import type { ResolvedVirtualization } from './virtualization.js'
 
 const DEFAULT_PAGE_SIZE = 10
 
@@ -76,6 +78,12 @@ export interface BstRuntimeHandle<TData extends RowData> {
   fitColumns: boolean
   /** Responsive column hiding (G4) — hide low-priority columns when narrow. */
   enableResponsive: boolean
+  /** Row virtualization (D1) — render only the viewport's rows. Resolved config. */
+  virtualization: ResolvedVirtualization
+  /** A2 infinite scroll — fired once when the virtualized body nears its end. */
+  onReachEnd?: () => void
+  /** Rows-from-end that trigger `onReachEnd`. Default 8. */
+  endReachedThreshold?: number
 }
 
 /** Column ids whose column def carries a user-authored `cell` renderer. */
@@ -339,6 +347,9 @@ export function useBstTable<TData extends RowData>(opts: UseBstTableOptions<TDat
       opts.enableConditionalFormatting !== false ? opts.conditionalFormats : undefined,
     fitColumns: !!opts.fitColumns,
     enableResponsive: !!opts.enableResponsive,
+    virtualization: resolveVirtualization(opts.enableVirtualization, opts.enableColumnVirtualization),
+    onReachEnd: opts.onReachEnd,
+    endReachedThreshold: opts.endReachedThreshold,
   }
   ;(table as unknown as Record<symbol, unknown>)[BST_RUNTIME] = handle
 

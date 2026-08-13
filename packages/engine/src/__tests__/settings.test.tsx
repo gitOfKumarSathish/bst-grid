@@ -85,7 +85,14 @@ const NEWER_LABELS = [
 
 // Always visible in the sheet (alwaysShow) so a user can enable them from settings —
 // they don't wait to be provisioned by the developer.
-const ALWAYS_VISIBLE_OPT_INS = ['Row grouping', 'Copy column', 'Copy row', 'Per-column filter row']
+const ALWAYS_VISIBLE_OPT_INS = [
+  'Row grouping',
+  'Copy column',
+  'Copy row',
+  'Per-column filter row',
+  'Row virtualization',
+  'Column virtualization',
+]
 // The remaining opt-in newer features that appear only once provisioned.
 const HIDDEN_UNTIL_PROVISIONED = NEWER_LABELS.filter((l) => !ALWAYS_VISIBLE_OPT_INS.includes(l))
 
@@ -199,6 +206,15 @@ describe('useBstSettings — newer features (added after the sheet shipped)', ()
     render(<LabelsFor data={data} columns={columns} />)
     const labels = txt('labels') || ''
     for (const l of ALWAYS_VISIBLE_OPT_INS) expect(labels).toContain(l)
+  })
+
+  test('virtualization (D1) is discoverable — a Performance group, shown even unprovisioned', () => {
+    // The user's escape hatch for a slow/large grid: turn virtualization on from
+    // the settings sheet without any developer wiring.
+    render(<LabelsFor data={data} columns={columns} />)
+    expect(txt('groups')).toContain('Performance')
+    expect(txt('labels')).toContain('Row virtualization')
+    expect(txt('labels')).toContain('Column virtualization')
   })
 
   test('conditional formatting is always offered (default on), rules or not', () => {

@@ -1,10 +1,19 @@
 import * as React from 'react'
-import type { BstCellApi, BstColumnMeta, BstOption, CellEditProps, CellType } from './types.js'
+import type {
+  BstCellApi,
+  BstColumnMeta,
+  BstOption,
+  CellEditProps,
+  CellType,
+  FieldError,
+} from './types.js'
 import { createCellTypeRegistry, defineCellType } from './registry.js'
 import type { CellTypeRegistry } from './registry.js'
 import { useBstIcons } from '../icons.js'
 import type { BstIcons } from '../icons.js'
 import { qrCellType, barcodeCellType, richTextCellType } from '../cells/celltypes.js'
+import { resolveFieldFormat } from '../cells/formats.js'
+import type { FieldFormat } from '../cells/formats.js'
 
 /* ------------------------------------------------------------------ helpers */
 
@@ -225,26 +234,58 @@ function BooleanCell({ value }: { value: unknown }) {
 
 /* --------------------------------------------------------------- cell types */
 
+/* ------------------------------------------ field formats (ERP presets, B1/B2) */
+
+/** Resolve the `cellMeta.pattern` (name / RegExp / object) for a column, if any. */
+function cellFormat(meta: BstColumnMeta): FieldFormat | null {
+  const cm = (meta.cellMeta ?? {}) as Record<string, unknown>
+  if (cm.pattern == null) return null
+  return resolveFieldFormat(cm.pattern, cm.patternMessage as string | undefined)
+}
+
+/** Format-preset validation → `FieldError[]`. Empty values are the `required`
+ *  check's concern, so they pass here. Shared by `text` + `number`. */
+function patternErrors(value: unknown, meta: BstColumnMeta): FieldError[] {
+  const fmt = cellFormat(meta)
+  if (!fmt?.validate || value == null || value === '') return []
+  const msg = fmt.validate(String(value))
+  return msg ? [{ level: 'error', message: msg, code: 'pattern' }] : []
+}
+
+/** Masked display for a patterned value, else `fallback`. */
+function patternDisplay(value: unknown, meta: BstColumnMeta, fallback: string): string {
+  const fmt = cellFormat(meta)
+  if (!fmt || value == null || value === '') return fallback
+  const s = String(value)
+  return fmt.mask ? fmt.mask(s) : s
+}
+
 export const textCellType: CellType<string> = defineCellType<string>({
   id: 'text',
-  renderRead: ({ value }) => {
-    const s = asString(value)
+  renderRead: ({ value, meta }) => {
+    const s = patternDisplay(value, meta, asString(value))
     return (
       <span className="bst-cell-text" title={s || undefined}>
         {s}
       </span>
     )
   },
-  renderEdit: ({ draft, setDraft, autoFocus, meta }) => (
-    <input
-      className="bst-input"
-      autoFocus={autoFocus}
-      value={asString(draft)}
-      placeholder={meta.placeholder}
-      onChange={(e) => setDraft(e.target.value)}
-    />
-  ),
-  format: (v) => asString(v),
+  renderEdit: ({ draft, setDraft, autoFocus, meta }) => {
+    const fmt = cellFormat(meta)
+    return (
+      <input
+        className="bst-input"
+        autoFocus={autoFocus}
+        value={asString(draft)}
+        placeholder={fmt?.placeholder ?? meta.placeholder}
+        inputMode={fmt?.inputMode}
+        maxLength={fmt?.maxLength}
+        onChange={(e) => setDraft(fmt?.normalize ? fmt.normalize(e.target.value) : e.target.value)}
+      />
+    )
+  },
+  validate: (value, ctx) => patternErrors(value, ctx.meta),
+  format: (v, meta) => patternDisplay(v, meta as BstColumnMeta, asString(v)),
   parse: (raw) => raw,
   isEmpty: (v) => v == null || String(v).trim() === '',
 })
@@ -281,19 +322,47 @@ export const longTextCellType: CellType<string> = defineCellType<string>({
 export const numberCellType: CellType<number | null> = defineCellType<number | null>({
   id: 'number',
   renderRead: ({ value, meta }) => (
-    <span className="bst-cell-number">{numberFormat(value, meta)}</span>
+    // A field-format pattern (e.g. Aadhaar) masks its own display, bypassing the
+    // Intl numeric formatting (which would add thousands separators to an id).
+    <span className="bst-cell-number">{patternDisplay(value, meta, numberFormat(value, meta))}</span>
   ),
-  renderEdit: ({ draft, setDraft, autoFocus, meta }) => (
-    <input
-      className="bst-input bst-input-number"
-      type="number"
-      autoFocus={autoFocus}
-      value={draft == null ? '' : String(draft)}
-      placeholder={meta.placeholder}
-      onChange={(e) => setDraft(e.target.value === '' ? null : Number(e.target.value))}
-    />
-  ),
-  format: (v, meta) => numberFormat(v, meta),
+  renderEdit: ({ draft, setDraft, autoFocus, meta }) => {
+    const fmt = cellFormat(meta)
+    if (fmt) {
+      // Patterned numeric id (Aadhaar / PIN …): a normalized text input (digits
+      // only, capped) that stores a number; the mask is applied on read.
+      return (
+        <input
+          className="bst-input bst-input-number"
+          autoFocus={autoFocus}
+          value={draft == null ? '' : String(draft)}
+          placeholder={fmt.placeholder ?? meta.placeholder}
+          inputMode={fmt.inputMode ?? 'numeric'}
+          maxLength={fmt.maxLength}
+          onChange={(e) => {
+            const norm = fmt.normalize ? fmt.normalize(e.target.value) : e.target.value
+            if (norm === '') return setDraft(null)
+            const n = Number(norm)
+            // Numeric patterns (aadhaar/pincode) normalize to digits → always valid;
+            // a non-numeric normalize (misconfigured pattern) is ignored.
+            setDraft(Number.isNaN(n) ? null : n)
+          }}
+        />
+      )
+    }
+    return (
+      <input
+        className="bst-input bst-input-number"
+        type="number"
+        autoFocus={autoFocus}
+        value={draft == null ? '' : String(draft)}
+        placeholder={meta.placeholder}
+        onChange={(e) => setDraft(e.target.value === '' ? null : Number(e.target.value))}
+      />
+    )
+  },
+  validate: (value, ctx) => patternErrors(value, ctx.meta),
+  format: (v, meta) => patternDisplay(v, meta, numberFormat(v, meta)),
   parse: (raw) => parseNumber(raw),
   isEmpty: (v) => v == null,
 })

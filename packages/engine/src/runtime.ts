@@ -154,6 +154,9 @@ export interface BstRuntime<TData extends RowData> {
   reset: () => void
 
   // ---- editing ----
+  /** Resolved save triggers (`enter`/`blur`/`explicit`). The inline editor
+   *  consults these before auto-committing on Enter or blur. */
+  saveOn: SaveTrigger[]
   startEditing: (rowId: string, columnId: string) => void
   cancelEditing: () => void
   setDraft: (rowId: string, columnId: string, value: unknown) => void
@@ -1250,5 +1253,6 @@ export function createRuntime<TData extends RowData>(
     deleteRow,
     duplicateRow,
     buildCellApi,
+    saveOn: ctx.saveOn,
   }
 }

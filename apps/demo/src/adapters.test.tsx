@@ -7,8 +7,8 @@ import { BstTableMui } from '@bloomskill/table-mui'
 import { BstTableShadcn } from '@bloomskill/table-shadcn'
 import {
   people, columns, dbTables, dbTableColumns, dbFieldColumns,
-  serverPeople, serverColumns,
-  type DbTable, type DbField, type Person,
+  serverPeople, serverColumns, erpVendors, erpColumns,
+  type DbTable, type DbField, type Person, type ErpVendor,
 } from './data'
 
 afterEach(cleanup)
@@ -196,5 +196,27 @@ describe('Server DataSource (Plan.md §5) drives the grid in manual mode', () =>
     // Toggle to the other direction → the opposite extreme leads.
     fireEvent.click(within(u.container).getByText('Salary'))
     await waitFor(() => expect(salaryOf()).toBe(afterFirst === max ? min : max))
+  })
+})
+
+// ERP field formats (B1/B2) — the demo's KYC grid through the MUI adapter: a
+// patterned cell masks its display (Aadhaar grouped, PAN upper-cased).
+describe('ERP field formats (cellMeta.pattern) through the MUI adapter', () => {
+  test('Aadhaar (number) renders masked; PAN (text) renders upper-cased', () => {
+    const u = render(
+      <ThemeProvider theme={createTheme()}>
+        <BstTableMui<ErpVendor>
+          data={erpVendors}
+          columns={erpColumns}
+          getRowId={(r) => r.id}
+          pagination={false}
+          showSearch={false}
+        />
+      </ThemeProvider>,
+    )
+    // Aadhaar masked as "#### #### ####"
+    expect(u.container.textContent).toMatch(/\d{4} \d{4} \d{4}/)
+    // PAN shown upper-cased
+    expect(within(u.container).getByText('AAPFU0939F')).toBeInTheDocument()
   })
 })

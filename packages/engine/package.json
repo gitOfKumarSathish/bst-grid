@@ -36,7 +36,8 @@
     "react-dom": ">=18"
   },
   "dependencies": {
-    "@tanstack/react-table": "^9.1.2"
+    "@tanstack/react-table": "^9.1.2",
+    "@tanstack/react-virtual": "^3.13.0"
   },
   "license": "MIT",
   "publishConfig": {

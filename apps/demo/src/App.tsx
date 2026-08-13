@@ -6,6 +6,7 @@ import { lucideIcons } from '@bloomskill/table-shadcn/icons/lucide';
 import {
   BstConditionalFormatBuilder,
   useBstDataSource,
+  useBstInfiniteDataSource,
   createClientDataSource,
 } from '@bloomskill/table-engine';
 import type { BstTableColumn, BstFormatRule } from '@bloomskill/table-engine';
@@ -28,9 +29,15 @@ import {
   dbFieldColumns,
   serverPeople,
   serverColumns,
+  erpVendors,
+  erpColumns,
+  wideVirtualRows,
+  wideVirtualColumns,
   type Person,
   type DbTable,
   type DbField,
+  type ErpVendor,
+  type WideRow,
 } from './data';
 
 const box: React.CSSProperties = {
@@ -121,6 +128,101 @@ const respColumns: BstTableColumn<Person>[] = [
 ];
 
 /**
+ * Virtualization (D1) — row + column windowing. A 20,000 × 42 grid renders only
+ * the cells inside the viewport, so the DOM stays tiny and scrolling is 60fps.
+ * `enableVirtualization` turns on row windowing; `enableColumnVirtualization` adds
+ * horizontal windowing for the 40 metric columns. Everything else (sort, search,
+ * cell selection, clipboard) works unchanged over the full dataset.
+ */
+function VirtualizationSection() {
+  const cellCount = (wideVirtualRows.length * wideVirtualColumns.length).toLocaleString();
+  return (
+    <section>
+      <h3 style={{ margin: '0 0 8px' }}>Virtualization — row + column windowing (D1)</h3>
+      <div style={{ ...box, marginBottom: 8 }}>
+        <b>{wideVirtualRows.length.toLocaleString()} rows × {wideVirtualColumns.length} columns</b>{' '}
+        ({cellCount} cells) in one client-side grid. <code>enableVirtualization</code> renders only
+        the rows in view; <code>enableColumnVirtualization</code> does the same horizontally — scroll
+        both ways and the DOM node count stays bounded (a few dozen rows, not 20,000). Sorting,
+        search and cell selection still run over the <b>whole</b> dataset. Row heights are measured,
+        so this composes with variable content; it <i>yields</i> (renders un-windowed) if
+        master-detail, grouping, cell spanning or row pinning is on. Open the <b>⚙ settings</b> gear —
+        both virtualization toggles live in a <b>Performance</b> group and are <b>always shown</b>, so
+        an end-user can switch windowing on for any large grid without developer wiring.
+      </div>
+      <BstTableMui<WideRow>
+        title="20k × 42 (virtualized)"
+        columns={wideVirtualColumns}
+        data={wideVirtualRows}
+        getRowId={(r) => r.id}
+        enableVirtualization
+        enableColumnVirtualization
+        enableCellSelection
+        enableClipboard
+        pagination={false}
+        showPagination={false}
+        showSettings={{ persistKey: 'demo-virtual' }}
+      />
+    </section>
+  );
+}
+
+/**
+ * Infinite scroll (A2) — `useBstInfiniteDataSource` fetches one window at a time
+ * from a server `DataSource` and APPENDS as you scroll, instead of paging. Pairs
+ * with `enableVirtualization` (you don't want thousands of appended rows in the
+ * DOM) + `pagination={false}`. Sort / filter still run server-side and reset the
+ * accumulation. Wire `onReachEnd` and the grid fires it as the tail nears.
+ */
+function InfiniteScrollSection() {
+  const source = React.useMemo(
+    () => createClientDataSource(serverPeople, { delayMs: 300 }),
+    [],
+  );
+  const inf = useBstInfiniteDataSource(source, { pageSize: 100 });
+  return (
+    <section>
+      <h3 style={{ margin: '0 0 8px' }}>Infinite scroll — fetch-on-scroll append (A2)</h3>
+      <div style={{ ...box, marginBottom: 8 }}>
+        <code>useBstInfiniteDataSource(source, {'{ pageSize: 100 }'})</code> loads a window at a time
+        from a <b>server query</b> (here a <code>createClientDataSource</code> over{' '}
+        <b>{serverPeople.length.toLocaleString()} rows</b> with 300&nbsp;ms latency) and{' '}
+        <b>appends</b> as you scroll — no pager. Row virtualization keeps the growing list cheap;
+        sorting / filtering re-run server-side and reset the accumulation. Spread{' '}
+        <code>{'{...inf.tableProps}'}</code> and pass <code>onReachEnd={'{inf.fetchNextPage}'}</code>.
+      </div>
+      <div
+        style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8, fontSize: 13, flexWrap: 'wrap' }}
+      >
+        <span
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6, padding: '3px 10px',
+            borderRadius: 999, background: inf.isFetchingNextPage || inf.loading ? '#fef9c3' : '#dcfce7',
+            color: inf.isFetchingNextPage || inf.loading ? '#854d0e' : '#166534', fontWeight: 600,
+          }}
+        >
+          {inf.loading ? 'Loading…' : inf.isFetchingNextPage ? 'Fetching next…' : 'Idle'}
+        </span>
+        <span style={{ opacity: 0.75 }}>
+          Loaded <b>{inf.rows.length.toLocaleString()}</b> of{' '}
+          <b>{inf.totalCount.toLocaleString()}</b> rows{inf.hasNextPage ? ' — scroll for more' : ' — all loaded'}
+        </span>
+      </div>
+      <BstTableMui<Person>
+        title="Registers (infinite)"
+        columns={serverColumns}
+        getRowId={(r) => r.id}
+        enableVirtualization
+        pagination={false}
+        showPagination={false}
+        onReachEnd={inf.fetchNextPage}
+        {...inf.tableProps}
+      />
+    </section>
+  );
+}
+
+/**
  * Server DataSource (Plan.md §5) — the grid runs in TanStack **manual mode**:
  * sorting / filtering / paging happen in the source, and the grid renders exactly
  * the page it is handed. `useBstDataSource` owns the query state and returns
@@ -191,6 +293,43 @@ function ServerDataSourceSection() {
         enableColumnFilterRow
         pageSizeOptions={[10, 25, 50]}
         {...ds.tableProps}
+      />
+    </section>
+  );
+}
+
+/**
+ * ERP field formats (B1/B2) — Frappe-style validation + input masks on plain
+ * `text` / `number` cells via `cellMeta.pattern` (Aadhaar, PAN, GSTIN, IFSC, …).
+ */
+function ErpFormatsSection() {
+  const [rows, setRows] = React.useState<ErpVendor[]>(erpVendors);
+  return (
+    <section>
+      <h3 style={{ margin: '0 0 8px' }}>ERP field formats — Aadhaar · PAN · GSTIN · IFSC · … (B1/B2)</h3>
+      <div style={{ ...box, marginBottom: 8 }}>
+        Frappe-style <b>field formats</b> on a plain <code>text</code> / <code>number</code> cell via{' '}
+        <code>cellMeta.pattern</code>: each preset brings its own <b>validation</b> (with real
+        checksums — Aadhaar's <i>Verhoeff</i>, GSTIN's mod-36), an <b>input mask</b> and a{' '}
+        <b>normalizer</b>. Double-click a cell and type an invalid value — a bad <b>PAN</b>,{' '}
+        <b>Aadhaar</b> or <b>GSTIN</b> — to see it blocked with a message; valid values are masked on
+        read (Aadhaar → <code>1234 5678 9012</code>, PAN upper-cased, IBAN/Card grouped). Built-ins:{' '}
+        <code>aadhaar · pan · gstin · tan · ifsc · email · phone · pincode · url · upi · passport ·
+        iec · esic · pf · iban · swift · creditCard</code> — with real checksums for Aadhaar
+        (Verhoeff), GSTIN (mod-36), <b>IBAN</b> (mod-97) and <b>Card</b> (Luhn). Add your own with{' '}
+        <code>defineFieldFormat</code> or a <code>RegExp</code>. Scroll right for the banking &amp;
+        statutory columns.
+      </div>
+      <BstTableMui<ErpVendor>
+        title="Vendors (KYC)"
+        data={rows}
+        columns={erpColumns}
+        getRowId={(r) => r.id}
+        enableEditing
+        enableValidation
+        onDataChange={setRows}
+        pagination={false}
+        showSearch={false}
       />
     </section>
   );
@@ -676,6 +815,12 @@ export default function App() {
             />
           </div>
         </section>
+
+        <ErpFormatsSection />
+
+        <VirtualizationSection />
+
+        <InfiniteScrollSection />
 
         <ServerDataSourceSection />
 

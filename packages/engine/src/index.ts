@@ -47,6 +47,21 @@ export type {
   DsColumnFilter,
   DsPagination,
 } from './useBstDataSource.js'
+// ---- infinite scroll (A2 — fetch-on-scroll append over a DataSource) ----
+export { useBstInfiniteDataSource } from './useBstInfiniteDataSource.js'
+export type {
+  UseBstInfiniteDataSourceOptions,
+  BstInfiniteDataSourceResult,
+  BstInfiniteTableProps,
+} from './useBstInfiniteDataSource.js'
+
+// ---- virtualization (D1 — row/column windowing helpers; wiring lives in BstTable) ----
+export { resolveVirtualization, virtualizationBypassReason } from './virtualization.js'
+export type {
+  VirtualizationOptions,
+  ResolvedVirtualization,
+  VirtualizationCompat,
+} from './virtualization.js'
 
 // ---- options / column types ----
 export type {
@@ -128,6 +143,27 @@ export {
 } from './cells/celltypes.js'
 export { qrMatrix } from './cells/qr.js'
 export type { QrMatrix, QrEcLevel } from './cells/qr.js'
+// ---- Field formats (ERP presets: Aadhaar / PAN / GSTIN / IFSC / … via cellMeta.pattern) ----
+export {
+  FIELD_FORMATS,
+  resolveFieldFormat,
+  defineFieldFormat,
+  verhoeffValid,
+  verhoeffChecksum,
+  isValidAadhaar,
+  isValidPan,
+  isValidGstin,
+  gstinCheckDigit,
+  isValidIfsc,
+  isValidPassport,
+  isValidIec,
+  isValidEsic,
+  isValidUan,
+  isValidSwift,
+  isValidIban,
+  luhnValid,
+} from './cells/formats.js'
+export type { FieldFormat, FieldPattern } from './cells/formats.js'
 export { code128 } from './cells/barcode.js'
 export type { BarcodeResult } from './cells/barcode.js'
 export { sanitizeHtml, htmlToText, escapeHtml, isRichTextEmpty } from './cells/richtext.js'

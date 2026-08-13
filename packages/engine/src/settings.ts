@@ -145,6 +145,22 @@ const SETTINGS_META: Record<BstSettingKey, SettingMeta> = {
     hint: 'Toolbar "Formats" button — build rules at runtime (K3)',
   },
   showDensityToggle: { group: 'Display', default: false, label: 'Density toggle' },
+  // Performance (default-off, but always shown so a user can switch virtualization
+  // on themselves for a large grid — like Row grouping)
+  enableVirtualization: {
+    group: 'Performance',
+    default: false,
+    alwaysShow: true,
+    label: 'Row virtualization',
+    hint: 'Render only the visible rows — for large datasets (D1)',
+  },
+  enableColumnVirtualization: {
+    group: 'Performance',
+    default: false,
+    alwaysShow: true,
+    label: 'Column virtualization',
+    hint: 'Also window wide grids horizontally · needs Row virtualization',
+  },
 }
 
 /** Fallback label for a toggle registered without an explicit `label`. */

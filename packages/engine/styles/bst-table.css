@@ -1130,3 +1130,27 @@
   gap: 8px;
   margin-top: 2px;
 }
+
+/* ── Virtualization (D1) ─────────────────────────────────────────────────────
+   With row virtualization on, `.bst-virtualized` is added to the scroll box. It
+   needs a bounded height so it actually scrolls (override via `styles.root` or
+   the `--bst-virtual-max-height` var); the header sticks while the body scrolls;
+   and the spacer row/cells that offset the window carry no chrome. */
+.bst-table-scroll.bst-virtualized {
+  max-height: var(--bst-virtual-max-height, 440px);
+}
+.bst-table-scroll.bst-virtualized thead {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+}
+.bst-virtual-spacer,
+.bst-virtual-spacer > td,
+.bst-virtual-colspacer {
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent;
+}
+.bst-virtual-spacer {
+  pointer-events: none;
+}

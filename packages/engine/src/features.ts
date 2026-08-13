@@ -28,6 +28,7 @@ import {
   sortFn_basic,
   sortFn_alphanumeric,
   sortFn_datetime,
+  sortFn_text,
   filterFn_includesString,
   filterFn_inNumberRange,
   aggregationFn_sum,
@@ -70,6 +71,11 @@ export const bstTableFeatures = tableFeatures({
     basic: sortFn_basic,
     alphanumeric: sortFn_alphanumeric,
     datetime: sortFn_datetime,
+    // v9 auto-resolves plain string columns to the `text` fn; leaving it out of
+    // the registry silently fell them back to `basic`, whose null-vs-string
+    // comparison is inconsistent, so null-containing string columns never sorted
+    // (#5).
+    text: sortFn_text,
   },
   filterFns: {
     includesString: filterFn_includesString,

@@ -5,6 +5,7 @@ import type { CellTypeRegistry } from './registry/registry.js'
 import type { CellRenderProps } from './registry/types.js'
 import type { BstCellSpan, BstSpanContext } from './spanning.js'
 import type { BstFormatRule } from './formatting.js'
+import type { VirtualizationOptions } from './virtualization.js'
 import type { BstSaveEvent, CommitPolicy, SaveTrigger } from './runtime.js'
 
 /** A Bst-Table column definition, pre-bound to the engine's feature set. */
@@ -190,6 +191,24 @@ export interface BstTableEngineToggles {
    * sheet toggles ("Editing" group), so end-users can switch batch mode per table.
    */
   enableBatchEditing?: boolean
+  /**
+   * Row virtualization (D1) — render only the rows inside the scroll viewport
+   * (plus overscan), so a 10k / 1M-row grid stays fast with a bounded DOM. Pass
+   * `true`, or an object to tune it (`{ overscan, estimateRowSize, estimateColumnSize }`
+   * — an object implies enabled, §12). Opt-in. Default false. The scroll box needs
+   * a bounded height — one is applied by default and can be overridden via
+   * `styles.root`. **Yields to** master-detail, grouping, cell spanning and row
+   * pinning (the grid renders un-windowed when one of those is on). Built on
+   * `@tanstack/react-virtual`.
+   */
+  enableVirtualization?: boolean | VirtualizationOptions
+  /**
+   * Column virtualization (D1) — also window the columns horizontally, for very
+   * wide (100+ column) grids. Sub-toggle of `enableVirtualization` (needs it on).
+   * Falls back to rendering all columns when column pinning, `fitColumns`, grouped
+   * headers or cell spanning is active. Default false.
+   */
+  enableColumnVirtualization?: boolean
 }
 
 export interface UseBstTableOptions<TData extends RowData> extends BstTableEngineToggles {
@@ -331,4 +350,14 @@ export interface UseBstTableOptions<TData extends RowData> extends BstTableEngin
   classNames?: BstClassNames<TData>
   /** Inline styles / CSS variables per structural slot (parallels `classNames`). */
   styles?: BstStyles<TData>
+  /**
+   * Fired once when the user scrolls near the end of the (row-virtualized) body —
+   * the hook for A2 infinite scroll / fetch-on-scroll. Wire it to
+   * `useBstInfiniteDataSource(...).fetchNextPage`. No-op unless
+   * `enableVirtualization` is on (it needs the row virtualizer to know the end is
+   * near). Debounced against repeat fires for the same tail.
+   */
+  onReachEnd?: () => void
+  /** How many rows from the end trigger `onReachEnd`. Default 8. */
+  endReachedThreshold?: number
 }
