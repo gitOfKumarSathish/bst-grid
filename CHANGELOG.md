@@ -9,6 +9,8 @@ this project uses [Semantic Versioning](https://semver.org).
 > affected package README(s) **and** bump the version, in the same change.
 
 ## [Unreleased]
+
+## [0.33.0] — 2026-08-13
 ### Added — DataSource file verbs (I3, formal): `uploadFile` / `deleteFile` / `getFileUrl`
 - The **`DataSource` contract** (`@bloomskill/table-engine`) gains three optional file verbs
   (Plan.md §2.2) so file storage can move server-side: **`uploadFile(file, ctx?)`** → a stored
@@ -110,6 +112,42 @@ went live at 0.32.4, and pointed at `docs/mcp-server.md`, which is not in the pu
   pointer, why it's trustworthy: generated-from-source, self-contained). Corrected "three packages"
   → four in the intro, build command, versioning and release notes; portability note now mentions
   the no-repo MCP boot check. Dropped the broken `docs/mcp-server.md` link.
+
+### Fixed — adoption-audit correctness pass (14 defects; `@bloomskill/table-engine` + `@bloomskill/table-shadcn`)
+Defects reproduced against a live 9,568-row register and re-verified against source; each fix ships
+with a regression test (`packages/*/src/__tests__/tier*.test.tsx`). Full tracker in `AUDIT_FIXES.md`.
+
+- **Sorting (`table-engine`)** — the `text` sort fn is now registered, so plain-string columns
+  (which v9 auto-resolves to `text`) no longer fall back to an inconsistent comparator that left
+  null-containing columns unsorted.
+- **Filtering (`table-engine`)** — empty cells (`null` / `''` / whitespace / `[]`) no longer coerce
+  to `0` (the Unix epoch) and silently match `before` / `<` / `<=` or zero-spanning ranges; date
+  `equals` / `between` now compare by **local calendar day** (an "on <day>" filter matched no
+  ISO-timestamp cell before, returning zero rows); a half-filled `between` now filters on the one
+  bound present (open-ended) instead of building a `<= NaN` predicate that emptied the grid to
+  "No rows".
+- **Editing — `saveOn` honored (`table-engine`)** — the inline editor now consults the resolved
+  `saveOn`, so `saveOn: 'explicit'` actually suppresses the blur/Enter auto-commit (it was resolved
+  and documented but never read). `runtime.saveOn` is now exposed.
+- **Editing — row-edit Cancel discards drafts (`table-engine`)** — cancelling a row-edit session now
+  clears its drafts, so a subsequent Save no longer persists the value the user cancelled.
+- **Editing — paste clears the stale draft (`table-engine`)** — `pasteFromText` now clears any
+  pre-existing draft on the target cell (as `commitCell` does), so the pasted value is no longer
+  shadowed by a stale draft and the unsaved-changes counter no longer sticks.
+- **Keyboard trap fixed (`table-engine`)** — the table-level key handler now ignores events that
+  originate in the grid's own form controls (column-filter inputs, `<select>`, an open editor), so
+  Arrow / Home / End / Tab / Ctrl+A / Enter and Ctrl+C/V reach those inputs natively (WCAG 2.1.2).
+- **Sortable headers keyboard-operable (`table-engine`)** — `role="button"` sort headers now toggle
+  on **Enter / Space**, not only click (WCAG 2.1.1).
+- **Cell spanning (`table-engine`)** — the explicit-span planner now pre-scans its footprint and
+  refuses a span that would swallow a group-merge origin, so rows no longer render one `<td>` short
+  with values shifted under the wrong headers.
+- **Settings-sheet focus trap (`table-shadcn`)** — the settings and review-changes slide-overs
+  (`role="dialog" aria-modal`) now move focus into the sheet on open, cycle Tab within it, and
+  restore focus to the opener on close (MUI's `Drawer` already did this natively).
+- **Columns-menu escape hatch (`table-shadcn`)** — the Columns menu now stays available whenever
+  column pinning, ordering or grouping is on (not only when hiding is on), so turning hiding off no
+  longer strands an already-pinned/grouped grid with no UI to undo it.
 
 ## [0.32.4] — 2026-08-13
 ### Added — `@bloomskill/table-mcp`: an MCP server for AI coding agents (new package)

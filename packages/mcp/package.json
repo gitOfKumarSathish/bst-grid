@@ -1,6 +1,6 @@
 {
   "name": "@bloomskill/table-mcp",
-  "version": "0.32.6",
+  "version": "0.33.0",
   "description": "Bst-Table MCP server — gives AI coding agents accurate, version-pinned knowledge of @bloomskill/table-* : docs search, the feature-toggle registry, cell types, config validation and grid scaffolding.",
   "repository": {
     "type": "git",
