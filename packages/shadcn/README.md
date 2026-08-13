@@ -45,6 +45,10 @@ so you can switch skins without changing your data code.
   (sampled `canvas.measureText`, clamped to `minSize`/`maxSize`). Pair `enableResponsive` with
   `meta.responsivePriority` to drop low-priority columns on narrow screens, or use `fitColumns` to
   remove horizontal scrolling entirely.
+- 🚀 **Virtualization + infinite scroll (D1/A2)** — `enableVirtualization` (+ `enableColumnVirtualization`)
+  windows rows/columns so a 20k-row grid stays at 60fps with a bounded DOM; `useBstInfiniteDataSource`
+  + `onReachEnd` append on scroll. Both flow through the adapter unchanged. (Virtualization yields to
+  master-detail / grouping / spanning / row-pinning.)
 - 🎨 **Ships its own CSS — no Tailwind build required.** Just import the stylesheet.
 - ✅ OOTB sorting · search · pagination · column visibility · resizing, with the same
   `enable*` / `show*` toggles as every Bst-Table skin.
@@ -216,6 +220,8 @@ Extends **every** [`useBstTable` option](https://www.npmjs.com/package/@bloomski
 - **Access control** — `disabled` · `rowDisabled` · `cellDisabled`
 - **Cells & styling** — `enableCellSpanning` · `getCellSpan` · `conditionalFormats` ·
   `enableConditionalFormatting` · `classNames` · `styles`
+- **Performance** — `enableVirtualization` · `enableColumnVirtualization` · `onReachEnd` ·
+  `endReachedThreshold` (large-data windowing + A2 infinite scroll)
 - **Server mode** — `manualSorting` / `manualFiltering` / `manualPagination` / `manualGrouping` ·
   `rowCount` / `pageCount` · `autoResetPageIndex` · `state` · `on*Change` (spread
   `useBstDataSource(...).tableProps` straight in)

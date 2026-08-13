@@ -9,6 +9,67 @@ this project uses [Semantic Versioning](https://semver.org).
 > affected package README(s) **and** bump the version, in the same change.
 
 ## [Unreleased]
+### Added — ERP field formats: `cellMeta.pattern` (Aadhaar / PAN / GSTIN / IFSC / …) (B1/B2)
+- **`cellMeta.pattern`** (`@bloomskill/table-engine`) — a Frappe-style **field-format preset** on a
+  plain `text` or `number` cell that brings its own **validation + input mask + normalizer**, so the
+  identity / finance fields an ERP form needs validate and display consistently without a
+  hand-written `meta.validate` per column. Built-ins: **`aadhaar`** (12-digit, real **Verhoeff**
+  checksum, masked `#### #### ####`) · **`pan`** · **`gstin`** (15-char, **mod-36** checksum) · `tan`
+  · `ifsc` · `email` · `phone` (India mobile) · `pincode` · `url` · `upi` · **`passport`** ·
+  **`iec`** · **`esic`** (17-digit) · **`pf`** (12-digit UAN) · **`iban`** (**mod-97** checksum,
+  grouped) · **`swift`** (BIC) · **`creditCard`** (**Luhn**, grouped). `pattern` accepts a built-in
+  **name**, a **`RegExp`** (+ `cellMeta.patternMessage`), or a custom **`FieldFormat`** object;
+  register reusable ones with **`defineFieldFormat`** / by adding to **`FIELD_FORMATS`**. The editor
+  normalizes as you type (Aadhaar → digits only, PAN → upper-case) and the read cell shows the mask
+  (bypassing numeric grouping for an id). New exports: `FIELD_FORMATS`, `resolveFieldFormat`,
+  `defineFieldFormat`, and standalone validators `verhoeffValid` / `verhoeffChecksum` /
+  `isValidAadhaar` / `isValidPan` / `isValidGstin` / `gstinCheckDigit` / `isValidIfsc` /
+  `isValidPassport` / `isValidIec` / `isValidEsic` / `isValidUan` / `isValidSwift` / `isValidIban` /
+  `luhnValid`; types `FieldFormat`, `FieldPattern`. **Opt-in + backward compatible** (a cell without
+  `pattern` is unchanged) and inherited by both adapters. New `formats.test.tsx` (checksums + grid
+  integration); demo's **ERP field formats** KYC section covers all presets; new runnable
+  **`examples/field-formats`** (Vite + StackBlitz) demonstrates a KYC grid end-to-end.
+
+### Added — Row & column virtualization (D1) + infinite scroll (A2)
+- **`enableVirtualization`** (`@bloomskill/table-engine`, `boolean | { overscan, estimateRowSize, estimateColumnSize }`)
+  — row virtualization on **`@tanstack/react-virtual`**: paints only the rows in the scroll viewport
+  (plus overscan) with **dynamic row measurement** (composes with row-resize / variable content), a
+  **sticky header**, spacer rows, and a bounded scroll-box height (applied by default; override via
+  `styles.root`). A 20k×42 grid stays at 60fps with a few dozen rows in the DOM. **Yields** (renders
+  un-windowed, one-time dev warning) when master-detail, grouping, cell spanning or row pinning is on
+  (`virtualizationBypassReason`).
+- **`enableColumnVirtualization`** — sub-toggle (needs `enableVirtualization`) that also windows
+  columns horizontally for very wide grids, keeping header / filter row / body aligned via spacer
+  cells. Falls back to all-columns under column pinning, `fitColumns`, grouped headers or cell spanning.
+- **`useBstInfiniteDataSource(source, { pageSize })`** + **`<BstTable onReachEnd>`** (A2) —
+  fetch-on-scroll **append** over a server `DataSource`: accumulates windows, resets on sort/filter
+  change, exposes `fetchNextPage` / `hasNextPage` / `isFetchingNextPage` / `rows` / `totalCount` +
+  `tableProps` (manual mode). Pair with `enableVirtualization` + `pagination={false}`.
+- Both toggles are **settings-sheet** entries (new "Performance" group, **always shown** so an
+  end-user can switch virtualization on for a large grid without developer wiring), flow through both
+  adapters unchanged, and carry `rules.ts` dependency rules; `bst_validate_config` accepts them. New exports:
+  `resolveVirtualization`, `virtualizationBypassReason`, `useBstInfiniteDataSource` (+ types). Tests:
+  `virtualization.test.tsx` (12) + `infiniteDataSource.test.tsx` (6). Demo adds **Virtualization**
+  (20k×42) and **Infinite scroll** sections. Closes A2; COVERAGE tally now 53 ✅ · 4 🟡 · 1 ❌.
+
+### Fixed — `bst_validate_config` robustness (5 verified bugs)
+A review found the validator's lexical matching produced false positives, a false "all clear", and
+a stale version check. All fixed with regression tests:
+
+- **String values no longer trip the not-built / prop detection** — a new single-pass `scrub()`
+  strips comments and string *values* (keeping keys), so a column literally named `liveUpdatedAt` or
+  `header: "PDF preview"` no longer emits a bogus I5/B5 error, and a `//`-commented prop is ignored.
+- **JSON passed as `code` is read correctly** — the value regexes tolerate a quoted key, so
+  `{ "enableGlobalFilter": false }` is detected the same as the JS-literal form.
+- **Batch editing without `onSave` is caught** — whether requested via `enableBatchEditing` **or**
+  inline as `enableEditing={{ mode: 'batch' }}` (the mode is read before scrubbing).
+- **A not-built prop yields one useful error**, not the redundant "unknown option" + "not built" pair.
+- **`bst_detect_version`** now honours `>=`, `>`, `<=`, `<` and `x`-ranges (`0.32.x`), so a project
+  on `>=0.32.0` is no longer falsely warned as a version mismatch.
+- **Docs** — the README Quick-Start example + the "doesn't exist" bullets use `enableLiveUpdates`
+  (I5, genuinely unbuilt) now that `enableVirtualization` is real; the loose "`showSearch` without
+  `enableGlobalFilter`" phrasing is corrected (search is on by default).
+
 ### Docs — `@bloomskill/table-mcp` README rewritten for first-time users; root README documents MCP support
 The npm page still carried a "⚠️ Not on npm yet — `npx` fails with 404" banner after the package
 went live at 0.32.4, and pointed at `docs/mcp-server.md`, which is not in the published tarball.
@@ -52,12 +113,12 @@ accurate, version-pinned knowledge of the packages — plus scaffolding and vali
   editing emits a single-request `onSave`). Every output is typechecked against the built packages.
 - **4 prompts** (`bst-quick-start`, `bst-add-feature`, `bst-new-cell-type`, `bst-migrate`) and
   `bst://` resources for coverage, features, cell types and examples.
-- **Three parity/freshness guards**, in the spirit of the engine's compile-time settings-sheet
-  check: corpus generation fails the build if an engine toggle has no §12 row; `rules.test.ts` fails
-  if a toggle has no flag-dependency entry; and a freshness test fails if any indexed source's mtime
-  is newer than the corpus's `generatedAt` (now a full ISO timestamp) — catching a doc edited
-  without rebuilding the corpus. A new feature cannot slip past the validator, and the docs can't go
-  stale silently.
+- **Two hard parity guards + one soft freshness check**, in the spirit of the engine's compile-time
+  settings-sheet check: corpus generation fails the build if an engine toggle has no §12 row;
+  `rules.test.ts` fails if a toggle has no flag-dependency entry; and a freshness check **warns**
+  (not fails) when an indexed source's mtime is newer than the corpus's `generatedAt` (a full ISO
+  timestamp), so editing docs doesn't break `npm test` while still surfacing a stale corpus. A new
+  feature cannot slip past the validator.
 - Zero search dependencies (hand-written BM25); runtime deps are the MCP SDK and zod. Runs over
   stdio, makes no network calls, and works standalone via `npx -y @bloomskill/table-mcp`.
 - Repo wiring: `bump-version.mjs` bumps four packages; root `build`/`typecheck`/`release` include

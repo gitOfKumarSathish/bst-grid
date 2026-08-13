@@ -19,9 +19,11 @@ const PKG_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 /** Tool calls to exercise: [tool, args, a substring the response must contain]. */
 const CALLS = [
   ['bst_search_docs', { query: 'batch editing save in one call' }, 'onSave'],
-  ['bst_search_docs', { query: 'virtualization', kind: 'requirement' }, 'NOT BUILT'],
+  // I5 (WebSocket/live merge) is the remaining ❌ — exercises the not-built path.
+  ['bst_search_docs', { query: 'websocket live update merge', kind: 'requirement' }, 'NOT BUILT'],
   ['bst_get_feature', { flag: 'enableClipboard' }, 'enableCellSelection'],
-  ['bst_get_feature', { requirement: 'D1' }, 'NOT BUILT'],
+  // D1 (virtualization) is implemented now — status-agnostic check on its flag.
+  ['bst_get_feature', { requirement: 'D1' }, 'enableVirtualization'],
   ['bst_get_feature', { kind: 'toggle', layer: 'engine' }, 'enableSorting'],
   ['bst_get_cell_type', { type: 'multiSelect' }, 'maxChips'],
   ['bst_get_cell_type', {}, 'sparkline'],

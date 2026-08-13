@@ -14,11 +14,12 @@ export interface StaleSource {
  * Finds indexed sources whose mtime is **newer** than the corpus's `generatedAt`
  * — i.e. edited since the last build, so the corpus no longer reflects them.
  *
- * This is the prose counterpart of the toggle/rule parity guards: those fail the
- * gate when a feature is undocumented, this fails it when a documented source has
- * drifted from the built corpus. It runs in the test layer (after the build, like
- * the other guards), because the generator itself always regenerates and so can
- * never observe its own staleness.
+ * This is the prose counterpart of the toggle/rule parity guards, but softer: the
+ * toggle/rule guards fail the gate when a feature is undocumented; this one only
+ * **warns** (via `generate.test.ts`) when a documented source has drifted from the
+ * built corpus, so editing a doc without rebuilding doesn't break `npm test`. It
+ * runs in the test layer (after the build, like the other guards), because the
+ * generator itself always regenerates and so can never observe its own staleness.
  *
  * mtime-based, so it's meaningful within a working tree (edit a doc, forget to
  * rebuild → caught) rather than across `git clone`s, which don't preserve mtimes

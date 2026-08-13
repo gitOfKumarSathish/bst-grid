@@ -131,6 +131,21 @@ export const RULES: Record<string, FlagRule> = {
     ],
   },
 
+  // ---- Performance (D1 — row/column virtualization) ----
+  enableVirtualization: {
+    conflictsWith: [
+      { flag: 'enableExpanding', why: 'the grid renders un-windowed (yields) while master-detail is on' },
+      { flag: 'enableGrouping', why: 'the grid renders un-windowed (yields) while grouping is on' },
+      { flag: 'enableCellSpanning', why: 'the grid renders un-windowed (yields) while cell spanning is on' },
+      { flag: 'enableRowPinning', why: 'the grid renders un-windowed (yields) while row pinning is on' },
+    ],
+    note: "Paints only the visible rows for large datasets. Object form tunes `overscan` / `estimateRowSize` / `estimateColumnSize`. Needs a bounded scroll-box height (applied by default; override via `styles.root`).",
+  },
+  enableColumnVirtualization: {
+    requires: ['enableVirtualization'],
+    note: 'Also windows columns horizontally, for very wide grids. Falls back to all-columns under column pinning, `fitColumns`, grouped headers or cell spanning.',
+  },
+
   // ---- Adapter chrome (§12: chrome follows behaviour) ----
   showToolbar: { note: 'The container for search, menus and buttons — turning it off hides all toolbar chrome.' },
   showSearch: { requires: ['enableGlobalFilter'] },
@@ -180,21 +195,14 @@ export const SERVER_MODE_RULES: Array<{ when: string; needs: string[]; why: stri
  * documented workaround instead of a flat refusal.
  */
 // Patterns deliberately omit leading `\b`: the giveaway usually arrives inside a
-// camelCase prop an agent invented (`enableVirtualization`, `onWebSocketUpdate`),
+// camelCase prop an agent invented (`onWebSocketUpdate`, `enableLiveUpdates`),
 // where a word boundary would never match.
+//
+// NOTE: virtualization (D1, `enableVirtualization` / `enableColumnVirtualization`)
+// and infinite scroll (A2, `useBstInfiniteDataSource` + `onReachEnd`) are NOT here —
+// both are built. Virtualization's rules live in the RULES table above; infinite
+// scroll is a hook (no toggle), documented in the DataSource guide.
 export const NOT_BUILT: Array<{ match: RegExp; requirement: string; instead: string }> = [
-  {
-    match: /(virtuali[sz]|windowing|react-virtual|overscan)/i,
-    requirement: 'D1',
-    instead:
-      'Row/column virtualization is NOT implemented. For large data use the server `DataSource` (`useBstDataSource`) with `manualPagination` and render small pages.',
-  },
-  {
-    match: /infinite[\s_-]*(scroll|loading)|fetch[\s_-]*on[\s_-]*scroll/i,
-    requirement: 'A2',
-    instead:
-      'Infinite fetch-on-scroll is NOT implemented. Use `useBstDataSource` with server pagination instead.',
-  },
   {
     match: /websocket|live[\s_-]*(merge|update)/i,
     requirement: 'I5',

@@ -107,7 +107,7 @@ Each example imports the **published** package from npm — the same code you'd 
 or run it locally:
 
 ```bash
-cd examples/quick-start   # or editing · cell-types · conditional-formatting · cell-spanning · server-mode
+cd examples/quick-start   # or editing · cell-types · conditional-formatting · cell-spanning · server-mode · field-formats
 npm install && npm run dev
 ```
 
@@ -119,6 +119,7 @@ npm install && npm run dev
 | **Conditional formatting** | Value-driven cell/row colours | [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/gitOfKumarSathish/bst-grid/tree/main/examples/conditional-formatting?file=src%2FApp.tsx) |
 | **Cell spanning** | Merged cells via `meta.rowSpan: 'group'` | [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/gitOfKumarSathish/bst-grid/tree/main/examples/cell-spanning?file=src%2FApp.tsx) |
 | **Server mode** | `useBstDataSource` — server-style sort/filter/paginate over 5k rows | [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/gitOfKumarSathish/bst-grid/tree/main/examples/server-mode?file=src%2FApp.tsx) |
+| **Field formats** | ERP validation + masks via `cellMeta.pattern` — Aadhaar · PAN · GSTIN · IBAN · card | [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/gitOfKumarSathish/bst-grid/tree/main/examples/field-formats?file=src%2FApp.tsx) |
 
 > StackBlitz builds the project on open; a brief blank preview just means it's still installing.
 > Running locally (above) is always instant and is the guaranteed path.
@@ -171,6 +172,7 @@ settings (e.g. `pagination={{ pageSize: 25 }}`). Follow a link for the full guid
 | [Master-detail panel](#row-layout) | `enableExpanding` + `renderDetail` | `false` |
 | [Row pinning (freeze top/bottom)](#row-layout) | `enableRowPinning` | `false` |
 | [Row resizing (drag height)](#row-layout) | `enableRowResize` | `false` |
+| [Virtualization (row/column)](#virtualization-d1) | `enableVirtualization` (+ `enableColumnVirtualization`) | `false` |
 
 #### ✏️ Editing
 
@@ -197,6 +199,8 @@ settings (e.g. `pagination={{ pageSize: 25 }}`). Follow a link for the full guid
 | [Cell-type registry (17 types)](#cell-types) | `meta.type` | `'text'` |
 | [In-cell charts (sparkline / KPI)](#cell-types) | `meta.type: 'sparkline' \| 'kpi'` | — |
 | [QR · barcode · rich text](#cell-types) | `meta.type: 'qr' \| 'barcode' \| 'richText'` | — |
+| [ERP field formats (Aadhaar · PAN · GSTIN · IBAN · Luhn …)](#cellmeta-by-cell-type) | `cellMeta.pattern` on `text` / `number` | — |
+| [Width-aware chips (fit to column)](#cellmeta-by-cell-type) | `cellMeta.fitChips` on `multiSelect` | `false` |
 | [Cell spanning (merge cells)](#cell-spanning) | `enableCellSpanning` | `false` |
 | [Custom CSS slots](#custom-css) | `classNames` / `styles` | — |
 | [Conditional formatting](#conditional-formatting) | `conditionalFormats` + `enableConditionalFormatting` | on when rules present |
@@ -271,9 +275,9 @@ hot path; the MUI / shadcn adapters supply richer **editors** for the same types
 
 | `meta.type` | Renders | Value shape | Editable | Notable `cellMeta` |
 | --- | --- | --- | --- | --- |
-| `text` *(default)* | single-line text, ellipsis + title tooltip | `string` | ✅ input | `required` |
+| `text` *(default)* | single-line text, ellipsis + title tooltip | `string` | ✅ input | `required`, `pattern` |
 | `longText` | clamped multi-line text | `string` | ✅ textarea → popup (adapters) | `required` |
-| `number` | locale number / currency / percent | `number \| null` | ✅ number input | `precision`, `currency`, `useGrouping`, `required` |
+| `number` | locale number / currency / percent | `number \| null` | ✅ number input | `precision`, `currency`, `useGrouping`, `required`, `pattern` |
 | `dateTime` | date / time / datetime | `string \| Date \| null` | ✅ native picker | `variant`, `required` |
 | `boolean` | check ✓ / muted dash | `boolean` | ✅ checkbox | — |
 | `singleSelect` | badge (color · icon · avatar) | `string \| null` | ✅ dropdown | via `meta.options` |
@@ -297,6 +301,28 @@ hot path; the MUI / shadcn adapters supply richer **editors** for the same types
 
 `meta.cellMeta` is free-form per-type settings. A field common to **every editable type** is
 `required` (a non-empty check the [validator](#editing-and-validation) enforces). The rest:
+
+**`text` / `number` — field formats (ERP, Frappe-style).** `cellMeta.pattern` applies a named
+**validation + input-mask + normalizer** preset — the identity / finance fields an ERP form needs,
+validated and masked without a hand-written `validate` per column:
+
+| `cellMeta` | Type | Effect |
+| --- | --- | --- |
+| `pattern` | preset name · `RegExp` · `FieldFormat` | Validate + mask + normalize the cell as that format. |
+| `patternMessage` | `string` | Error message to show when `pattern` is a bare `RegExp`. |
+
+Built-in names: `aadhaar` (12-digit, **Verhoeff** checksum, masked `#### #### ####`) · `pan` ·
+`gstin` (15-char, **mod-36** checksum) · `tan` · `ifsc` · `email` · `phone` (India mobile) ·
+`pincode` · `url` · `upi` · `passport` · `iec` · `esic` (17-digit) · `pf` (12-digit UAN) ·
+`iban` (**mod-97** checksum, grouped) · `swift` (BIC) · `creditCard` (**Luhn**, grouped). Register
+your own with `defineFieldFormat` or by adding to `FIELD_FORMATS`; the checksum/structure validators
+(`isValidAadhaar`, `isValidGstin`, `isValidIban`, `luhnValid`, `verhoeffValid`, …) are exported for
+use outside the grid too.
+
+```ts
+{ id: 'pan',     meta: { type: 'text',   editable: true, cellMeta: { pattern: 'pan' } } }
+{ id: 'aadhaar', meta: { type: 'number', editable: true, cellMeta: { pattern: 'aadhaar' } } }
+```
 
 **`number`** — also honours `meta.format` (`'currency'` / `'percent'` / `Intl.NumberFormatOptions`) and `meta.locale`.
 
@@ -447,6 +473,10 @@ means *passing the object implies enabled*.
 | `getRowCanExpand` | `(row) => boolean` | all rows | Which rows can expand. |
 | `enableRowPinning` | `boolean` | `false` | Freeze rows top/bottom (G1). |
 | `enableRowResize` | `boolean` | `false` | Drag a row's bottom edge to set its height (G2). |
+| `enableVirtualization` | `boolean \| VirtualizationOptions` | `false` | [Row virtualization](#virtualization-d1) (D1) — window visible rows for large data. Object tunes `overscan` / `estimateRowSize` / `estimateColumnSize`. |
+| `enableColumnVirtualization` | `boolean` | `false` | Also window columns (needs `enableVirtualization`). |
+| `onReachEnd` | `() => void` | — | Infinite scroll (A2) — fires near the end of a virtualized body. |
+| `endReachedThreshold` | `number` | `8` | Rows-from-end that trigger `onReachEnd`. |
 | `createRow` | `() => Partial<TData>` | — | Blank-row factory for Add row. |
 | `tempIdPrefix` | `string` | `'tmp_'` | Prefix for created/duplicated row ids. |
 
@@ -908,6 +938,49 @@ const table = useBstTable(effective)   // enable*/show* now reflect the user's c
 - Exports: `applySettingsOverrides(props, overrides)` and `BST_SETTINGS_REGISTRY` (ordered metadata). The
   list is derived from the engine's own toggle interface, so new features show up automatically.
 
+## Virtualization (D1)
+
+> 🟡 **Status:** implemented and wired on `@tanstack/react-virtual`; not yet released (see [`COVERAGE.md`](../../COVERAGE.md)).
+
+Render only the rows (and, optionally, columns) inside the scroll viewport, so a 10k–1M-row dataset
+stays smooth with a bounded DOM. Opt-in and **off by default** — a normal grid keeps its whole row
+model in the DOM.
+
+```tsx
+<BstTableMui data={rows} columns={columns} getRowId={(r) => r.id} enableVirtualization />
+
+// tuning (an object implies enabled):
+<BstTableMui
+  data={rows}
+  columns={columns}
+  getRowId={(r) => r.id}
+  enableVirtualization={{ overscan: 12, estimateRowSize: 40 }}
+  enableColumnVirtualization   // also window very wide grids horizontally
+/>
+```
+
+| Option | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `enableVirtualization` | `boolean \| VirtualizationOptions` | `false` | Window the **rows**. An object implies enabled and tunes the virtualizer. |
+| ↳ `overscan` | `number` | `8` | Rows rendered beyond each viewport edge (smoother scroll, more DOM). |
+| ↳ `estimateRowSize` | `number` | `36` | Estimated row height (px) before a row is measured — keep close to the real height. |
+| ↳ `estimateColumnSize` | `number` | `150` | Estimated column width (px) for column virtualization. |
+| `enableColumnVirtualization` | `boolean` | `false` | Also window **columns** (very wide grids). **Needs `enableVirtualization`.** |
+| `onReachEnd` | `() => void` | — | **A2 infinite scroll** — fired once when the virtualized body nears its end (fetch the next page here). |
+| `endReachedThreshold` | `number` | `8` | Rows-from-end that trigger `onReachEnd`. |
+
+**Requirements & behaviour**
+
+- The scroll box needs a **bounded height** — one is applied by default; override via `styles.root`.
+- **Yields gracefully.** Some features need rows outside the window (multi-`<tr>` items, spans, pins),
+  so when any of **master-detail (`enableExpanding`) · grouping · cell spanning · row pinning** is on,
+  the grid renders **un-windowed** and logs a one-time dev warning (the incompatible feature wins;
+  these target small, curated datasets anyway). The active reason comes from `virtualizationBypassReason`.
+- Column virtualization additionally falls back to all-columns under **column pinning**, `fitColumns`,
+  grouped headers or cell spanning.
+- `resolveVirtualization` and `virtualizationBypassReason` are exported (pure, unit-tested) if you need
+  the resolved config or the bypass reason yourself.
+
 ## Server mode (DataSource)
 
 > ▶ **[Run it live](https://stackblitz.com/github/gitOfKumarSathish/bst-grid/tree/main/examples/server-mode?file=src%2FApp.tsx)** on StackBlitz (5k rows, runs offline via `createClientDataSource`).
@@ -951,6 +1024,33 @@ function People() {
 - **Caveats:** **grouping** and **whole-column copy** operate on the *loaded page* under a DataSource;
   `sort` / `filter` ids are **column ids** — map them to DB fields in the fetcher.
 
+**Infinite scroll (A2).** For a growing, virtualized list instead of pages, swap `useBstDataSource`
+for **`useBstInfiniteDataSource`** — it **appends** windows as you scroll rather than replacing the
+page. Pair it with `enableVirtualization` and `pagination={false}`, and wire `onReachEnd`:
+
+```tsx
+import { useBstInfiniteDataSource } from '@bloomskill/table-engine'
+
+function People() {
+  const inf = useBstInfiniteDataSource(source, { pageSize: 100 })
+  return (
+    <BstTableShadcn
+      columns={columns}
+      getRowId={(r) => r.id}
+      enableVirtualization
+      pagination={false}
+      showPagination={false}
+      onReachEnd={inf.fetchNextPage}   // fires as the tail nears
+      {...inf.tableProps}
+    />
+  )
+}
+```
+
+Returns `{ rows, totalCount, loading, isFetchingNextPage, hasNextPage, fetchNextPage, onReachEnd,
+refetch, tableProps }`. Sort / filter still run server-side and **reset** the accumulation to the
+first window.
+
 ---
 
 ## Exports
@@ -962,9 +1062,11 @@ function People() {
 `BstFilterBuilder` · `BstConditionalFormatBuilder` + types `BstTableInstance`, `BstRuntimeHandle`,
 `BstFormatBuilderColumn`.
 
-**Server mode (DataSource)** — `useBstDataSource` · `createClientDataSource` · `createServerDataSource`
+**Server mode (DataSource)** — `useBstDataSource` · `useBstInfiniteDataSource` · `createClientDataSource` · `createServerDataSource`
 \+ types `DataSource`, `DataSourceQuery`, `DataSourcePage`, `DataSourceSort`, `DataSourceFilter`,
-`BstServerTableProps`, `BstDataSourceResult`, `UseBstDataSourceOptions`, `DsSort`, `DsColumnFilter`,
+`BstServerTableProps`, `BstDataSourceResult`, `UseBstDataSourceOptions`,
+`BstInfiniteDataSourceResult`, `UseBstInfiniteDataSourceOptions`, `BstInfiniteTableProps`,
+`DsSort`, `DsColumnFilter`,
 `DsPagination`.
 
 **Body icons** — `defaultBstIcons` · `resolveBstIcons` · `useBstIcons` · `BstIconsContext` ·

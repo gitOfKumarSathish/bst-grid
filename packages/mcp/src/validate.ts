@@ -39,29 +39,93 @@ function defaultOf(feature: FeatureEntry | undefined): boolean | undefined {
 }
 
 /**
+ * Strips comments and string *values* from a config snippet so lexical matching
+ * runs on **code**, not data. A string *key* (a quoted string immediately
+ * followed by `:`) is kept, so `{ "showSearch": true }` is still read; a string
+ * *value* (`id: "liveUpdatedAt"`, `header: "PDF preview"`) is blanked, so it
+ * can't trip the not-built patterns or be mistaken for a prop. Single pass, so a
+ * `//` inside a string (`"http://x"`) is not mistaken for a comment. Length is
+ * preserved (removed spans become spaces) so nothing else shifts.
+ */
+export function scrub(source: string): string {
+  const out: string[] = []
+  const n = source.length
+  let i = 0
+  const blank = (len: number): void => {
+    out.push(' '.repeat(len))
+  }
+  while (i < n) {
+    const two = source.slice(i, i + 2)
+    if (two === '//') {
+      let j = i + 2
+      while (j < n && source[j] !== '\n') j++
+      blank(j - i)
+      i = j
+      continue
+    }
+    if (two === '/*') {
+      let j = i + 2
+      while (j < n && source.slice(j, j + 2) !== '*/') j++
+      j = Math.min(n, j + 2)
+      blank(j - i)
+      i = j
+      continue
+    }
+    const ch = source[i] as string
+    if (ch === '"' || ch === "'" || ch === '`') {
+      let j = i + 1
+      while (j < n) {
+        if (source[j] === '\\') {
+          j += 2
+          continue
+        }
+        if (source[j] === ch) {
+          j++
+          break
+        }
+        j++
+      }
+      let k = j
+      while (k < n && /\s/.test(source[k] as string)) k++
+      if (source[k] === ':') out.push(source.slice(i, j)) // key — keep
+      else blank(j - i) // value — remove
+      i = j
+      continue
+    }
+    out.push(ch)
+    i++
+  }
+  return out.join('')
+}
+
+/**
  * Detects which props appear in a snippet and whether each is explicitly off.
  *
  * Deliberately lexical, not a parser: the input is usually a JSX fragment or a
  * partial options object pasted out of context, which no parser would accept.
  * Being lexical means the validator can be wrong about *values* in exotic code
  * (`enableEditing={someVar}`), so anything it can't read confidently is left
- * `undefined` and reported as unknown rather than asserted.
+ * `undefined` and reported as unknown rather than asserted. Runs on {@link scrub}bed
+ * input, so comments and string values never masquerade as props.
  */
 export function detectProps(source: string, known: string[]): Map<string, Resolved> {
   const found = new Map<string, Resolved>()
+  const src = scrub(source)
 
   for (const prop of known) {
     if (prop.includes('.')) continue // `meta.*` props are per-column, not grid props
     // Word-boundary match, but not when it's part of a longer identifier.
-    const present = new RegExp(`(?<![\\w$])${prop}(?![\\w$])`).test(source)
+    const present = new RegExp(`(?<![\\w$])${prop}(?![\\w$])`).test(src)
     if (!present) continue
 
+    // A `["']?` after the name tolerates a quoted key, so JSON passed as `code`
+    // (`{ "flag": false }`) reads the same as a JS literal (`{ flag: false }`).
     // Explicitly falsy: `flag={false}`, `flag: false`, `flag = false`.
-    const off = new RegExp(`(?<![\\w$])${prop}\\s*(?:=\\s*\\{\\s*false\\s*\\}|[:=]\\s*false)`).test(source)
+    const off = new RegExp(`(?<![\\w$])${prop}["']?\\s*(?:=\\s*\\{\\s*false\\s*\\}|[:=]\\s*false)`).test(src)
     // Explicitly truthy: bare JSX attribute, `={true}`, `: true`, or an object/value.
     const on = new RegExp(
-      `(?<![\\w$])${prop}\\s*(?:=\\s*\\{\\s*(?:true|\\{|\\[)|[:=]\\s*(?:true|\\{|\\[)|[/>\\s]|$)`,
-    ).test(source)
+      `(?<![\\w$])${prop}["']?\\s*(?:=\\s*\\{\\s*(?:true|\\{|\\[)|[:=]\\s*(?:true|\\{|\\[)|[/>\\s]|$)`,
+    ).test(src)
 
     const explicit = off ? false : on ? true : undefined
     found.set(prop, { explicit, effective: explicit })
@@ -86,6 +150,10 @@ export function validateConfig(
 
   const resolved = config ? fromConfigObject(config, knownFlags) : detectProps(source, knownFlags)
 
+  // Comments and string values stripped, so every regex check below matches on
+  // code — not a column id, a header label, or a `// commented-out` prop.
+  const src = scrub(source)
+
   // Fill in defaults for flags the input never mentions, so "chrome without
   // behaviour" is judged against what the grid will actually do.
   const effective = (flag: string): boolean | undefined => {
@@ -99,7 +167,12 @@ export function validateConfig(
   const mentioned = [...resolved.keys()]
 
   // 1. Unknown props — the most common hallucination, and the cheapest to catch.
+  //    A prop that names a known-missing capability (e.g. `enableVirtualization`)
+  //    is left to step 2, which reports the spec leaf (D1) and the real
+  //    workaround — strictly more useful than a bare "unknown option", and it
+  //    stops one invented prop from producing two errors.
   for (const prop of unknownProps(source, corpus)) {
+    if (NOT_BUILT.some((gap) => gap.match.test(prop))) continue
     findings.push({
       level: 'error',
       subject: prop,
@@ -108,10 +181,11 @@ export function validateConfig(
     })
   }
 
-  // 2. Capabilities that do not exist. Checked against the raw text so a request
-  //    phrased in a comment or a prop name is caught either way.
+  // 2. Capabilities that do not exist. Matched on the scrubbed source, so an
+  //    invented prop (`enableVirtualization`, `rowVirtualizer`) is caught but a
+  //    column literally named `pdfPreview` or `liveCount` is not.
   for (const gap of NOT_BUILT) {
-    if (!gap.match.test(source)) continue
+    if (!gap.match.test(src)) continue
     const leaf = corpus.requirements.find((r) => r.id === gap.requirement)
     findings.push({
       level: 'error',
@@ -156,7 +230,7 @@ export function validateConfig(
 
     for (const option of rule.needsOptions ?? []) {
       const names = option.name.split(/\s+or\s+/)
-      const supplied = names.some((n) => new RegExp(`(?<![\\w$])${n.split('.')[0]}(?![\\w$])`).test(source))
+      const supplied = names.some((n) => new RegExp(`(?<![\\w$])${n.split('.')[0]}(?![\\w$])`).test(src))
       if (!supplied) {
         findings.push({
           level: 'warning',
@@ -181,7 +255,7 @@ export function validateConfig(
 
   // 4. Options that are inert without their flag.
   for (const [option, requirement] of Object.entries(OPTION_REQUIRES)) {
-    const present = new RegExp(`(?<![\\w$])${option}(?![\\w$])`).test(source)
+    const present = new RegExp(`(?<![\\w$])${option}(?![\\w$])`).test(src)
     if (!present) continue
     if (effective(requirement.flag) === false) {
       findings.push({
@@ -202,8 +276,8 @@ export function validateConfig(
 
   // 5. Server mode.
   for (const rule of SERVER_MODE_RULES) {
-    if (!new RegExp(`(?<![\\w$])${rule.when}(?![\\w$])`).test(source)) continue
-    const satisfied = rule.needs.some((n) => new RegExp(`(?<![\\w$])${n}(?![\\w$])`).test(source))
+    if (!new RegExp(`(?<![\\w$])${rule.when}(?![\\w$])`).test(src)) continue
+    const satisfied = rule.needs.some((n) => new RegExp(`(?<![\\w$])${n}(?![\\w$])`).test(src))
     if (!satisfied) {
       findings.push({
         level: 'error',
@@ -216,12 +290,29 @@ export function validateConfig(
 
   // 6. Editing needs stable row identity — the single most common broken grid.
   if (effective('enableEditing') === true || effective('enableRowSelection') === true) {
-    if (!/(?<![\w$])getRowId(?![\w$])/.test(source)) {
+    if (!/(?<![\w$])getRowId(?![\w$])/.test(src)) {
       findings.push({
         level: 'error',
         subject: 'getRowId',
         message: `Editing/selection is on but \`getRowId\` is missing. Writes target rows by id, never by index, so edits land on the wrong row once the grid is sorted or filtered.`,
         fix: `Add \`getRowId={(row) => row.id}\`.`,
+      })
+    }
+  }
+
+  // 7. Batch editing needs `onSave`, whether requested via the `enableBatchEditing`
+  //    flag OR inline as `enableEditing={{ mode: 'batch' }}`. The mode lives in a
+  //    string value (scrubbed away), so it's read from the raw source with a
+  //    targeted pattern. Without `onSave` every edit stays an unsaved draft.
+  const batchByFlag = effective('enableBatchEditing') === true
+  const batchByMode = /mode\s*:\s*['"`]?batch/.test(source)
+  if ((batchByFlag || batchByMode) && effective('enableEditing') !== false) {
+    if (!/(?<![\w$])onSave(?![\w$])/.test(src)) {
+      findings.push({
+        level: 'warning',
+        subject: 'enableEditing',
+        message: `Batch editing is on but \`onSave\` is missing — every edit stays an unsaved draft and nothing is persisted.`,
+        fix: `Add \`onSave={handleSave}\` — it fires once per save action with the whole change set.`,
       })
     }
   }
@@ -251,7 +342,7 @@ function fromConfigObject(config: Record<string, unknown>, known: string[]): Map
 function unknownProps(source: string, corpus: BstCorpus): string[] {
   const known = new Set(corpus.features.map((f) => f.flag))
   const out = new Set<string>()
-  for (const match of source.matchAll(/(?<![\w$])((?:enable|show)[A-Z][\w$]*)/g)) {
+  for (const match of scrub(source).matchAll(/(?<![\w$])((?:enable|show)[A-Z][\w$]*)/g)) {
     const name = match[1]
     if (name && !known.has(name)) out.add(name)
   }

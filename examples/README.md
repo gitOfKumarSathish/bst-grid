@@ -12,6 +12,7 @@ project, so it runs locally, on StackBlitz, or on CodeSandbox with no extra setu
 | [`conditional-formatting`](./conditional-formatting) | Value-driven cell/row colours via `conditionalFormats` |
 | [`cell-spanning`](./cell-spanning) | Merged cells via `meta.rowSpan: 'group'` |
 | [`server-mode`](./server-mode) | `useBstDataSource` server-side sort/filter/paginate (runs offline via `createClientDataSource`) |
+| [`field-formats`](./field-formats) | ERP field validation + masks via `cellMeta.pattern` (Aadhaar · PAN · GSTIN · IBAN · card …) |
 
 Every example runs the same way — `npm install && npm run dev`.
 

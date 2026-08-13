@@ -86,10 +86,11 @@ Behind the scenes it calls `bst_scaffold_grid`, and the component it hands you *
 flag dependency already satisfied. Two more prompts worth trying on day one:
 
 > What Bst-Table flag turns on the filter builder, and what does it depend on?
-> Check this grid config for mistakes: `{ showSearch: true, enableVirtualization: true }`
+> Check this grid config for mistakes: `{ showSearch: true, enableGlobalFilter: false, enableLiveUpdates: true }`
 
-The second one returns two real errors: `showSearch` does nothing without `enableGlobalFilter`, and
-`enableVirtualization` **is not a thing in this library**.
+The second one returns two real errors: `showSearch` does nothing while `enableGlobalFilter` is
+**off** (chrome never implies behaviour), and `enableLiveUpdates` **is not a real flag** —
+live / WebSocket merge (I5) isn't built.
 
 > **You do not need Bst-Table installed.** The whole knowledge base ships inside this package, so
 > the server works in any project — including an empty folder where you are still deciding.
@@ -126,19 +127,20 @@ Bst-Table's flags live in two layers — `enable*` (engine behaviour) and `show*
 and a wrong combination fails **silently** rather than loudly. `bst_validate_config` catches what
 code review usually doesn't:
 
-- `showSearch` without `enableGlobalFilter` — the box never renders; chrome never implies behaviour
+- `showSearch` while `enableGlobalFilter` is off — the box never renders; chrome never implies behaviour (on its own `showSearch` is fine — search is on by default)
 - `enableEditing` without `getRowId` — edits land on the wrong row after a sort
 - `enableEditing: { mode: 'batch' }` without `onSave` — nothing is ever persisted
 - `enableClipboard` — implies `enableCellSelection`, but **paste** also needs `enableEditing`
 - `manualPagination` without `rowCount` — no page count
-- `enableVirtualization` — **there is no such flag**; D1 is not implemented (use the server `DataSource`)
+- `enableLiveUpdates` — **there is no such flag**; live / WebSocket merge (I5) isn't built (push updates by replacing `data`)
 
 ### It will also tell you what *doesn't* exist
 
-The most valuable thing this server does is say **no**. Of the 58 spec requirements, **51 are built,
-5 are partial and 2 are missing** — and an agent working from the READMEs alone would never guess
-which. `bst_get_feature({ requirement: 'D1' })` returns ❌ NOT BUILT plus the documented workaround,
-and `bst_validate_config` rejects code that assumes otherwise.
+The most valuable thing this server does is say **no**. Of the 58 spec requirements, **almost all are
+built** — a handful are partial, and I5 (live/WebSocket merge) is the standing gap — and an agent
+working from the READMEs alone would never guess which. `bst_get_feature({ requirement: 'I5' })`
+returns ❌ NOT BUILT plus the documented workaround, and `bst_validate_config` rejects code that
+assumes otherwise. The exact split is read live from `COVERAGE.md`, so it never drifts.
 
 ---
 

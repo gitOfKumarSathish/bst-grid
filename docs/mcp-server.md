@@ -380,12 +380,12 @@ All tools are read-only and take a `response_format` of `markdown` (default) or 
 `bst_validate_config` exists because Bst-Table's two flag layers — `enable*` (engine behaviour)
 and `show*` (adapter chrome) — fail **silently**, not loudly:
 
-- `showSearch` without `enableGlobalFilter` → the box never renders (chrome never implies behaviour)
+- `showSearch` while `enableGlobalFilter` is **off** → the box never renders (chrome never implies behaviour; `showSearch` alone is fine — search defaults on)
 - `enableEditing` without `getRowId` → edits land on the wrong row after a sort
 - `enableEditing: { mode: 'batch' }` without `onSave` → nothing is ever persisted
 - `enableClipboard` → implies `enableCellSelection`; **paste** additionally needs `enableEditing`
 - `manualPagination` without `rowCount` → no page count
-- `enableVirtualization` → **there is no such prop** (D1 isn't built — use the server `DataSource`)
+- `enableLiveUpdates` → **there is no such prop** (I5 live/WebSocket merge isn't built — push updates by replacing `data`)
 
 ---
 
@@ -465,13 +465,13 @@ and a new guide needs no code change to join the corpus.
 **Three guards keep the server honest** — the same discipline the engine uses for its settings
 sheet (`CLAUDE.md` §12):
 
-1. Corpus generation errors if a toggle in `BST_SETTINGS_REGISTRY` has no `CLAUDE.md` §12 row.
-2. `packages/mcp/src/__tests__/rules.test.ts` fails if a toggle has no entry in
+1. Corpus generation **errors** (hard) if a toggle in `BST_SETTINGS_REGISTRY` has no `CLAUDE.md` §12 row.
+2. `packages/mcp/src/__tests__/rules.test.ts` **fails** (hard) if a toggle has no entry in
    `packages/mcp/src/rules.ts` (the hand-authored flag-dependency table).
-3. A freshness test fails if any indexed source's mtime is newer than the corpus's `generatedAt`
-   — i.e. a doc or README was edited without rebuilding the corpus (`findStaleSources`). The
-   `npm run mcp` gate builds first, so it always passes there; it catches a stale corpus during
-   local edits and in review.
+3. A freshness check **warns** (soft) if any indexed source's mtime is newer than the corpus's
+   `generatedAt` — i.e. a doc or README was edited without rebuilding the corpus (`findStaleSources`).
+   It's a warning, not a failure, so editing docs doesn't break `npm test`; `npm run mcp` builds
+   first, so the corpus is always fresh there anyway.
 
 So the rule for adding any Bst-Table feature is unchanged (`CLAUDE.md` §13) — add the §12 row and a
 `rules.ts` entry, and the MCP server updates itself.

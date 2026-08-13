@@ -5,23 +5,23 @@ _2026-08-13, synced at **v0.32.2**. Compares the `CLAUDE.md` §11 requirement le
 engine + adapter source. Re-run when a version ships._
 
 **Legend:** ✅ built · 🟡 partial · ❌ missing (needs the Phase-4 foundation / a new dep)
-**Tally:** ✅ 51 built · 🟡 5 partial · ❌ 2 missing (of 58). _(v0.30.0 — batch editing + `getChangeSet` + single-call `onSave` → I4 now partial; v0.28.0 server DataSource foundation → A3 server pagination done, A2 now partial; v0.25.0 G2 row resize; v0.23.0 B1 QR/barcode + J2 rich-text)_
+**Tally:** ✅ 53 built · 🟡 4 partial · ❌ 1 missing (of 58). _(D1 row/column virtualization + A2 infinite scroll shipped on `@tanstack/react-virtual` → both ✅, leaving I5 the only ❌; v0.30.0 — batch editing + `getChangeSet` + single-call `onSave` → I4 now partial; v0.28.0 server DataSource foundation → A3 server pagination done; v0.25.0 G2 row resize; v0.23.0 B1 QR/barcode + J2 rich-text)_
 
 | ID | Requirement | Status | Where / why |
 |---|---|---|---|
 | A1 | Inline editing | ✅ | P2 — `enableEditing` |
-| A2 | Infinite / virtual scroll | 🟡 | **data-source foundation done (v0.28.0)**; the *virtual* scroll (D1) + *infinite* fetch-on-scroll UI still to build |
+| A2 | Infinite / virtual scroll | ✅ | *virtual* scroll = D1 (`enableVirtualization`); *infinite* = **`useBstInfiniteDataSource`** (fetch-on-scroll append + `onReachEnd`) over the server `DataSource` |
 | A3 | Pagination (client/server) | ✅ | client + **server (manual mode) v0.28.0** — `useBstDataSource` / `DataSource` (manual sort/filter/paginate passthrough) |
 | A4 | Nested / master-detail | ✅ | **v0.13.0** — `enableExpanding` + `renderDetail` |
 | A5 | Inline charts / cell spanning | ✅ | **v0.12.0** spanning (`enableCellSpanning`, col+row) · charts = M1 |
-| A6 | High-perf at 3 scales | 🟡 | workflow tier ✅; **server tier reachable v0.28.0** (paginate on the server, render small pages); 10k client-virtual still needs D1 |
-| B1 | Text / long text | ✅ | P2 · QR + barcode **v0.23.0** (dep-free inline-SVG; QR verified bit-for-bit vs `qrcode`) |
-| B2 | Number (currency/precision/formats) | ✅ | P2 — `Intl` formats |
+| A6 | High-perf at 3 scales | 🟡 | workflow tier ✅; **10k client-virtual now ✅ (D1)**; server tier reachable v0.28.0 + infinite scroll (A2); 1M migration tier still to prove end-to-end |
+| B1 | Text / long text | ✅ | P2 · QR + barcode **v0.23.0** (dep-free inline-SVG; QR verified bit-for-bit vs `qrcode`) · **ERP field formats** (`cellMeta.pattern`: PAN/GSTIN/IFSC/IBAN/SWIFT/email/…) |
+| B2 | Number (currency/precision/formats) | ✅ | P2 — `Intl` formats · **ERP field formats** (`cellMeta.pattern`: Aadhaar/Verhoeff, PIN, card/Luhn) |
 | B3 | Date / time | ✅ | P2 |
 | B4 | Boolean | ✅ | P2 (now an injectable check icon) |
 | B5 | Files & attachments | 🟡 | file cell + view + **image thumbnails + file-type icons** done; PDF thumbnail (pdf.js) + upload/delete pending |
 | B6 | Single select | ✅ | P2 (inline overlay editor) |
-| B7 | Multi select (chips/overflow) | ✅ | P2 |
+| B7 | Multi select (chips/overflow) | ✅ | P2 · **width-aware chips** (`cellMeta.fitChips` — fit to column width) |
 | B8 | Radio group | ✅ | P2 |
 | B9 | Hyperlink | ✅ | P2 |
 | B10 | Action column | ✅ | P2; "floating" variant open (Q5) |
@@ -31,7 +31,7 @@ engine + adapter source. Re-run when a version ships._
 | C4 | Inline validation feedback | ✅ | P2 |
 | C5 | Shortcuts (arrows/undo-redo) | ✅ | P3 — nav + `enableUndoRedo` |
 | C6 | Tab nav (skip/wrap) | ✅ | P3 |
-| D1 | Row & column virtualization | ❌ | not implemented (no `@tanstack/react-virtual`) |
+| D1 | Row & column virtualization | ✅ | `enableVirtualization` (+ `enableColumnVirtualization`) on `@tanstack/react-virtual` — windowed rows (dynamic measure) + columns, sticky header, bounded DOM; yields to master-detail / grouping / cell spanning / row pinning. Tested (`virtualization.test.tsx`) |
 | D2 | Lightweight cell renderers | ✅ | P2 — memoized hot-path |
 | D3 | Smart column auto-size | ✅ | **v0.22.0** — double-click resizer → sampled `canvas.measureText` fit |
 | D4 | Partial / dirty-cell render | ✅ | P2–3 — draft overlay, paint-time |
@@ -80,10 +80,11 @@ validation, grid scaffolding; its corpus is generated from this file among other
 stays accurate for agents automatically).
 
 ## Still open
-**Server DataSource foundation — done (v0.28.0):** the manual sort/filter/paginate seam ships, so the
-server tier is reachable. What still builds **on top of it**: A2 *infinite* fetch-on-scroll UI ·
+**Virtualization (D1) + infinite scroll (A2) — done:** `enableVirtualization` +
+`enableColumnVirtualization` window rows/columns on `@tanstack/react-virtual`, and
+`useBstInfiniteDataSource` + `<BstTable onReachEnd>` append on scroll over the server `DataSource`.
+This closes A2 and the client-side 10k tier of A6. What still builds on the server foundation:
 I4 **backend reconcile** (the change-set + single-call `onSave` half landed in v0.30.0; applying the
-server's response back into cells/rows is what remains) · I5 live/WebSocket merge.
-**Needs virtualization (D1, `@tanstack/react-virtual`):** rendering 10k+ rows client-side · A2 *virtual*
-scroll · the client-side 10k tier of A6.
+server's response back into cells/rows is what remains) · I5 live/WebSocket merge · the 1M migration
+tier proven end-to-end (A6).
 **Smaller / dep-gated:** B5 PDF thumbnail (pdf.js) · I3 file upload/delete (DataSource verbs).

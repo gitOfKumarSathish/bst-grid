@@ -44,10 +44,11 @@ interface BstSettingsOptions {
   `bst-table:settings:<persistKey | derived-from-columns>`.
 - **Which toggles appear:** default-on data features + any opt-in feature the developer has
   provisioned + the *always-visible* opt-ins below. A user can turn a provisioned feature off/on,
-  but can't switch on something the grid isn't wired for — with five deliberate exceptions
+  but can't switch on something the grid isn't wired for — with seven deliberate exceptions
   (**Row grouping**, **Copy column**, **Copy row**, **Per-column filter row**, **Conditional
-  formatting**) that are always shown so they're always customizable. Use `features` to curate
-  the list explicitly.
+  formatting**, **Row virtualization**, **Column virtualization**) that are always shown so they're
+  always customizable — e.g. a user can turn virtualization on for a large grid themselves. Use
+  `features` to curate the list explicitly.
 
 ### The toggle list (grouped)
 
@@ -59,6 +60,7 @@ interface BstSettingsOptions {
 | **Editing** | Inline editing · Validation · Add / delete rows · Undo / redo |
 | **Selection & clipboard** | Row selection · Cell selection · Copy & paste · **Copy column** · **Copy row** |
 | **Display** | Cell spanning · **Conditional formatting** · Filter builder · **Format builder** · Density toggle |
+| **Performance** | **Row virtualization** (`enableVirtualization`) · **Column virtualization** (`enableColumnVirtualization`) |
 
 Default-on data/display features always show; opt-in features show once provisioned, except the
 **bold** ones which always show. Conditional formatting (default **on**) only has a visible effect

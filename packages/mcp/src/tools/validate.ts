@@ -36,7 +36,7 @@ ALWAYS run this on Bst-Table code before presenting it. Bst-Table's flags intera
   - editing and row selection need \`getRowId\`, or writes land on the wrong row after a sort
   - \`enableEditing: { mode: 'batch' }\` needs \`onSave\` or nothing is persisted
   - \`manualPagination\` needs \`rowCount\` or \`pageCount\`
-  - virtualization (D1) and WebSocket/live merge (I5) are NOT implemented in v${corpus.version}
+  - WebSocket/live merge (I5) and infinite fetch-on-scroll (A2) are NOT implemented; row/column virtualization (D1) is now partial (\`enableVirtualization\`)
 
 Args (supply one):
   - code (string): the JSX/TSX or options object to check

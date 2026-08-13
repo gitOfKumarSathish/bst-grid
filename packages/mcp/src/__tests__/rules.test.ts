@@ -98,6 +98,19 @@ describeCorpus('validateConfig', () => {
     expect(report.findings.some((f) => f.subject === 'enableBatchEditing' && f.message.includes('onSave'))).toBe(true)
   })
 
+  /**
+   * Batch mode requested inline (`enableEditing={{ mode: 'batch' }}`) needs
+   * `onSave` just as much as the `enableBatchEditing` flag does — the mode lives
+   * in a string value, so it must be read before scrubbing.
+   */
+  it('warns on inline batch mode without onSave', () => {
+    const missing = check("<BstTableMui getRowId={g} onDataChange={s} enableEditing={{ mode: 'batch' }} />")
+    expect(missing.findings.some((f) => f.message.includes('onSave'))).toBe(true)
+    // With onSave present, no such warning.
+    const ok = check("<BstTableMui getRowId={g} onSave={save} enableEditing={{ mode: 'batch' }} />")
+    expect(ok.findings.some((f) => f.message.includes('onSave'))).toBe(false)
+  })
+
   it('rejects props Bst-Table does not have', () => {
     const report = check('<BstTableMui enableRangeSelection showSidebar />')
     expect(report.ok).toBe(false)
@@ -108,11 +121,49 @@ describeCorpus('validateConfig', () => {
 
   /** The anti-hallucination path: asking for what doesn't exist must be refused. */
   it('refuses capabilities that are not built, citing the spec leaf', () => {
-    const report = check('<BstTableMui enableVirtualization rowVirtualizer={v} />')
+    const report = check('<BstTableMui enableLiveUpdates onWebSocketUpdate={x} />')
     expect(report.ok).toBe(false)
-    const finding = report.findings.find((f) => f.subject === 'D1')
+    const finding = report.findings.find((f) => f.subject === 'I5')
     expect(finding?.message).toContain('NOT built')
-    expect(finding?.fix).toContain('useBstDataSource')
+    expect(finding?.fix).toContain('replacing')
+  })
+
+  /**
+   * A prop that names a not-built capability yields ONE useful error (the spec
+   * leaf + workaround), not the redundant pair of "unknown option" + "not built".
+   * Regression guard for the README Quick-Start example.
+   */
+  it('reports an invented capability prop as a single spec-leaf error, not two', () => {
+    const errors = check('{ enableLiveUpdates: true }').findings.filter((f) => f.level === 'error')
+    expect(errors).toHaveLength(1)
+    expect(errors[0]?.subject).toBe('I5')
+    // The generic "not a Bst-Table option" error must be suppressed for it.
+    expect(errors.some((f) => f.subject === 'enableLiveUpdates')).toBe(false)
+  })
+
+  /** The exact README Quick-Start example must yield exactly the two errors it documents. */
+  it('matches the documented Quick-Start example (showSearch dep + I5)', () => {
+    const report = check('{ showSearch: true, enableGlobalFilter: false, enableLiveUpdates: true }')
+    const errorSubjects = report.findings.filter((f) => f.level === 'error').map((f) => f.subject).sort()
+    expect(errorSubjects).toEqual(['I5', 'showSearch'])
+  })
+
+  /**
+   * Virtualization is a REAL flag now (🟡 partial). It must NOT be flagged as an
+   * unknown/not-built prop, and its sub-toggle dependency + yield-conflicts fire.
+   */
+  it('accepts enableVirtualization as a real flag and checks its rules', () => {
+    const clean = check('<BstTableMui getRowId={g} enableVirtualization />')
+    expect(clean.findings.some((f) => f.subject === 'enableVirtualization' && f.level === 'error')).toBe(false)
+    expect(clean.findings.some((f) => f.subject === 'D1')).toBe(false)
+
+    // Column virtualization needs row virtualization on.
+    const sub = check('<BstTableMui getRowId={g} enableColumnVirtualization enableVirtualization={false} />')
+    expect(sub.findings.some((f) => f.subject === 'enableColumnVirtualization' && f.level === 'error')).toBe(true)
+
+    // It yields to grouping — surfaced as a warning, not a hard error.
+    const yields = check('<BstTableMui getRowId={g} enableVirtualization enableGrouping />')
+    expect(yields.findings.some((f) => f.subject === 'enableVirtualization' && f.message.includes('grouping'))).toBe(true)
   })
 
   it('requires a row count when paginating server-side', () => {

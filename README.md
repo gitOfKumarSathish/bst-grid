@@ -191,10 +191,11 @@ No engine change required.
 
 ## Not built yet
 
-**Virtualization** (D1 — row/column windowing via TanStack Virtual) and **infinite
-fetch-on-scroll** (A2) are the main gaps; the server `DataSource` already covers the large-data tier
-through pagination. Also pending: PDF thumbnails (B5, needs `pdf.js`), file **upload/delete**
-DataSource verbs (I3), and **live/WebSocket merge** (I5). See [`COVERAGE.md`](COVERAGE.md) and
+**Virtualization** (D1 — row/column windowing on `@tanstack/react-virtual`, plus an `onReachEnd`
+infinite-scroll hook) is **implemented and 🟡 in progress** (`enableVirtualization` +
+`enableColumnVirtualization`) — wired into `BstTable`, yielding to master-detail / grouping / spanning /
+row-pinning, not yet released. Still open: **live/WebSocket merge** (I5), PDF thumbnails (B5, needs
+`pdf.js`), and file **upload/delete** DataSource verbs (I3). See [`COVERAGE.md`](COVERAGE.md) and
 [`Plan.md`](Plan.md).
 
 ## License

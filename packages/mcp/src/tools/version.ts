@@ -133,15 +133,48 @@ Error handling:
   )
 }
 
-/** True when a dependency range plainly admits `version` (exact, `^`, `~`, `*`, or `latest`). */
-function rangeAllows(range: string, version: string): boolean {
+/** Compares two `[major, minor, patch]` tuples: -1 if a<b, 0 if equal, 1 if a>b. */
+function cmp(a: number[], b: number[]): number {
+  for (let i = 0; i < 3; i++) {
+    const x = a[i] ?? 0
+    const y = b[i] ?? 0
+    if (x !== y) return x < y ? -1 : 1
+  }
+  return 0
+}
+
+/**
+ * True when a dependency range plainly admits `version`. Best-effort, not a full
+ * semver implementation: it handles the forms that actually appear in a
+ * package.json — exact, `*` / `latest`, `x`-ranges (`0.32.x`), caret, tilde, and
+ * the comparators `>=` `>` `<=` `<`. Anything it can't parse falls back to an
+ * exact match, so it stays conservative rather than guessing.
+ */
+export function rangeAllows(range: string, version: string): boolean {
   const cleaned = range.trim()
-  if (cleaned === '*' || cleaned === 'latest' || cleaned === '') return true
+  if (cleaned === '' || cleaned === '*' || cleaned === 'x' || cleaned === 'latest') return true
   if (cleaned === version) return true
+
+  const ver = version.split('.').map(Number)
+
+  // x-ranges: `0.32.x`, `0.32.*`, `0.x` — every non-wildcard part must match.
+  if (/[x*]/i.test(cleaned) && !/^[\^~]/.test(cleaned)) {
+    const parts = cleaned.split('.')
+    return parts.every((p, i) => /^[x*]$/i.test(p) || Number(p) === ver[i])
+  }
+
   const bare = cleaned.replace(/^[\^~>=<\s]+/, '')
-  const [major, minor] = version.split('.')
-  const [wantMajor, wantMinor] = bare.split('.')
-  if (cleaned.startsWith('^')) return wantMajor === major
-  if (cleaned.startsWith('~')) return wantMajor === major && wantMinor === minor
+  const want = bare.split('.').map(Number)
+  if (want.some(Number.isNaN)) return bare === version // unparseable → exact only
+
+  // `^0.32.0` locks the minor for 0.x releases (npm semantics), else the major.
+  if (cleaned.startsWith('^')) {
+    return want[0] === 0 ? ver[0] === 0 && ver[1] === want[1] : ver[0] === want[0]
+  }
+  if (cleaned.startsWith('~')) return ver[0] === want[0] && ver[1] === want[1]
+  if (cleaned.startsWith('>=')) return cmp(ver, want) >= 0
+  if (cleaned.startsWith('>')) return cmp(ver, want) > 0
+  if (cleaned.startsWith('<=')) return cmp(ver, want) <= 0
+  if (cleaned.startsWith('<')) return cmp(ver, want) < 0
   return bare === version
 }
