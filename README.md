@@ -83,11 +83,17 @@ npm run mcp            # MCP server gate: stdio smoke test + scaffolded-output t
 ### Using the grid with an AI coding agent
 
 [`@bloomskill/table-mcp`](packages/mcp) is an MCP server that teaches agents this library — without
-it they fall back on AG Grid or MUI X DataGrid APIs, which do not exist here. Register it once:
+it they fall back on AG Grid or MUI X DataGrid APIs, which do not exist here. Register it once, at
+**user scope** so it applies to every project on the machine:
 
 ```bash
-claude mcp add bst-table -- npx -y @bloomskill/table-mcp
+claude mcp add bst-table -s user -- npx -y @bloomskill/table-mcp
 ```
+
+It is self-contained (no network, no API key) and works in any project, including ones that don't
+have `@bloomskill/table-*` installed. **Not published yet**, so until it is, use the tarball or
+local-build route — install routes, per-client config, team sharing and publishing are all in
+[`docs/mcp-server.md`](docs/mcp-server.md).
 
 The suite is **35 test files / ~245 tests** (32 engine · 1 MUI · 2 shadcn) covering every
 feature area — editing, validation, selection, clipboard, spanning, grouping, DataSource,

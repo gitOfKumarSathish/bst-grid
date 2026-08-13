@@ -48,6 +48,41 @@ accurate, version-pinned knowledge of the packages — plus scaffolding and vali
   it; `verify:portability` installs the tarball outside the workspace and proves the corpus ships
   inside it; new `npm run mcp` gate (stdio smoke + scaffold typecheck) stands in for the demo
   step of the §13 Definition of Done.
+- **`scripts/mcp-server.sh` launch wrapper**, used by this repo's `.mcp.json` and `.vscode/mcp.json`.
+  Clients spawn the server with *their* cwd and *their* `PATH` — so a relative script path can
+  resolve to nothing, and under nvm there is frequently no `node` on `PATH` at all (nvm lives in an
+  interactive shell rc, not a GUI/daemon environment). The wrapper resolves both the checkout and a
+  `node` binary from its own location, so one committed config works from any directory on any
+  machine. Diagnostics go to stderr — stdout is the JSON-RPC channel.
+
+### Added — Distribution & team-sharing docs for the MCP server (docs)
+The server was documented as something you *install*, not something you *hand to other people*, and
+the two are different problems: this repo's `.mcp.json` is project-scoped and names a path inside
+the checkout, so it does nothing in anyone else's project. Now spelled out end to end.
+
+- **`docs/mcp-server.md` §2 restructured into three named install routes** — **npm** (`npx`, the
+  zero-setup path for anyone), **tarball** (`npm pack` → `npm i -g` the `.tgz`, for sharing before
+  publishing), **local build** (for contributors) — each with the exact `command`/`args` pair, plus
+  a lookup table so every client config in §3 is the same shape with one line swapped.
+- **New `docs/mcp-server.md` §4 "Use it in your own projects — and share it with others"**: the
+  local / project / user scope table (**user scope** is the answer to "wherever I'm working";
+  project scope only ever applies to the repo it sits in), the one-command teammate setup, how to
+  commit an `.mcp.json` into a *consuming* app's repo so a team gets it on clone, the publish
+  procedure, and how corpus freshness travels with the installed version (`bst_detect_version`).
+- **Publishing caveats recorded**: `npm run release` publishes all four packages and 403s on any
+  already on the registry at the current `version.ini` version, so publish `table-mcp` alone (its
+  version is free — the *name* has never been published) or bump first; and publishing makes the
+  corpus — every README, the §12 registry, `COVERAGE.md`, all six examples — public.
+- **Client configs now lead with the npx form** and name the *user-level* config location for each
+  client (`~/.cursor/mcp.json`, VS Code *MCP: Open User Configuration*, `claude_desktop_config.json`
+  incl. its Linux path), instead of showing an absolute checkout path as the default.
+- **Fixed** the troubleshooting table's 404 row, which pointed at "Option B" for the local build
+  when Option B *was* the npm route; added rows for the release 403, for "works in the Bst-Table
+  repo but not in my app" (scope), and for a teammate's stale corpus. Uninstall now mentions
+  `npm rm -g` for the tarball route.
+- `packages/mcp/README.md` and the root `README.md` re-pointed at the same story: `-s user` in the
+  register command, self-contained/no-`@bloomskill/table-*`-needed called out, and the "not on npm
+  yet" warning reduced to one line that names the two routes that work today.
 
 ### Changed — Documentation audit across all three packages + the repo root (docs)
 Cross-verified every README against the `CLAUDE.md` §12 registry, `types.ts`, `settings.ts`, both

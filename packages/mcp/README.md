@@ -14,65 +14,77 @@ registry, the `CLAUDE.md` §12 feature table, the `COVERAGE.md` status matrix, T
 MCP server knows it; there is no second place to update and nothing to drift.
 
 > 📖 **Full setup, install & usage guide:** [`docs/mcp-server.md`](../../docs/mcp-server.md) —
-> per-client config (Claude Code · Cursor · VS Code · Claude Desktop), verification, every tool
-> with examples, workflows and troubleshooting. This README is the quick reference.
+> install routes, per-client config (Claude Code · Cursor · VS Code · Claude Desktop), **how to use
+> it in your own projects and share it with a team** (§4), verification, every tool with examples,
+> workflows and troubleshooting. This README is the quick reference.
 
 ## Install
 
-> ⚠️ **Not on npm yet.** Until the first `npm run release`, `npx -y @bloomskill/table-mcp` fails
-> with *404 Not Found* — build it locally and point your client at `dist/cli.js` instead. Both
-> forms are shown below; see [`docs/mcp-server.md`](../../docs/mcp-server.md) §2 for the full
-> build steps.
+> ⚠️ **Not on npm yet.** Until it is published, `npx -y @bloomskill/table-mcp` fails with
+> *404 Not Found*. Use the **tarball** or **local build** route below; publishing it is one command
+> — [`docs/mcp-server.md`](../../docs/mcp-server.md) §4.4.
+
+Three routes, same server over stdio — only the launch command changes:
+
+| Route | Who it's for | `command` | `args` |
+| --- | --- | --- | --- |
+| **npm** | anyone, in any project | `npx` | `["-y", "@bloomskill/table-mcp"]` |
+| **tarball** | sharing before publishing | `bst-table-mcp` | *(none)* |
+| **local build** | contributors to this repo | `node` | `["/abs/path/packages/mcp/dist/cli.js"]` |
 
 ```bash
+# tarball: build + pack here, then `npm i -g` the .tgz on the other machine
 npm run build -w @bloomskill/table-engine   # the corpus reads the engine's build output
 npm run build -w @bloomskill/table-mcp      # compile + generate dist/corpus.json
+npm pack -w @bloomskill/table-mcp           # → bloomskill-table-mcp-<version>.tgz
 ```
 
-**Claude Code**
+**Claude Code** — `-s user` registers it for **every project** on the machine (omit it and you get
+the current directory only):
 
 ```bash
-# Local build (works today) — use your own absolute path:
-claude mcp add bst-table -- node /abs/path/packages/mcp/dist/cli.js
-
-# Once published:
-claude mcp add bst-table -- npx -y @bloomskill/table-mcp
+claude mcp add bst-table -s user -- npx -y @bloomskill/table-mcp   # npm route
+claude mcp add bst-table -s user -- bst-table-mcp                  # tarball route
+claude mcp add bst-table -- node /abs/path/packages/mcp/dist/cli.js  # local build
 ```
 
-**Cursor** (`.cursor/mcp.json`) · **Claude Desktop** (`claude_desktop_config.json`) — both use the
-`mcpServers` key:
+**Cursor** (`~/.cursor/mcp.json` for all projects, `.cursor/mcp.json` for one) · **Claude Desktop**
+(`claude_desktop_config.json`) — both use the `mcpServers` key:
 
 ```json
 {
   "mcpServers": {
     "bst-table": {
-      "command": "node",
-      "args": ["/abs/path/packages/mcp/dist/cli.js"]
+      "command": "npx",
+      "args": ["-y", "@bloomskill/table-mcp"]
     }
   }
 }
 ```
 
-**VS Code / Copilot** (`.vscode/mcp.json`) uses a different shape — a `servers` key and an
-explicit `type`:
+**VS Code / Copilot** uses a different shape — a `servers` key and an explicit `type`. Command
+Palette → *MCP: Open User Configuration* for all projects, or `.vscode/mcp.json` for one:
 
 ```json
 {
   "servers": {
     "bst-table": {
       "type": "stdio",
-      "command": "node",
-      "args": ["/abs/path/packages/mcp/dist/cli.js"]
+      "command": "npx",
+      "args": ["-y", "@bloomskill/table-mcp"]
     }
   }
 }
 ```
 
-Once published, swap `command`/`args` for `"npx"` / `["-y", "@bloomskill/table-mcp"]` in any of
-the above.
-
 Requires Node ≥ 18. The server runs over **stdio** and makes no network calls — the entire
-knowledge base ships inside the package.
+knowledge base ships inside the package, so it works in **any** project, including ones that don't
+have `@bloomskill/table-*` installed.
+
+> **Sharing it with your team:** register at **user scope** (above) for "every project on my
+> machine", or commit an `.mcp.json` with the npx form into the *consuming* app's repo so everyone
+> gets it on clone. Both, plus publishing and version drift, are covered in
+> [`docs/mcp-server.md`](../../docs/mcp-server.md) §4.
 
 ## Tools
 
