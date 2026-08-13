@@ -9,6 +9,51 @@ this project uses [Semantic Versioning](https://semver.org).
 > affected package README(s) **and** bump the version, in the same change.
 
 ## [Unreleased]
+### Changed — Documentation audit across all three packages + the repo root (docs)
+Cross-verified every README against the `CLAUDE.md` §12 registry, `types.ts`, `settings.ts`, both
+adapter prop interfaces, `runtime.ts` and `index.ts`. Feature coverage was already complete
+(44/45 registry features documented, all 17 cell types catalogued, all 18 `BstColumnMeta` fields
+tabulated, every documented `runtime.*` API verified to exist); these fix the doc-hygiene gaps:
+
+- **Root `README.md` rewritten** — it still described the repo as a *Phase-1 POC* using "only easy,
+  out-of-the-box features", cited a stale "7/7 tests" figure, and listed editing, validation,
+  cell/range selection, clipboard, the server DataSource and the cell-type registry as
+  **"Not in scope yet"** — all long since shipped. Now: a package table, a grouped capability
+  summary, the real suite size (35 files / ~245 tests), a runnable-examples pointer, the portability
+  story, and an accurate "not built yet" list (D1 virtualization · A2 infinite scroll · B5 PDF
+  thumbnails · I3 upload/delete · I5 live merge).
+- **Fixed 4 broken cross-package links** — both adapter READMEs pointed at engine anchors that the
+  README overhaul had renamed: `#custom-css-classnames--styles` → `#custom-css` and
+  `#runtime-settings-usebstsettings` → `#runtime-settings-sheet`.
+- **`showColumnEditToggle` added to both adapters' Props tables** — it was implemented and described
+  in a feature bullet, but missing from the table a reader actually scans.
+- **`enableCopyColumn` / `enableCopyRow` now named in both adapter READMEs** — the copy-column
+  behaviour was described without ever naming the flags that gate it.
+- **`autoResetPageIndex` documented** (engine, Server mode) — a real public option that appeared in
+  no README; the `on*Change` row now enumerates all six callbacks.
+- **Adapters' "extends every `useBstTable` option" lists rebuilt** — the flat parenthetical stopped at
+  Phase 3 and omitted `enableRowResize`, `enableCopyColumn`/`Row`, `enableConditionalFormatting`,
+  `enableBatchEditing`, `onSave`, `tempIdPrefix` and the whole server-mode group. Now a grouped list
+  that links to the engine's options reference as the authority.
+- **Engine "Full export list" completed** — ~25 exported symbols were missing (`BST_RUNTIME`,
+  `isConditionActive`, `splitCellKey`, `createStore`, `arrayEqual`, `isRichTextEmpty`,
+  `advancedCellTypes`, and types `BstRuntimeHandle`, `BstTableEngineToggles`, `SpanRow`, `SpanCol`,
+  `BstFormatBuilderColumn`, `BstSettingsOverrides`, `DsSort`, `DsColumnFilter`, `DsPagination`,
+  `RuntimeCtx`, `CellChange`, `CellValidateContext`, `FieldErrorLevel`, `SaveTrigger`,
+  `CommitPolicy`, `VisualIndex`, `MoveActiveOptions`, `InteractionState`/`InteractionStore`/`Store`).
+- **`actionMenu` cell type, column auto-size (D3) and `meta.responsivePriority` now surfaced in both
+  adapter READMEs** — engine features both skins inherit but neither mentioned.
+- **`COVERAGE.md` re-synced** — the header claimed v0.19.0 while the packages were at v0.32.2.
+  **I4 moved ❌ → 🟡**: batch editing (v0.30.0) shipped the change-set + single-call `onSave` half;
+  reconciling the server's response back into cells/rows is what remains. Tally is now
+  ✅ 51 · 🟡 5 · ❌ 2.
+
+_No source changes — documentation only._
+
+## [0.32.2] — 2026-08-13
+_Covers the interim `0.32.1` and `0.32.2` patch bumps, which shipped the work below without their
+own headings._
+
 ### Changed — Engine README overhaul + runnable examples (docs)
 - **`packages/engine/README.md` restructured** for discoverability — the previous 38-bullet feature
   "dump" is replaced by a linked **Contents** menu, a grouped **Feature map** (Data ops · Columns ·

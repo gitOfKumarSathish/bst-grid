@@ -490,8 +490,9 @@ means *passing the object implies enabled*.
 | --- | --- | --- |
 | `manualSorting` / `manualFiltering` / `manualPagination` / `manualGrouping` | `boolean` | Run that operation server-side. |
 | `rowCount` / `pageCount` | `number` | Total rows / pages (drives the page count). |
+| `autoResetPageIndex` | `boolean` | Whether to jump back to page 0 when the data or filters change. `useBstDataSource` sets this for you — turn it off to keep the user's page across a refetch. |
 | `state` | `object` | Controlled `{ sorting, columnFilters, globalFilter, pagination }`. |
-| `on*Change` | `(updater) => void` | Controlled-state callbacks. |
+| `on*Change` | `(updater) => void` | Controlled-state callbacks — `onSortingChange` · `onColumnFiltersChange` · `onGlobalFilterChange` · `onPaginationChange` · `onGroupingChange` · `onExpandedChange`. |
 
 Built-in `sortFn`s: `basic` · `alphanumeric` · `datetime`. Built-in `filterFn`s: `includesString` ·
 `inNumberRange` · `bstCondition` (the operator-aware default).
@@ -957,43 +958,53 @@ function People() {
 <details>
 <summary><b>Full export list</b></summary>
 
-**Hooks / render** — `useBstTable` · `useBstGrid` · `getBstRuntime` · `BstTable` · `BstFilterBuilder` ·
-`BstConditionalFormatBuilder`.
+**Hooks / render** — `useBstTable` · `useBstGrid` · `getBstRuntime` · `BST_RUNTIME` · `BstTable` ·
+`BstFilterBuilder` · `BstConditionalFormatBuilder` + types `BstTableInstance`, `BstRuntimeHandle`,
+`BstFormatBuilderColumn`.
 
 **Server mode (DataSource)** — `useBstDataSource` · `createClientDataSource` · `createServerDataSource`
 \+ types `DataSource`, `DataSourceQuery`, `DataSourcePage`, `DataSourceSort`, `DataSourceFilter`,
-`BstServerTableProps`, `BstDataSourceResult`, `UseBstDataSourceOptions`.
+`BstServerTableProps`, `BstDataSourceResult`, `UseBstDataSourceOptions`, `DsSort`, `DsColumnFilter`,
+`DsPagination`.
 
 **Body icons** — `defaultBstIcons` · `resolveBstIcons` · `useBstIcons` · `BstIconsContext` ·
 `BST_ICON_SLOTS` + types `BstIcons`, `BstIconOverrides`, `IconProps`, `IconComponent`.
 
 **Settings** — `useBstSettings` · `applySettingsOverrides` · `BST_SETTINGS_REGISTRY` + types
-`BstSettingKey`, `BstSettingsItem`, `BstSettingsGroup`, `BstSettingsModel`, `BstSettingsOptions`.
+`BstSettingKey`, `BstSettingsItem`, `BstSettingsGroup`, `BstSettingsModel`, `BstSettingsOptions`,
+`BstSettingsOverrides`.
 
-**Filtering (E3)** — `evalCondition` · `operatorsForType` · `operatorArity` · `filterFn_bstCondition` ·
-`TEXT_OPERATORS` / `NUMBER_OPERATORS` / `DATE_OPERATORS` / `SELECT_OPERATORS` / `BOOLEAN_OPERATORS` +
-types `FilterOperator`, `FilterCondition`.
+**Filtering (E3)** — `evalCondition` · `isConditionActive` · `operatorsForType` · `operatorArity` ·
+`filterFn_bstCondition` · `TEXT_OPERATORS` / `NUMBER_OPERATORS` / `DATE_OPERATORS` /
+`SELECT_OPERATORS` / `BOOLEAN_OPERATORS` + types `FilterOperator`, `FilterCondition`.
 
 **Conditional formatting (K3)** — `evalCellFormat` · `evalRowFormat` · `DEFAULT_FORMAT_PRESETS` + types
 `BstFormatRule`, `BstFormatScope`, `BstFormatContext`, `FormatResult`, `BstFormatPreset`.
 
 **Cell-type registry** — `createCellTypeRegistry` · `defineCellType` · `createDefaultRegistry` ·
-`defaultCellTypes` + each `*CellType` (incl. `qrCellType` · `barcodeCellType` · `richTextCellType`).
+`defaultCellTypes` · `advancedCellTypes` + all 17 cell types: `textCellType` · `longTextCellType` ·
+`numberCellType` · `dateTimeCellType` · `booleanCellType` · `singleSelectCellType` ·
+`multiSelectCellType` · `radioCellType` · `hyperlinkCellType` · `filesCellType` ·
+`sparklineCellType` · `kpiCellType` · `actionCellType` · `actionMenuCellType` · `qrCellType` ·
+`barcodeCellType` · `richTextCellType` + type `CellTypeRegistry`.
 
 **Advanced-cell encoders** — `qrMatrix` · `code128` · `sanitizeHtml` · `htmlToText` · `escapeHtml` ·
-`RichTextEditor` + types `QrMatrix`, `QrEcLevel`, `BarcodeResult`.
+`isRichTextEmpty` · `RichTextEditor` + types `QrMatrix`, `QrEcLevel`, `BarcodeResult`.
 
 **Spanning / auto-size** — `computeCellSpans` · `computeAutoWidth` · `measureTextWidth` + types
-`BstCellSpan`, `BstSpanContext`, `SpanPlan`, `AutoSizeOptions`.
+`BstCellSpan`, `BstSpanContext`, `SpanPlan`, `SpanRow`, `SpanCol`, `AutoSizeOptions`.
 
-**Runtime / store** — `createRuntime` · `createInteractionStore` · `useStoreSelector` · `cellKey` ·
-`runValidators` · `hasBlockingError`.
+**Runtime / store** — `createRuntime` · `createInteractionStore` · `createStore` · `useStoreSelector` ·
+`arrayEqual` · `cellKey` · `splitCellKey` · `runValidators` · `hasBlockingError` + types `BstRuntime`,
+`RuntimeCtx`, `CellChange`, `BstCellEdit`, `BstRowChange`, `BstSaveEvent`, `CellAccess`, `CellRef`,
+`SaveTrigger`, `CommitPolicy`, `VisualIndex`, `MoveActiveOptions`, `InteractionState`,
+`InteractionStore`, `Store`.
 
 **Core** — `bstTableFeatures` · `createColumnHelper` · `flexRender` + types `BstTableColumn`,
-`UseBstTableOptions`, `EditingOptions`, `ValidationOptions`, `BstClassNames`, `BstStyles`,
-`BstRowContext`, `BstHeaderSlotContext`, `CellType`, `CellRenderProps`, `CellEditProps`,
-`BstColumnMeta`, `BstOption`, `BstCellApi`, `FieldError`, `CellRef`, `CellAccess`, `BstRuntime`,
-`BstTableInstance`, `BstTableFeatures`, `BstSaveEvent`, `BstCellEdit`, `BstRowChange`.
+`UseBstTableOptions`, `BstTableEngineToggles`, `BstTableFeatures`, `EditingOptions`,
+`ValidationOptions`, `BstClassNames`, `BstStyles`, `BstRowContext`, `BstHeaderSlotContext`,
+`CellType`, `CellRenderProps`, `CellEditProps`, `CellValidateContext`, `BstColumnMeta`, `BstOption`,
+`BstCellApi`, `FieldError`, `FieldErrorLevel`.
 
 </details>
 

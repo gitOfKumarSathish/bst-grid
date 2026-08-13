@@ -1,11 +1,11 @@
 # Bst-Table — Spec coverage matrix (58 leaves)
 
-_2026-08-11, synced at **v0.19.0**. Compares the `CLAUDE.md` §11 requirement leaves
-(A1–M2) against what has shipped (`CHANGELOG` v0.1.0 → v0.19.0), verified against the
+_2026-08-13, synced at **v0.32.2**. Compares the `CLAUDE.md` §11 requirement leaves
+(A1–M2) against what has shipped (`CHANGELOG` v0.1.0 → v0.32.2), verified against the
 engine + adapter source. Re-run when a version ships._
 
 **Legend:** ✅ built · 🟡 partial · ❌ missing (needs the Phase-4 foundation / a new dep)
-**Tally:** ✅ 51 built · 🟡 4 partial · ❌ 3 missing (of 58). _(v0.28.0 — server DataSource foundation → A3 server pagination done, A2 now partial; v0.25.0 G2 row resize; v0.23.0 B1 QR/barcode + J2 rich-text)_
+**Tally:** ✅ 51 built · 🟡 5 partial · ❌ 2 missing (of 58). _(v0.30.0 — batch editing + `getChangeSet` + single-call `onSave` → I4 now partial; v0.28.0 server DataSource foundation → A3 server pagination done, A2 now partial; v0.25.0 G2 row resize; v0.23.0 B1 QR/barcode + J2 rich-text)_
 
 | ID | Requirement | Status | Where / why |
 |---|---|---|---|
@@ -55,7 +55,7 @@ engine + adapter source. Re-run when a version ships._
 | I1 | Row lifecycle events | ✅ | P2 — `enableRowActions` + `onDataChange` |
 | I2 | Cell events + deferred save | ✅ | P2 (C2≡I2) |
 | I3 | File ops (upload/view/delete) | 🟡 | view + thumbnails done; **upload/delete** (DataSource verbs) pending |
-| I4 | Backend updates → cells/rows/grid | ❌ | change-set / reconciliation not built |
+| I4 | Backend updates → cells/rows/grid | 🟡 | **change-set half done v0.30.0** — batch mode's `runtime.getChangeSet()` + one `onSave({ changes, rows[].patch, next })` per save action, with a rejected save keeping every draft; **reconciling the backend's response back into cells/rows** (server-authoritative values, partial failures) not built |
 | I5 | External updates (parent/WS) | ❌ | WebSocket / live merge not built |
 | J1 | Popup form editors | ✅ | P2 — Dialog / modal popups |
 | J2 | Rich / custom React editors | ✅ | custom React ✅ · rich-text **v0.23.0** (dep-free sanitized-HTML cell + popup editor; not Lexical) |
@@ -79,7 +79,8 @@ undo/redo · cell/range selection + keyboard nav · clipboard · **runtime setti
 ## Still open
 **Server DataSource foundation — done (v0.28.0):** the manual sort/filter/paginate seam ships, so the
 server tier is reachable. What still builds **on top of it**: A2 *infinite* fetch-on-scroll UI ·
-I4 backend reconcile (change-set) · I5 live/WebSocket merge.
+I4 **backend reconcile** (the change-set + single-call `onSave` half landed in v0.30.0; applying the
+server's response back into cells/rows is what remains) · I5 live/WebSocket merge.
 **Needs virtualization (D1, `@tanstack/react-virtual`):** rendering 10k+ rows client-side · A2 *virtual*
 scroll · the client-side 10k tier of A6.
 **Smaller / dep-gated:** B5 PDF thumbnail (pdf.js) · I3 file upload/delete (DataSource verbs).

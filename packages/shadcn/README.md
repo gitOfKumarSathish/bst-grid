@@ -18,7 +18,7 @@ so you can switch skins without changing your data code.
 - 🧱 **Drop-in shadcn-style grid** — one `<BstTableShadcn />` component.
 - 🎛 **Radix DropdownMenu** column-visibility menu; shadcn-style search & pagination.
 - ✏️ **Editing (Phase 2)** at MUI parity — native-control editors for the full B-series, a dependency-free **modal** for long-text & file popups, **Add row** button + unsaved **Save / Discard** bar, inline error rings. Wired via `createShadcnPreset()`.
-- ⌨️ **Selection · keyboard nav · clipboard (Phase 3)** — pass `enableCellSelection` / `enableClipboard`; range selection, Arrow/Tab/Home/End navigation, and copy/paste (TSV) come from the shared grid body, no extra chrome required. The **Columns menu** gains a **Copy-column** button (the pluggable `copy` icon) per column — copies the whole column across **all pages** (also Ctrl/Cmd+Space).
+- ⌨️ **Selection · keyboard nav · clipboard (Phase 3)** — pass `enableCellSelection` / `enableClipboard`; range selection, Arrow/Tab/Home/End navigation, and copy/paste (TSV) come from the shared grid body, no extra chrome required. The **Columns menu** gains a **Copy-column** button (the pluggable `copy` icon) per column — copies the whole column across **all pages** (also Ctrl/Cmd+Space). Whole-column and whole-row copy are sub-toggles: **`enableCopyColumn`** / **`enableCopyRow`** (both default `true`; Shift+Space copies a row).
 - ☑️ **Row selection (Phase 3)** — `enableRowSelection` renders a checkbox column (header select-all + per-row) and a toolbar "{n} selected" badge + Clear (`showSelectionInfo`).
 - ↩️ **Undo/redo (Phase 3)** — `enableUndoRedo` adds toolbar Undo/Redo buttons (`showUndoRedo`) wired to the engine's edit history (Ctrl/Cmd+Z / Ctrl/Cmd+Y also work).
 - 📌 **Layout chrome (Phase 3)** — `enableColumnPinning` / `enableColumnOrdering` add pin + move controls to the Radix columns menu; `showDensityToggle` cycles row-height density; **`enableRowResize`** lets users drag a row's bottom edge to set its height (double-click to reset). **`showColumnEditToggle`** adds a per-column **edit lock/unlock** (✏️) so an end-user can make an editable column read-only at runtime (requires `enableEditing`).
@@ -38,6 +38,13 @@ so you can switch skins without changing your data code.
 - 🖌️ **Custom CSS** — `className` / `style` on the outer card; the engine's `classNames` / `styles` slots + per-column `meta.cellClassName` / `headerClassName` style the grid body.
 - 📈 **In-cell visualization** — `sparkline` (line / area / bar) and `kpi` (value + delta + mini-spark) cell types via `meta.type` — dep-free inline SVG, no charting library.
 - 🔳 **QR · barcode · rich-text cells** — `meta.type: 'qr'` / `'barcode'` render dep-free inline-SVG QR codes + Code 128 barcodes; `'richText'` stores sanitized HTML — a plain-text preview by default, or set `cellMeta.render: 'html'` to show it **formatted** in the cell — and edits in a shadcn **modal** with a formatting toolbar. From the shared engine.
+- ⋯ **Row action menu** — `meta.type: 'actionMenu'` renders a compact **⋯** kebab popup of the row's
+  actions (edit / save / cancel / duplicate / delete), the space-saving alternative to the inline
+  `action` buttons. Inherited from the engine preset, styled by the skin.
+- 📏 **Column auto-size** — **double-click** any resize handle to fit the column to its content
+  (sampled `canvas.measureText`, clamped to `minSize`/`maxSize`). Pair `enableResponsive` with
+  `meta.responsivePriority` to drop low-priority columns on narrow screens, or use `fitColumns` to
+  remove horizontal scrolling entirely.
 - 🎨 **Ships its own CSS — no Tailwind build required.** Just import the stylesheet.
 - ✅ OOTB sorting · search · pagination · column visibility · resizing, with the same
   `enable*` / `show*` toggles as every Bst-Table skin.
@@ -140,7 +147,7 @@ listed, so users can't switch on something the grid isn't wired for.
 ```
 
 The same headless model powers both skins — it's the engine's `useBstSettings` hook
-([docs](https://www.npmjs.com/package/@bloomskill/table-engine#runtime-settings-usebstsettings)).
+([docs](https://www.npmjs.com/package/@bloomskill/table-engine#runtime-settings-sheet)).
 
 ### Icons
 
@@ -192,14 +199,28 @@ your theme — including dark, which your app's `.dark` class already drives.
 
 ## Props
 
-Extends every [`useBstTable` option](https://www.npmjs.com/package/@bloomskill/table-engine)
-(`data`, `columns`, `getRowId`, `enableSorting`, `enableGlobalFilter`, `enableColumnFilters`,
-`enableHiding`, `enableColumnResizing`, `pagination`, plus Phase-2 `enableEditing`, `enableValidation`,
-`enableRowActions`, `cellTypes`, `onDataChange`, `createRow`, `disabled`, `rowDisabled`,
-`cellDisabled`, `initialState`, `classNames`, `styles`, `enableCellSpanning`, `getCellSpan`,
-`enableExpanding`, `renderDetail`, `getRowCanExpand`, `enableRowPinning`, `enableGrouping`, `conditionalFormats`, `fitColumns`, `enableResponsive`, plus Phase-3 `enableRowSelection`,
-`enableCellSelection`, `enableClipboard`, `enableUndoRedo`, `enableColumnPinning`,
-`enableColumnOrdering`, `enableColumnFilterRow`) plus:
+Extends **every** [`useBstTable` option](https://www.npmjs.com/package/@bloomskill/table-engine#options-reference)
+— the engine README's options reference is the authoritative list. In summary:
+
+- **Core** — `data` · `columns` · `getRowId` · `initialState`
+- **Data ops** — `enableSorting` · `enableGlobalFilter` · `enableColumnFilters` · `enableColumnFilterRow` ·
+  `enableGrouping` · `pagination`
+- **Columns & layout** — `enableHiding` · `enableColumnResizing` · `enableColumnPinning` ·
+  `enableColumnOrdering` · `fitColumns` · `enableResponsive`
+- **Rows** — `enableRowSelection` · `enableRowActions` · `enableExpanding` · `renderDetail` ·
+  `getRowCanExpand` · `enableRowPinning` · `enableRowResize` · `createRow` · `tempIdPrefix`
+- **Editing** — `enableEditing` · `enableValidation` · `enableBatchEditing` · `enableUndoRedo` ·
+  `cellTypes` · `onDataChange` · `onSave`
+- **Selection & clipboard** — `enableCellSelection` · `enableClipboard` · `enableCopyColumn` ·
+  `enableCopyRow`
+- **Access control** — `disabled` · `rowDisabled` · `cellDisabled`
+- **Cells & styling** — `enableCellSpanning` · `getCellSpan` · `conditionalFormats` ·
+  `enableConditionalFormatting` · `classNames` · `styles`
+- **Server mode** — `manualSorting` / `manualFiltering` / `manualPagination` / `manualGrouping` ·
+  `rowCount` / `pageCount` · `autoResetPageIndex` · `state` · `on*Change` (spread
+  `useBstDataSource(...).tableProps` straight in)
+
+Plus the shadcn-only chrome props:
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -219,6 +240,7 @@ Extends every [`useBstTable` option](https://www.npmjs.com/package/@bloomskill/t
 | `showSelectionInfo` | `boolean` | follows `enableRowSelection` | Show the "{n} selected" chip + Clear. |
 | `showUndoRedo` | `boolean` | follows `enableUndoRedo` | Show the Undo/Redo buttons. |
 | `showDensityToggle` | `boolean` | `false` | Show the row-height density button. |
+| `showColumnEditToggle` | `boolean` | `false` | Add a per-column **edit lock/unlock** (✏️) to the Radix columns menu, so an end-user can make an editable column read-only at runtime. Requires `enableEditing`. |
 | `showFilterBuilder` | `boolean` | `false` | Show the Filters button + filter-builder panel (E3). |
 | `showFormatBuilder` | `boolean` | `false` | Show the Formats button + conditional-format builder panel (K3). Needs `enableConditionalFormatting` (default on). |
 | `onConditionalFormatsChange` | `(rules) => void` | — | Own the builder's rule edits (controlled mode); omit for local, uncontrolled edits. |
@@ -230,7 +252,7 @@ Extends every [`useBstTable` option](https://www.npmjs.com/package/@bloomskill/t
 **Custom CSS:** the engine's `classNames` / `styles` slot objects are forwarded to the grid body —
 style the root / header / row / cell / … parts, or a whole column via `meta.cellClassName` /
 `meta.headerClassName`. See the engine's
-[Custom CSS](https://www.npmjs.com/package/@bloomskill/table-engine#custom-css-classnames--styles).
+[Custom CSS](https://www.npmjs.com/package/@bloomskill/table-engine#custom-css).
 Use the adapter's `className` / `style` for the outer card.
 
 **Toggle convention:** `enable*` controls engine behaviour, `show*` controls chrome.
