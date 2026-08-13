@@ -1,0 +1,9 @@
+{
+  "servers": {
+    "bst-table": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["${workspaceFolder}/packages/mcp/dist/cli.js"]
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "bst-table": {
+      "command": "node",
+      "args": ["packages/mcp/dist/cli.js"]
+    }
+  }
+}
