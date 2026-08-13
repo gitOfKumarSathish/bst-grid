@@ -2,6 +2,17 @@
   "name": "@bloomskill/table-mui",
   "version": "0.33.0",
   "description": "Bst-Table MUI style adapter — Material UI toolbar/menus/pagination around the @bloomskill/table-engine grid body.",
+  "keywords": [
+    "react",
+    "table",
+    "data-grid",
+    "datagrid",
+    "mui",
+    "material-ui",
+    "tanstack-table",
+    "editable-grid",
+    "bst-table"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gitOfKumarSathish/bst-grid.git",

@@ -2,6 +2,19 @@
   "name": "@bloomskill/table-shadcn",
   "version": "0.33.0",
   "description": "Bst-Table shadcn/Radix style adapter — Radix primitives + shadcn-style CSS around the @bloomskill/table-engine grid body.",
+  "keywords": [
+    "react",
+    "table",
+    "data-grid",
+    "datagrid",
+    "shadcn",
+    "shadcn-ui",
+    "radix-ui",
+    "tailwindcss",
+    "tanstack-table",
+    "editable-grid",
+    "bst-table"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gitOfKumarSathish/bst-grid.git",

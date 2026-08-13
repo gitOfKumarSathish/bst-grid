@@ -2,6 +2,21 @@
   "name": "@bloomskill/table-engine",
   "version": "0.33.0",
   "description": "Bst-Table headless engine — TanStack Table v9 wiring + neutral renderer + CSS-var theme tokens. UI-library agnostic.",
+  "keywords": [
+    "react",
+    "table",
+    "data-grid",
+    "datagrid",
+    "data-table",
+    "tanstack-table",
+    "react-table",
+    "headless",
+    "virtualization",
+    "editable-grid",
+    "spreadsheet",
+    "typescript",
+    "bst-table"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gitOfKumarSathish/bst-grid.git",

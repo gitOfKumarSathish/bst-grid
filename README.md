@@ -62,7 +62,7 @@ the tools up on its own:
 > Build me a Bst-Table grid of orders with inline editing, a status dropdown and copy/paste.
 
 The component it returns **compiles**, with every flag dependency already satisfied. It also knows
-what *doesn't* exist here (`enableVirtualization` is not a flag) and which combinations fail
+what *doesn't* exist here (`enableLiveUpdates` is not a flag) and which combinations fail
 silently (`showSearch` does nothing without `enableGlobalFilter`).
 
 Two properties make it trustworthy: the knowledge base is **generated from this repo at build
@@ -191,12 +191,13 @@ No engine change required.
 
 ## Not built yet
 
-**Virtualization** (D1 — row/column windowing on `@tanstack/react-virtual`, plus an `onReachEnd`
-infinite-scroll hook) is **implemented and 🟡 in progress** (`enableVirtualization` +
-`enableColumnVirtualization`) — wired into `BstTable`, yielding to master-detail / grouping / spanning /
-row-pinning, not yet released. Still open: **live/WebSocket merge** (I5), PDF thumbnails (B5, needs
-`pdf.js`), and file **upload/delete** DataSource verbs (I3). See [`COVERAGE.md`](COVERAGE.md) and
-[`Plan.md`](Plan.md).
+The genuinely open items are **live / WebSocket merge** (I5 — for now, push updates by replacing
+`data`), **reconciling a backend's response back into cells** (I4 — server-authoritative values /
+partial failures; the batch change-set + single-call `onSave` half is done), and an **in-cell PDF
+thumbnail** render (B5 — needs `pdf.js`; file preview already opens PDFs in the browser's native
+viewer). Row/column **virtualization** (D1) + **infinite scroll** (A2) and the file
+**upload / view / delete** DataSource verbs (I3) all shipped in **0.33.0**. See
+[`COVERAGE.md`](COVERAGE.md) and [`Plan.md`](Plan.md).
 
 ## License
 

@@ -10,7 +10,7 @@ component-library styling**, so you pair it with a skin:
 [`@bloomskill/table-mui`](https://www.npmjs.com/package/@bloomskill/table-mui),
 [`@bloomskill/table-shadcn`](https://www.npmjs.com/package/@bloomskill/table-shadcn), or your own.
 
-- 🪶 **Zero extra deps** — only `@tanstack/react-table`; `react` / `react-dom` are peers.
+- 🪶 **Two lightweight deps** — `@tanstack/react-table` + `@tanstack/react-virtual`; `react` / `react-dom` are peers.
 - 🎛 **Every feature is a toggle** — data features on by default, heavy features opt-in.
 - 🛰️ **One grid, every scale** — the same component runs client-side or against a server `DataSource` (1M rows).
 
@@ -61,7 +61,7 @@ component-library styling**, so you pair it with a skin:
 npm install @bloomskill/table-engine react react-dom
 ```
 
-`@tanstack/react-table` ships as a dependency — you don't install it separately.
+`@tanstack/react-table` and `@tanstack/react-virtual` ship as dependencies — you don't install them separately.
 
 ## Quick start
 
@@ -955,7 +955,7 @@ const table = useBstTable(effective)   // enable*/show* now reflect the user's c
 
 ## Virtualization (D1)
 
-> 🟡 **Status:** implemented and wired on `@tanstack/react-virtual`; not yet released (see [`COVERAGE.md`](../../COVERAGE.md)).
+> **Available since 0.33.0** — row/column windowing on `@tanstack/react-virtual` (see [`COVERAGE.md`](../../COVERAGE.md)).
 
 Render only the rows (and, optionally, columns) inside the scroll viewport, so a 10k–1M-row dataset
 stays smooth with a bounded DOM. Opt-in and **off by default** — a normal grid keeps its whole row
@@ -1148,7 +1148,8 @@ preview fallback. New exports: `createFileHandlers`, types `BstFileRef`, `DataSo
 
 ## Requirements
 
-- React `>= 18`
+- **Peers:** `react` / `react-dom` `>= 18`
+- **Bundled** (installed automatically): `@tanstack/react-table` `^9`, `@tanstack/react-virtual` `^3`
 
 ## License
 
