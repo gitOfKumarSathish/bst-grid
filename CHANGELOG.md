@@ -9,6 +9,17 @@ this project uses [Semantic Versioning](https://semver.org).
 > affected package README(s) **and** bump the version, in the same change.
 
 ## [Unreleased]
+### Added — DataSource file verbs (I3, formal): `uploadFile` / `deleteFile` / `getFileUrl`
+- The **`DataSource` contract** (`@bloomskill/table-engine`) gains three optional file verbs
+  (Plan.md §2.2) so file storage can move server-side: **`uploadFile(file, ctx?)`** → a stored
+  **`BstFileRef`**, **`deleteFile(ref, ctx?)`**, and **`getFileUrl(ref, ctx?)`** → a fresh
+  short-lived view URL (so B5 thumbnails never embed a permanent URL in row data).
+  **`createFileHandlers(source, ctx?)`** bridges them to a `files` cell's `cellMeta.onUpload` /
+  `onDelete`, so ONE server contract drives both the grid query and file storage; a source without
+  the verbs yields no handlers (the cell keeps its local object-URL preview fallback). New exports:
+  `createFileHandlers`, types `BstFileRef`, `DataSourceFileContext`, `BstFileCellHandlers`. Tested
+  (`dataSourceFiles.test.ts`). Completes I3 alongside the cell-level upload/delete below.
+
 ### Added — File preview + configurable upload/delete (B5/I3)
 - **Click-to-preview for the `files` cell** (`@bloomskill/table-engine`) — clicking a file opens a
   **dependency-free preview overlay** (`BstFilePreview`, exported): **images** render inline, **PDFs

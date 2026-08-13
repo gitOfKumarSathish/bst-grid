@@ -49,14 +49,55 @@ export interface DataSourcePage<TData> {
 }
 
 /**
+ * A stored file reference the grid keeps in row data (I3, Plan.md §2.2). `url`
+ * should be a **short-lived / signed** view URL, not a permanent link — resolve it
+ * on demand with `getFileUrl` so B5 thumbnails never bake a permanent URL into the
+ * row. Structurally a superset of the adapters' file-cell shape, so a ref returned
+ * by `uploadFile` drops straight into a `files` cell.
+ */
+export interface BstFileRef {
+  /** Display name. */
+  name: string
+  /** Stable storage id/key — what `uploadFile` returns and `deleteFile`/`getFileUrl` take. */
+  id?: string
+  /** A (possibly short-lived) URL to view / download the file. */
+  url?: string
+  /** MIME type, when known. */
+  contentType?: string
+  /** Size in bytes, when known. */
+  size?: number
+}
+
+/** Where a file verb is acting — lets the server scope the upload/delete to a cell. */
+export interface DataSourceFileContext {
+  /** Row the file belongs to (if any). */
+  rowId?: string
+  /** Column the file belongs to (if any). */
+  columnId?: string
+}
+
+/**
  * A pluggable data source. `signal` aborts a request the grid has superseded.
  * Sort/filter `id`s are the **column ids** (map them to your DB fields
  * server-side). Grouping and expansion are NOT part of the query — server-side
  * grouping/aggregation is a separate concern, so enable `enableGrouping` only in
  * client mode.
+ *
+ * The three **file verbs** (I3, Plan.md §2.2) are optional — implement them to move
+ * file storage server-side; bridge them to a `files` cell with
+ * {@link createFileHandlers}.
  */
 export interface DataSource<TData> {
   fetch(query: DataSourceQuery, signal?: AbortSignal): Promise<DataSourcePage<TData>>
+  /**
+   * I3 — upload one picked file and return the stored {@link BstFileRef} to put in
+   * the row. Throw/reject to surface the failure (the cell keeps its busy state off).
+   */
+  uploadFile?(file: File, ctx?: DataSourceFileContext, signal?: AbortSignal): Promise<BstFileRef>
+  /** I3 — delete a stored file (runs before the cell removes it). */
+  deleteFile?(ref: BstFileRef, ctx?: DataSourceFileContext, signal?: AbortSignal): Promise<void>
+  /** I3 — resolve a fresh (short-lived) view URL for a stored file — B5 thumbnails / preview. */
+  getFileUrl?(ref: BstFileRef, ctx?: DataSourceFileContext, signal?: AbortSignal): Promise<string>
 }
 
 /**
@@ -148,4 +189,32 @@ export function createClientDataSource<TData>(
       }
     },
   }
+}
+
+/** The `files` cell hooks a {@link createFileHandlers} bridge produces. */
+export interface BstFileCellHandlers {
+  onUpload?: (file: File) => Promise<BstFileRef>
+  onDelete?: (ref: BstFileRef) => Promise<void>
+}
+
+/**
+ * Bridge a {@link DataSource}'s file verbs (I3) to the `files` cell's
+ * `cellMeta.onUpload` / `cellMeta.onDelete` hooks, so ONE server contract drives
+ * both the grid query and file storage. Drop the result into a column:
+ *
+ * ```ts
+ * meta: { type: 'files', editable: true, cellMeta: createFileHandlers(source) }
+ * ```
+ *
+ * Only the verbs the source actually implements are wired (a source with no
+ * `uploadFile` leaves the cell on its local object-URL preview fallback).
+ */
+export function createFileHandlers<TData>(
+  source: DataSource<TData>,
+  ctx?: DataSourceFileContext,
+): BstFileCellHandlers {
+  const handlers: BstFileCellHandlers = {}
+  if (source.uploadFile) handlers.onUpload = (file: File) => source.uploadFile!(file, ctx)
+  if (source.deleteFile) handlers.onDelete = (ref: BstFileRef) => source.deleteFile!(ref, ctx)
+  return handlers
 }

@@ -5,7 +5,7 @@ _2026-08-13, synced at **v0.32.2**. Compares the `CLAUDE.md` §11 requirement le
 engine + adapter source. Re-run when a version ships._
 
 **Legend:** ✅ built · 🟡 partial · ❌ missing (needs the Phase-4 foundation / a new dep)
-**Tally:** ✅ 53 built · 🟡 4 partial · ❌ 1 missing (of 58). _(D1 row/column virtualization + A2 infinite scroll shipped on `@tanstack/react-virtual` → both ✅, leaving I5 the only ❌; v0.30.0 — batch editing + `getChangeSet` + single-call `onSave` → I4 now partial; v0.28.0 server DataSource foundation → A3 server pagination done; v0.25.0 G2 row resize; v0.23.0 B1 QR/barcode + J2 rich-text)_
+**Tally:** ✅ 54 built · 🟡 3 partial · ❌ 1 missing (of 58). _(I3 file ops now ✅ — formal `DataSource.uploadFile`/`deleteFile`/`getFileUrl` verbs + `createFileHandlers` bridge on top of the cell-level upload/delete; D1 row/column virtualization + A2 infinite scroll shipped on `@tanstack/react-virtual` → both ✅, leaving I5 the only ❌; v0.30.0 — batch editing + `getChangeSet` + single-call `onSave` → I4 now partial; v0.28.0 server DataSource foundation → A3 server pagination done; v0.25.0 G2 row resize; v0.23.0 B1 QR/barcode + J2 rich-text)_
 
 | ID | Requirement | Status | Where / why |
 |---|---|---|---|
@@ -54,7 +54,7 @@ engine + adapter source. Re-run when a version ships._
 | H4 | Paste | ✅ | P3 — needs `enableEditing` |
 | I1 | Row lifecycle events | ✅ | P2 — `enableRowActions` + `onDataChange` |
 | I2 | Cell events + deferred save | ✅ | P2 (C2≡I2) |
-| I3 | File ops (upload/view/delete) | 🟡 | view + **preview** + **upload/delete configurable** via `cellMeta.onUpload(file)` / `onDelete(file)` (busy state; local object-URL fallback for offline); folding these into the formal server **DataSource verbs** still pending |
+| I3 | File ops (upload/view/delete) | ✅ | view + **preview** (`BstFilePreview`) + **upload/delete** via `cellMeta.onUpload`/`onDelete` (busy state; local object-URL fallback), now also **formal `DataSource` verbs** `uploadFile`/`deleteFile`/`getFileUrl` + `createFileHandlers(source)` bridge (Plan.md §2.2) |
 | I4 | Backend updates → cells/rows/grid | 🟡 | **change-set half done v0.30.0** — batch mode's `runtime.getChangeSet()` + one `onSave({ changes, rows[].patch, next })` per save action, with a rejected save keeping every draft; **reconciling the backend's response back into cells/rows** (server-authoritative values, partial failures) not built |
 | I5 | External updates (parent/WS) | ❌ | WebSocket / live merge not built |
 | J1 | Popup form editors | ✅ | P2 — Dialog / modal popups |
@@ -87,4 +87,4 @@ This closes A2 and the client-side 10k tier of A6. What still builds on the serv
 I4 **backend reconcile** (the change-set + single-call `onSave` half landed in v0.30.0; applying the
 server's response back into cells/rows is what remains) · I5 live/WebSocket merge · the 1M migration
 tier proven end-to-end (A6).
-**Smaller / dep-gated:** B5 in-cell PDF **thumbnail** (pdf.js) — click-to-preview + upload/delete already ship (`BstFilePreview` + `cellMeta.onUpload`/`onDelete`) · I3 folding upload/delete into the formal server **DataSource verbs**.
+**Smaller / dep-gated:** B5 in-cell PDF **thumbnail** (pdf.js) — click-to-preview + upload/delete already ship (`BstFilePreview` + `cellMeta.onUpload`/`onDelete` + the formal `DataSource` file verbs).

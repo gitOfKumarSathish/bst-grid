@@ -30,13 +30,16 @@ export {
 export type { FilterOperator, FilterCondition } from './filtering.js'
 
 // ---- DataSource (server tier — manual sort / filter / paginate; Plan.md §5) ----
-export { createClientDataSource, createServerDataSource } from './datasource.js'
+export { createClientDataSource, createServerDataSource, createFileHandlers } from './datasource.js'
 export type {
   DataSource,
   DataSourceQuery,
   DataSourcePage,
   DataSourceSort,
   DataSourceFilter,
+  BstFileRef,
+  DataSourceFileContext,
+  BstFileCellHandlers,
 } from './datasource.js'
 export { useBstDataSource } from './useBstDataSource.js'
 export type {

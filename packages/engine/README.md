@@ -1066,6 +1066,26 @@ Returns `{ rows, totalCount, loading, isFetchingNextPage, hasNextPage, fetchNext
 refetch, tableProps }`. Sort / filter still run server-side and **reset** the accumulation to the
 first window.
 
+**File verbs (I3).** The `DataSource` contract has three optional file verbs so file storage can move
+server-side (Plan.md §2.2): **`uploadFile(file, ctx?)`** → returns a stored `BstFileRef`,
+**`deleteFile(ref, ctx?)`**, and **`getFileUrl(ref, ctx?)`** → a fresh short-lived view URL (so B5
+thumbnails never bake a permanent URL into row data). Bridge them to a `files` cell's editor with
+**`createFileHandlers(source, ctx?)`** — it returns the `onUpload` / `onDelete` the cell already uses:
+
+```tsx
+import { createFileHandlers } from '@bloomskill/table-engine'
+
+const source = createServerDataSource(fetchPage) // also implements uploadFile/deleteFile/getFileUrl
+const columns = [
+  { id: 'docs', accessorKey: 'docs', header: 'Docs',
+    meta: { type: 'files', editable: true, cellMeta: createFileHandlers(source) } },
+]
+```
+
+A source that implements neither verb yields no handlers, so the cell keeps its local object-URL
+preview fallback. New exports: `createFileHandlers`, types `BstFileRef`, `DataSourceFileContext`,
+`BstFileCellHandlers`.
+
 ---
 
 ## Exports
@@ -1077,8 +1097,9 @@ first window.
 `BstFilterBuilder` · `BstConditionalFormatBuilder` + types `BstTableInstance`, `BstRuntimeHandle`,
 `BstFormatBuilderColumn`.
 
-**Server mode (DataSource)** — `useBstDataSource` · `useBstInfiniteDataSource` · `createClientDataSource` · `createServerDataSource`
+**Server mode (DataSource)** — `useBstDataSource` · `useBstInfiniteDataSource` · `createClientDataSource` · `createServerDataSource` · `createFileHandlers`
 \+ types `DataSource`, `DataSourceQuery`, `DataSourcePage`, `DataSourceSort`, `DataSourceFilter`,
+`BstFileRef`, `DataSourceFileContext`, `BstFileCellHandlers`,
 `BstServerTableProps`, `BstDataSourceResult`, `UseBstDataSourceOptions`,
 `BstInfiniteDataSourceResult`, `UseBstInfiniteDataSourceOptions`, `BstInfiniteTableProps`,
 `DsSort`, `DsColumnFilter`,
