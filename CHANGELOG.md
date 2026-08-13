@@ -9,6 +9,21 @@ this project uses [Semantic Versioning](https://semver.org).
 > affected package README(s) **and** bump the version, in the same change.
 
 ## [Unreleased]
+### Added — File preview + configurable upload/delete (B5/I3)
+- **Click-to-preview for the `files` cell** (`@bloomskill/table-engine`) — clicking a file opens a
+  **dependency-free preview overlay** (`BstFilePreview`, exported): **images** render inline, **PDFs
+  open in the browser's native viewer** (`<iframe>` — no `pdf.js`), anything else offers an
+  open/download link. Closes on Escape / backdrop click. Opt out per column with `cellMeta.preview:
+  false` (a file needs a `url` to preview).
+- **Configurable upload / delete in the adapters' file editor** (`@bloomskill/table-mui` +
+  `@bloomskill/table-shadcn`) — `cellMeta.onUpload(file) => FileRef | Promise<FileRef>` uploads each
+  picked file (busy state shown; errors surfaced) and `cellMeta.onDelete(file) => void |
+  Promise<void>` runs before removal, so real backends wire in with two callbacks. Without `onUpload`
+  the editor keeps a **local object URL** so preview still works offline; `cellMeta.accept` /
+  `multiple` tune the picker, and file names in the editor are click-to-preview too. New
+  `filePreview.test.tsx`; demo's Files column gains previewable docs + mock upload/delete. Both skins
+  reach parity (shadcn's dep-free modal + MUI's Dialog).
+
 ### Added — ERP field formats: `cellMeta.pattern` (Aadhaar / PAN / GSTIN / IFSC / …) (B1/B2)
 - **`cellMeta.pattern`** (`@bloomskill/table-engine`) — a Frappe-style **field-format preset** on a
   plain `text` or `number` cell that brings its own **validation + input mask + normalizer**, so the

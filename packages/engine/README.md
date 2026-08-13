@@ -201,6 +201,7 @@ settings (e.g. `pagination={{ pageSize: 25 }}`). Follow a link for the full guid
 | [QR · barcode · rich text](#cell-types) | `meta.type: 'qr' \| 'barcode' \| 'richText'` | — |
 | [ERP field formats (Aadhaar · PAN · GSTIN · IBAN · Luhn …)](#cellmeta-by-cell-type) | `cellMeta.pattern` on `text` / `number` | — |
 | [Width-aware chips (fit to column)](#cellmeta-by-cell-type) | `cellMeta.fitChips` on `multiSelect` | `false` |
+| [File preview + upload/delete (B5/I3)](#cellmeta-by-cell-type) | `meta.type: 'files'` + `cellMeta.onUpload`/`onDelete` | click-to-preview on |
 | [Cell spanning (merge cells)](#cell-spanning) | `enableCellSpanning` | `false` |
 | [Custom CSS slots](#custom-css) | `classNames` / `styles` | — |
 | [Conditional formatting](#conditional-formatting) | `conditionalFormats` + `enableConditionalFormatting` | on when rules present |
@@ -284,7 +285,7 @@ hot path; the MUI / shadcn adapters supply richer **editors** for the same types
 | `multiSelect` | chips + `+N more` overflow | `string[]` | ✅ checkbox dropdown | `maxChips`, `fitChips` |
 | `radio` | badge | `string \| null` | ✅ radio group | `layout` |
 | `hyperlink` | anchor | `string` or `{ href, label }` | ✅ url input | `target` |
-| `files` | image thumbnail / file-type icon + name | `FileRef[]` (`{ name, url, thumbnailUrl?, contentType? }`) | popup (adapters) | — |
+| `files` | thumbnail / icon + name · **click to preview** (image inline, PDF native viewer) | `FileRef[]` (`{ name, url, thumbnailUrl?, contentType? }`) | popup: add/remove (adapters) | `preview`, `onUpload`, `onDelete`, `accept` |
 | `sparkline` | inline SVG line / area / bar | `number[]` (or `"1,2,3"`) | read-only | `variant`, `width`, `height`, `color`, `min`, `max`, `showValue` |
 | `kpi` | value + trend delta chip + mini-spark | `number` or `{ value, delta?, data? }` | read-only | `invertDelta`, `deltaPercent`, `sparkWidth` |
 | `qr` | inline-SVG QR code (byte mode, v1–10) | `string` | ✅ input | `ecLevel`, `size`, `margin` |
@@ -356,6 +357,20 @@ use outside the grid too.
 | `cellMeta` | Type | Effect |
 | --- | --- | --- |
 | `target` | `string` | Anchor `target`. Default `'_blank'`. |
+
+**`files`** — value is `FileRef[]` (`{ name?, url?, thumbnailUrl?, contentType? }`). Read cells show a
+thumbnail (images) or file-type icon + name; **click a file to preview it** — images render inline,
+**PDFs open in the browser's native viewer** (`<iframe>`, no `pdf.js`), everything else offers an
+open/download link. The adapters' popup editor adds / removes files.
+
+| `cellMeta` | Type | Effect |
+| --- | --- | --- |
+| `preview` | `boolean` | Click-to-preview. Default `true` (a file needs a `url` to preview). |
+| `onUpload` | `(file: File) => FileRef \| Promise<FileRef>` | Called for each picked file — upload it and return the stored ref (busy state shown). Without it, the editor keeps a local object URL so preview still works offline. |
+| `onDelete` | `(file: FileRef) => void \| Promise<void>` | Called before a file is removed (e.g. delete it on the server). |
+| `accept` / `multiple` | `string` / `boolean` | Passed to the file `<input>`. |
+
+Programmatic: the preview overlay is exported as **`BstFilePreview`** — reuse it in your own file UI.
 
 **`sparkline`** — value is `number[]` (or a comma string).
 

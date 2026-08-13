@@ -17,7 +17,7 @@ so you can switch skins without changing your data code.
 
 - 🧱 **Drop-in shadcn-style grid** — one `<BstTableShadcn />` component.
 - 🎛 **Radix DropdownMenu** column-visibility menu; shadcn-style search & pagination.
-- ✏️ **Editing (Phase 2)** at MUI parity — native-control editors for the full B-series, a dependency-free **modal** for long-text & file popups, **Add row** button + unsaved **Save / Discard** bar, inline error rings. Wired via `createShadcnPreset()`.
+- ✏️ **Editing (Phase 2)** at MUI parity — native-control editors for the full B-series, a dependency-free **modal** for long-text & file popups (the **files** modal adds **click-to-preview** — images inline · PDFs in the native viewer — and configurable **upload/delete** via `cellMeta.onUpload`/`onDelete`), **Add row** button + unsaved **Save / Discard** bar, inline error rings. Wired via `createShadcnPreset()`.
 - ⌨️ **Selection · keyboard nav · clipboard (Phase 3)** — pass `enableCellSelection` / `enableClipboard`; range selection, Arrow/Tab/Home/End navigation, and copy/paste (TSV) come from the shared grid body, no extra chrome required. The **Columns menu** gains a **Copy-column** button (the pluggable `copy` icon) per column — copies the whole column across **all pages** (also Ctrl/Cmd+Space). Whole-column and whole-row copy are sub-toggles: **`enableCopyColumn`** / **`enableCopyRow`** (both default `true`; Shift+Space copies a row).
 - ☑️ **Row selection (Phase 3)** — `enableRowSelection` renders a checkbox column (header select-all + per-row) and a toolbar "{n} selected" badge + Clear (`showSelectionInfo`).
 - ↩️ **Undo/redo (Phase 3)** — `enableUndoRedo` adds toolbar Undo/Redo buttons (`showUndoRedo`) wired to the engine's edit history (Ctrl/Cmd+Z / Ctrl/Cmd+Y also work).

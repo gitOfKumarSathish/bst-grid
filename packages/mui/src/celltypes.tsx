@@ -20,6 +20,7 @@ import {
   barcodeCellType,
   richTextCellType,
   sanitizeHtml,
+  BstFilePreview,
 } from '@bloomskill/table-engine'
 import type { CellTypeRegistry, BstColumnMeta, BstOption } from '@bloomskill/table-engine'
 import TextField from '@mui/material/TextField'
@@ -319,58 +320,126 @@ const muiHyperlink = defineCellType<unknown>({
   ),
 })
 
+/**
+ * Files editor (B5/I3) — a dialog to add / remove files, with **click-to-preview**
+ * (reuses the engine's `BstFilePreview`). Backend wiring is opt-in via `cellMeta`:
+ * `onUpload(file) => FileRef | Promise<FileRef>` uploads each picked file (shows a
+ * busy state); `onDelete(file) => void | Promise<void>` runs before removal. With
+ * no `onUpload`, files get a local object URL so the preview still works offline.
+ * `cellMeta.accept` / `cellMeta.multiple` tune the file input.
+ */
+function MuiFilesEdit(p: {
+  draft: unknown
+  setDraft: (v: unknown) => void
+  commit: (override?: unknown) => void
+  cancel: () => void
+  meta: BstColumnMeta
+}) {
+  const files = filesOf(p.draft)
+  const cm = (p.meta?.cellMeta ?? {}) as Record<string, any>
+  const onUpload = cm.onUpload as ((file: File) => FileLike | Promise<FileLike>) | undefined
+  const onDelete = cm.onDelete as ((file: FileLike) => void | Promise<void>) | undefined
+  const [preview, setPreview] = React.useState<FileLike | null>(null)
+  const [busy, setBusy] = React.useState(false)
+  const [error, setError] = React.useState<string | null>(null)
+
+  const addFiles = async (list: FileList | null) => {
+    const picked = Array.from(list ?? [])
+    if (!picked.length) return
+    setError(null)
+    if (onUpload) {
+      setBusy(true)
+      try {
+        const results: FileLike[] = []
+        for (const file of picked) results.push(await onUpload(file))
+        p.setDraft([...files, ...results])
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Upload failed')
+      } finally {
+        setBusy(false)
+      }
+    } else {
+      // No upload handler → a local object URL so preview works offline.
+      p.setDraft([
+        ...files,
+        ...picked.map((file) => ({ name: file.name, contentType: file.type, url: URL.createObjectURL(file) })),
+      ])
+    }
+  }
+
+  const removeAt = async (i: number) => {
+    if (onDelete) {
+      setBusy(true)
+      try {
+        await onDelete(files[i])
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Delete failed')
+        setBusy(false)
+        return
+      }
+      setBusy(false)
+    }
+    p.setDraft(files.filter((_, j) => j !== i))
+  }
+
+  return (
+    <Dialog open onClose={p.cancel} maxWidth="xs" fullWidth>
+      <DialogTitle>Files</DialogTitle>
+      <DialogContent>
+        {files.length === 0 ? (
+          <Box sx={{ color: 'text.secondary', py: 1 }}>No files</Box>
+        ) : (
+          files.map((f, i) => (
+            <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }}>
+              {f.url ? (
+                <Button
+                  variant="text"
+                  size="small"
+                  onClick={() => setPreview(f)}
+                  sx={{ flex: 1, justifyContent: 'flex-start', textTransform: 'none', minWidth: 0 }}
+                >
+                  <Box component="span" sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {f.name ?? f.url}
+                  </Box>
+                </Button>
+              ) : (
+                <Box sx={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {f.name ?? f.url}
+                </Box>
+              )}
+              <Button size="small" color="error" disabled={busy} onClick={() => removeAt(i)}>
+                Remove
+              </Button>
+            </Box>
+          ))
+        )}
+        {error ? <Box sx={{ color: 'error.main', fontSize: 12, mt: 1 }}>{error}</Box> : null}
+        <Button component="label" variant="outlined" size="small" sx={{ mt: 1 }} disabled={busy}>
+          {busy ? 'Uploading…' : 'Add file'}
+          <input
+            type="file"
+            hidden
+            multiple={cm.multiple !== false}
+            accept={cm.accept}
+            onChange={(e) => addFiles(e.target.files)}
+          />
+        </Button>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={p.cancel}>Cancel</Button>
+        <Button variant="contained" onClick={() => p.commit()} disabled={busy}>
+          Save
+        </Button>
+      </DialogActions>
+      {preview ? <BstFilePreview file={preview} onClose={() => setPreview(null)} /> : null}
+    </Dialog>
+  )
+}
+
 const muiFiles = defineCellType<unknown>({
   ...filesCellType,
   editMode: 'popup',
-  renderEdit: ({ draft, setDraft, commit, cancel }) => {
-    const files = filesOf(draft)
-    return (
-      <Dialog open onClose={cancel} maxWidth="xs" fullWidth>
-        <DialogTitle>Files</DialogTitle>
-        <DialogContent>
-          {files.length === 0 ? (
-            <Box sx={{ color: 'text.secondary', py: 1 }}>No files</Box>
-          ) : (
-            files.map((f, i) => (
-              <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }}>
-                <Box sx={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {f.name ?? f.url}
-                </Box>
-                <Button
-                  size="small"
-                  color="error"
-                  onClick={() => setDraft(files.filter((_, j) => j !== i))}
-                >
-                  Remove
-                </Button>
-              </Box>
-            ))
-          )}
-          <Button component="label" variant="outlined" size="small" sx={{ mt: 1 }}>
-            Add file
-            <input
-              type="file"
-              hidden
-              multiple
-              onChange={(e) => {
-                const added = Array.from(e.target.files ?? []).map((file) => ({
-                  name: file.name,
-                  contentType: file.type,
-                }))
-                setDraft([...files, ...added])
-              }}
-            />
-          </Button>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={cancel}>Cancel</Button>
-          <Button variant="contained" onClick={() => commit()}>
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog>
-    )
-  },
+  renderEdit: (props) => <MuiFilesEdit {...(props as any)} />,
 })
 
 /** All MUI cell types (neutral read renderers + MUI editors). */

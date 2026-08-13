@@ -1,6 +1,26 @@
 import type { BstTableColumn, FieldError } from '@bloomskill/table-engine'
 import { verhoeffChecksum, gstinCheckDigit } from '@bloomskill/table-engine'
 
+// Demo-only previewable documents as data URIs, so the file preview (click a file
+// → overlay) works fully offline: an SVG "badge" image + a minimal one-page PDF.
+const svgDoc = (label: string, color: string) =>
+  'data:image/svg+xml,' +
+  encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="480" height="320"><rect width="480" height="320" fill="${color}"/><text x="240" y="176" font-family="system-ui" font-size="30" fill="#fff" text-anchor="middle">${label}</text></svg>`,
+  )
+const pdfDoc = (title: string) => {
+  const body = `BT /F1 20 Tf 24 92 Td (${title}) Tj ET`
+  const pdf =
+    `%PDF-1.4\n` +
+    `1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n` +
+    `2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n` +
+    `3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 320 160]/Resources<</Font<</F1 4 0 R>>>>/Contents 5 0 R>>endobj\n` +
+    `4 0 obj<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>endobj\n` +
+    `5 0 obj<</Length ${body.length}>>stream\n${body}\nendstream endobj\n` +
+    `trailer<</Root 1 0 R>>`
+  return 'data:application/pdf,' + encodeURIComponent(pdf)
+}
+
 export type Person = {
   id: string
   name: string
@@ -18,13 +38,13 @@ export type Person = {
 }
 
 export const people: Person[] = [
-  { id: '1', name: 'Alice Johnson', email: 'alice@acme.io', age: 34, salary: 120000, joined: '2023-02-11', active: true, role: 'admin', skills: ['react', 'ts', 'node'], plan: 'pro', website: 'https://alice.dev', bio: 'Platform lead. Loves DX and fast grids.', files: [{ name: 'contract.pdf' }] },
+  { id: '1', name: 'Alice Johnson', email: 'alice@acme.io', age: 34, salary: 120000, joined: '2023-02-11', active: true, role: 'admin', skills: ['react', 'ts', 'node'], plan: 'pro', website: 'https://alice.dev', bio: 'Platform lead. Loves DX and fast grids.', files: [{ name: 'contract.pdf', contentType: 'application/pdf', url: pdfDoc('Employment Contract') }, { name: 'badge.svg', contentType: 'image/svg+xml', url: svgDoc('Alice', '#6366f1') }] },
   { id: '2', name: 'Bob Smith', email: 'bob@acme.io', age: 28, salary: 90000, joined: '2024-06-01', active: false, role: 'editor', skills: ['css', 'react'], plan: 'free', website: 'https://bob.io', bio: 'Frontend engineer.', files: [] },
-  { id: '3', name: 'Carla Diaz', email: 'carla@acme.io', age: 41, salary: 135000, joined: '2022-11-23', active: true, role: 'viewer', skills: ['sql'], plan: 'ent', website: 'https://carla.example', bio: 'Data analyst.', files: [{ name: 'avatar.png' }] },
+  { id: '3', name: 'Carla Diaz', email: 'carla@acme.io', age: 41, salary: 135000, joined: '2022-11-23', active: true, role: 'viewer', skills: ['sql'], plan: 'ent', website: 'https://carla.example', bio: 'Data analyst.', files: [{ name: 'avatar.svg', contentType: 'image/svg+xml', url: svgDoc('Carla', '#22c55e') }] },
   { id: '4', name: 'David Lee', email: 'david@acme.io', age: 37, salary: 110000, joined: '2021-09-15', active: false, role: 'editor', skills: ['node', 'sql', 'ts'], plan: 'pro', website: 'https://dlee.dev', bio: 'Backend.', files: [] },
   { id: '5', name: 'Ella Fitz', email: 'ella@acme.io', age: 30, salary: 98000, joined: '2024-01-08', active: true, role: 'admin', skills: ['react', 'css'], plan: 'free', website: 'https://ella.design', bio: 'Design systems.', files: [] },
   { id: '6', name: 'Frank Ocean', email: 'frank@acme.io', age: 45, salary: 150000, joined: '2020-05-30', active: true, role: 'viewer', skills: ['ts'], plan: 'ent', website: 'https://frank.fm', bio: 'Music + code.', files: [] },
-  { id: '7', name: 'Grace Hopper', email: 'grace@acme.io', age: 52, salary: 180000, joined: '2019-03-19', active: true, role: 'admin', skills: ['node', 'sql'], plan: 'pro', website: 'https://grace.navy', bio: 'Compiler pioneer.', files: [{ name: 'talk.pdf' }] },
+  { id: '7', name: 'Grace Hopper', email: 'grace@acme.io', age: 52, salary: 180000, joined: '2019-03-19', active: true, role: 'admin', skills: ['node', 'sql'], plan: 'pro', website: 'https://grace.navy', bio: 'Compiler pioneer.', files: [{ name: 'talk.pdf', contentType: 'application/pdf', url: pdfDoc('Compiler Talk') }] },
   { id: '8', name: 'Hiro Tanaka', email: 'hiro@acme.io', age: 26, salary: 82000, joined: '2024-08-02', active: false, role: 'editor', skills: ['react', 'ts', 'css', 'node'], plan: 'free', website: 'https://hiro.jp', bio: 'Fullstack.', files: [] },
   { id: '9', name: 'Ivy Chen', email: 'ivy@acme.io', age: 33, salary: 105000, joined: '2023-12-12', active: true, role: 'viewer', skills: ['sql', 'ts'], plan: 'pro', website: 'https://ivy.dev', bio: 'BI + dashboards.', files: [] },
   { id: '10', name: 'Jack Ma', email: 'jack@acme.io', age: 39, salary: 125000, joined: '2022-07-07', active: false, role: 'editor', skills: ['node'], plan: 'ent', website: 'https://jack.biz', bio: 'Commerce.', files: [] },
@@ -120,7 +140,25 @@ export const columns: BstTableColumn<Person>[] = [
   },
   { id: 'website', accessorKey: 'website', header: 'Website', size: 170, meta: { type: 'hyperlink', editable: true } },
   { id: 'bio', accessorKey: 'bio', header: 'Bio (popup)', size: 170, meta: { type: 'longText', editable: true } },
-  { id: 'files', accessorKey: 'files', header: 'Files (popup)', size: 150, meta: { type: 'files', editable: true } },
+  {
+    id: 'files', accessorKey: 'files', header: 'Files (popup)', size: 150,
+    meta: {
+      type: 'files', editable: true,
+      cellMeta: {
+        // Click a file to preview it (image inline · PDF in the native viewer).
+        // onUpload/onDelete are where you'd call your backend; here they simulate it
+        // (a 400 ms delay + a local object URL so the preview works offline).
+        accept: 'image/*,application/pdf',
+        onUpload: async (file: File) => {
+          await new Promise((r) => setTimeout(r, 400))
+          return { name: file.name, contentType: file.type, url: URL.createObjectURL(file) }
+        },
+        onDelete: async () => {
+          await new Promise((r) => setTimeout(r, 200))
+        },
+      },
+    },
+  },
   {
     id: 'actions', header: '', size: 190, enableSorting: false,
     meta: { type: 'action', actions: { edit: true, delete: true, duplicate: true } },

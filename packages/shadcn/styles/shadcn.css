@@ -393,6 +393,19 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* Clickable file name in the files editor → opens the preview. */
+.sc-file-link {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  text-align: left;
+  color: var(--sc-primary);
+  cursor: pointer;
+}
+.sc-file-link:hover {
+  text-decoration: underline;
+}
 .sc-richtext-toolbar {
   display: flex;
   gap: 4px;

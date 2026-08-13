@@ -152,6 +152,11 @@ function isImageFile(f: FileRefLike): boolean {
   return /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(f.name ?? f.url ?? '')
 }
 
+/** PDF — previewed inline via the browser's native `<iframe>` viewer (no pdf.js). */
+function isPdfFile(f: FileRefLike): boolean {
+  return f.contentType === 'application/pdf' || /\.pdf(\?|#|$)/i.test(f.name ?? f.url ?? '')
+}
+
 function fileIconSlot(f: FileRefLike): keyof BstIcons {
   const name = (f.name ?? f.url ?? '').toLowerCase()
   if (/\.pdf$/.test(name)) return 'filePdf'
@@ -196,23 +201,135 @@ function Chip({ opt, value }: { opt?: BstOption; value: string }) {
   )
 }
 
-function FileChip({ file }: { file: FileRefLike }) {
+function FileChip({ file, onClick }: { file: FileRefLike; onClick?: () => void }) {
   const icons = useBstIcons()
   const label = file.name ?? file.url ?? 'file'
+  let inner: React.ReactNode
   if (isImageFile(file)) {
-    return (
-      <span className="bst-file">
-        <img className="bst-file-thumb" src={file.thumbnailUrl ?? file.url} alt={label} />
-      </span>
+    inner = <img className="bst-file-thumb" src={file.thumbnailUrl ?? file.url} alt={label} />
+  } else {
+    const FileI = icons[fileIconSlot(file)]
+    inner = (
+      <>
+        <span className="bst-file-icon" aria-hidden="true">
+          <FileI size={16} />
+        </span>
+        <span className="bst-file-name">{label}</span>
+      </>
     )
   }
-  const FileI = icons[fileIconSlot(file)]
+  if (!onClick) return <span className="bst-file">{inner}</span>
+  // Clickable → opens the preview. stopPropagation so the click previews the file
+  // instead of selecting / editing the cell underneath it.
   return (
-    <span className="bst-file">
-      <span className="bst-file-icon" aria-hidden="true">
-        <FileI size={16} />
-      </span>
-      <span className="bst-file-name">{label}</span>
+    <button
+      type="button"
+      className="bst-file bst-file-clickable"
+      title={'Preview ' + label}
+      onClick={(e) => {
+        e.stopPropagation()
+        onClick()
+      }}
+    >
+      {inner}
+    </button>
+  )
+}
+
+/**
+ * Dependency-free file preview overlay (B5/I3). Renders the clicked document
+ * full-screen: **images** inline, **PDFs** in the browser's native viewer
+ * (`<iframe>` — no pdf.js), anything else as an open/download fallback. Closes on
+ * Escape or a backdrop click. Exported so adapters can reuse it from their file
+ * editors. A file needs a `url` to preview.
+ */
+export function BstFilePreview({
+  file,
+  onClose,
+}: {
+  file: { name?: string; url?: string; thumbnailUrl?: string; contentType?: string }
+  onClose: () => void
+}) {
+  const icons = useBstIcons()
+  const Close = icons.remove
+  React.useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [onClose])
+  const url = file.url
+  const name = file.name ?? 'Preview'
+  const img = isImageFile(file as FileRefLike)
+  const pdf = isPdfFile(file as FileRefLike)
+  return (
+    <div
+      className="bst-file-preview-backdrop"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label={name}
+    >
+      <div className="bst-file-preview" onClick={(e) => e.stopPropagation()}>
+        <div className="bst-file-preview-bar">
+          <span className="bst-file-preview-title" title={name}>
+            {name}
+          </span>
+          {url ? (
+            <a className="bst-file-preview-open" href={url} target="_blank" rel="noreferrer">
+              Open ↗
+            </a>
+          ) : null}
+          <button
+            type="button"
+            className="bst-file-preview-close"
+            onClick={onClose}
+            aria-label="Close preview"
+          >
+            <Close size={16} />
+          </button>
+        </div>
+        <div className="bst-file-preview-body">
+          {!url ? (
+            <div className="bst-file-preview-empty">No preview available</div>
+          ) : img ? (
+            <img className="bst-file-preview-img" src={url} alt={name} />
+          ) : pdf ? (
+            <iframe className="bst-file-preview-frame" src={url} title={name} />
+          ) : (
+            <div className="bst-file-preview-empty">
+              No inline preview for this file type.{' '}
+              <a href={url} target="_blank" rel="noreferrer">
+                Open / download
+              </a>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Read-mode `files` cell: file chips (image thumbnail / type icon + name) that
+ * open {@link BstFilePreview} on click. Disable click-to-preview per column with
+ * `cellMeta.preview: false`.
+ */
+function FilesCell({ files, meta }: { files: FileRefLike[]; meta: BstColumnMeta }) {
+  const [preview, setPreview] = React.useState<FileRefLike | null>(null)
+  const cm = (meta.cellMeta ?? {}) as Record<string, unknown>
+  const canPreview = cm.preview !== false
+  return (
+    <span className="bst-cell-files">
+      {files.map((f, i) => (
+        <FileChip
+          key={i}
+          file={f}
+          onClick={canPreview && f.url ? () => setPreview(f) : undefined}
+        />
+      ))}
+      {preview ? <BstFilePreview file={preview} onClose={() => setPreview(null)} /> : null}
     </span>
   )
 }
@@ -773,16 +890,10 @@ export const hyperlinkCellType: CellType<unknown> = defineCellType<unknown>({
 export const filesCellType: CellType<unknown> = defineCellType<unknown>({
   id: 'files',
   editMode: 'popup',
-  renderRead: ({ value }) => {
+  renderRead: ({ value, meta }) => {
     const files = normalizeFiles(value)
     if (!files.length) return <span className="bst-cell-muted">—</span>
-    return (
-      <span className="bst-cell-files">
-        {files.map((f, i) => (
-          <FileChip key={i} file={f} />
-        ))}
-      </span>
-    )
+    return <FilesCell files={files} meta={meta} />
   },
   format: (v) => normalizeFiles(v).map((f) => f.name ?? f.url ?? '').join(', '),
   isEmpty: (v) => normalizeFiles(v).length === 0,

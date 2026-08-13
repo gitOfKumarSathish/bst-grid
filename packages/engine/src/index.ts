@@ -131,6 +131,7 @@ export {
   kpiCellType,
   actionCellType,
   actionMenuCellType,
+  BstFilePreview,
 } from './registry/defaults.js'
 
 // ---- advanced cell types (B1 QR/barcode, J2 rich text) + their dep-free encoders ----

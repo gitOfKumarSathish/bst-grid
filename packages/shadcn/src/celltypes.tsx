@@ -7,8 +7,9 @@ import {
   filesCellType,
   richTextCellType,
   sanitizeHtml,
+  BstFilePreview,
 } from '@bloomskill/table-engine'
-import type { CellTypeRegistry } from '@bloomskill/table-engine'
+import type { CellTypeRegistry, BstColumnMeta } from '@bloomskill/table-engine'
 
 /**
  * shadcn/Radix adapter cell types. Text/number/date/boolean/select/radio use the
@@ -86,60 +87,119 @@ const scLongText = defineCellType<string>({
   ),
 })
 
+/**
+ * Files editor (B5/I3) — add / remove with **click-to-preview** (engine
+ * `BstFilePreview`). Opt-in backend wiring via `cellMeta.onUpload(file)` /
+ * `cellMeta.onDelete(file)` (busy state shown); without `onUpload`, files get a
+ * local object URL so preview works offline. `cellMeta.accept` / `.multiple` tune
+ * the picker. Mirrors the MUI editor for skin parity.
+ */
+function ScFilesEdit(p: {
+  draft: unknown
+  setDraft: (v: unknown) => void
+  commit: (override?: unknown) => void
+  cancel: () => void
+  meta: BstColumnMeta
+}) {
+  const files = filesOf(p.draft)
+  const cm = (p.meta?.cellMeta ?? {}) as Record<string, any>
+  const onUpload = cm.onUpload as ((file: File) => FileLike | Promise<FileLike>) | undefined
+  const onDelete = cm.onDelete as ((file: FileLike) => void | Promise<void>) | undefined
+  const [preview, setPreview] = React.useState<FileLike | null>(null)
+  const [busy, setBusy] = React.useState(false)
+  const [error, setError] = React.useState<string | null>(null)
+
+  const addFiles = async (list: FileList | null) => {
+    const picked = Array.from(list ?? [])
+    if (!picked.length) return
+    setError(null)
+    if (onUpload) {
+      setBusy(true)
+      try {
+        const results: FileLike[] = []
+        for (const file of picked) results.push(await onUpload(file))
+        p.setDraft([...files, ...results])
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Upload failed')
+      } finally {
+        setBusy(false)
+      }
+    } else {
+      p.setDraft([
+        ...files,
+        ...picked.map((file) => ({ name: file.name, contentType: file.type, url: URL.createObjectURL(file) })),
+      ])
+    }
+  }
+
+  const removeAt = async (i: number) => {
+    if (onDelete) {
+      setBusy(true)
+      try {
+        await onDelete(files[i])
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Delete failed')
+        setBusy(false)
+        return
+      }
+      setBusy(false)
+    }
+    p.setDraft(files.filter((_, j) => j !== i))
+  }
+
+  return (
+    <ScModal
+      title="Files"
+      onClose={p.cancel}
+      footer={
+        <>
+          <button type="button" className="sc-btn" onClick={p.cancel}>
+            Cancel
+          </button>
+          <button type="button" className="sc-btn sc-btn-primary" disabled={busy} onClick={() => p.commit()}>
+            Save
+          </button>
+        </>
+      }
+    >
+      {files.length === 0 ? (
+        <div className="sc-muted">No files</div>
+      ) : (
+        files.map((f, i) => (
+          <div key={i} className="sc-file-row">
+            {f.url ? (
+              <button type="button" className="sc-file-name sc-file-link" onClick={() => setPreview(f)} title="Preview">
+                {f.name ?? f.url}
+              </button>
+            ) : (
+              <span className="sc-file-name">{f.name ?? f.url}</span>
+            )}
+            <button type="button" className="sc-btn sc-btn-danger" disabled={busy} onClick={() => removeAt(i)}>
+              Remove
+            </button>
+          </div>
+        ))
+      )}
+      {error ? <div style={{ color: '#dc2626', fontSize: 12, marginTop: 6 }}>{error}</div> : null}
+      <label className="sc-btn" style={{ marginTop: 8, display: 'inline-block' }}>
+        {busy ? 'Uploading…' : 'Add file'}
+        <input
+          type="file"
+          hidden
+          multiple={cm.multiple !== false}
+          accept={cm.accept}
+          onChange={(e) => addFiles(e.target.files)}
+        />
+      </label>
+      {preview ? <BstFilePreview file={preview} onClose={() => setPreview(null)} /> : null}
+    </ScModal>
+  )
+}
+
 const scFiles = defineCellType<unknown>({
   ...filesCellType,
   editMode: 'popup',
-  renderEdit: ({ draft, setDraft, commit, cancel }) => {
-    const files = filesOf(draft)
-    return (
-      <ScModal
-        title="Files"
-        onClose={cancel}
-        footer={
-          <>
-            <button type="button" className="sc-btn" onClick={cancel}>
-              Cancel
-            </button>
-            <button type="button" className="sc-btn sc-btn-primary" onClick={() => commit()}>
-              Save
-            </button>
-          </>
-        }
-      >
-        {files.length === 0 ? (
-          <div className="sc-muted">No files</div>
-        ) : (
-          files.map((f, i) => (
-            <div key={i} className="sc-file-row">
-              <span className="sc-file-name">{f.name ?? f.url}</span>
-              <button
-                type="button"
-                className="sc-btn sc-btn-danger"
-                onClick={() => setDraft(files.filter((_, j) => j !== i))}
-              >
-                Remove
-              </button>
-            </div>
-          ))
-        )}
-        <label className="sc-btn" style={{ marginTop: 8, display: 'inline-block' }}>
-          Add file
-          <input
-            type="file"
-            hidden
-            multiple
-            onChange={(e) => {
-              const added = Array.from(e.target.files ?? []).map((file) => ({
-                name: file.name,
-                contentType: file.type,
-              }))
-              setDraft([...files, ...added])
-            }}
-          />
-        </label>
-      </ScModal>
-    )
-  },
+  renderEdit: (props) => <ScFilesEdit {...(props as any)} />,
 })
 
 function ScRichTextEdit({
