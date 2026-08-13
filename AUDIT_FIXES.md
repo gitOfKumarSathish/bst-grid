@@ -12,6 +12,39 @@
 Each fix follows the §13 Definition of Done: **code + test → §12 registry (if a toggle) →
 demo → README(s) → CHANGELOG → version bump**. Ship tier-by-tier as slices.
 
+## Progress — this session (2026-08-13)
+**Done + green — the full engine suite passes (283 tests / 41 files, 0 failures):**
+- **Tier 1** — #5, #19, #12/#17/#18, #4 → `__tests__/tier1Fixes.test.tsx`
+- **Tier 3** — #6, #7, #8 → `__tests__/tier3Filtering.test.tsx`. (#8 fix = keep a half-built
+  `between` active but treat the missing bound as **open-ended** → one-sided filter, no
+  `<= NaN` grid-wipe. Chosen over "make it inactive" so it reconciles with the existing
+  `datasourceHardening` design, which intentionally keeps a one-bound range active.)
+- **Tier 4** — #10 (paste clears stale draft) → `tier4Editing.test.tsx`;
+  #2 (row-edit Cancel discards the session's drafts) → `tier4CancelRow.test.tsx`
+- **Tier 6 #24** (span footprint pre-scan) → `tier6Spanning.test.tsx`
+- **Tier 5 (shadcn)** — #20 settings-sheet focus trap · #16 Columns menu stays available for
+  pin/group/reorder when hiding is off → `packages/shadcn/src/__tests__/tier5Shadcn.test.tsx`
+
+Total: **14 defects fixed, all with regression tests** (engine 283/283 green; shadcn 37/37 green;
+engine + shadcn typecheck clean).
+
+> `filtering.ts` was auto-reverted to HEAD **twice** earlier by an external writer (open
+> editor buffer or a file watcher). Re-applied and currently holding. If it reverts again,
+> re-apply from this file's Tier-3 notes.
+
+**Not started — files under active concurrent rewrite (coordinate before editing):**
+- **Tier 2** (coordinate space #3/#9/#21/#22/#23) — `BstTable.tsx` / `useBstTable.ts` are
+  mid-rewrite for D1 virtualization, which itself reshapes the coordinate space. Do *after*
+  that work lands, or it will collide and likely be clobbered.
+- **Tier 5 #13/#15** (`useBstTable.ts`) · **Tier 7 MCP** — concurrently modified.
+- **Tier 5 #14** (shadcn filter-toggle strand) — the real fix (clear stranded `columnFilters`
+  when column filters are disabled) is engine-side in `useBstTable.ts`, which is concurrently
+  modified; deferred to avoid colliding.
+
+Remaining DoD chores for the done tiers (demo wiring, READMEs, CHANGELOG, version bump) are
+pending — they touch concurrently-modified files (`CLAUDE.md`, `CHANGELOG.md`, demo) so are
+best done once the tree settles.
+
 ---
 
 ## Tier 0 — Release discipline (Gate 2) — cheapest gate, unblocks adoption on its own
