@@ -1165,7 +1165,18 @@ export function createRuntime<TData extends RowData>(
           return { ...s, drafts, dirtyCells, dirtyRows }
         })
       }
-      if (changes.length) persist(changes)
+      if (changes.length) {
+        persist(changes)
+        // Clear any pre-existing draft on the pasted cells — otherwise a stale
+        // draft (e.g. from an earlier validation-blocked edit) keeps shadowing the
+        // freshly-pasted value via draftAwareValue and the dirty counter sticks
+        // forever (#10). commitCell already pairs persist with clearCellDraft.
+        set((s) => {
+          let next: InteractionState = s
+          for (const ch of changes) next = clearCellDraft(next, ch.rowId, ch.columnId)
+          return next
+        })
+      }
     }
 
     const gates = cells.map((c) => validateCellForCommit(c.rowId, c.columnId, c.value))
@@ -1189,7 +1200,14 @@ export function createRuntime<TData extends RowData>(
     isDisabled: isCellDisabled(rowId, columnId),
     isDirty: snapshot.isDirty,
     startEditing: () => startEditing(rowId, columnId),
-    cancelEditing: () => cancelEditing(),
+    cancelEditing: () => {
+      // From a row-action cell, "Cancel" must discard the row-edit session's
+      // drafts, not merely close the open editor — otherwise the drafts survive
+      // and the next Save persists the value the user cancelled (#2). Fall back to
+      // a plain editor-close for a lone cell edit (no session on this row).
+      if (store.getState().rowSession === rowId) cancelRowSession()
+      else cancelEditing()
+    },
     commitCell: (value) => commitCell(rowId, columnId, value),
     editRow: () => beginRowSession(rowId),
     saveRow: () => void commitRowSession(rowId),
