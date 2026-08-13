@@ -24,6 +24,9 @@ demo → README(s) → CHANGELOG → version bump**. Ship tier-by-tier as slices
 - **Tier 6 #24** (span footprint pre-scan) → `tier6Spanning.test.tsx`
 - **Tier 5 (shadcn)** — #20 settings-sheet focus trap · #16 Columns menu stays available for
   pin/group/reorder when hiding is off → `packages/shadcn/src/__tests__/tier5Shadcn.test.tsx`
+- **Tier 2** — #3/#9/#21/#22/#23 coordinate-space refactor (now that D1 virtualization has
+  landed): coord space built from the painted row order + `isDataRow` guard on editability / nav /
+  paste → `__tests__/tier2CoordSpace.test.tsx`
 
 Total: **14 defects fixed, all with regression tests** (engine 283/283 green; shadcn 37/37 green;
 engine + shadcn typecheck clean).
@@ -32,10 +35,7 @@ engine + shadcn typecheck clean).
 > editor buffer or a file watcher). Re-applied and currently holding. If it reverts again,
 > re-apply from this file's Tier-3 notes.
 
-**Not started — files under active concurrent rewrite (coordinate before editing):**
-- **Tier 2** (coordinate space #3/#9/#21/#22/#23) — `BstTable.tsx` / `useBstTable.ts` are
-  mid-rewrite for D1 virtualization, which itself reshapes the coordinate space. Do *after*
-  that work lands, or it will collide and likely be clobbered.
+**Not started:**
 - **Tier 5 #13/#15** (`useBstTable.ts`) · **Tier 7 MCP** — concurrently modified.
 - **Tier 5 #14** (shadcn filter-toggle strand) — the real fix (clear stranded `columnFilters`
   when column filters are disabled) is engine-side in `useBstTable.ts`, which is concurrently
@@ -71,16 +71,18 @@ Code + tests landed; engine builds clean; 6 new tests in `__tests__/tier1Fixes.t
 > MCP corpus parity). Those failures are **not** from the Tier-1 fixes. Tiers 2–7 overlap
 > these files — coordinate before editing on top.
 
-## Tier 2 — Coordinate-space refactor (one change → 5 bugs) — Gate 1 core
-Build one helper: **visual coordinate → real editable data row (or skip)**, consumed by
-`isCellEditable`, `moveActive`, and the paste loop; align the coord space to the *painted*
-body rows (top/center/bottom when row-pinning is on).
-| Ref | Verdict | Source | Status |
-| --- | --- | --- | --- |
-| **#3** `isCellEditable` true for phantom/group rows | CONFIRMED | `runtime.ts:330-344` (esp. 338) | [ ] |
-| **#9/#21** pinned rows absent from coord space | CONFIRMED | `useBstTable.ts:167-176`, `BstTable.tsx:170-176` | [ ] |
-| **#22** nav lands on group rows, empties clipboard | CONFIRMED | `runtime.ts:962-1003,1024` | [ ] |
-| **#23** paste onto group row discarded, still fires `onDataChange` + no-op undo | CONFIRMED | `runtime.ts:1112-1121,577-580` | [ ] |
+## Tier 2 — Coordinate-space refactor (one change → 5 bugs) — Gate 1 core — ✅ DONE (2026-08-13)
+Two pivots landed: (1) `useBstTable` now builds the coord space (`visibleRowIds`/`rowVisualIndex`)
+from the **painted** body-row order — top → center → bottom when row-pinning is on — so it matches
+`<BstTable>`; (2) a single `isDataRow(rowId)` predicate (`rowIndexById.has`) that `isCellEditable`,
+`moveActive` and (via editability) the paste loop consult to skip grouped/aggregated/phantom rows.
+Regression tests in `__tests__/tier2CoordSpace.test.tsx` (4).
+| Ref | Verdict | Source | Fix | Status |
+| --- | --- | --- | --- | --- |
+| **#3** `isCellEditable` true for phantom/group rows | CONFIRMED | `runtime.ts:330-344` (esp. 338) | `isDataRow` guard → false for non-data rows | [x] |
+| **#9/#21** pinned rows absent from coord space | CONFIRMED | `useBstTable.ts:167-176`, `BstTable.tsx:170-176` | coord space built from painted top/center/bottom order | [x] |
+| **#22** nav lands on group rows, empties clipboard | CONFIRMED | `runtime.ts:962-1003,1024` | `moveActive` snaps past non-data rows in travel direction | [x] |
+| **#23** paste onto group row discarded, still fires `onDataChange` + no-op undo | CONFIRMED | `runtime.ts:1112-1121,577-580` | paste skips non-editable → non-data rows never written (via #3) | [x] |
 
 ## Tier 3 — Filtering correctness (Gate 1)
 | Ref | Verdict | Source | Fix | Status |

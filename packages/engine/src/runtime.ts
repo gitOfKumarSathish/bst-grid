@@ -287,6 +287,12 @@ export function createRuntime<TData extends RowData>(
     return idx == null ? undefined : ctx.data[idx]
   }
 
+  /** True only for real DATA rows (present in `data`) — excludes grouped /
+   *  aggregated / phantom rows, which appear in the visual coordinate space but
+   *  carry no editable cell. The pivot for the Tier-2 coordinate-space fixes:
+   *  editability (#3), keyboard nav (#22) and paste (#23) all skip them. */
+  const isDataRow = (rowId: string): boolean => ctx.rowIndexById.has(rowId)
+
   const getField = (row: TData | undefined, columnId: string): unknown =>
     row == null ? undefined : (row as Record<string, unknown>)[fieldOf(columnId)]
 
@@ -332,6 +338,10 @@ export function createRuntime<TData extends RowData>(
 
   const isCellEditable = (rowId: string, columnId: string): boolean => {
     if (!ctx.enableEditing) return false
+    // A grouped / aggregated / phantom row is in the coord space but is not real
+    // editable data (#3) — so paste onto one is skipped, never firing a bogus
+    // onDataChange / no-op undo (#23).
+    if (!isDataRow(rowId)) return false
     const meta = metaOf(columnId)
     if (meta.type === 'action') return false
     if (isCellDisabled(rowId, columnId)) return false
@@ -997,6 +1007,25 @@ export function createRuntime<TData extends RowData>(
       } else {
         r = clamp(r + dRow, 0, rows.length - 1)
         c = clamp(c + dCol, 0, cols.length - 1)
+      }
+    }
+    // Grouped / aggregated rows are painted and occupy the coord space but aren't
+    // navigable (landing on one empties the clipboard, #22). Snap the target to
+    // the nearest DATA row in the direction of travel; if none lies that way,
+    // don't move.
+    {
+      const step = !cur
+        ? 1
+        : opts.toEdge
+          ? dRow < 0 ? 1 : dRow > 0 ? -1 : 0
+          : opts.wrap
+            ? dCol >= 0 ? 1 : -1
+            : dRow > 0 ? 1 : dRow < 0 ? -1 : 0
+      if (step !== 0 && !isDataRow(rows[r])) {
+        let i = r
+        while (i >= 0 && i < rows.length && !isDataRow(rows[i])) i += step
+        if (i < 0 || i >= rows.length) return
+        r = i
       }
     }
     const rowId = rows[r]

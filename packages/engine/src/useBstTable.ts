@@ -173,7 +173,19 @@ function buildCtx<TData extends RowData>(
   visibleColumnIds.forEach((id, i) => colVisualIndex.set(id, i))
 
   const rowModelRows = table.getRowModel().rows as any[]
-  const visibleRowIds = rowModelRows.map((r) => r.id as string)
+  // The coordinate space MUST match the painted body-row order in <BstTable> so
+  // selection / nav / paste coordinates line up with what's on screen. With row
+  // pinning the paint order is top → center → bottom (not the row-model order),
+  // so build the map from the same sequence (#9/#21). Pinning off → identical to
+  // the row model, so the common path is unchanged.
+  const paintedRows = opts.enableRowPinning
+    ? [
+        ...((table.getTopRows?.() ?? []) as any[]),
+        ...((table.getCenterRows?.() ?? []) as any[]),
+        ...((table.getBottomRows?.() ?? []) as any[]),
+      ]
+    : rowModelRows
+  const visibleRowIds = paintedRows.map((r) => r.id as string)
   const rowVisualIndex = new Map<string, number>()
   visibleRowIds.forEach((id, i) => rowVisualIndex.set(id, i))
 
