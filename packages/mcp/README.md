@@ -2,54 +2,39 @@
 
 **An MCP server that teaches AI coding agents Bst-Table.**
 
-Bst-Table is a private React data grid. No language model has ever seen it, so asked to
-"build a Bst-Table grid with batch editing" an agent will confidently produce **AG Grid** or
-**MUI X DataGrid** code — the very libraries this project exists to replace. This server closes
-that gap: it gives Claude Code, Cursor, Copilot or any MCP client accurate, version-pinned
-knowledge of `@bloomskill/table-*`, plus the ability to scaffold and validate real configurations.
+[Bst-Table](https://github.com/gitOfKumarSathish/bst-grid) is a React data grid
+(`@bloomskill/table-engine` + MUI/shadcn skins). No language model was trained on it, so asked to
+"build a Bst-Table grid with batch editing" an agent confidently writes **AG Grid** or **MUI X
+DataGrid** code — the very libraries this project exists to replace. Point your agent at this
+server and it gets the real API instead: searchable docs, the full feature-toggle registry, every
+cell type, exact type signatures, plus the ability to **scaffold** and **validate** working grids.
 
-Its knowledge base is **generated from source at build time** — the engine's runtime toggle
-registry, the `CLAUDE.md` §12 feature table, the `COVERAGE.md` status matrix, TSDoc, the built
-`.d.ts`, every package README and all six runnable examples. Ship a Bst-Table feature and the
-MCP server knows it; there is no second place to update and nothing to drift.
+Works with **Claude Code · Cursor · VS Code (Copilot) · Claude Desktop** — anything that speaks MCP.
 
-> 📖 **Full setup, install & usage guide:** [`docs/mcp-server.md`](../../docs/mcp-server.md) —
-> install routes, per-client config (Claude Code · Cursor · VS Code · Claude Desktop), **how to use
-> it in your own projects and share it with a team** (§4), verification, every tool with examples,
-> workflows and troubleshooting. This README is the quick reference.
+---
 
-## Install
+## Quick start
 
-> ⚠️ **Not on npm yet.** Until it is published, `npx -y @bloomskill/table-mcp` fails with
-> *404 Not Found*. Use the **tarball** or **local build** route below; publishing it is one command
-> — [`docs/mcp-server.md`](../../docs/mcp-server.md) §4.4.
+### 1. Register the server
 
-Three routes, same server over stdio — only the launch command changes:
+Pick your client. Nothing to install first — `npx` fetches the package on first run.
 
-| Route | Who it's for | `command` | `args` |
-| --- | --- | --- | --- |
-| **npm** | anyone, in any project | `npx` | `["-y", "@bloomskill/table-mcp"]` |
-| **tarball** | sharing before publishing | `bst-table-mcp` | *(none)* |
-| **local build** | contributors to this repo | `node` | `["/abs/path/packages/mcp/dist/cli.js"]` |
+<details open>
+<summary><b>Claude Code</b> (one command)</summary>
 
 ```bash
-# tarball: build + pack here, then `npm i -g` the .tgz on the other machine
-npm run build -w @bloomskill/table-engine   # the corpus reads the engine's build output
-npm run build -w @bloomskill/table-mcp      # compile + generate dist/corpus.json
-npm pack -w @bloomskill/table-mcp           # → bloomskill-table-mcp-<version>.tgz
+claude mcp add bst-table -s user -- npx -y @bloomskill/table-mcp
 ```
 
-**Claude Code** — `-s user` registers it for **every project** on the machine (omit it and you get
-the current directory only):
+`-s user` = available in **every project** on this machine. Drop it to register only the current
+directory, or use `-s project` to write a `.mcp.json` your whole team gets on clone.
+</details>
 
-```bash
-claude mcp add bst-table -s user -- npx -y @bloomskill/table-mcp   # npm route
-claude mcp add bst-table -s user -- bst-table-mcp                  # tarball route
-claude mcp add bst-table -- node /abs/path/packages/mcp/dist/cli.js  # local build
-```
+<details open>
+<summary><b>Cursor</b> · <b>Claude Desktop</b> (<code>mcpServers</code> key)</summary>
 
-**Cursor** (`~/.cursor/mcp.json` for all projects, `.cursor/mcp.json` for one) · **Claude Desktop**
-(`claude_desktop_config.json`) — both use the `mcpServers` key:
+Cursor: `~/.cursor/mcp.json` (all projects) or `.cursor/mcp.json` (one project).
+Claude Desktop: `claude_desktop_config.json`.
 
 ```json
 {
@@ -61,9 +46,12 @@ claude mcp add bst-table -- node /abs/path/packages/mcp/dist/cli.js  # local bui
   }
 }
 ```
+</details>
 
-**VS Code / Copilot** uses a different shape — a `servers` key and an explicit `type`. Command
-Palette → *MCP: Open User Configuration* for all projects, or `.vscode/mcp.json` for one:
+<details>
+<summary><b>VS Code / Copilot</b> (<code>servers</code> key — different shape)</summary>
+
+Command Palette → *MCP: Open User Configuration* (all projects), or `.vscode/mcp.json` (one project).
 
 ```json
 {
@@ -76,66 +64,128 @@ Palette → *MCP: Open User Configuration* for all projects, or `.vscode/mcp.jso
   }
 }
 ```
+</details>
 
-Requires Node ≥ 18. The server runs over **stdio** and makes no network calls — the entire
-knowledge base ships inside the package, so it works in **any** project, including ones that don't
-have `@bloomskill/table-*` installed.
+### 2. Restart your client
 
-> **Sharing it with your team:** register at **user scope** (above) for "every project on my
-> machine", or commit an `.mcp.json` with the npx form into the *consuming* app's repo so everyone
-> gets it on clone. Both, plus publishing and version drift, are covered in
-> [`docs/mcp-server.md`](../../docs/mcp-server.md) §4.
+MCP servers are read at startup. In Claude Code, confirm it connected:
 
-## Tools
+```bash
+claude mcp list          # → bst-table: npx -y @bloomskill/table-mcp - ✔ Connected
+```
+
+Other clients list connected servers in their MCP/settings panel.
+
+### 3. Ask for a grid
+
+Just talk to your agent normally — it picks the tools up on its own:
+
+> Build me a Bst-Table grid of orders with inline editing, a status dropdown and CSV-style copy/paste.
+
+Behind the scenes it calls `bst_scaffold_grid`, and the component it hands you **compiles** — every
+flag dependency already satisfied. Two more prompts worth trying on day one:
+
+> What Bst-Table flag turns on the filter builder, and what does it depend on?
+> Check this grid config for mistakes: `{ showSearch: true, enableVirtualization: true }`
+
+The second one returns two real errors: `showSearch` does nothing without `enableGlobalFilter`, and
+`enableVirtualization` **is not a thing in this library**.
+
+> **You do not need Bst-Table installed.** The whole knowledge base ships inside this package, so
+> the server works in any project — including an empty folder where you are still deciding.
+
+---
+
+## What you get
 
 | Tool | What it answers |
 | --- | --- |
-| `bst_search_docs` | Free-text search across READMEs, features, cell types, coverage, API signatures and examples. **Start here.** |
-| `bst_get_feature` | One flag (layer · type · default · maps-to · status · dependencies), one spec leaf (`D1` → ❌ NOT BUILT + workaround), or the whole registry. |
+| `bst_search_docs` | Free-text search across every README, feature, cell type, coverage row, API signature and example. **Start here when unsure.** |
+| `bst_get_feature` | One flag (layer · type · default · maps-to · status · **dependencies**), one spec leaf (`D1` → ❌ NOT BUILT + workaround), or the whole 61-flag registry. |
 | `bst_get_cell_type` | A `meta.type` renderer: value shape, editability, `cellMeta` fields. Or all 17. |
-| `bst_get_api` | The exact signature of a `@bloomskill/table-engine` export, read from its built `.d.ts`. |
+| `bst_get_api` | The exact signature of any `@bloomskill/table-engine` export, read from the built `.d.ts` (150 entries). |
 | `bst_get_example` | Full source of one of the six runnable example apps. |
-| `bst_scaffold_grid` | A complete, compiling component with every flag dependency already satisfied. |
+| `bst_scaffold_grid` | A complete, compiling component from a feature list + column list. |
 | `bst_validate_config` | Lints a config for unknown props, unmet dependencies, inert options and capabilities that don't exist. |
 | `bst_detect_version` | Which `@bloomskill/table-*` versions a project has, vs. what this server documents. |
 
+**Prompts** (slash commands in most clients) — `bst-quick-start` (new grid) · `bst-add-feature`
+(switch a capability on, dependencies included) · `bst-new-cell-type` (author a custom
+renderer/editor) · `bst-migrate` (port an AG Grid or MUI X DataGrid table over).
+
+**Resources** — `bst://coverage` · `bst://features` · `bst://cell-types` · `bst://example/{name}`.
+
+### The 17 cell types it knows
+
+`text` · `longText` · `number` · `dateTime` · `boolean` · `singleSelect` · `multiSelect` · `radio` ·
+`hyperlink` · `files` · `sparkline` · `kpi` · `qr` · `barcode` · `richText` · `action` · `actionMenu`
+
 ### Why validation matters
 
-Bst-Table's flags live in two layers — `enable*` (engine behaviour) and `show*` (adapter chrome)
-— and they fail **silently** rather than loudly. `bst_validate_config` catches what a review
-usually doesn't:
+Bst-Table's flags live in two layers — `enable*` (engine behaviour) and `show*` (adapter chrome) —
+and a wrong combination fails **silently** rather than loudly. `bst_validate_config` catches what
+code review usually doesn't:
 
 - `showSearch` without `enableGlobalFilter` — the box never renders; chrome never implies behaviour
 - `enableEditing` without `getRowId` — edits land on the wrong row after a sort
 - `enableEditing: { mode: 'batch' }` without `onSave` — nothing is ever persisted
 - `enableClipboard` — implies `enableCellSelection`, but **paste** also needs `enableEditing`
 - `manualPagination` without `rowCount` — no page count
-- `enableVirtualization` — **there is no such thing**; D1 is not implemented (use the server `DataSource`)
+- `enableVirtualization` — **there is no such flag**; D1 is not implemented (use the server `DataSource`)
 
-## Prompts
+### It will also tell you what *doesn't* exist
 
-`bst-quick-start` (new grid) · `bst-add-feature` (switch a capability on, dependencies included) ·
-`bst-new-cell-type` (author a custom renderer/editor) · `bst-migrate` (port an AG Grid or MUI X
-DataGrid table over).
+The most valuable thing this server does is say **no**. Of the 58 spec requirements, **51 are built,
+5 are partial and 2 are missing** — and an agent working from the READMEs alone would never guess
+which. `bst_get_feature({ requirement: 'D1' })` returns ❌ NOT BUILT plus the documented workaround,
+and `bst_validate_config` rejects code that assumes otherwise.
 
-## Resources
+---
 
-`bst://coverage` · `bst://features` · `bst://cell-types` · `bst://example/{name}`
+## How it stays current
 
-## What it will tell you *doesn't* exist
+The knowledge base is **generated from source at build time** — the engine's runtime toggle registry
+(`BST_SETTINGS_REGISTRY`), the `CLAUDE.md` §12 feature table, the `COVERAGE.md` status matrix,
+`types.ts` TSDoc, the built `.d.ts`, all five READMEs and all six example apps. Ship a Bst-Table
+feature and the server knows it; there is no second place to update and nothing to drift.
 
-The most valuable thing this server does is say **no**. Of the 58 spec leaves, 51 are built, 5 are
-partial and 2 are missing — and an agent working from the READMEs alone would never guess which.
-`bst_get_feature({ requirement: 'D1' })` returns ❌ NOT BUILT plus the documented workaround, and
-`bst_validate_config` rejects code that assumes otherwise. Coverage is read from `COVERAGE.md`, so
-it is exactly as current as the repo.
+Two guards **fail the build** if that slips: corpus generation errors when a toggle has no §12 row,
+and `rules.test.ts` fails when a toggle has no dependency entry in `src/rules.ts`.
+
+The version tracks the library it documents — **`@bloomskill/table-mcp@0.32.4` documents
+`@bloomskill/table-*@0.32.4`.** Keep them in step; `bst_detect_version` reports any gap.
+
+---
+
+## Troubleshooting
+
+| Symptom | Fix |
+| --- | --- |
+| Server shows as failed / not connected | Check Node ≥ 18 (`node -v`). Run `npx -y @bloomskill/table-mcp` in a terminal — it should start and wait silently on stdio (Ctrl+C to exit). Any error prints there. |
+| `command not found: npx` in the client | GUI apps don't always inherit your shell `PATH` (common with nvm). Use an absolute path as `command`, e.g. `/Users/you/.nvm/versions/node/v22.0.0/bin/npx`. |
+| Registered but the agent ignores it | Restart the client — servers are read at startup. Then ask explicitly: *"use the bst-table MCP server to …"*. |
+| Agent still writes AG Grid / MUI X code | It answered from memory instead of calling a tool. Say *"check with bst_search_docs first"* once; it sticks for the session. |
+| Advice doesn't match your installed version | Run `bst_detect_version`, then align — `npm i @bloomskill/table-mcp@<your table version>`. |
+| Corporate registry / offline | `npm i -g @bloomskill/table-mcp` once, then use `bst-table-mcp` (no args) as the `command`. |
+
+The server runs over **stdio**, makes **no network calls** and needs **no API key** — everything it
+knows is baked into the package.
+
+---
+
+## Requirements
+
+Node ≥ 18 (developed on 24). Runtime dependencies: `@modelcontextprotocol/sdk` and `zod` — search is
+a hand-written BM25 index, so there is no vector store, no embedding model and no API key.
 
 ## Development
+
+From the repo root:
 
 ```bash
 npm run build -w @bloomskill/table-engine   # the corpus generator reads the engine's build output
 npm run build -w @bloomskill/table-mcp      # compile + regenerate dist/corpus.json
-npm run mcp                                 # build + smoke + scaffold typecheck (from the repo root)
+npm run mcp                                 # the full gate — build + tests + smoke + scaffold typecheck
 ```
 
 | Check | Command | Proves |
@@ -144,19 +194,6 @@ npm run mcp                                 # build + smoke + scaffold typecheck
 | Smoke | `npm run smoke -w @bloomskill/table-mcp` | A real MCP client can connect and every tool answers |
 | Scaffold typecheck | `npm run typecheck:scaffold -w @bloomskill/table-mcp` | Every generated component **compiles** against the built packages |
 | Portability | `npm run verify:portability` | `npx`-installable outside the repo, with the corpus baked in |
-
-Two parity guards keep the server honest, in the same spirit as the engine's compile-time
-settings-sheet check (`CLAUDE.md` §12):
-
-1. **Corpus parity** — corpus generation *fails the build* if a toggle in `BST_SETTINGS_REGISTRY`
-   has no `CLAUDE.md` §12 row.
-2. **Rule parity** — `rules.test.ts` fails if a toggle has no entry in `src/rules.ts`, so a new
-   feature can't slip past the validator.
-
-## Requirements
-
-Node ≥ 18 (developed on 24). Runtime dependencies: `@modelcontextprotocol/sdk` and `zod` — search
-is a hand-written BM25 index, so there is no vector store, no embedding model and no API key.
 
 ## License
 

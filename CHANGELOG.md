@@ -9,6 +9,22 @@ this project uses [Semantic Versioning](https://semver.org).
 > affected package README(s) **and** bump the version, in the same change.
 
 ## [Unreleased]
+### Docs — `@bloomskill/table-mcp` README rewritten for first-time users; root README documents MCP support
+The npm page still carried a "⚠️ Not on npm yet — `npx` fails with 404" banner after the package
+went live at 0.32.4, and pointed at `docs/mcp-server.md`, which is not in the published tarball.
+
+- **`packages/mcp/README.md`** — replaced the banner with a real **Quick start**: per-client
+  registration (Claude Code · Cursor · Claude Desktop · VS Code/Copilot, in collapsible blocks),
+  how to verify the server connected, and a first prompt to type. Added the 17 cell-type names, a
+  **troubleshooting table** (PATH/nvm, restart-required, version mismatch, offline registry), and
+  the version-parity rule (`table-mcp@X` documents `table-*@X`). Removed all links to files that
+  are not in the published package.
+- **`README.md`** — new **"AI coding agents (MCP)"** section (registration command, per-client
+  pointer, why it's trustworthy: generated-from-source, self-contained). Corrected "three packages"
+  → four in the intro, build command, versioning and release notes; portability note now mentions
+  the no-repo MCP boot check. Dropped the broken `docs/mcp-server.md` link.
+
+## [0.32.4] — 2026-08-13
 ### Added — `@bloomskill/table-mcp`: an MCP server for AI coding agents (new package)
 A fourth package, published alongside the other three and versioned in lockstep with them.
 No language model has seen Bst-Table, so an agent asked to build one of these grids emits AG Grid

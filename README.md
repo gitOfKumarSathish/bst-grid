@@ -1,8 +1,8 @@
 # Bst-Table — one headless grid engine + two swappable skins
 
-A React data grid built on **TanStack Table v9**, packaged as three real npm packages:
-**one headless engine** and **two style adapters** (MUI and shadcn/Radix) that render the
-identical grid from the same data and columns.
+A React data grid built on **TanStack Table v9**, packaged as four real npm packages:
+**one headless engine**, **two style adapters** (MUI and shadcn/Radix) that render the identical
+grid from the same data and columns, and an **MCP server** so AI coding agents know the API.
 
 **MIT/Apache dependencies only** — no per-seat licence, and no Enterprise paywall on
 master-detail, range selection or clipboard.
@@ -43,6 +43,34 @@ behaviour, `show*` = adapter chrome. Data features default **on**; heavy feature
 See [`COVERAGE.md`](COVERAGE.md) for the requirement-by-requirement status matrix, and
 [`CLAUDE.md`](CLAUDE.md) §12 for the full feature-toggle registry.
 
+## AI coding agents (MCP)
+
+No model was trained on this library, so an agent asked for "a Bst-Table grid with batch editing"
+writes **AG Grid** or **MUI X DataGrid** code — the APIs this project exists to replace.
+[`@bloomskill/table-mcp`](packages/mcp) closes that gap: an MCP server carrying searchable docs, the
+61-flag toggle registry, all 17 cell types, 150 API signatures, plus grid **scaffolding** and config
+**validation**. Register it once, at user scope so it covers every project on the machine:
+
+```bash
+claude mcp add bst-table -s user -- npx -y @bloomskill/table-mcp
+```
+
+For Cursor, VS Code/Copilot and Claude Desktop (each wants a slightly different JSON shape), see the
+[MCP README](packages/mcp/README.md#quick-start). Then just ask for what you want — the agent picks
+the tools up on its own:
+
+> Build me a Bst-Table grid of orders with inline editing, a status dropdown and copy/paste.
+
+The component it returns **compiles**, with every flag dependency already satisfied. It also knows
+what *doesn't* exist here (`enableVirtualization` is not a flag) and which combinations fail
+silently (`showSearch` does nothing without `enableGlobalFilter`).
+
+Two properties make it trustworthy: the knowledge base is **generated from this repo at build
+time** — the §12 registry, `COVERAGE.md`, TSDoc, the built `.d.ts`, every README and example — so it
+cannot drift from the code; and it is **self-contained** (no network, no API key), working in any
+project, including ones that don't have `@bloomskill/table-*` installed. Its version matches the
+library it documents.
+
 ## Structure
 
 ```text
@@ -73,27 +101,12 @@ nvm use 24 || nvm install 24
 
 ```bash
 npm install            # install workspace deps
-npm run build          # build all three packages (tsc → dist)
+npm run build          # build all four packages (tsc → dist)
 npm test               # engine unit + adapter integration tests (Vitest/jsdom)
 npm run demo           # start the Vite demo (both skins) at http://localhost:5173
 npm run verify:portability   # pack tarballs, install into a fresh external app, build + test
 npm run mcp            # MCP server gate: stdio smoke test + scaffolded-output typecheck
 ```
-
-### Using the grid with an AI coding agent
-
-[`@bloomskill/table-mcp`](packages/mcp) is an MCP server that teaches agents this library — without
-it they fall back on AG Grid or MUI X DataGrid APIs, which do not exist here. Register it once, at
-**user scope** so it applies to every project on the machine:
-
-```bash
-claude mcp add bst-table -s user -- npx -y @bloomskill/table-mcp
-```
-
-It is self-contained (no network, no API key) and works in any project, including ones that don't
-have `@bloomskill/table-*` installed. **Not published yet**, so until it is, use the tarball or
-local-build route — install routes, per-client config, team sharing and publishing are all in
-[`docs/mcp-server.md`](docs/mcp-server.md).
 
 The suite is **35 test files / ~245 tests** (32 engine · 1 MUI · 2 shadcn) covering every
 feature area — editing, validation, selection, clipboard, spanning, grouping, DataSource,
@@ -135,10 +148,11 @@ cd examples/quick-start && npm install && npm run dev
 
 ## Releasing & versioning
 
-The three packages are versioned **in lockstep** from a single source of truth,
+The four packages are versioned **in lockstep** from a single source of truth,
 [`version.ini`](version.ini). Don't hand-edit versions in `package.json` — use the scripts,
-which bump `version.ini`, sync all three `package.json`s (version + the adapters' internal
-`@bloomskill/table-engine` range), and run `npm install`.
+which bump `version.ini`, sync all four `package.json`s (version + the adapters' internal
+`@bloomskill/table-engine` range), and run `npm install`. The MCP server rides the same version
+because its corpus documents exactly the release it ships with.
 
 ```bash
 # 1. bump — preview first with:  node scripts/bump-version.mjs <level> --dry
@@ -148,7 +162,7 @@ npm run version:major    # breaking change    0.1.1 → 1.0.0
 
 # 2. record it (see CLAUDE.md §13): update CHANGELOG.md + the affected README(s)
 
-# 3. publish all three (engine first — adapters peer-depend on it)
+# 3. publish all four (engine first — adapters peer-depend on it)
 npm run release
 ```
 
@@ -162,9 +176,11 @@ npm run release
 
 ## Portability
 
-`npm run verify:portability` packs the three tarballs, installs them into a throwaway project
-**outside** the workspace ([`scripts/consumer-template/`](scripts/consumer-template)), then builds
-and runs tests there — proving the packages work as real npm dependencies, not just as workspace links.
+`npm run verify:portability` packs the engine + adapter tarballs, installs them into a throwaway
+project **outside** the workspace ([`scripts/consumer-template/`](scripts/consumer-template)), then
+builds and runs tests there — proving the packages work as real npm dependencies, not just as
+workspace links. It then packs `@bloomskill/table-mcp` and boots it with **no repo present**,
+proving the corpus really is baked into the published tarball.
 
 ## How a new skin is added
 
