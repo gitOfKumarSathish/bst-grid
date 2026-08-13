@@ -86,9 +86,15 @@ const str = (v: unknown): string => (v == null ? '' : String(v))
 
 const num = (v: unknown): number => {
   if (typeof v === 'number') return v
-  const n = Number(v)
+  if (v == null) return NaN
+  // Blank / whitespace-only / empty-array cells have NO numeric value — they must
+  // NOT coerce to 0 (the Unix epoch), which silently matched `before`/`<`/`<=`
+  // and any zero-spanning range on every empty cell (#6).
+  const s = String(v).trim()
+  if (s === '') return NaN
+  const n = Number(s)
   if (!Number.isNaN(n)) return n
-  const t = Date.parse(String(v)) // allow date strings for </>/between
+  const t = Date.parse(s) // allow date strings for </>/between
   return Number.isNaN(t) ? NaN : t
 }
 
@@ -97,6 +103,32 @@ const isEmptyVal = (v: unknown): boolean =>
 
 const looseEq = (a: unknown, b: unknown): boolean =>
   str(a).toLowerCase() === str(b).toLowerCase()
+
+/** Parse a value to a Date, treating a bare `YYYY-MM-DD` as LOCAL midnight (the
+ *  calendar day the user picked) rather than UTC — so day comparisons never slip
+ *  a day (#7). Returns null when the value isn't a valid date. */
+const toDate = (v: unknown): Date | null => {
+  if (v instanceof Date) return Number.isNaN(v.getTime()) ? null : v
+  if (typeof v === 'number') {
+    const d = new Date(v)
+    return Number.isNaN(d.getTime()) ? null : d
+  }
+  const s = str(v).trim()
+  if (!s) return null
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s)
+  if (m) return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]))
+  const t = Date.parse(s)
+  return Number.isNaN(t) ? null : new Date(t)
+}
+
+/** True for a bare calendar-date string (`YYYY-MM-DD`) — what the date filter inputs emit. */
+const isDateOnly = (v: unknown): boolean => /^\d{4}-\d{2}-\d{2}$/.test(str(v).trim())
+
+/** Same local calendar day (ignores time-of-day). */
+const sameLocalDay = (a: Date, b: Date): boolean =>
+  a.getFullYear() === b.getFullYear() &&
+  a.getMonth() === b.getMonth() &&
+  a.getDate() === b.getDate()
 
 const includesArr = (cell: unknown, value: unknown): boolean =>
   Array.isArray(cell)
@@ -117,7 +149,9 @@ export function evalCondition(cell: unknown, raw: unknown): boolean {
     op = 'contains'
     value = raw
   }
-  // A filter with no value (other than unary ops) is treated as inactive.
+  // A filter with no value (other than unary ops) is treated as inactive. A
+  // `between` is inactive only when BOTH bounds are empty (a one-bound range is a
+  // valid one-sided filter — see the `between` case).
   const unary = op === 'empty' || op === 'notEmpty' || op === 'isTrue' || op === 'isFalse'
   if (!unary && isEmptyVal(value) && (op !== 'between' || isEmptyVal(value2))) return true
 
@@ -126,8 +160,17 @@ export function evalCondition(cell: unknown, raw: unknown): boolean {
       return includesArr(cell, value)
     case 'notContains':
       return !includesArr(cell, value)
-    case 'equals':
+    case 'equals': {
+      // A date-only filter value ("on <day>") must match a datetime cell by
+      // calendar day, not string identity — otherwise it never matches an ISO
+      // timestamp and returns zero rows (#7).
+      if (isDateOnly(value)) {
+        const c = toDate(cell)
+        const v = toDate(value)
+        if (c && v) return sameLocalDay(c, v)
+      }
       return Array.isArray(cell) ? cell.some((x) => looseEq(x, value)) : looseEq(cell, value)
+    }
     case 'notEquals':
       return Array.isArray(cell) ? !cell.some((x) => looseEq(x, value)) : !looseEq(cell, value)
     case 'startsWith':
@@ -147,8 +190,26 @@ export function evalCondition(cell: unknown, raw: unknown): boolean {
     case 'lte':
       return num(cell) <= num(value)
     case 'between': {
+      // Date range: whole local days, inclusive — so `between D and D` matches
+      // every time on day D (bounds are no longer UTC midnight, which excluded any
+      // non-midnight timestamp) (#7).
+      if (isDateOnly(value) || isDateOnly(value2)) {
+        const c = toDate(cell)
+        const lo = toDate(value)
+        const hi = toDate(value2)
+        if (c && lo && hi) {
+          const hiEnd = new Date(hi.getFullYear(), hi.getMonth(), hi.getDate(), 23, 59, 59, 999)
+          return c.getTime() >= lo.getTime() && c.getTime() <= hiEnd.getTime()
+        }
+      }
+      // Numeric range. An empty cell has no value to compare (#6); a missing bound
+      // is open-ended, so a half-built range filters on the bound present instead
+      // of building a `<= NaN` predicate that emptied the grid to "No rows" (#8).
       const c = num(cell)
-      return c >= num(value) && c <= num(value2)
+      if (Number.isNaN(c)) return false
+      const lo = num(value)
+      const hi = num(value2)
+      return (Number.isNaN(lo) || c >= lo) && (Number.isNaN(hi) || c <= hi)
     }
     case 'isTrue':
       return cell === true || cell === 'true' || cell === 1 || cell === '1'

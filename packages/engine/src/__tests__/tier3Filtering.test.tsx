@@ -60,12 +60,20 @@ describe('#7 date equals / between match by local calendar day', () => {
   })
 })
 
-describe('#8 a half-filled between is inactive, not a grid-emptying predicate', () => {
-  test('only one bound → treated as inactive (matches every row)', () => {
-    expect(isConditionActive({ op: 'between', value: '5' })).toBe(false)
-    expect(isConditionActive({ op: 'between', value: '', value2: '10' })).toBe(false)
-    expect(evalCondition(3, { op: 'between', value: '5', value2: '' })).toBe(true)
-    expect(evalCondition(999, { op: 'between', value: '', value2: '10' })).toBe(true)
+describe('#8 a half-filled between filters one-sided instead of emptying the grid', () => {
+  test('one bound present → active, filters on that bound (never a <= NaN wipe)', () => {
+    // Lower bound only → c >= lo
+    expect(isConditionActive({ op: 'between', value: '5' })).toBe(true)
+    expect(evalCondition(9, { op: 'between', value: '5', value2: '' })).toBe(true)
+    expect(evalCondition(3, { op: 'between', value: '5', value2: '' })).toBe(false)
+    // Upper bound only → c <= hi
+    expect(evalCondition(4, { op: 'between', value: '', value2: '10' })).toBe(true)
+    expect(evalCondition(50, { op: 'between', value: '', value2: '10' })).toBe(false)
+  })
+
+  test('both bounds empty → inactive (matches every row)', () => {
+    expect(isConditionActive({ op: 'between', value: '', value2: '' })).toBe(false)
+    expect(evalCondition(3, { op: 'between', value: '', value2: '' })).toBe(true)
   })
 
   test('both bounds present → active and applied', () => {
