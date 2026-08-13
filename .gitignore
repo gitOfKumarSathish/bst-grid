@@ -9,3 +9,4 @@ packages/mcp/.typecheck-scaffold/
 
 # Claude Code local (personal) settings
 .claude/settings.local.json
+.git.root-backup/
