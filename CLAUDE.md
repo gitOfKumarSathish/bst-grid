@@ -625,6 +625,8 @@ pure interactions with no flag (double-click auto-size).
 | Review-changes sheet | `showChangesSheet` (+ `changesRowLabel`) | chrome | boolean | follows `mode: 'batch'` | adapter "{n} unsaved" chip + **Review & save** → right sheet (MUI Drawer / shadcn slide-over) listing each edit (row · column · old → new) with per-change/per-row revert + the final Save confirmation (`runtime.commitAll()` → one `onSave`); failed save keeps drafts + shows the error. Replaces the plain save bar while on. Like `showSaveBar`, not a settings-sheet entry | ✅ done |
 | Batch-editing runtime switch | `enableBatchEditing` | engine | boolean | — (follows `enableEditing.mode`) | overrides the editing mode at runtime: `true` forces `'batch'`, `false` forces a batch grid back to per-cell; unset follows `enableEditing.mode`. **In the settings sheet** ("Editing", `alwaysShow`) via the new `SETTINGS_META.getBase` hook, so the switch truthfully reflects a `{ mode: 'batch' }` grid as ON; adapters' review-sheet chrome follows it. | ✅ done |
 
+| MCP server for AI agents | `@bloomskill/table-mcp` | tooling | MCP stdio server | — (separate package) | `npx -y @bloomskill/table-mcp` — 8 tools (`bst_search_docs` · `bst_get_feature` · `bst_get_cell_type` · `bst_get_api` · `bst_get_example` · `bst_scaffold_grid` · `bst_validate_config` · `bst_detect_version`), 4 prompts, `bst://` resources. Corpus **generated from source** at build time; `src/rules.ts` holds the hand-authored flag-dependency table (parity-tested) | ✅ done |
+
 Add a row here — in this exact shape — whenever a feature is introduced.
 
 > **Custom-CSS note:** these are customization props, not on/off toggles — presence
@@ -661,19 +663,36 @@ needs a version bump.)
 | MUI chrome · `show*` props · MUI-specific behaviour | `packages/mui/README.md` |
 | shadcn/Radix chrome · `show*` props · `dark` · shadcn CSS | `packages/shadcn/README.md` |
 | A feature spanning engine + adapters (e.g. row selection, editing) | engine README **and** each adapter README |
+| MCP server tools/prompts/resources · the corpus generator · validation rules | `packages/mcp/README.md` |
 
 Also refresh **Requirements** (peer deps) in a README whenever that package's dependencies change.
 
+> **MCP server (`@bloomskill/table-mcp`) — it updates itself, with two exceptions.** Its knowledge
+> base is **generated from source** (`BST_SETTINGS_REGISTRY`, the §12 table, `COVERAGE.md`,
+> `types.ts` TSDoc, the built `.d.ts`, the READMEs, `examples/*`), so a new feature flows in with
+> no extra step — provided you did steps 2 and 4 above. Two guards enforce that and will **fail
+> the build**: corpus generation errors if a toggle in `BST_SETTINGS_REGISTRY` has no §12 row, and
+> `packages/mcp/src/__tests__/rules.test.ts` fails if a toggle has no entry in
+> `packages/mcp/src/rules.ts` (the hand-authored flag-dependency table — a bare `{}` is a valid
+> entry meaning "no dependencies"). So: **add a rules entry for every new `enable*`/`show*` flag.**
+
+> **DoD step 3 for `packages/mcp`.** An MCP server can't be shown in `apps/demo`, so its equivalent
+> gate is `npm run mcp` from the repo root — builds, runs the package's tests (including the two
+> parity guards), boots the server over stdio as a real MCP client and calls every tool, then
+> typechecks every scaffolded component against the built packages. That must pass before publishing.
+
 ### Release flow (versions kept in lockstep via `version.ini`)
 `version.ini` is the **single source of truth** for the version. The `version:*` scripts
-increment it and sync all three `package.json`s (version + the adapters' internal
-`@bloomskill/table-engine` range) and run `npm install`.
+increment it and sync all four `package.json`s (version + the adapters' internal
+`@bloomskill/table-engine` range) and run `npm install`. The MCP server rides the same version
+because its corpus documents exactly the release it ships with.
 ```bash
 1. npm run build && npm test && npm run verify:portability     # all green
 2. # update the demo (apps/demo) + README(s) + §12 registry + CHANGELOG.md
 3. npm run demo               # eyeball the new feature live BEFORE publishing (builds first, so dist is fresh)
 4. npm run version:patch      # or version:minor / version:major (bumps version.ini + all 3 pkgs)
-5. npm run release            # build + publish all three (engine FIRST — adapters peer-depend on it)
+5. npm run mcp                # MCP DoD gate: build + tests (parity guards) + stdio smoke + scaffold typecheck (see §13 note below)
+6. npm run release            # build + publish all four (engine FIRST — adapters peer-depend on it)
 ```
 Semver: **patch** = fix/docs · **minor** = new backward-compatible feature (most new flags) ·
 **major** = breaking change. Record every release in `CHANGELOG.md`.

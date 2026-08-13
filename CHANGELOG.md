@@ -1,14 +1,54 @@
 # Changelog
 
 All notable changes to the **`@bloomskill/table-*`** packages
-(`table-engine`, `table-mui`, `table-shadcn`). Versions are kept **in lockstep** —
-all three bump together. Format loosely follows [Keep a Changelog](https://keepachangelog.com);
+(`table-engine`, `table-mui`, `table-shadcn`, `table-mcp`). Versions are kept **in lockstep** —
+all four bump together. Format loosely follows [Keep a Changelog](https://keepachangelog.com);
 this project uses [Semantic Versioning](https://semver.org).
 
 > Per `CLAUDE.md` §13: every feature/behaviour change must add an entry here **and** update the
 > affected package README(s) **and** bump the version, in the same change.
 
 ## [Unreleased]
+### Added — `@bloomskill/table-mcp`: an MCP server for AI coding agents (new package)
+A fourth package, published alongside the other three and versioned in lockstep with them.
+No language model has seen Bst-Table, so an agent asked to build one of these grids emits AG Grid
+or MUI X DataGrid code instead. This server gives any MCP client (Claude Code, Cursor, Copilot)
+accurate, version-pinned knowledge of the packages — plus scaffolding and validation.
+
+- **Knowledge base generated from source at build time**, not hand-written: `BST_SETTINGS_REGISTRY`
+  (runtime toggles), the `CLAUDE.md` §12 table, the `COVERAGE.md` 58-leaf matrix, `types.ts` TSDoc,
+  the engine's built `.d.ts`, all package READMEs and the six `examples/` apps → `dist/corpus.json`.
+  Shipping a feature updates the MCP server for free; nothing can drift.
+- **Self-indexing docs**: the doc corpus is the four package READMEs plus a **`docs/*.md` glob**, so
+  the server documents itself — its own `docs/mcp-server.md` guide and `packages/mcp/README.md` are
+  searchable (`bst_search_docs("install mcp")` works), and a new guide joins the index with no code
+  change. `bst_search_docs` gains a `pkg: 'mcp'` filter.
+- **8 tools** — `bst_search_docs` (BM25 over the whole corpus), `bst_get_feature` (a flag's layer /
+  type / default / dependencies, **or** a spec leaf's built/partial/missing status),
+  `bst_get_cell_type`, `bst_get_api`, `bst_get_example`, `bst_scaffold_grid`,
+  `bst_validate_config`, `bst_detect_version`.
+- **`bst_validate_config`** catches the silent failures: chrome without its behaviour flag
+  (`showSearch` + `enableGlobalFilter={false}`), editing without `getRowId`, batch mode without
+  `onSave`, `manualPagination` without `rowCount`, and invented capabilities — asking for
+  virtualization returns D1's ❌ NOT BUILT plus the server-`DataSource` workaround.
+- **`bst_scaffold_grid`** emits a complete component with dependencies already resolved
+  (clipboard also enables cell selection; editing also wires `getRowId` + `onDataChange`; batch
+  editing emits a single-request `onSave`). Every output is typechecked against the built packages.
+- **4 prompts** (`bst-quick-start`, `bst-add-feature`, `bst-new-cell-type`, `bst-migrate`) and
+  `bst://` resources for coverage, features, cell types and examples.
+- **Three parity/freshness guards**, in the spirit of the engine's compile-time settings-sheet
+  check: corpus generation fails the build if an engine toggle has no §12 row; `rules.test.ts` fails
+  if a toggle has no flag-dependency entry; and a freshness test fails if any indexed source's mtime
+  is newer than the corpus's `generatedAt` (now a full ISO timestamp) — catching a doc edited
+  without rebuilding the corpus. A new feature cannot slip past the validator, and the docs can't go
+  stale silently.
+- Zero search dependencies (hand-written BM25); runtime deps are the MCP SDK and zod. Runs over
+  stdio, makes no network calls, and works standalone via `npx -y @bloomskill/table-mcp`.
+- Repo wiring: `bump-version.mjs` bumps four packages; root `build`/`typecheck`/`release` include
+  it; `verify:portability` installs the tarball outside the workspace and proves the corpus ships
+  inside it; new `npm run mcp` gate (stdio smoke + scaffold typecheck) stands in for the demo
+  step of the §13 Definition of Done.
+
 ### Changed — Documentation audit across all three packages + the repo root (docs)
 Cross-verified every README against the `CLAUDE.md` §12 registry, `types.ts`, `settings.ts`, both
 adapter prop interfaces, `runtime.ts` and `index.ts`. Feature coverage was already complete

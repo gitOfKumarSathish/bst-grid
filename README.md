@@ -12,6 +12,7 @@ master-detail, range selection or clipboard.
 | [`@bloomskill/table-engine`](packages/engine) | Headless engine — TanStack v9 wiring, the cell-type registry, editing/validation/selection/clipboard, a neutral `<BstTable>` body, CSS-var tokens. No UI library inside. |
 | [`@bloomskill/table-mui`](packages/mui) | Material UI skin — toolbar, menus, pagination, MUI editors, theme mapping. |
 | [`@bloomskill/table-shadcn`](packages/shadcn) | shadcn / Radix skin — inherits your design tokens and icon library, ships its own CSS (no Tailwind build needed). |
+| [`@bloomskill/table-mcp`](packages/mcp) | MCP server — gives AI coding agents (Claude Code, Cursor, Copilot) accurate knowledge of this library: docs search, the feature registry, config validation and grid scaffolding. |
 
 Full per-package docs live in each package README. Start with the
 **[engine README](packages/engine/README.md)** — it documents every option, cell type and feature.
@@ -49,7 +50,8 @@ bst-table/
 ├─ packages/
 │  ├─ engine/     @bloomskill/table-engine   — headless TanStack v9 wiring + neutral <BstTable> + CSS-var tokens
 │  ├─ mui/        @bloomskill/table-mui      — Material UI toolbar/menu/pagination chrome + editors
-│  └─ shadcn/     @bloomskill/table-shadcn   — Radix primitives + shadcn-style CSS chrome + editors
+│  ├─ shadcn/     @bloomskill/table-shadcn   — Radix primitives + shadcn-style CSS chrome + editors
+│  └─ mcp/        @bloomskill/table-mcp      — MCP server for AI agents; corpus generated from this repo at build time
 ├─ apps/
 │  └─ demo/       @bloomskill/demo           — Vite app rendering BOTH skins over the same data
 ├─ examples/                                 — six standalone runnable apps (also open in StackBlitz)
@@ -75,6 +77,16 @@ npm run build          # build all three packages (tsc → dist)
 npm test               # engine unit + adapter integration tests (Vitest/jsdom)
 npm run demo           # start the Vite demo (both skins) at http://localhost:5173
 npm run verify:portability   # pack tarballs, install into a fresh external app, build + test
+npm run mcp            # MCP server gate: stdio smoke test + scaffolded-output typecheck
+```
+
+### Using the grid with an AI coding agent
+
+[`@bloomskill/table-mcp`](packages/mcp) is an MCP server that teaches agents this library — without
+it they fall back on AG Grid or MUI X DataGrid APIs, which do not exist here. Register it once:
+
+```bash
+claude mcp add bst-table -- npx -y @bloomskill/table-mcp
 ```
 
 The suite is **35 test files / ~245 tests** (32 engine · 1 MUI · 2 shadcn) covering every

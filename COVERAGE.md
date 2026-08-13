@@ -74,7 +74,10 @@ undo/redo · cell/range selection + keyboard nav · clipboard · **runtime setti
 (`useBstSettings`) · **custom-CSS slots** (K1/K2) · **conditional-format builder** ·
 **two adapters** (MUI + shadcn) with shadcn **`theme="inherit"`** + **pluggable icons**
 (lucide/tabler/…) · **fit-to-viewport** (`fitColumns`) · injectable body icons ·
-**server DataSource** (`useBstDataSource` / `createClientDataSource` / `createServerDataSource`).
+**server DataSource** (`useBstDataSource` / `createClientDataSource` / `createServerDataSource`) ·
+**MCP server for AI agents** (`@bloomskill/table-mcp` — docs search, feature registry, config
+validation, grid scaffolding; its corpus is generated from this file among others, so coverage
+stays accurate for agents automatically).
 
 ## Still open
 **Server DataSource foundation — done (v0.28.0):** the manual sort/filter/paginate seam ships, so the

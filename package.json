@@ -9,17 +9,18 @@
     "apps/*"
   ],
   "scripts": {
-    "build": "npm run build -w @bloomskill/table-engine && npm run build -w @bloomskill/table-mui && npm run build -w @bloomskill/table-shadcn",
-    "typecheck": "tsc -p packages/engine/tsconfig.json --noEmit && tsc -p packages/mui/tsconfig.json --noEmit && tsc -p packages/shadcn/tsconfig.json --noEmit",
+    "build": "npm run build -w @bloomskill/table-engine && npm run build -w @bloomskill/table-mui && npm run build -w @bloomskill/table-shadcn && npm run build -w @bloomskill/table-mcp",
+    "typecheck": "tsc -p packages/engine/tsconfig.json --noEmit && tsc -p packages/mui/tsconfig.json --noEmit && tsc -p packages/shadcn/tsconfig.json --noEmit && tsc -p packages/mcp/tsconfig.json --noEmit",
     "test": "vitest run",
     "demo": "npm run build && npm run dev -w @bloomskill/demo",
     "demo:fast": "npm run dev -w @bloomskill/demo",
     "verify:portability": "bash scripts/pack-and-verify.sh",
+    "mcp": "npm run build -w @bloomskill/table-mcp && vitest run packages/mcp && npm run smoke -w @bloomskill/table-mcp && npm run typecheck:scaffold -w @bloomskill/table-mcp",
     "version:patch": "node scripts/bump-version.mjs patch && npm install",
     "version:minor": "node scripts/bump-version.mjs minor && npm install",
     "version:major": "node scripts/bump-version.mjs major && npm install",
     "release:preflight": "npm whoami || (echo 'npm publish will fail: not authenticated (npm token missing/expired). Run: npm login  (or put a valid //registry.npmjs.org/:_authToken in ~/.npmrc), then re-run: npm run release' && exit 1)",
-    "release": "npm run release:preflight && npm run build && npm publish -w @bloomskill/table-engine && npm publish -w @bloomskill/table-mui && npm publish -w @bloomskill/table-shadcn"
+    "release": "npm run release:preflight && npm run build && npm publish -w @bloomskill/table-engine && npm publish -w @bloomskill/table-mui && npm publish -w @bloomskill/table-shadcn && npm publish -w @bloomskill/table-mcp"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.0",

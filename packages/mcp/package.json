@@ -1,0 +1,57 @@
+{
+  "name": "@bloomskill/table-mcp",
+  "version": "0.32.2",
+  "description": "Bst-Table MCP server — gives AI coding agents accurate, version-pinned knowledge of @bloomskill/table-* : docs search, the feature-toggle registry, cell types, config validation and grid scaffolding.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gitOfKumarSathish/bst-grid.git",
+    "directory": "packages/mcp"
+  },
+  "homepage": "https://github.com/gitOfKumarSathish/bst-grid/tree/main/packages/mcp#readme",
+  "bugs": "https://github.com/gitOfKumarSathish/bst-grid/issues",
+  "type": "module",
+  "main": "./dist/server.js",
+  "types": "./dist/server.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js"
+    }
+  },
+  "bin": {
+    "bst-table-mcp": "./dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "bst-table",
+    "data-grid",
+    "tanstack-table",
+    "claude",
+    "ai"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node ./dist/generate/run.js",
+    "dev": "tsc -p tsconfig.json --watch",
+    "start": "node ./dist/cli.js",
+    "smoke": "node ./scripts/smoke.mjs",
+    "typecheck:scaffold": "node ./scripts/typecheck-scaffold.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
+}

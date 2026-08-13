@@ -1,6 +1,6 @@
 // Bump the @bloomskill/table-* versions from version.ini (single source of truth).
 // Usage: node scripts/bump-version.mjs <patch|minor|major> [--dry]
-// Keeps all 3 packages in lockstep and updates the adapters' internal
+// Keeps all 4 packages in lockstep and updates the adapters' internal
 // @bloomskill/table-engine ranges to match the new version.
 import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
@@ -8,7 +8,7 @@ import { dirname, join } from 'node:path'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const INI = join(ROOT, 'version.ini')
-const PKGS = ['engine', 'mui', 'shadcn']
+const PKGS = ['engine', 'mui', 'shadcn', 'mcp']
 const ENGINE_DEP = '@bloomskill/table-engine'
 
 const level = (process.argv[2] || 'patch').toLowerCase()
@@ -37,7 +37,9 @@ if (dry) process.exit(0)
 // 1) version.ini
 writeFileSync(INI, ini.replace(/version\s*=\s*\d+\.\d+\.\d+/, `version = ${next}`))
 
-// 2) each package.json: version + internal engine ranges (adapters only)
+// 2) each package.json: version + internal engine ranges (adapters only).
+// The MCP server rides the same version: its corpus documents exactly the
+// release it ships with, so a drifting version would misreport the API.
 for (const p of PKGS) {
   const f = join(ROOT, 'packages', p, 'package.json')
   const j = JSON.parse(readFileSync(f, 'utf8'))
@@ -51,4 +53,4 @@ for (const p of PKGS) {
 
 console.log(`\nNext:
   1. add a "[${next}]" entry to CHANGELOG.md + update README(s) per CLAUDE.md §13
-  2. npm run release        # build + publish all three (engine first)`)
+  2. npm run release        # build + publish all four (engine first)`)
