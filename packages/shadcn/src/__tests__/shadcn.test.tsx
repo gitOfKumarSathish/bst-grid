@@ -361,7 +361,8 @@ describe('@bloomskill/table-shadcn — Batch editing toggle in the settings shee
 })
 
 describe('@bloomskill/table-shadcn — conditional-format builder chrome (K3)', () => {
-  test('Formats button opens the rule panel; adding a rule bumps the count; X closes it', () => {
+  test('Formats in the "⋯ More" menu opens the rule panel; adding a rule bumps the count', async () => {
+    const user = userEvent.setup()
     const { container } = render(
       <BstTableShadcn
         data={seed}
@@ -374,9 +375,15 @@ describe('@bloomskill/table-shadcn — conditional-format builder chrome (K3)', 
       />,
     )
     expect(container.querySelector('.cf-t')).toBeTruthy() // seeded rule applied
-    fireEvent.click(screen.getByRole('button', { name: /Formats \(1\)/ }))
+    // Formats now lives in the "⋯ More" overflow menu
+    await user.click(screen.getByRole('button', { name: /more options/i }))
+    await user.click(await screen.findByRole('menuitem', { name: /Formats \(1\)/ }))
+    // panel opens; add a rule → count bumps
     fireEvent.click(screen.getByRole('button', { name: '+ Add rule' }))
-    expect(screen.getByRole('button', { name: /Formats \(2\)/ })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /more options/i }))
+    expect(await screen.findByRole('menuitem', { name: /Formats \(2\)/ })).toBeInTheDocument()
+    // close the menu, then close the panel via its X
+    await user.keyboard('{Escape}')
     fireEvent.click(screen.getByRole('button', { name: 'Close conditional formatting' }))
     expect(screen.queryByRole('button', { name: '+ Add rule' })).toBeNull()
   })

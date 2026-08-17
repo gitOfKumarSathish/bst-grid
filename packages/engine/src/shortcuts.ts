@@ -16,6 +16,9 @@ export interface BstShortcut {
   category: ShortcutCategory
   /** Engine flags that must ALL be active for this shortcut to fire. */
   requires: string[]
+  /** Show this entry only on the given platform (e.g. `⌘Y` redo is a PC-only
+   *  convention). Omit → shown on both. Filtered by `resolveActiveShortcuts`. */
+  platform?: 'mac' | 'pc'
 }
 
 /** Authored in display order, grouped by category. */
@@ -43,7 +46,8 @@ export const BST_SHORTCUTS_REGISTRY: readonly BstShortcut[] = [
   // History
   { keys: ['Mod', 'Z'], label: 'Undo', category: 'History', requires: ['enableUndoRedo'] },
   { keys: ['Mod', 'Shift', 'Z'], label: 'Redo', category: 'History', requires: ['enableUndoRedo'] },
-  { keys: ['Mod', 'Y'], label: 'Redo (alt)', category: 'History', requires: ['enableUndoRedo'] },
+  // ⌘Y is a Windows/Linux redo convention, not a Mac one — hide it on Mac.
+  { keys: ['Mod', 'Y'], label: 'Redo (alt)', category: 'History', requires: ['enableUndoRedo'], platform: 'pc' },
 ]
 
 /** Render one key token for display, platform-aware. */
@@ -74,11 +78,13 @@ const CATEGORY_ORDER: ShortcutCategory[] = ['Navigate', 'Edit', 'Clipboard', 'Hi
 /**
  * Filter the registry to the shortcuts whose required flags are **all** active,
  * grouped by category and optionally narrowed by a free-text `query` (label or
- * keys). Pure — the overlay renders exactly this.
+ * keys). Pass `isMac` to drop platform-specific entries (e.g. `⌘Y` redo on Mac);
+ * omit it to keep everything. Pure — the overlay renders exactly this.
  */
 export function resolveActiveShortcuts(
   flags: Record<string, boolean | undefined>,
   query = '',
+  isMac?: boolean,
 ): ResolvedShortcutGroup[] {
   const q = query.trim().toLowerCase()
   const groups: ResolvedShortcutGroup[] = []
@@ -87,6 +93,7 @@ export function resolveActiveShortcuts(
       (s) =>
         s.category === category &&
         s.requires.every((f) => flags[f] === true) &&
+        (!s.platform || isMac === undefined || s.platform === (isMac ? 'mac' : 'pc')) &&
         (!q ||
           s.label.toLowerCase().includes(q) ||
           s.keys.join(' ').toLowerCase().includes(q)),

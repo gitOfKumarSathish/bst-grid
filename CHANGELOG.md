@@ -9,6 +9,12 @@ this project uses [Semantic Versioning](https://semver.org).
 > affected package README(s) **and** bump the version, in the same change.
 
 ## [Unreleased]
+### Changed — Smart header: toolbar declutter (Phase 1)
+- **Add row moved out of the toolbar to a footer bar** under the table (both skins) — it's a data
+  action, so it now sits with the rows, not the view controls.
+- **Undo/Redo · Density · Formats collapse into a single "⋯ More" menu** (MUI `Menu` / shadcn Radix
+  `DropdownMenu`), leaving a leaner toolbar: Search · Filters · Columns · Export · ⋯ · ⚙ ⌨.
+
 ### Added — In-UI keyboard-shortcuts overlay (`showShortcuts`)
 - A toolbar **"?" button** + a dependency-free, theme-aware **overlay** that lists the keyboard
   shortcuts **active on this grid** — grouped (Navigate · Edit · Clipboard · History), searchable,
@@ -20,6 +26,8 @@ this project uses [Semantic Versioning](https://semver.org).
   `onKeyDown` handler and is guarded by `shortcuts.test.tsx`.
 - Both skins add the `showShortcuts` toolbar button (off by default, opt-in). `@bloomskill/table-mui` +
   `@bloomskill/table-shadcn`.
+- **Mac-aware:** keys auto-detect (⌘/⇧ on Mac); `showShortcuts={{ platform: 'mac' | 'pc' | 'auto' }}`
+  forces it when detection is unreliable, and the `⌘Y` redo-alt (a Windows convention) is hidden on Mac.
 
 ### Added — Context menu (Phase 6, AG6)
 - **`enableContextMenu`** — a dependency-free **right-click menu** at the cursor. Default items: Copy /

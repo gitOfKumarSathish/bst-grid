@@ -28,6 +28,9 @@ export interface BstShortcutsProps<TData extends RowData> {
   table: unknown
   /** Extra class on the trigger button (adapters can blend it into their toolbar). */
   className?: string
+  /** Key rendering: `'mac'` forces ⌘/⇧, `'pc'` forces Ctrl, `'auto'` (default)
+   *  detects from `navigator`. Use it when detection is unreliable (remote/proxied). */
+  platform?: 'mac' | 'pc' | 'auto'
 }
 
 /**
@@ -36,10 +39,17 @@ export interface BstShortcutsProps<TData extends RowData> {
  * platform-aware). Also opens on `?`. Self-contained so an adapter just drops in
  * `<BstShortcuts table={table} />`.
  */
-export function BstShortcuts<TData extends RowData>({ table, className }: BstShortcutsProps<TData>) {
+export function BstShortcuts<TData extends RowData>({
+  table,
+  className,
+  platform = 'auto',
+}: BstShortcutsProps<TData>) {
   const [open, setOpen] = React.useState(false)
   const [query, setQuery] = React.useState('')
-  const isMac = React.useMemo(detectMac, [])
+  const isMac = React.useMemo(
+    () => (platform === 'mac' ? true : platform === 'pc' ? false : detectMac()),
+    [platform],
+  )
 
   const handle = getBstRuntime<TData>(table) as unknown as Record<string, boolean>
   const flags: Record<string, boolean> = {
@@ -50,7 +60,7 @@ export function BstShortcuts<TData extends RowData>({ table, className }: BstSho
     enableCopyColumn: !!handle.enableCopyColumn,
     enableCopyRow: !!handle.enableCopyRow,
   }
-  const groups = resolveActiveShortcuts(flags, query)
+  const groups = resolveActiveShortcuts(flags, query, isMac)
 
   // `?` toggles the overlay (unless the user is typing).
   React.useEffect(() => {

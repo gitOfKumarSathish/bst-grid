@@ -117,8 +117,9 @@ export interface BstTableShadcnProps<TData extends RowData> extends UseBstTableO
    */
   showSettings?: boolean | BstSettingsOptions
   /** Keyboard-shortcuts help button (⌨) + overlay; also opens on `?`. Lists only
-   * the shortcuts active on this grid. Default: false (opt-in). */
-  showShortcuts?: boolean
+   * the shortcuts active on this grid. `boolean`, or `{ platform }` to force
+   * ⌘/Ctrl key rendering (default auto-detects). Default: false (opt-in). */
+  showShortcuts?: boolean | { platform?: 'mac' | 'pc' | 'auto' }
   /** Page-size choices in the pagination bar. Default: [5, 10, 20, 50]. */
   pageSizeOptions?: number[]
   /** Custom class name on the outer card (the whole component). Fine-grained
@@ -372,6 +373,8 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
   const filterBuilderOn = !!showFilterBuilder && (rest.enableColumnFilters ?? true)
   const formatBuilderOn = !!showFormatBuilder && rest.enableConditionalFormatting !== false
   const [formatsOpen, setFormatsOpen] = React.useState(false)
+  // Smart header: low-frequency controls collapse into a single "⋯ More" menu.
+  const moreOn = formatBuilderOn || undoRedoOn || densityOn
   // Builder column list derived from the grid's own columns (leafs, minus action columns).
   const formatColumns = React.useMemo<BstFormatBuilderColumn[]>(() => {
     const flatten = (cols: any[]): any[] =>
@@ -503,12 +506,6 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
               Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
             </button>
           )}
-          {formatBuilderOn && (
-            <button className="sc-btn" onClick={() => setFormatsOpen((o) => !o)}>
-              <I.format size={16} />
-              Formats{formatRules.length > 0 ? ` (${formatRules.length})` : ''}
-            </button>
-          )}
           <span style={{ flex: 1 }} />
           {exportOn && (
             <DropdownMenu.Root>
@@ -565,26 +562,6 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
               </DropdownMenu.Portal>
             </DropdownMenu.Root>
           )}
-          {undoRedoOn && (
-            <>
-              <button
-                className="sc-btn sc-icon"
-                disabled={!canUndo}
-                onClick={() => runtime.undo()}
-                aria-label="Undo"
-              >
-                <I.undo size={17} />
-              </button>
-              <button
-                className="sc-btn sc-icon"
-                disabled={!canRedo}
-                onClick={() => runtime.redo()}
-                aria-label="Redo"
-              >
-                <I.redo size={17} />
-              </button>
-            </>
-          )}
           {selectionInfoOn && (
             <>
               <span className="sc-badge">{selectedCount} selected</span>
@@ -622,22 +599,6 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
                 Review & save
               </button>
             </>
-          )}
-          {addRowOn && (
-            <button className="sc-btn" onClick={() => runtime.addRow()}>
-              <I.plus size={16} />
-              Add row
-            </button>
-          )}
-          {densityOn && (
-            <button
-              className="sc-btn"
-              onClick={cycleDensity}
-              style={{ textTransform: 'capitalize' }}
-            >
-              <I.density size={16} />
-              {density}
-            </button>
           )}
           {colsMenuOn && (
             <DropdownMenu.Root>
@@ -751,6 +712,65 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
               </DropdownMenu.Portal>
             </DropdownMenu.Root>
           )}
+          {moreOn && (
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger asChild>
+                <button className="sc-btn sc-icon" aria-label="More options">
+                  <svg width={16} height={16} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <circle cx="12" cy="5" r="1.6" />
+                    <circle cx="12" cy="12" r="1.6" />
+                    <circle cx="12" cy="19" r="1.6" />
+                  </svg>
+                </button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Portal>
+                <DropdownMenu.Content className={menuClass} align="end" sideOffset={4}>
+                  {formatBuilderOn && (
+                    <DropdownMenu.Item
+                      className="sc-menu-item"
+                      onSelect={() => setFormatsOpen((o) => !o)}
+                    >
+                      <I.format size={16} />
+                      Formats{formatRules.length > 0 ? ` (${formatRules.length})` : ''}
+                    </DropdownMenu.Item>
+                  )}
+                  {undoRedoOn && (
+                    <DropdownMenu.Item
+                      className="sc-menu-item"
+                      disabled={!canUndo}
+                      onSelect={() => runtime.undo()}
+                    >
+                      <I.undo size={16} />
+                      Undo
+                    </DropdownMenu.Item>
+                  )}
+                  {undoRedoOn && (
+                    <DropdownMenu.Item
+                      className="sc-menu-item"
+                      disabled={!canRedo}
+                      onSelect={() => runtime.redo()}
+                    >
+                      <I.redo size={16} />
+                      Redo
+                    </DropdownMenu.Item>
+                  )}
+                  {densityOn && (
+                    <DropdownMenu.Item
+                      className="sc-menu-item"
+                      style={{ textTransform: 'capitalize' }}
+                      onSelect={(e) => {
+                        e.preventDefault()
+                        cycleDensity()
+                      }}
+                    >
+                      <I.density size={16} />
+                      Density: {density}
+                    </DropdownMenu.Item>
+                  )}
+                </DropdownMenu.Content>
+              </DropdownMenu.Portal>
+            </DropdownMenu.Root>
+          )}
           {settingsOn && (
             <button
               className="sc-btn sc-icon"
@@ -760,7 +780,13 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
               <I.settings size={17} />
             </button>
           )}
-          {showShortcuts && <BstShortcuts table={table} className="sc-btn sc-icon" />}
+          {showShortcuts && (
+            <BstShortcuts
+              table={table}
+              className="sc-btn sc-icon"
+              platform={typeof showShortcuts === 'object' ? showShortcuts.platform : undefined}
+            />
+          )}
         </div>
       )}
 
@@ -979,6 +1005,15 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
       >
         <BstTable table={table} icons={bodyIcons} />
       </div>
+
+      {addRowOn && (
+        <div className="sc-footer">
+          <button className="sc-btn" onClick={() => runtime.addRow()}>
+            <I.plus size={16} />
+            Add row
+          </button>
+        </div>
+      )}
 
       {paginationBarOn && (
         <div className="sc-footer">

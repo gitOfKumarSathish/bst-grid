@@ -53,6 +53,7 @@ import DensityMediumIcon from '@mui/icons-material/DensityMedium'
 import FilterListIcon from '@mui/icons-material/FilterList'
 import FormatColorFillIcon from '@mui/icons-material/FormatColorFill'
 import SettingsIcon from '@mui/icons-material/Settings'
+import MoreVertIcon from '@mui/icons-material/MoreVert'
 import CloseIcon from '@mui/icons-material/Close'
 import CheckIcon from '@mui/icons-material/Check'
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
@@ -141,8 +142,9 @@ export interface BstTableMuiProps<TData extends RowData> extends UseBstTableOpti
    */
   showSettings?: boolean | BstSettingsOptions
   /** Keyboard-shortcuts help button (⌨) + overlay; also opens on `?`. Lists only
-   * the shortcuts active on this grid. Default: false (opt-in). */
-  showShortcuts?: boolean
+   * the shortcuts active on this grid. `boolean`, or `{ platform }` to force
+   * ⌘/Ctrl key rendering (default auto-detects). Default: false (opt-in). */
+  showShortcuts?: boolean | { platform?: 'mac' | 'pc' | 'auto' }
   /** Page-size choices in the pagination bar. Default: [5, 10, 20, 50]. */
   pageSizeOptions?: number[]
   /** Custom class name on the outer card (the whole component). Fine-grained
@@ -233,6 +235,7 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
   )
   const [colAnchor, setColAnchor] = React.useState<null | HTMLElement>(null)
   const [exportAnchor, setExportAnchor] = React.useState<null | HTMLElement>(null)
+  const [moreAnchor, setMoreAnchor] = React.useState<null | HTMLElement>(null)
   const [settingsOpen, setSettingsOpen] = React.useState(false)
   const [settingsQuery, setSettingsQuery] = React.useState('')
   const closeSettings = React.useCallback(() => {
@@ -305,6 +308,8 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
   const filterBuilderOn = !!showFilterBuilder && (rest.enableColumnFilters ?? true)
   const formatBuilderOn = !!showFormatBuilder && rest.enableConditionalFormatting !== false
   const [formatsOpen, setFormatsOpen] = React.useState(false)
+  // Smart header: low-frequency controls collapse into a single "⋯ More" menu.
+  const moreOn = formatBuilderOn || undoRedoOn || densityOn
   // Builder column list derived from the grid's own columns (leafs, minus action columns).
   const formatColumns = React.useMemo<BstFormatBuilderColumn[]>(() => {
     const flatten = (cols: any[]): any[] =>
@@ -477,16 +482,6 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
               Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
             </Button>
           )}
-          {formatBuilderOn && (
-            <Button
-              size="small"
-              startIcon={<FormatColorFillIcon />}
-              onClick={() => setFormatsOpen((o) => !o)}
-              color={formatRules.length > 0 ? 'primary' : 'inherit'}
-            >
-              Formats{formatRules.length > 0 ? ` (${formatRules.length})` : ''}
-            </Button>
-          )}
           <span style={{ flex: 1 }} />
           {exportOn && (
             <>
@@ -533,26 +528,6 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
                   </MenuItem>
                 )}
               </Menu>
-            </>
-          )}
-          {undoRedoOn && (
-            <>
-              <IconButton
-                size="small"
-                disabled={!canUndo}
-                onClick={() => runtime.undo()}
-                aria-label="Undo"
-              >
-                <UndoIcon fontSize="small" />
-              </IconButton>
-              <IconButton
-                size="small"
-                disabled={!canRedo}
-                onClick={() => runtime.redo()}
-                aria-label="Redo"
-              >
-                <RedoIcon fontSize="small" />
-              </IconButton>
             </>
           )}
           {selectionInfoOn && (
@@ -602,21 +577,6 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
                 Review & save
               </Button>
             </>
-          )}
-          {addRowOn && (
-            <Button size="small" startIcon={<AddIcon />} onClick={() => runtime.addRow()}>
-              Add row
-            </Button>
-          )}
-          {densityOn && (
-            <Button
-              size="small"
-              startIcon={<DensityMediumIcon />}
-              onClick={cycleDensity}
-              sx={{ textTransform: 'capitalize' }}
-            >
-              {density}
-            </Button>
           )}
           {colsMenuOn && (
             <>
@@ -733,6 +693,60 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
               </Menu>
             </>
           )}
+          {moreOn && (
+            <>
+              <IconButton
+                size="small"
+                aria-label="More options"
+                onClick={(e) => setMoreAnchor(e.currentTarget)}
+              >
+                <MoreVertIcon fontSize="small" />
+              </IconButton>
+              <Menu anchorEl={moreAnchor} open={!!moreAnchor} onClose={() => setMoreAnchor(null)}>
+                {formatBuilderOn && (
+                  <MenuItem
+                    onClick={() => {
+                      setFormatsOpen((o) => !o)
+                      setMoreAnchor(null)
+                    }}
+                  >
+                    <FormatColorFillIcon fontSize="small" sx={{ mr: 1.5 }} />
+                    Formats{formatRules.length > 0 ? ` (${formatRules.length})` : ''}
+                  </MenuItem>
+                )}
+                {undoRedoOn && (
+                  <MenuItem
+                    disabled={!canUndo}
+                    onClick={() => {
+                      runtime.undo()
+                      setMoreAnchor(null)
+                    }}
+                  >
+                    <UndoIcon fontSize="small" sx={{ mr: 1.5 }} />
+                    Undo
+                  </MenuItem>
+                )}
+                {undoRedoOn && (
+                  <MenuItem
+                    disabled={!canRedo}
+                    onClick={() => {
+                      runtime.redo()
+                      setMoreAnchor(null)
+                    }}
+                  >
+                    <RedoIcon fontSize="small" sx={{ mr: 1.5 }} />
+                    Redo
+                  </MenuItem>
+                )}
+                {densityOn && (
+                  <MenuItem onClick={() => cycleDensity()} sx={{ textTransform: 'capitalize' }}>
+                    <DensityMediumIcon fontSize="small" sx={{ mr: 1.5 }} />
+                    Density: {density}
+                  </MenuItem>
+                )}
+              </Menu>
+            </>
+          )}
           {settingsOn && (
             <IconButton
               size="small"
@@ -742,7 +756,12 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
               <SettingsIcon fontSize="small" />
             </IconButton>
           )}
-          {showShortcuts && <BstShortcuts table={table} />}
+          {showShortcuts && (
+            <BstShortcuts
+              table={table}
+              platform={typeof showShortcuts === 'object' ? showShortcuts.platform : undefined}
+            />
+          )}
         </Stack>
       )}
 
@@ -1062,6 +1081,14 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
       >
         <BstTable table={table} icons={bodyIcons} />
       </div>
+
+      {addRowOn && (
+        <Stack direction="row" sx={{ p: 1, borderTop: 1, borderColor: 'divider' }}>
+          <Button size="small" startIcon={<AddIcon />} onClick={() => runtime.addRow()}>
+            Add row
+          </Button>
+        </Stack>
+      )}
 
       {paginationBarOn && (
         <Stack

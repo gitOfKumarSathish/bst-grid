@@ -78,6 +78,16 @@ describe('resolveActiveShortcuts (pure)', () => {
     expect(groups[0].category).toBe('History')
     expect(groups[0].items.map((i) => i.label)).toEqual(['Undo'])
   })
+
+  test('isMac drops the ⌘Y redo-alt on Mac; keeps it on PC; both when unset', () => {
+    const hist = (isMac?: boolean) =>
+      resolveActiveShortcuts(ALL_ON, '', isMac)
+        .find((g) => g.category === 'History')!
+        .items.map((i) => i.label)
+    expect(hist(true)).toEqual(['Undo', 'Redo']) // Mac: no ⌘Y
+    expect(hist(false)).toContain('Redo (alt)') // PC: keeps it
+    expect(hist(undefined)).toContain('Redo (alt)') // unset: everything
+  })
 })
 
 describe('registry integrity (mirror of the keydown handler)', () => {
