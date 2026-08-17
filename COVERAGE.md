@@ -130,13 +130,13 @@ Everything below ships **free** (MIT/Apache)._
 | AG23 | Formal loading / error overlays | 🆓 | 🟡 | P4/P5 |
 | AG24 | RTL support | 🆓 | ❌ | P8 |
 | AG25 | Row / column animations | 🆓 | ❌ | P8 |
-| AG26 | Auto row height (content-measured) | 🆓 | 🟡 | P8 |
+| AG26 | Auto row height (content-measured) | 🆓 | ✅ | P8 — `enableAutoRowHeight` + `meta.wrapText` (CSS wrap, browser-measured, dep-free) |
 | AG27 | Auto-generate columns from data | 🆓 | ❌ | P8 |
 | AG28 | Cell flashing on data change | 🆓 | ❌ | P8 |
 | AG29 | Aligned grids (shared column state) | 🆓 | ❌ | P8 |
 
-**Tally:** 29 parity items — ✅ 5 built (P5 export + P6 Set Filter / status bar) · ❌ 18 missing ·
-🟡 6 partial. **12 of them are AG Grid Enterprise-paid** — they ship free here.
+**Tally:** 29 parity items — ✅ 6 built (P5 export · P6 Set Filter / status bar · P8 auto row height) ·
+❌ 18 missing · 🟡 5 partial. **12 of them are AG Grid Enterprise-paid** — they ship free here.
 
 **Already matched (AG Grid Enterprise-paid, shipped free):** cell/range selection · clipboard
 copy/paste · batch editing · row grouping + aggregation · master-detail · sparklines · advanced-filter

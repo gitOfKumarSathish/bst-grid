@@ -544,10 +544,11 @@ Tree data — self-referencing hierarchy (`AG13`) · pivoting (`AG14`) · integr
 calculated / formula columns (`AG17`) · cell notes / comments (`AG18`).
 → *Deliverable:* enterprise-heavyweight analytics + true server-side scale.
 
-**Phase 8 — Polish & parity tail**
-RTL (`AG24`) · row/column move+sort animations (`AG25`) · auto row height (`AG26`) · auto-generate
+**Phase 8 — Polish & parity tail**  *(in progress)*
+RTL (`AG24`) · row/column move+sort animations (`AG25`) · **auto row height** (`AG26` ✅) · auto-generate
 columns (`AG27`) · cell flashing on change (`AG28`) · aligned grids (`AG29`).
 → *Deliverable:* the last-mile polish.
+**Shipped:** `AG26` — `enableAutoRowHeight` + `meta.wrapText` (CSS wrap; browser-measured, dep-free).
 
 Each item ships behind a §12 toggle (`enable*` / `show*`) with the full Definition of Done (demo +
 README + CHANGELOG + version bump). Every **AG Grid Enterprise-paid** capability above (Set Filter,

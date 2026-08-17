@@ -113,7 +113,7 @@ Legend — **AG tier:** 🆓 Community · 💷 Enterprise (paid). **Status:** �
 | 25 | **Row/column move + sort animations** | 🆓 | ❌ | S/M | Perceived-quality polish. |
 | 26 | **RTL support** | 🆓 | ❌ | M | Arabic/Hebrew layouts. |
 | 27 | **Auto-generate columns from data** | 🆓 | ❌ | S | Zero-config first render. |
-| 28 | **Auto row height** (fit wrapped content) | 🆓 | 🟡 | M | We have manual row resize, not content-measured auto height. |
+| 28 | **Auto row height** (fit wrapped content) | 🆓 | ✅ P8 | M | Shipped: `enableAutoRowHeight` + `meta.wrapText` — cells wrap, rows grow (browser-measured, dep-free). |
 | 29 | **Aligned grids** (two grids share column state) | 🆓 | ❌ | S | Niche (header/detail split). |
 | 30 | **AI toolkit** (natural-language → grid ops) | 💷 | 🟡 | L | We already expose an MCP server; a runtime NL layer is optional. |
 

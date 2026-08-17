@@ -170,6 +170,18 @@
   vertical-align: top;
 }
 
+/* Auto row height (AG26) — cells wrap and the row grows to fit its content (the
+   browser measures it — no JS). `overflow: hidden` is kept from `.bst-table-td`,
+   so a manually-resized row still clips to its set height while an auto row grows. */
+.bst-auto-rowheight .bst-table-td,
+.bst-table-td.bst-wrap {
+  white-space: normal;
+  text-overflow: clip;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  vertical-align: top;
+}
+
 .bst-table-empty {
   padding: 44px 12px;
   text-align: center;

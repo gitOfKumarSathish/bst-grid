@@ -598,7 +598,13 @@ export function BstTable({
     <BstIconsContext.Provider value={I}>
     <div
       ref={scrollRef}
-      className={cx('bst-table-scroll', rowVirtActive && 'bst-virtualized', className, classNames?.root)}
+      className={cx(
+        'bst-table-scroll',
+        rowVirtActive && 'bst-virtualized',
+        handle.enableAutoRowHeight && 'bst-auto-rowheight',
+        className,
+        classNames?.root,
+      )}
       style={{ ...(handle.fitColumns ? { overflowX: 'hidden' as const } : null), ...styles?.root }}
     >
       <table
@@ -1397,6 +1403,7 @@ const GridCell = React.memo(function GridCell({
     (slotClass ? ' ' + slotClass : '') +
     (extraClass ? ' ' + extraClass : '') +
     (rowFmtClass ? ' ' + rowFmtClass : '') +
+    (meta.wrapText ? ' bst-wrap' : '') +
     (cellFmt?.className ? ' ' + cellFmt.className : '')
 
   // Precedence: active editor → user-authored `cell` → cell-type registry read

@@ -30,6 +30,12 @@ this project uses [Semantic Versioning](https://semver.org).
   pseudo-elements, shadcn `.sc-dep-child` / `.sc-dep-last`).
 
 ## [0.35.0] — 2026-08-17
+### Added — Auto row height (Phase 8, AG26)
+- **`enableAutoRowHeight`** — body cells wrap and each row grows to fit its content, **browser-measured
+  (no JS)**. Opt individual columns in with **`meta.wrapText`**. Keeps `overflow: hidden`, so a
+  manually-resized row (`enableRowResize`) still clips to its set height while auto rows grow.
+  Settings-sheet toggle ("Rows", always shown). Tested (`autoRowHeight.test.tsx`). Closes COVERAGE
+  `AG26`. `@bloomskill/table-engine` (both adapters inherit it).
 ### Added — Set Filter + status bar (Phase 6, AG4–AG5)
 - **Set Filter (`enableSetFilter`, AG4)** — an Excel-style **checklist of distinct values** per column
   in the filter row (`BstSetFilter`: search · select-all / clear · per-value counts · a "(Blanks)"

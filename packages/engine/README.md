@@ -489,6 +489,7 @@ means *passing the object implies enabled*.
 | `getRowCanExpand` | `(row) => boolean` | all rows | Which rows can expand. |
 | `enableRowPinning` | `boolean` | `false` | Freeze rows top/bottom (G1). |
 | `enableRowResize` | `boolean` | `false` | Drag a row's bottom edge to set its height (G2). |
+| `enableAutoRowHeight` | `boolean` | `false` | [Auto row height](#row-layout) (AG26) — cells wrap and rows grow to fit content; per-column via `meta.wrapText`. |
 | `enableVirtualization` | `boolean \| VirtualizationOptions` | `false` | [Row virtualization](#virtualization-d1) (D1) — window visible rows for large data. Object tunes `overscan` / `estimateRowSize` / `estimateColumnSize`. |
 | `enableColumnVirtualization` | `boolean` | `false` | Also window columns (needs `enableVirtualization`). |
 | `onReachEnd` | `() => void` | — | Infinite scroll (A2) — fires near the end of a virtualized body. |
@@ -859,6 +860,7 @@ Adapters add a **density** toggle (`showDensityToggle` → `data-bst-density` �
 | **Master-detail** | `enableExpanding` + `renderDetail(row)` | Leading expander column; clicking opens a full-width detail panel. `getRowCanExpand(row)` gates which rows expand. |
 | **Row pinning** | `enableRowPinning` | Leading pin column; the toggle cycles a row **top → bottom → unpinned**. Pinned rows survive sort/filter/pagination and stick while the body scrolls. |
 | **Row resizing** | `enableRowResize` | Drag any row's **bottom edge** to set its height (min 24px; **double-click** resets). Heights are local UI state. |
+| **Auto row height** | `enableAutoRowHeight` | Body cells **wrap** and each row grows to fit its content — **browser-measured, no JS**. Opt a single column in with `meta.wrapText`. A manually-resized row keeps its set height and clips the wrapped content (AG26). |
 
 ```tsx
 useBstTable<Order>({

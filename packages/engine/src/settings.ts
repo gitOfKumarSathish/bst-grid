@@ -112,6 +112,7 @@ const SETTINGS_META: Record<BstSettingKey, SettingMeta> = {
   enableExpanding: { group: 'Rows', default: false, label: 'Master-detail rows', hint: 'Expandable detail panel (A4)' },
   enableRowPinning: { group: 'Rows', default: false, label: 'Pin rows', hint: 'Freeze rows top / bottom (G1)' },
   enableRowResize: { group: 'Rows', default: false, alwaysShow: true, label: 'Resize rows', hint: 'Drag a row edge to set its height (G2)' },
+  enableAutoRowHeight: { group: 'Rows', default: false, alwaysShow: true, label: 'Auto row height', hint: 'Rows grow to fit wrapped content (AG26)' },
   // Editing
   enableEditing: { group: 'Editing', default: false, label: 'Inline editing' },
   enableBatchEditing: {

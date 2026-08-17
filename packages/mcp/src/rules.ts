@@ -151,6 +151,9 @@ export const RULES: Record<string, FlagRule> = {
       { name: 'getCellSpan or meta.rowSpan', why: 'spanning is opt-in per cell; without either nothing merges' },
     ],
   },
+  enableAutoRowHeight: {
+    note: 'Body cells wrap and each row grows to fit its content (AG26) — browser-measured, no JS. Opt individual columns in/out with `meta.wrapText`. A manually-resized row (`enableRowResize`) keeps its set height and clips the wrapped content.',
+  },
 
   // ---- Performance (D1 — row/column virtualization) ----
   enableVirtualization: {

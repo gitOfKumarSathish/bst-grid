@@ -69,6 +69,12 @@ export interface BstColumnMeta<TData extends RowData = any, TValue = any> {
    * `boolean`) use the Set Filter and the rest use the condition input.
    */
   filter?: 'set' | 'condition'
+  /**
+   * Wrap this column's content onto multiple lines and let the row grow to fit it
+   * (AG26). Turns off the single-line truncation for this column only — the row
+   * sizes to the tallest cell. Independent of the grid-wide `enableAutoRowHeight`.
+   */
+  wrapText?: boolean
   /** Display format: an `Intl.*` options bag, or a shorthand string. */
   format?: string | Record<string, unknown>
   /** BCP-47 locale for number / date parse + format. */

@@ -68,6 +68,8 @@ export interface BstRuntimeHandle<TData extends RowData> {
   enableRowPinning: boolean
   /** Row resizing (G2) — drag a row's bottom edge to set its height. */
   enableRowResize: boolean
+  /** Auto row height (AG26) — body cells wrap and rows grow to fit their content. */
+  enableAutoRowHeight: boolean
   /** Multi-column grouping (E4) — collapsible group rows + aggregates. */
   enableGrouping: boolean
   /** Conditional-format rules (K3) applied to cells/rows at render. */
@@ -404,6 +406,7 @@ export function useBstTable<TData extends RowData>(opts: UseBstTableOptions<TDat
     renderDetail: opts.renderDetail,
     enableRowPinning: !!opts.enableRowPinning,
     enableRowResize: !!opts.enableRowResize,
+    enableAutoRowHeight: !!opts.enableAutoRowHeight,
     enableGrouping: !!opts.enableGrouping,
     conditionalFormats:
       opts.enableConditionalFormatting !== false ? opts.conditionalFormats : undefined,

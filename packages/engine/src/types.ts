@@ -245,6 +245,14 @@ export interface BstTableEngineToggles {
    * `runtime.printTable()` a no-op. Needs `enableExport`. Default: true.
    */
   enablePrint?: boolean
+  /**
+   * Auto row height (AG26) — rows grow to fit **wrapped** content instead of
+   * truncating each cell to one line; the browser measures the content, so no
+   * JS measurement is needed. Every body cell wraps; opt individual columns in
+   * (or out) with `meta.wrapText`. Composes with manual row resize (a resized row
+   * keeps its explicit height and clips the wrapped content). Default: false.
+   */
+  enableAutoRowHeight?: boolean
 }
 
 export interface UseBstTableOptions<TData extends RowData> extends BstTableEngineToggles {
