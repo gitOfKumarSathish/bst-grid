@@ -97,6 +97,17 @@ describe('formula / calculated columns (AG17)', () => {
     expect(lastCellNum(container)).toBe(6000)
   })
 
+  test('a formula column is filterable — it renders a filter input in the filter row', () => {
+    const cols: BstTableColumn<Row>[] = [
+      { id: 'item', accessorKey: 'item', header: 'Item', meta: { type: 'text' } },
+      { id: 'band', header: 'Band', meta: { type: 'text', formula: '=IF(qty >= 5, "hi", "lo")' } },
+    ]
+    const { container } = render(<Grid columns={cols} enableColumnFilters enableColumnFilterRow />)
+    // one .bst-colfilter input per filterable text column — the formula column included
+    const filterInputs = container.querySelectorAll('.bst-colfilter')
+    expect(filterInputs.length).toBe(2)
+  })
+
   test('recurses into grouped (columns: [...]) headers', () => {
     const grouped: BstTableColumn<Row>[] = [
       {
