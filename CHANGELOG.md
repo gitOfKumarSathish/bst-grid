@@ -31,7 +31,9 @@ this project uses [Semantic Versioning](https://semver.org).
   `validateFormula`, `listFormulaFunctions`, `FORMULA_FUNCTIONS`, `FormulaError`.
 - **Runtime builder** — `formulaColumns` (`BstUserFormula[]`) appends end-user computed columns, and
   **`<BstFormulaBuilder>`** (headless, shared by both skins) lets users add / edit / remove them at
-  runtime with a live preview, validation and a function/field help panel. Adapters expose a
+  runtime with a live preview **over the full dataset** (so aggregates like `SUM`/`MAX` match the
+  grid, not a single sample row), automatic result-**Type** detection (text / number / boolean), and a
+  function/field help panel. Adapters expose a
   **`showFormulaBuilder`** toolbar button (MUI + shadcn) + an `onFormulaColumnsChange` controlled
   callback, and a **settings-sheet toggle** (⚙ → Display, `alwaysShow`) so end-users can enable the
   Formula button themselves. Editing an expression **live-updates** the grid via a

@@ -1111,7 +1111,7 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
             formulas={formulaCols}
             onChange={handleFormulasChange}
             columns={formatColumns}
-            sampleRow={(rest.data as Record<string, unknown>[] | undefined)?.[0]}
+            sampleRows={rest.data as Record<string, unknown>[] | undefined}
             icons={bodyIcons}
           />
         </div>

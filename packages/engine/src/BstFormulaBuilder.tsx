@@ -26,15 +26,19 @@ export function BstFormulaBuilder({
   formulas,
   onChange,
   columns,
-  sampleRow,
+  sampleRows,
   className,
   icons,
 }: {
   formulas: BstUserFormula[]
   onChange: (formulas: BstUserFormula[]) => void
   columns: BstFormulaBuilderColumn[]
-  /** A row used to preview each formula's result (usually the first data row). */
-  sampleRow?: Record<string, unknown>
+  /**
+   * The dataset used to preview each formula. Row 0 is the row scope shown, and
+   * the **whole array** feeds aggregates (`SUM` / `MAX` / …) so the preview equals
+   * what the grid computes. Usually just the grid's `data`.
+   */
+  sampleRows?: Record<string, unknown>[]
   className?: string
   icons?: BstIconOverrides
 }) {
@@ -60,8 +64,10 @@ export function BstFormulaBuilder({
       {formulas.map((f, idx) => {
         const check = validateFormula(f.expression)
         let preview: React.ReactNode = null
-        if (f.expression.trim() && check.ok && sampleRow) {
-          const v = compileFormula(f.expression).fn(sampleRow, { rows: [sampleRow], index: 0 })
+        if (f.expression.trim() && check.ok && sampleRows && sampleRows.length) {
+          // Preview against the FULL dataset so aggregates (SUM / MAX / …) match
+          // the grid — evaluating them against a single row would just echo it.
+          const v = compileFormula(f.expression).fn(sampleRows[0], { rows: sampleRows, index: 0 })
           preview =
             v instanceof FormulaError ? (
               <span className="bst-fx-err">{String(v)}</span>
@@ -86,7 +92,13 @@ export function BstFormulaBuilder({
               placeholder="=qty * price"
               spellCheck={false}
               value={f.expression}
-              onChange={(e) => patch(idx, { ...f, expression: e.target.value })}
+              onChange={(e) =>
+                patch(idx, {
+                  ...f,
+                  expression: e.target.value,
+                  type: inferType(e.target.value, f.type, sampleRows),
+                })
+              }
             />
             <select
               className="bst-input bst-fx-type"
@@ -153,6 +165,25 @@ export function BstFormulaBuilder({
       )}
     </div>
   )
+}
+
+/**
+ * Infer the result cell type from a formula's first computed value, so a text /
+ * boolean formula renders without the user touching the Type dropdown. Falls back
+ * to the current type on an invalid or non-scalar (error) result.
+ */
+function inferType(
+  expr: string,
+  current: string | undefined,
+  rows?: Record<string, unknown>[],
+): string {
+  const fallback = current ?? 'number'
+  if (!expr.trim() || !rows || !rows.length || !validateFormula(expr).ok) return fallback
+  const v = compileFormula(expr).fn(rows[0], { rows, index: 0 })
+  if (typeof v === 'string') return 'text'
+  if (typeof v === 'boolean') return 'boolean'
+  if (typeof v === 'number') return 'number'
+  return fallback
 }
 
 /** Compute a fresh, non-colliding column id (no Date.now / Math.random). */

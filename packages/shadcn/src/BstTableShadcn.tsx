@@ -1030,7 +1030,7 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
             formulas={formulaCols}
             onChange={handleFormulasChange}
             columns={formatColumns}
-            sampleRow={(rest.data as Record<string, unknown>[] | undefined)?.[0]}
+            sampleRows={rest.data as Record<string, unknown>[] | undefined}
             icons={bodyIcons}
           />
         </div>
