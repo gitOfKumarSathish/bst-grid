@@ -162,6 +162,10 @@ export type {
   ResolvedShortcutGroup,
 } from './shortcuts.js'
 
+// ---- responsive toolbar overflow (smart-header Phase 2) ----
+export { partitionToolbar, useToolbarOverflow } from './toolbar.js'
+export type { ToolbarItemWidth } from './toolbar.js'
+
 // ---- cell-type registry (Plan.md §2.3) ----
 export { createCellTypeRegistry, defineCellType } from './registry/registry.js'
 export type { CellTypeRegistry } from './registry/registry.js'

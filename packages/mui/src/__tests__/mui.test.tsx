@@ -90,9 +90,8 @@ describe('@bloomskill/table-mui — layout chrome (Phase 3)', () => {
     render(<BstTableMui data={seed} columns={columns} getRowId={(r) => r.id} showDensityToggle />)
     const root = document.querySelector('.bst-table-root') as HTMLElement
     expect(root).not.toHaveAttribute('data-bst-density') // 'normal' → absent
-    // density now lives in the "⋯ More" overflow menu
-    fireEvent.click(screen.getByRole('button', { name: /more options/i }))
-    fireEvent.click(screen.getByRole('menuitem', { name: /density/i }))
+    // density is inline when the toolbar has room (responsive; jsdom = always inline)
+    fireEvent.click(screen.getByRole('button', { name: /normal/i }))
     expect(root).toHaveAttribute('data-bst-density', 'compact')
   })
 
@@ -174,17 +173,12 @@ describe('@bloomskill/table-mui — layout chrome (Phase 3)', () => {
     )
     // seeded rule is applied and counted on the button
     expect(container.querySelector('.cf-t')).toBeTruthy()
-    // Formats now lives in the "⋯ More" overflow menu
-    const openMore = () => fireEvent.click(screen.getByRole('button', { name: /more options/i }))
-    openMore()
-    fireEvent.click(screen.getByRole('menuitem', { name: /Formats \(1\)/ }))
-    // panel opens (menu closes on select); add a rule → count bumps (uncontrolled)
+    // Formats is inline when the toolbar has room (responsive; jsdom = always inline)
+    fireEvent.click(screen.getByRole('button', { name: /Formats \(1\)/ }))
+    // panel opens; add a rule → count bumps (uncontrolled local state)
     fireEvent.click(screen.getByRole('button', { name: '+ Add rule' }))
-    openMore()
-    const two = screen.getByRole('menuitem', { name: /Formats \(2\)/ })
-    expect(two).toBeInTheDocument()
-    // close the overflow menu (Esc), then close the panel via its X
-    fireEvent.keyDown(two, { key: 'Escape' })
+    expect(screen.getByRole('button', { name: /Formats \(2\)/ })).toBeInTheDocument()
+    // close via the panel's X
     fireEvent.click(screen.getByRole('button', { name: 'Close conditional formatting' }))
     expect(screen.queryByRole('button', { name: '+ Add rule' })).toBeNull()
   })

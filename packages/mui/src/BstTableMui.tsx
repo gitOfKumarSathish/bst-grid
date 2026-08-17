@@ -4,6 +4,7 @@ import {
   useBstSettings,
   filterSettingsGroups,
   shouldShowSettingsSearch,
+  useToolbarOverflow,
   BstTable,
   BstFilterBuilder,
   BstConditionalFormatBuilder,
@@ -308,8 +309,21 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
   const filterBuilderOn = !!showFilterBuilder && (rest.enableColumnFilters ?? true)
   const formatBuilderOn = !!showFormatBuilder && rest.enableConditionalFormatting !== false
   const [formatsOpen, setFormatsOpen] = React.useState(false)
-  // Smart header: low-frequency controls collapse into a single "⋯ More" menu.
-  const moreOn = formatBuilderOn || undoRedoOn || densityOn
+  // Smart header (Phase 2) — the toolbar's action buttons are RESPONSIVE: shown
+  // inline when there's room, and collapsed into a single "⋯ More" menu (lowest
+  // priority first) only as the width shrinks. Measured via ResizeObserver.
+  const toolbarRef = React.useRef<HTMLDivElement>(null)
+  const collapsible = React.useMemo(() => {
+    const l: { id: string; priority: number }[] = []
+    if (filterBuilderOn) l.push({ id: 'filters', priority: 5 })
+    if (exportOn) l.push({ id: 'export', priority: 4 })
+    if (undoRedoOn) l.push({ id: 'history', priority: 3 })
+    if (formatBuilderOn) l.push({ id: 'formats', priority: 2 })
+    if (densityOn) l.push({ id: 'density', priority: 1 })
+    return l
+  }, [filterBuilderOn, exportOn, undoRedoOn, formatBuilderOn, densityOn])
+  const ov = useToolbarOverflow(toolbarRef, collapsible)
+  const moreShown = ov.size > 0
   // Builder column list derived from the grid's own columns (leafs, minus action columns).
   const formatColumns = React.useMemo<BstFormatBuilderColumn[]>(() => {
     const flatten = (cols: any[]): any[] =>
@@ -444,6 +458,7 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
     >
       {toolbarOn && (
         <Stack
+          ref={toolbarRef}
           direction="row"
           spacing={1}
           sx={{
@@ -472,19 +487,21 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
               />
             </>
           )}
-          {filterBuilderOn && (
-            <Button
-              size="small"
-              startIcon={<FilterListIcon />}
-              onClick={() => setFiltersOpen((o) => !o)}
-              color={activeFilterCount > 0 ? 'primary' : 'inherit'}
-            >
-              Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
-            </Button>
+          {filterBuilderOn && !ov.has('filters') && (
+            <span data-tb="filters" style={{ display: 'inline-flex' }}>
+              <Button
+                size="small"
+                startIcon={<FilterListIcon />}
+                onClick={() => setFiltersOpen((o) => !o)}
+                color={activeFilterCount > 0 ? 'primary' : 'inherit'}
+              >
+                Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
+              </Button>
+            </span>
           )}
           <span style={{ flex: 1 }} />
-          {exportOn && (
-            <>
+          {exportOn && !ov.has('export') && (
+            <span data-tb="export" style={{ display: 'inline-flex' }}>
               <Button
                 size="small"
                 startIcon={<FileDownloadIcon />}
@@ -528,7 +545,51 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
                   </MenuItem>
                 )}
               </Menu>
-            </>
+            </span>
+          )}
+          {undoRedoOn && !ov.has('history') && (
+            <span data-tb="history" style={{ display: 'inline-flex' }}>
+              <IconButton
+                size="small"
+                disabled={!canUndo}
+                onClick={() => runtime.undo()}
+                aria-label="Undo"
+              >
+                <UndoIcon fontSize="small" />
+              </IconButton>
+              <IconButton
+                size="small"
+                disabled={!canRedo}
+                onClick={() => runtime.redo()}
+                aria-label="Redo"
+              >
+                <RedoIcon fontSize="small" />
+              </IconButton>
+            </span>
+          )}
+          {formatBuilderOn && !ov.has('formats') && (
+            <span data-tb="formats" style={{ display: 'inline-flex' }}>
+              <Button
+                size="small"
+                startIcon={<FormatColorFillIcon />}
+                onClick={() => setFormatsOpen((o) => !o)}
+                color={formatRules.length > 0 ? 'primary' : 'inherit'}
+              >
+                Formats{formatRules.length > 0 ? ` (${formatRules.length})` : ''}
+              </Button>
+            </span>
+          )}
+          {densityOn && !ov.has('density') && (
+            <span data-tb="density" style={{ display: 'inline-flex' }}>
+              <Button
+                size="small"
+                startIcon={<DensityMediumIcon />}
+                onClick={cycleDensity}
+                sx={{ textTransform: 'capitalize' }}
+              >
+                {density}
+              </Button>
+            </span>
           )}
           {selectionInfoOn && (
             <>
@@ -693,17 +754,62 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
               </Menu>
             </>
           )}
-          {moreOn && (
+          {moreShown && (
             <>
               <IconButton
                 size="small"
+                data-tb-more
                 aria-label="More options"
                 onClick={(e) => setMoreAnchor(e.currentTarget)}
               >
                 <MoreVertIcon fontSize="small" />
               </IconButton>
               <Menu anchorEl={moreAnchor} open={!!moreAnchor} onClose={() => setMoreAnchor(null)}>
-                {formatBuilderOn && (
+                {ov.has('filters') && (
+                  <MenuItem
+                    onClick={() => {
+                      setFiltersOpen((o) => !o)
+                      setMoreAnchor(null)
+                    }}
+                  >
+                    <FilterListIcon fontSize="small" sx={{ mr: 1.5 }} />
+                    Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
+                  </MenuItem>
+                )}
+                {ov.has('export') && exportFmts.csv && (
+                  <MenuItem
+                    onClick={() => {
+                      runtime.exportCsv()
+                      setMoreAnchor(null)
+                    }}
+                  >
+                    <FileDownloadIcon fontSize="small" sx={{ mr: 1.5 }} />
+                    Download CSV
+                  </MenuItem>
+                )}
+                {ov.has('export') && exportFmts.excel && (
+                  <MenuItem
+                    onClick={() => {
+                      runtime.exportExcel()
+                      setMoreAnchor(null)
+                    }}
+                  >
+                    <FileDownloadIcon fontSize="small" sx={{ mr: 1.5 }} />
+                    Download Excel
+                  </MenuItem>
+                )}
+                {ov.has('export') && exportFmts.print && (
+                  <MenuItem
+                    onClick={() => {
+                      runtime.printTable()
+                      setMoreAnchor(null)
+                    }}
+                  >
+                    <FileDownloadIcon fontSize="small" sx={{ mr: 1.5 }} />
+                    Print
+                  </MenuItem>
+                )}
+                {ov.has('formats') && (
                   <MenuItem
                     onClick={() => {
                       setFormatsOpen((o) => !o)
@@ -714,7 +820,7 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
                     Formats{formatRules.length > 0 ? ` (${formatRules.length})` : ''}
                   </MenuItem>
                 )}
-                {undoRedoOn && (
+                {ov.has('history') && (
                   <MenuItem
                     disabled={!canUndo}
                     onClick={() => {
@@ -726,7 +832,7 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
                     Undo
                   </MenuItem>
                 )}
-                {undoRedoOn && (
+                {ov.has('history') && (
                   <MenuItem
                     disabled={!canRedo}
                     onClick={() => {
@@ -738,7 +844,7 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
                     Redo
                   </MenuItem>
                 )}
-                {densityOn && (
+                {ov.has('density') && (
                   <MenuItem onClick={() => cycleDensity()} sx={{ textTransform: 'capitalize' }}>
                     <DensityMediumIcon fontSize="small" sx={{ mr: 1.5 }} />
                     Density: {density}

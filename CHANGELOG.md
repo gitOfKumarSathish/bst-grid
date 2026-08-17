@@ -9,11 +9,15 @@ this project uses [Semantic Versioning](https://semver.org).
 > affected package README(s) **and** bump the version, in the same change.
 
 ## [Unreleased]
-### Changed — Smart header: toolbar declutter (Phase 1)
+### Changed — Smart header: toolbar declutter + responsive overflow (Phases 1–2)
 - **Add row moved out of the toolbar to a footer bar** under the table (both skins) — it's a data
   action, so it now sits with the rows, not the view controls.
-- **Undo/Redo · Density · Formats collapse into a single "⋯ More" menu** (MUI `Menu` / shadcn Radix
-  `DropdownMenu`), leaving a leaner toolbar: Search · Filters · Columns · Export · ⋯ · ⚙ ⌨.
+- **Responsive toolbar** — the action buttons (**Filters · Export · Undo/Redo · Formats · Density**)
+  are **shown inline when there's room and collapse into a single "⋯ More" menu** (lowest priority
+  first) only as the width shrinks, promoting back as it widens. Driven by a `ResizeObserver` + the
+  pure, priority-ranked **`partitionToolbar`** (new engine exports `partitionToolbar` /
+  `useToolbarOverflow`), so the header fits any width — leaner when tight, nothing needlessly hidden
+  when wide. Menu chrome: MUI `Menu` / shadcn Radix `DropdownMenu`.
 
 ### Added — In-UI keyboard-shortcuts overlay (`showShortcuts`)
 - A toolbar **"?" button** + a dependency-free, theme-aware **overlay** that lists the keyboard

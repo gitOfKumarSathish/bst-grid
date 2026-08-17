@@ -4,6 +4,7 @@ import {
   useBstSettings,
   filterSettingsGroups,
   shouldShowSettingsSearch,
+  useToolbarOverflow,
   BstTable,
   BstFilterBuilder,
   BstConditionalFormatBuilder,
@@ -373,8 +374,21 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
   const filterBuilderOn = !!showFilterBuilder && (rest.enableColumnFilters ?? true)
   const formatBuilderOn = !!showFormatBuilder && rest.enableConditionalFormatting !== false
   const [formatsOpen, setFormatsOpen] = React.useState(false)
-  // Smart header: low-frequency controls collapse into a single "⋯ More" menu.
-  const moreOn = formatBuilderOn || undoRedoOn || densityOn
+  // Smart header (Phase 2) — the toolbar's action buttons are RESPONSIVE: shown
+  // inline when there's room, and collapsed into a single "⋯ More" menu (lowest
+  // priority first) only as the width shrinks. Measured via ResizeObserver.
+  const toolbarRef = React.useRef<HTMLDivElement>(null)
+  const collapsible = React.useMemo(() => {
+    const l: { id: string; priority: number }[] = []
+    if (filterBuilderOn) l.push({ id: 'filters', priority: 5 })
+    if (exportOn) l.push({ id: 'export', priority: 4 })
+    if (undoRedoOn) l.push({ id: 'history', priority: 3 })
+    if (formatBuilderOn) l.push({ id: 'formats', priority: 2 })
+    if (densityOn) l.push({ id: 'density', priority: 1 })
+    return l
+  }, [filterBuilderOn, exportOn, undoRedoOn, formatBuilderOn, densityOn])
+  const ov = useToolbarOverflow(toolbarRef, collapsible)
+  const moreShown = ov.size > 0
   // Builder column list derived from the grid's own columns (leafs, minus action columns).
   const formatColumns = React.useMemo<BstFormatBuilderColumn[]>(() => {
     const flatten = (cols: any[]): any[] =>
@@ -487,7 +501,7 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
   return (
     <div className={'sc-card' + themeClass + (className ? ' ' + className : '')} style={style}>
       {toolbarOn && (
-        <div className="sc-toolbar">
+        <div className="sc-toolbar" ref={toolbarRef}>
           {title && <span className="sc-title">{title}</span>}
           {searchOn && (
             <div className="sc-search">
@@ -500,14 +514,17 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
               />
             </div>
           )}
-          {filterBuilderOn && (
-            <button className="sc-btn" onClick={() => setFiltersOpen((o) => !o)}>
-              <I.filter size={16} />
-              Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
-            </button>
+          {filterBuilderOn && !ov.has('filters') && (
+            <span data-tb="filters" style={{ display: 'inline-flex' }}>
+              <button className="sc-btn" onClick={() => setFiltersOpen((o) => !o)}>
+                <I.filter size={16} />
+                Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
+              </button>
+            </span>
           )}
           <span style={{ flex: 1 }} />
-          {exportOn && (
+          {exportOn && !ov.has('export') && (
+            <span data-tb="export" style={{ display: 'inline-flex' }}>
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
                 <button className="sc-btn" aria-label="Export">
@@ -561,6 +578,47 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
                 </DropdownMenu.Content>
               </DropdownMenu.Portal>
             </DropdownMenu.Root>
+            </span>
+          )}
+          {undoRedoOn && !ov.has('history') && (
+            <span data-tb="history" style={{ display: 'inline-flex', gap: 4 }}>
+              <button
+                className="sc-btn sc-icon"
+                disabled={!canUndo}
+                onClick={() => runtime.undo()}
+                aria-label="Undo"
+              >
+                <I.undo size={17} />
+              </button>
+              <button
+                className="sc-btn sc-icon"
+                disabled={!canRedo}
+                onClick={() => runtime.redo()}
+                aria-label="Redo"
+              >
+                <I.redo size={17} />
+              </button>
+            </span>
+          )}
+          {formatBuilderOn && !ov.has('formats') && (
+            <span data-tb="formats" style={{ display: 'inline-flex' }}>
+              <button className="sc-btn" onClick={() => setFormatsOpen((o) => !o)}>
+                <I.format size={16} />
+                Formats{formatRules.length > 0 ? ` (${formatRules.length})` : ''}
+              </button>
+            </span>
+          )}
+          {densityOn && !ov.has('density') && (
+            <span data-tb="density" style={{ display: 'inline-flex' }}>
+              <button
+                className="sc-btn"
+                onClick={cycleDensity}
+                style={{ textTransform: 'capitalize' }}
+              >
+                <I.density size={16} />
+                {density}
+              </button>
+            </span>
           )}
           {selectionInfoOn && (
             <>
@@ -712,10 +770,10 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
               </DropdownMenu.Portal>
             </DropdownMenu.Root>
           )}
-          {moreOn && (
+          {moreShown && (
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
-                <button className="sc-btn sc-icon" aria-label="More options">
+                <button className="sc-btn sc-icon" data-tb-more aria-label="More options">
                   <svg width={16} height={16} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                     <circle cx="12" cy="5" r="1.6" />
                     <circle cx="12" cy="12" r="1.6" />
@@ -725,7 +783,31 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
               </DropdownMenu.Trigger>
               <DropdownMenu.Portal>
                 <DropdownMenu.Content className={menuClass} align="end" sideOffset={4}>
-                  {formatBuilderOn && (
+                  {ov.has('filters') && (
+                    <DropdownMenu.Item
+                      className="sc-menu-item"
+                      onSelect={() => setFiltersOpen((o) => !o)}
+                    >
+                      <I.filter size={16} />
+                      Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
+                    </DropdownMenu.Item>
+                  )}
+                  {ov.has('export') && exportFmts.csv && (
+                    <DropdownMenu.Item className="sc-menu-item" onSelect={() => runtime.exportCsv()}>
+                      Download CSV
+                    </DropdownMenu.Item>
+                  )}
+                  {ov.has('export') && exportFmts.excel && (
+                    <DropdownMenu.Item className="sc-menu-item" onSelect={() => runtime.exportExcel()}>
+                      Download Excel
+                    </DropdownMenu.Item>
+                  )}
+                  {ov.has('export') && exportFmts.print && (
+                    <DropdownMenu.Item className="sc-menu-item" onSelect={() => runtime.printTable()}>
+                      Print
+                    </DropdownMenu.Item>
+                  )}
+                  {ov.has('formats') && (
                     <DropdownMenu.Item
                       className="sc-menu-item"
                       onSelect={() => setFormatsOpen((o) => !o)}
@@ -734,7 +816,7 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
                       Formats{formatRules.length > 0 ? ` (${formatRules.length})` : ''}
                     </DropdownMenu.Item>
                   )}
-                  {undoRedoOn && (
+                  {ov.has('history') && (
                     <DropdownMenu.Item
                       className="sc-menu-item"
                       disabled={!canUndo}
@@ -744,7 +826,7 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
                       Undo
                     </DropdownMenu.Item>
                   )}
-                  {undoRedoOn && (
+                  {ov.has('history') && (
                     <DropdownMenu.Item
                       className="sc-menu-item"
                       disabled={!canRedo}
@@ -754,7 +836,7 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
                       Redo
                     </DropdownMenu.Item>
                   )}
-                  {densityOn && (
+                  {ov.has('density') && (
                     <DropdownMenu.Item
                       className="sc-menu-item"
                       style={{ textTransform: 'capitalize' }}
