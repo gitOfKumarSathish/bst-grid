@@ -611,6 +611,7 @@ export default function App() {
             pageSizeOptions={[8, 16, 50]}
             showColumnEditToggle // G/F4: per-column edit lock in the Columns menu
             showFormatBuilder // K3: 🎨 Formats button → conditional-format rule builder
+            showFormulaBuilder // AG17: Σ Formula button → calculated-column builder
             conditionalFormats={cfRules}
             onConditionalFormatsChange={setCfRules}
             enableExport={{ fileName: 'people' }} // Phase 5 (AG1–AG3): CSV / Excel / Print toolbar menu
@@ -629,6 +630,7 @@ export default function App() {
             onDataChange={setDataSc}
             showColumnEditToggle // G/F4: per-column edit lock in the Columns menu
             showFormatBuilder // K3: 🎨 Formats button → conditional-format rule builder
+            showFormulaBuilder // AG17: Σ Formula button → calculated-column builder
             conditionalFormats={cfRules}
             onConditionalFormatsChange={setCfRules}
             enableExport={{ fileName: 'people' }} // Phase 5 (AG1–AG3): CSV / Excel / Print toolbar menu
