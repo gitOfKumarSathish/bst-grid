@@ -418,6 +418,46 @@ const gsColumns: BstTableColumn<Person>[] = [
   { id: 'email', accessorKey: 'email', header: 'Email', meta: { type: 'text' } },
 ];
 
+// Multi-filter (AG11) — a DEDICATED section so it doesn't clutter the main grids.
+// The Name column opts in via an array meta.filter to stack a "contains" input + a
+// distinct-values checklist; the other columns keep their single filter.
+const mfColumns: BstTableColumn<Person>[] = [
+  { id: 'name', accessorKey: 'name', header: 'Name', meta: { type: 'text', filter: ['condition', 'set'] } },
+  { id: 'role', accessorKey: 'role', header: 'Role', meta: { type: 'text' } },
+  {
+    id: 'salary',
+    accessorKey: 'salary',
+    header: 'Salary',
+    meta: { type: 'number', align: 'right', cellMeta: { currency: 'USD', precision: 0 } },
+  },
+];
+
+function MultiFilterSection() {
+  return (
+    <section>
+      <h3 style={{ margin: '0 0 8px' }}>Multi-filter — stack filter types on one column (AG11)</h3>
+      <div style={{ ...box, marginBottom: 8 }}>
+        <code>enableMultiFilter</code> lets a column opt in via an <b>array</b> <code>meta.filter</code>{' '}
+        (here <code>['condition', 'set']</code> on <b>Name</b>) to <b>stack</b> two filters in its filter
+        row — a <b>"contains"</b> text input <b>and</b> a <b>distinct-values checklist</b>. A row must
+        match <b>both</b> (AND). Type <code>a</code> in the Name box, then open its <b>All ▾</b> checklist
+        to narrow further. Other columns keep their single filter.
+      </div>
+      <BstTableMui<Person>
+        title="Multi-filter (Name column)"
+        data={people.slice(0, 8)}
+        columns={mfColumns}
+        getRowId={(r) => r.id}
+        enableColumnFilterRow
+        enableSetFilter
+        enableMultiFilter
+        pagination={false}
+        showSearch={false}
+      />
+    </section>
+  );
+}
+
 const GRID_STATE_KEY = 'demo-people-view';
 
 function GridStateSection() {
@@ -611,7 +651,6 @@ export default function App() {
     showFilterBuilder: true, // per-column condition builder (E3)
     enableColumnFilterRow: true, // per-column filter inputs under the header ("dual filter")
     enableSetFilter: true, // AG4: categorical columns (see role/plan) get a distinct-values checklist
-    enableMultiFilter: true, // AG11: the Name column stacks a "contains" input + a set checklist (meta.filter: ['condition','set'])
     showStatusBar: true, // AG5: footer — row counts + selection sum/avg/min/max
     enableAutoRowHeight: true, // AG26: rows grow to fit wrapped content (browser-measured)
     enableContextMenu: true, // AG6: right-click a cell → Copy / Export / Autosize (+ getContextMenuItems)
@@ -1080,6 +1119,8 @@ export default function App() {
         <ErpFormatsSection />
 
         <GridStateSection />
+
+        <MultiFilterSection />
 
         <FilesSection dark={dark} />
 

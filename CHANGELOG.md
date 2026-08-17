@@ -24,8 +24,10 @@ this project uses [Semantic Versioning](https://semver.org).
   to a reusable `ConditionInput`. Needs `enableColumnFilters` + `enableColumnFilterRow` (a `'set'` part
   needs `enableSetFilter`); with `enableMultiFilter` off, an array `meta.filter` falls back to its first
   entry.
-- Settings-sheet toggle ("Data operations"); demo stacks contains + a distinct-names checklist on the
-  **Name** column (both skins). Tested in `multiFilter.test.tsx` (10 cases).
+- Settings-sheet toggle ("Data operations"); demo shows it in a **dedicated "Multi-filter (AG11)"
+  section** (Name column stacks a "contains" input + a distinct-names checklist) so the main grids keep
+  their single filters. Verified in a headless browser (popup opens correctly below the trigger). Tested
+  in `multiFilter.test.tsx` (10 cases).
 
 ## [0.38.0] — 2026-08-17
 ### Changed — B5 in-cell PDF thumbnails now render via pdf.js (reliable)
