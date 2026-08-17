@@ -101,6 +101,8 @@ export interface BstRuntimeHandle<TData extends RowData> {
   renderLoading?: () => React.ReactNode
   /** Custom error-overlay content (default ⚠ + the error node). */
   renderError?: (error: React.ReactNode) => React.ReactNode
+  /** AG17 — number of runtime `formulaColumns` (drives auto-scroll-to-reveal). */
+  formulaColumnCount: number
 }
 
 /** Column ids whose column def carries a user-authored `cell` renderer. */
@@ -484,6 +486,7 @@ export function useBstTable<TData extends RowData>(opts: UseBstTableOptions<TDat
     error: opts.error,
     renderLoading: opts.renderLoading,
     renderError: opts.renderError,
+    formulaColumnCount: opts.formulaColumns?.length ?? 0,
   }
   ;(table as unknown as Record<symbol, unknown>)[BST_RUNTIME] = handle
 

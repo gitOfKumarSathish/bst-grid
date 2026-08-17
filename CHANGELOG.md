@@ -37,8 +37,10 @@ this project uses [Semantic Versioning](https://semver.org).
   **`showFormulaBuilder`** toolbar button (MUI + shadcn) + an `onFormulaColumnsChange` controlled
   callback, and a **settings-sheet toggle** (⚙ → Display, `alwaysShow`) so end-users can enable the
   Formula button themselves. Editing an expression **live-updates** the grid via a
-  stable-accessor-via-ref + data-bump (TanStack caches accessors by column id). Verified live in both
-  skins (MUI + shadcn `theme="inherit"`). Tested (`formula-expr.test.ts`, `formula.test.tsx`).
+  stable-accessor-via-ref + data-bump (TanStack caches accessors by column id). A newly-added formula
+  column is **appended last, then auto-scrolled into view**, so it isn't lost off the right edge of a
+  wide grid. Verified live in both skins (MUI + shadcn `theme="inherit"`). Tested (`formula-expr.test.ts`,
+  `formula.test.tsx`, `formula-builder.test.tsx`).
 
 ### Added — Loading / error overlays (AG23; `@bloomskill/table-engine` + adapters)
 - **`loading`** shows a dep-free spinner overlay over the grid body; **`error`** shows an error

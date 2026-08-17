@@ -129,6 +129,18 @@ export function BstTable({
   // It never mutates the column-sizing model, so toggling it off restores the
   // authored widths. `widthOf` returns the fitted width or the column's own.
   const scrollRef = React.useRef<HTMLDivElement>(null)
+
+  // AG17 — when a runtime formula column is added it is appended as the LAST
+  // column, so on a wide grid it lands off-screen. Scroll the body right to reveal
+  // it, so the user actually sees their new calculated column.
+  const prevFormulaCount = React.useRef(handle.formulaColumnCount)
+  React.useEffect(() => {
+    const el = scrollRef.current
+    if (el && handle.formulaColumnCount > prevFormulaCount.current) {
+      el.scrollTo({ left: el.scrollWidth, behavior: 'smooth' })
+    }
+    prevFormulaCount.current = handle.formulaColumnCount
+  }, [handle.formulaColumnCount])
   const [fitWidths, setFitWidths] = React.useState<Map<string, number> | null>(null)
   const utilityWidth =
     (handle.enableExpanding ? EXPANDER_COL_WIDTH : 0) +
