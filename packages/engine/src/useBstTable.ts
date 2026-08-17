@@ -16,9 +16,10 @@ import { createRuntime } from './runtime.js'
 import type { BstRuntime, CommitPolicy, RuntimeCtx, SaveTrigger } from './runtime.js'
 import { createDefaultRegistry } from './registry/defaults.js'
 import type { CellTypeRegistry } from './registry/registry.js'
-import type { BstColumnMeta } from './registry/types.js'
+import type { BstColumnMeta, BstFormulaContext } from './registry/types.js'
 import { resolveVirtualization } from './virtualization.js'
 import { normalizeFormulaColumns } from './formula.js'
+import { compileFormula } from './formula-expr.js'
 import type { ResolvedVirtualization } from './virtualization.js'
 
 const DEFAULT_PAGE_SIZE = 10
@@ -310,10 +311,39 @@ export function useBstTable<TData extends RowData>(opts: UseBstTableOptions<TDat
   // rebuilds columns; they re-normalize only when the column list itself changes.
   const dataRef = React.useRef(opts.data)
   dataRef.current = opts.data
-  const normalizedColumns = React.useMemo(
-    () => normalizeFormulaColumns(opts.columns, dataRef),
-    [opts.columns],
+
+  // Runtime `formulaColumns` (AG17 builder). Their expressions are recompiled
+  // every render into this ref, so a runtime column's `accessorFn` (below) can be
+  // STABLE while always evaluating the LATEST expression — TanStack caches a
+  // column's accessor by id, so editing the formula must not hinge on producing a
+  // new accessorFn (it wouldn't take effect). The column defs are re-memoized only
+  // when the id / header / type set changes, not on every keystroke.
+  const formulaFnRef = React.useRef(
+    new Map<string, (row: TData, ctx: BstFormulaContext<TData>) => unknown>(),
   )
+  formulaFnRef.current = new Map(
+    (opts.formulaColumns ?? []).map((f) => [f.id, compileFormula<TData>(f.expression).fn]),
+  )
+  const formulaShape = (opts.formulaColumns ?? [])
+    .map((f) => `${f.id} ${f.type ?? ''} ${f.header}`)
+    .join('')
+
+  const normalizedColumns = React.useMemo(() => {
+    const extra = (opts.formulaColumns ?? []).map(
+      (f) =>
+        ({
+          id: f.id,
+          header: f.header,
+          meta: { type: f.type ?? 'text' },
+          // Stable accessor → reads the freshly-compiled fn from the ref.
+          accessorFn: (row: TData, index: number) =>
+            formulaFnRef.current.get(f.id)?.(row, { rows: dataRef.current, index }),
+        }) as unknown as (typeof opts.columns)[number],
+    )
+    const merged = extra.length ? [...opts.columns, ...extra] : opts.columns
+    return normalizeFormulaColumns(merged, dataRef)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [opts.columns, formulaShape])
 
   // Server mode (Plan.md §5) — pass through to v9 ONLY the manual/controlled
   // options the caller actually set. Passing `state`/`on*Change` as `undefined`
@@ -342,9 +372,22 @@ export function useBstTable<TData extends RowData>(opts: UseBstTableOptions<TDat
     }
   }
 
+  // When a runtime formula's EXPRESSION changes, hand TanStack a fresh `data`
+  // array reference so it rebuilds its (memoized) row model — the stable accessor
+  // above reads the newly-compiled fn, but TanStack caches each cell's value until
+  // the row model is rebuilt. Gated on there being formula columns, so the default
+  // (no formulas) path keeps the original `data` reference untouched. Row object
+  // identities are preserved, so getRowId / selection / editing are unaffected.
+  const formulaExprKey = (opts.formulaColumns ?? []).map((f) => f.expression).join('')
+  const effectiveData = React.useMemo(
+    () => (opts.formulaColumns?.length ? [...opts.data] : opts.data),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [opts.data, formulaExprKey, opts.formulaColumns?.length],
+  )
+
   const table = useTable({
     features: bstTableFeatures,
-    data: opts.data,
+    data: effectiveData,
     columns: normalizedColumns,
     getRowId: opts.getRowId,
     globalFilterFn: 'includesString',

@@ -142,20 +142,17 @@ const formulaColumns: BstTableColumn<Person>[] = [
     meta: { type: 'number', align: 'right', cellMeta: { currency: 'USD', precision: 0 } },
   },
   {
-    id: 'monthly', header: 'Monthly', // computed: salary / 12
+    id: 'monthly', header: 'Monthly', // Excel-style string formula
     meta: {
       type: 'number', align: 'right', cellMeta: { currency: 'USD', precision: 0 },
-      formula: (r: Person) => Math.round((r.salary ?? 0) / 12),
+      formula: '=salary / 12',
     },
   },
   {
-    id: 'share', header: '% of payroll', // computed across all rows (ctx.rows)
+    id: 'share', header: '% of payroll', // string formula with a column aggregate
     meta: {
       type: 'number', align: 'right', cellMeta: { precision: 1 },
-      formula: (r: Person, ctx) => {
-        const total = ctx.rows.reduce((s, x) => s + (x.salary ?? 0), 0)
-        return total ? Math.round(((r.salary ?? 0) / total) * 1000) / 10 : 0
-      },
+      formula: '=ROUND(salary / SUM(salary) * 100, 1)',
     },
   },
 ]
@@ -831,17 +828,20 @@ export default function App() {
         <section>
           <h3 style={{ margin: '0 0 8px' }}>Calculated / formula columns (AG17)</h3>
           <div style={{ ...box, marginBottom: 8 }}>
-            <code>meta.formula</code> derives a cell value instead of reading a field. <b>Monthly</b> =
-            salary ÷ 12 (per row); <b>% of payroll</b> uses <code>ctx.rows</code> for the grand total.
-            Both still format via their <code>type</code> and sort by the computed value — click a
-            computed header.
+            <code>meta.formula</code> derives a cell value — as a function <i>or</i> an{' '}
+            <b>Excel-style string</b>: here <b>Monthly</b> = <code>=salary / 12</code> and{' '}
+            <b>% of payroll</b> = <code>=ROUND(salary / SUM(salary) * 100, 1)</code> (<code>SUM</code>{' '}
+            aggregates the whole column). Both format via their <code>type</code> and sort by the
+            computed value. Click the <b>Formula</b> button to <b>add your own</b> column at runtime —
+            try <code>=salary * 12</code> or <code>=IF(salary &gt; 100000, "High", "Low")</code>.
           </div>
           <BstTableMui<Person>
             data={people.slice(0, 6)}
             columns={formulaColumns}
             getRowId={(r) => r.id}
             pagination={false}
-            showToolbar={false}
+            showSearch={false}
+            showFormulaBuilder
           />
         </section>
 

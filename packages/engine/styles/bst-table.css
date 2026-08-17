@@ -1432,3 +1432,64 @@
     animation-duration: 1.8s;
   }
 }
+
+/* AG17 — formula (calculated column) builder */
+.bst-fx-builder {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: var(--bst-table-font);
+  color: var(--bst-table-fg);
+}
+.bst-fx-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.bst-fx-name {
+  width: 120px;
+  flex: 0 0 auto;
+}
+.bst-fx-expr {
+  flex: 1 1 auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.bst-fx-type {
+  width: 92px;
+  flex: 0 0 auto;
+}
+.bst-fx-invalid {
+  border-color: var(--bst-table-danger, #dc2626) !important;
+}
+.bst-fx-status {
+  flex: 0 0 auto;
+  min-width: 96px;
+  font-size: 12px;
+}
+.bst-fx-preview {
+  color: var(--bst-table-muted);
+}
+.bst-fx-err {
+  color: var(--bst-table-danger, #dc2626);
+  font-weight: 600;
+}
+.bst-fx-help {
+  font-size: 12px;
+  border-top: 1px solid var(--bst-table-border);
+  padding-top: 8px;
+}
+.bst-fx-field {
+  margin: 0 6px 4px 0;
+  background: color-mix(in srgb, var(--bst-table-accent) 10%, transparent);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+.bst-fx-funcs ul {
+  margin: 4px 0 0;
+  padding-left: 16px;
+  max-height: 180px;
+  overflow: auto;
+}
+.bst-fx-funcs li {
+  margin: 2px 0;
+}

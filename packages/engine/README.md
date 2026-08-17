@@ -948,11 +948,35 @@ const columns: BstTableColumn<Line>[] = [
 ]
 ```
 
-- **Cross-row math** — `formula: (row, ctx) => …` gets `ctx.rows` (the full, pre-pagination data) and
-  `ctx.index`, e.g. a share of the grand total: `(r, c) => r.amount / c.rows.reduce((s,x)=>s+x.amount,0)`.
-- **Dep-free & safe** — a function, never a string `eval`. Formula columns re-normalize only when the
-  column list changes (data edits don't rebuild them). The transform is exported as
-  `normalizeFormulaColumns` if you build column defs yourself.
+- **Excel-style strings** — instead of a function, pass a **string**: `formula: '=qty * price * 1.1'`,
+  `'=IF(salary > 100000, "High", "Low")'`, `'=ROUND(amount / SUM(amount) * 100, 1)'`. A dependency-free,
+  **safe** evaluator parses it (tokenizer + parser + interpreter — **never `eval`**). It references
+  columns by **field name** (`qty`, or `[Full Name]` for spaces), supports arithmetic / comparison /
+  logical operators and postfix `%`, and ~30 functions — math (`ROUND`, `ABS`, `MOD`, `POWER`…), text
+  (`CONCAT`, `UPPER`, `LEFT`…), logical (`IF`, `AND`, `OR`), and **aggregates** over `ctx.rows`
+  (`SUM`, `AVERAGE`, `MIN`, `MAX`, `COUNT`, `MEDIAN` — e.g. `=SUM(qty * price)`). Bad input renders an
+  Excel sentinel (`#DIV/0!`, `#VALUE!`, `#NAME?`). Helpers: `compileFormula`, `validateFormula`,
+  `listFormulaFunctions`, `FORMULA_FUNCTIONS`, `FormulaError`.
+- **Cross-row math** — a function `formula: (row, ctx) => …` gets `ctx.rows` (full, pre-pagination) and
+  `ctx.index`; string aggregates (`SUM(...)`) do the same. `normalizeFormulaColumns` is exported if you
+  build column defs yourself.
+
+### Runtime formula builder
+
+Let **end-users** author calculated columns at runtime. Pass **`formulaColumns`** (`BstUserFormula[]`)
+to seed/append computed columns, and render **`<BstFormulaBuilder>`** — or just flip the adapters'
+**`showFormulaBuilder`** toolbar button — to add / edit / remove them live, with a preview + validation
++ a function/field help panel. Own the list with `onFormulaColumnsChange`, or leave it uncontrolled.
+
+```tsx
+// uncontrolled — a "Formula" button appears in the toolbar
+<BstTableMui data={rows} columns={cols} showFormulaBuilder />
+
+// controlled — you own the list
+const [formulas, setFormulas] = React.useState<BstUserFormula[]>([])
+<BstTableMui data={rows} columns={cols} showFormulaBuilder
+  formulaColumns={formulas} onFormulaColumnsChange={setFormulas} />
+```
 
 ## Loading and error overlays
 

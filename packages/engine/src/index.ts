@@ -79,6 +79,7 @@ export type {
   BstStyles,
   BstRowContext,
   BstHeaderSlotContext,
+  BstUserFormula,
 } from './types.js'
 
 // ---- features (v9 registration) ----
@@ -118,6 +119,8 @@ export type {
 // ---- conditional formatting (K3) ----
 export { BstConditionalFormatBuilder } from './BstConditionalFormatBuilder.js'
 export type { BstFormatBuilderColumn } from './BstConditionalFormatBuilder.js'
+export { BstFormulaBuilder } from './BstFormulaBuilder.js'
+export type { BstFormulaBuilderColumn } from './BstFormulaBuilder.js'
 export { evalCellFormat, evalRowFormat, DEFAULT_FORMAT_PRESETS } from './formatting.js'
 export type {
   BstFormatRule,
@@ -217,6 +220,14 @@ export type {
 
 // ---- AG17 formula / calculated columns ----
 export { normalizeFormulaColumns } from './formula.js'
+export {
+  compileFormula,
+  validateFormula,
+  listFormulaFunctions,
+  FORMULA_FUNCTIONS,
+  FormulaError,
+} from './formula-expr.js'
+export type { FormulaCompileResult } from './formula-expr.js'
 
 // ---- interaction store + runtime (editing / validation / rows) ----
 export {

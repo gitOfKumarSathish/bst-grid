@@ -19,6 +19,23 @@ this project uses [Semantic Versioning](https://semver.org).
   changes never rebuild them); the transform is exported as `normalizeFormulaColumns`. Not a
   settings toggle (per-column config). Tested (`formula.test.tsx`).
 
+### Added — Excel-style formulas + runtime formula builder (AG17; engine + adapters)
+- **String formulas** — `meta.formula` now also accepts an **Excel-style expression**:
+  `'=qty * price * 1.1'`, `'=IF(salary > 100000, "High", "Low")'`, `'=ROUND(amount / SUM(amount) * 100, 1)'`.
+  A dependency-free **safe evaluator** (`formula-expr.ts` — tokenizer + Pratt parser + tree-walking
+  interpreter, **no `eval` / `new Function`**) handles field-name references (`[bracketed]` for spaces),
+  arithmetic / comparison / logical operators, postfix `%`, and ~30 functions: math
+  (`ROUND`/`ABS`/`MOD`/`POWER`…), text (`CONCAT`/`UPPER`/`LEFT`…), logical (`IF`/`AND`/`OR`), and
+  **aggregates over `ctx.rows`** (`SUM`/`AVERAGE`/`MIN`/`MAX`/`COUNT`/`MEDIAN`, incl. `SUM(qty*price)`).
+  Bad input renders Excel sentinels (`#DIV/0!` / `#VALUE!` / `#NAME?`). Exported: `compileFormula`,
+  `validateFormula`, `listFormulaFunctions`, `FORMULA_FUNCTIONS`, `FormulaError`.
+- **Runtime builder** — `formulaColumns` (`BstUserFormula[]`) appends end-user computed columns, and
+  **`<BstFormulaBuilder>`** (headless, shared by both skins) lets users add / edit / remove them at
+  runtime with a live preview, validation and a function/field help panel. Adapters expose a
+  **`showFormulaBuilder`** toolbar button (MUI + shadcn) + an `onFormulaColumnsChange` controlled
+  callback. Editing an expression **live-updates** the grid via a stable-accessor-via-ref + data-bump
+  (TanStack caches accessors by column id). Tested (`formula-expr.test.ts`, `formula.test.tsx`).
+
 ### Added — Loading / error overlays (AG23; `@bloomskill/table-engine` + adapters)
 - **`loading`** shows a dep-free spinner overlay over the grid body; **`error`** shows an error
   overlay (takes precedence over loading). Both sit in a `position:relative` viewport wrapper so

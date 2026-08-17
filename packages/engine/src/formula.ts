@@ -1,6 +1,7 @@
 import type { RowData } from '@tanstack/react-table'
 import type { BstTableColumn } from './types.js'
 import type { BstColumnMeta, BstFormulaContext } from './registry/types.js'
+import { compileFormula } from './formula-expr.js'
 
 /**
  * AG17 — Calculated / formula columns.
@@ -40,8 +41,15 @@ export function normalizeFormulaColumns<TData extends RowData>(
       }
       const meta = anyCol.meta as BstColumnMeta<TData> | undefined
       const formula = meta?.formula
-      if (typeof formula !== 'function') return col
+      if (formula == null) return col
       changed = true
+      // A string formula is an Excel-style expression — compile it (once) to the
+      // same (row, ctx) => value shape via the safe evaluator; a function is used
+      // as-is.
+      const compiled =
+        typeof formula === 'string'
+          ? compileFormula<TData>(formula).fn
+          : (formula as (row: TData, ctx: BstFormulaContext<TData>) => unknown)
       const id = (anyCol.id ?? anyCol.accessorKey) as string | undefined
       // Drop accessorKey — TanStack rejects a column with both accessorKey and
       // accessorFn; the formula is the sole value source.
@@ -50,7 +58,7 @@ export function normalizeFormulaColumns<TData extends RowData>(
         ...rest,
         id,
         accessorFn: (row: TData, index: number) =>
-          formula(row, { rows: dataRef.current, index } as BstFormulaContext<TData>),
+          compiled(row, { rows: dataRef.current, index } as BstFormulaContext<TData>),
       }
       return next as unknown as BstTableColumn<TData>
     })

@@ -7,6 +7,7 @@ import {
   BstTable,
   BstFilterBuilder,
   BstConditionalFormatBuilder,
+  BstFormulaBuilder,
   useStoreSelector,
 } from '@bloomskill/table-engine'
 import type {
@@ -15,6 +16,7 @@ import type {
   BstCellEdit,
   BstFormatRule,
   BstFormatBuilderColumn,
+  BstUserFormula,
 } from '@bloomskill/table-engine'
 import type { RowData } from '@tanstack/react-table'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
@@ -101,6 +103,15 @@ export interface BstTableShadcnProps<TData extends RowData> extends UseBstTableO
   showFormatBuilder?: boolean
   /** Controlled-mode callback for rule edits made in the format builder. */
   onConditionalFormatsChange?: (rules: BstFormatRule<TData>[]) => void
+  /**
+   * Formula (calculated-column) builder button + panel (AG17) — a toolbar
+   * "Formula" button opening a panel with `<BstFormulaBuilder>`, so end-users add
+   * Excel-style computed columns at runtime. Uncontrolled unless
+   * `onFormulaColumnsChange` is given. Default: false.
+   */
+  showFormulaBuilder?: boolean
+  /** Controlled-mode callback for edits made in the formula builder. */
+  onFormulaColumnsChange?: (formulas: BstUserFormula[]) => void
   /**
    * Per-column **edit lock/unlock** toggle in the Columns menu (requires
    * `enableEditing`). Lets an end-user make an editable column read-only (or back)
@@ -210,6 +221,8 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
     showFilterBuilder,
     showFormatBuilder,
     onConditionalFormatsChange,
+    showFormulaBuilder,
+    onFormulaColumnsChange,
     showColumnEditToggle,
     showSettings: _showSettings,
     pageSizeOptions = [5, 10, 20, 50],
@@ -232,11 +245,22 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
     onConditionalFormatsChange?.(next)
   }
 
+  const [localFormulas, setLocalFormulas] = React.useState<BstUserFormula[] | null>(null)
+  const effectiveFormulas = onFormulaColumnsChange
+    ? rest.formulaColumns
+    : localFormulas ?? rest.formulaColumns
+  const formulaCols = effectiveFormulas ?? []
+  const handleFormulasChange = (next: BstUserFormula[]) => {
+    if (!onFormulaColumnsChange) setLocalFormulas(next)
+    onFormulaColumnsChange?.(next)
+  }
+
   const preset = React.useMemo(() => cellTypes ?? createShadcnPreset(), [cellTypes])
   const gridOpts = {
     ...rest,
     cellTypes: preset,
     conditionalFormats: effectiveFormats,
+    formulaColumns: effectiveFormulas,
   } as UseBstTableOptions<TData>
   const { table, runtime, handle } = useBstGrid<TData>(gridOpts)
   const I = React.useMemo(() => resolveIcons(icons), [icons])
@@ -367,6 +391,8 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
   const filterBuilderOn = !!showFilterBuilder && (rest.enableColumnFilters ?? true)
   const formatBuilderOn = !!showFormatBuilder && rest.enableConditionalFormatting !== false
   const [formatsOpen, setFormatsOpen] = React.useState(false)
+  const formulaBuilderOn = !!showFormulaBuilder
+  const [formulaOpen, setFormulaOpen] = React.useState(false)
   // Builder column list derived from the grid's own columns (leafs, minus action columns).
   const formatColumns = React.useMemo<BstFormatBuilderColumn[]>(() => {
     const flatten = (cols: any[]): any[] =>
@@ -408,6 +434,7 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
       exportOn ||
       filterBuilderOn ||
       formatBuilderOn ||
+      formulaBuilderOn ||
       settingsOn)
 
   const pg = table.state.pagination
@@ -502,6 +529,26 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
             <button className="sc-btn" onClick={() => setFormatsOpen((o) => !o)}>
               <I.format size={16} />
               Formats{formatRules.length > 0 ? ` (${formatRules.length})` : ''}
+            </button>
+          )}
+          {formulaBuilderOn && (
+            <button className="sc-btn" onClick={() => setFormulaOpen((o) => !o)}>
+              {/* Inline "braces" glyph (lucide idiom) — no icon-slot churn. */}
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5a2 2 0 0 0 2 2h1" />
+                <path d="M16 3h1a2 2 0 0 1 2 2v5a2 2 0 0 0 2 2 2 2 0 0 0-2 2v5a2 2 0 0 1-2 2h-1" />
+              </svg>
+              Formula{formulaCols.length > 0 ? ` (${formulaCols.length})` : ''}
             </button>
           )}
           <span style={{ flex: 1 }} />
@@ -962,6 +1009,28 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
             rules={formatRules}
             onChange={handleFormatsChange}
             columns={formatColumns}
+            icons={bodyIcons}
+          />
+        </div>
+      )}
+
+      {formulaBuilderOn && formulaOpen && (
+        <div className="sc-filter-panel bst-table-root">
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
+            <span style={{ flex: 1, fontWeight: 600, fontSize: 13 }}>Calculated columns</span>
+            <button
+              className="sc-btn sc-icon"
+              aria-label="Close formula builder"
+              onClick={() => setFormulaOpen(false)}
+            >
+              <I.close size={15} />
+            </button>
+          </div>
+          <BstFormulaBuilder
+            formulas={formulaCols}
+            onChange={handleFormulasChange}
+            columns={formatColumns}
+            sampleRow={(rest.data as Record<string, unknown>[] | undefined)?.[0]}
             icons={bodyIcons}
           />
         </div>

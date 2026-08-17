@@ -7,6 +7,7 @@ import {
   BstTable,
   BstFilterBuilder,
   BstConditionalFormatBuilder,
+  BstFormulaBuilder,
   useStoreSelector,
 } from '@bloomskill/table-engine'
 import type {
@@ -15,6 +16,7 @@ import type {
   BstCellEdit,
   BstFormatRule,
   BstFormatBuilderColumn,
+  BstUserFormula,
 } from '@bloomskill/table-engine'
 import type { RowData } from '@tanstack/react-table'
 import Paper from '@mui/material/Paper'
@@ -51,6 +53,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import DensityMediumIcon from '@mui/icons-material/DensityMedium'
 import FilterListIcon from '@mui/icons-material/FilterList'
 import FormatColorFillIcon from '@mui/icons-material/FormatColorFill'
+import FunctionsIcon from '@mui/icons-material/Functions'
 import SettingsIcon from '@mui/icons-material/Settings'
 import CloseIcon from '@mui/icons-material/Close'
 import CheckIcon from '@mui/icons-material/Check'
@@ -126,6 +129,16 @@ export interface BstTableMuiProps<TData extends RowData> extends UseBstTableOpti
   /** Controlled-mode callback for rule edits made in the format builder. */
   onConditionalFormatsChange?: (rules: BstFormatRule<TData>[]) => void
   /**
+   * Formula (calculated-column) builder button + panel (AG17) — a toolbar
+   * "Formula" button that opens a panel hosting `<BstFormulaBuilder>`, so
+   * end-users add / edit / remove Excel-style computed columns at runtime.
+   * Uncontrolled by default (edits seed from `formulaColumns`); pass
+   * `onFormulaColumnsChange` to own them. Default: false.
+   */
+  showFormulaBuilder?: boolean
+  /** Controlled-mode callback for edits made in the formula builder. */
+  onFormulaColumnsChange?: (formulas: BstUserFormula[]) => void
+  /**
    * Per-column **edit lock/unlock** toggle in the Columns menu (requires
    * `enableEditing`). Lets an end-user make an editable column read-only (or back)
    * at runtime — `runtime.setColumnEditable`. Default: false (opt-in).
@@ -182,6 +195,8 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
     showFilterBuilder,
     showFormatBuilder,
     onConditionalFormatsChange,
+    showFormulaBuilder,
+    onFormulaColumnsChange,
     showColumnEditToggle,
     showSettings: _showSettings,
     pageSizeOptions = [5, 10, 20, 50],
@@ -204,11 +219,24 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
     onConditionalFormatsChange?.(next)
   }
 
+  // Runtime calculated columns (AG17 formula builder). Same controlled/uncontrolled
+  // shape as the format rules above.
+  const [localFormulas, setLocalFormulas] = React.useState<BstUserFormula[] | null>(null)
+  const effectiveFormulas = onFormulaColumnsChange
+    ? rest.formulaColumns
+    : localFormulas ?? rest.formulaColumns
+  const formulaCols = effectiveFormulas ?? []
+  const handleFormulasChange = (next: BstUserFormula[]) => {
+    if (!onFormulaColumnsChange) setLocalFormulas(next)
+    onFormulaColumnsChange?.(next)
+  }
+
   const preset = React.useMemo(() => cellTypes ?? createMuiPreset(), [cellTypes])
   const gridOpts = {
     ...rest,
     cellTypes: preset,
     conditionalFormats: effectiveFormats,
+    formulaColumns: effectiveFormulas,
   } as UseBstTableOptions<TData>
   const { table, runtime, handle } = useBstGrid<TData>(gridOpts)
   const theme = useTheme()
@@ -300,6 +328,8 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
   const filterBuilderOn = !!showFilterBuilder && (rest.enableColumnFilters ?? true)
   const formatBuilderOn = !!showFormatBuilder && rest.enableConditionalFormatting !== false
   const [formatsOpen, setFormatsOpen] = React.useState(false)
+  const formulaBuilderOn = !!showFormulaBuilder
+  const [formulaOpen, setFormulaOpen] = React.useState(false)
   // Builder column list derived from the grid's own columns (leafs, minus action columns).
   const formatColumns = React.useMemo<BstFormatBuilderColumn[]>(() => {
     const flatten = (cols: any[]): any[] =>
@@ -336,6 +366,7 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
       exportOn ||
       filterBuilderOn ||
       formatBuilderOn ||
+      formulaBuilderOn ||
       settingsOn)
 
   const vars = {
@@ -480,6 +511,16 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
               color={formatRules.length > 0 ? 'primary' : 'inherit'}
             >
               Formats{formatRules.length > 0 ? ` (${formatRules.length})` : ''}
+            </Button>
+          )}
+          {formulaBuilderOn && (
+            <Button
+              size="small"
+              startIcon={<FunctionsIcon />}
+              onClick={() => setFormulaOpen((o) => !o)}
+              color={formulaCols.length > 0 ? 'primary' : 'inherit'}
+            >
+              Formula{formulaCols.length > 0 ? ` (${formulaCols.length})` : ''}
             </Button>
           )}
           <span style={{ flex: 1 }} />
@@ -1044,6 +1085,33 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
             rules={formatRules}
             onChange={handleFormatsChange}
             columns={formatColumns}
+            icons={bodyIcons}
+          />
+        </div>
+      )}
+
+      {formulaBuilderOn && formulaOpen && (
+        <div
+          className="bst-table-root"
+          style={{ ...vars, padding: 12, borderBottom: `1px solid ${theme.palette.divider}` }}
+        >
+          <Stack direction="row" sx={{ alignItems: 'center', mb: 1 }}>
+            <Typography variant="subtitle2" sx={{ flex: 1 }}>
+              Calculated columns
+            </Typography>
+            <IconButton
+              size="small"
+              aria-label="Close formula builder"
+              onClick={() => setFormulaOpen(false)}
+            >
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </Stack>
+          <BstFormulaBuilder
+            formulas={formulaCols}
+            onChange={handleFormulasChange}
+            columns={formatColumns}
+            sampleRow={(rest.data as Record<string, unknown>[] | undefined)?.[0]}
             icons={bodyIcons}
           />
         </div>

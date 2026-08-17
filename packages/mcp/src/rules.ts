@@ -172,6 +172,9 @@ export const RULES: Record<string, FlagRule> = {
   showSearch: { requires: ['enableGlobalFilter'] },
   showFilterBuilder: { requires: ['enableColumnFilters'] },
   showFormatBuilder: { requires: ['enableConditionalFormatting'] },
+  showFormulaBuilder: {
+    note: 'Toolbar "Formula" button → a panel where end-users author Excel-style calculated columns at runtime. Uncontrolled unless `onFormulaColumnsChange` is passed; the columns it produces are `formulaColumns` (opt-in by presence, no gating toggle).',
+  },
   showColumnsMenu: { requires: ['enableHiding'] },
   showPagination: { requires: ['pagination'] },
   showAddRow: { requires: ['enableRowActions'] },

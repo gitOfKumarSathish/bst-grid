@@ -58,6 +58,45 @@ describe('formula / calculated columns (AG17)', () => {
     expect(out[0].accessorFn(seed[1], 1)).toBe(77) // 20 / 26
   })
 
+  test('string (Excel-style) formula compiles + renders via normalizeFormulaColumns', () => {
+    const cols: BstTableColumn<Row>[] = [
+      { id: 'item', accessorKey: 'item', header: 'Item', meta: { type: 'text' } },
+      { id: 'total', header: 'Total', meta: { type: 'number', formula: '=qty * price' } },
+      { id: 'band', header: 'Band', meta: { type: 'text', formula: '=IF(qty * price > 10, "big", "small")' } },
+    ]
+    const out = normalizeFormulaColumns(cols, { current: seed }) as any[]
+    const total = out.find((c) => c.id === 'total')
+    const band = out.find((c) => c.id === 'band')
+    expect(total.accessorFn(seed[0], 0)).toBe(6) // 3*2
+    expect(total.accessorFn(seed[1], 1)).toBe(20) // 5*4
+    expect(band.accessorFn(seed[0], 0)).toBe('small') // 6 <= 10
+    expect(band.accessorFn(seed[1], 1)).toBe('big') // 20 > 10
+  })
+
+  test('runtime formulaColumns are appended as computed columns (builder path)', () => {
+    const { container } = render(
+      <Grid formulaColumns={[{ id: 'x2', header: 'Double', expression: '=qty * price * 2', type: 'number' }]} />,
+    )
+    const cells = Array.from(container.querySelectorAll('tbody td')).map((c) => c.textContent?.trim())
+    expect(cells).toContain('12') // 3 * 2 * 2
+    expect(cells).toContain('40') // 5 * 4 * 2
+  })
+
+  test('editing a runtime formula expression live-updates the grid (no stale accessor cache)', () => {
+    const lastCellNum = (c: HTMLElement) => {
+      const tds = c.querySelector('tbody tr')!.querySelectorAll('td')
+      return Number(tds[tds.length - 1].textContent!.replace(/[^0-9.-]/g, ''))
+    }
+    const { container, rerender } = render(
+      <Grid formulaColumns={[{ id: 'c', header: 'C', expression: '=qty * 1000', type: 'number' }]} />,
+    )
+    expect(lastCellNum(container)).toBe(3000) // qty 3 * 1000
+    // Same column id, new expression — before the fix TanStack kept the cached
+    // accessor and this stayed 3000.
+    rerender(<Grid formulaColumns={[{ id: 'c', header: 'C', expression: '=qty * 2000', type: 'number' }]} />)
+    expect(lastCellNum(container)).toBe(6000)
+  })
+
   test('recurses into grouped (columns: [...]) headers', () => {
     const grouped: BstTableColumn<Row>[] = [
       {

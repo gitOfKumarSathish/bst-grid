@@ -220,9 +220,12 @@ style the root / header / row / cell / … parts, or a whole column via `meta.ce
 [Custom CSS](https://www.npmjs.com/package/@bloomskill/table-engine#custom-css).
 
 **Loading / error + formula columns:** `loading` / `error` (+ `renderLoading` / `renderError`, AG23)
-and per-column `meta.formula` (AG17) are engine features forwarded here unchanged — see
+and per-column `meta.formula` (AG17, function or Excel-style string) are engine features forwarded
+here unchanged — see
 [Loading and error overlays](https://www.npmjs.com/package/@bloomskill/table-engine#loading-and-error-overlays)
 and [Calculated columns](https://www.npmjs.com/package/@bloomskill/table-engine#calculated-columns).
+A **`showFormulaBuilder`** prop (+ `onFormulaColumnsChange`) adds a toolbar **Formula** button that
+opens a runtime builder panel, so end-users author calculated columns without code.
 Use the adapter's `className` / `style` for the outer card.
 
 **Toggle convention:** `enable*` controls engine behaviour, `show*` controls MUI chrome.

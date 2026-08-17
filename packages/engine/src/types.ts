@@ -417,4 +417,27 @@ export interface UseBstTableOptions<TData extends RowData> extends BstTableEngin
   renderLoading?: () => React.ReactNode
   /** Custom error-overlay content (default: a ⚠ glyph + the `error` node). */
   renderError?: (error: React.ReactNode) => React.ReactNode
+  /**
+   * Runtime calculated columns (AG17) — appended to `columns` as computed columns,
+   * each evaluating its Excel-style `expression`. Author them in code, or let
+   * end-users build them at runtime with `<BstFormulaBuilder>` (adapters expose a
+   * "Formula" toolbar button via `showFormulaBuilder`). Opt-in by presence.
+   */
+  formulaColumns?: BstUserFormula[]
+}
+
+/**
+ * A user-authored calculated column (AG17) — the runtime, Excel-style analog of a
+ * code-defined `meta.formula`. Each is appended as a computed column whose value
+ * is the compiled `expression`.
+ */
+export interface BstUserFormula {
+  /** Unique column id. */
+  id: string
+  /** Column header label. */
+  header: string
+  /** Excel-style formula, e.g. `'=qty * price'` (references columns by field name). */
+  expression: string
+  /** Cell type for rendering / formatting the result. Default `'text'`. */
+  type?: string
 }
