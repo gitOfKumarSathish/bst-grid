@@ -381,6 +381,7 @@ export default function App() {
     enableSetFilter: true, // AG4: categorical columns (see role/plan) get a distinct-values checklist
     showStatusBar: true, // AG5: footer — row counts + selection sum/avg/min/max
     enableAutoRowHeight: true, // AG26: rows grow to fit wrapped content (browser-measured)
+    enableContextMenu: true, // AG6: right-click a cell → Copy / Export / Autosize (+ getContextMenuItems)
     enableExpanding: true, // master-detail (A4): click ▸ for a detail panel
     renderDetail: (r: Person) => (
       <div

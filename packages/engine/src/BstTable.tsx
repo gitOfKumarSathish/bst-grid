@@ -11,6 +11,7 @@ import { useStoreSelector } from './interaction/useStoreSelector.js'
 import type { BstRuntime } from './runtime.js'
 import type { BstColumnMeta, CellType } from './registry/types.js'
 import type { CellEditProps, CellRenderProps, FieldError } from './registry/types.js'
+import type { BstContextMenuItem } from './types.js'
 import { computeCellSpans } from './spanning.js'
 import { evalCellFormat, evalRowFormat } from './formatting.js'
 import type { FormatResult } from './formatting.js'
@@ -594,6 +595,79 @@ export function BstTable({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rowVirtActive, activeRowId])
 
+  // Right-click context menu (AG6) — event-delegated on the scroll box: find the
+  // clicked cell via its data-attrs, assemble the default items from what's
+  // enabled, let `getContextMenuItems` reshape them, then open a dep-free popup at
+  // the cursor. If the resolved list is empty the native browser menu is left be.
+  const [ctxMenu, setCtxMenu] = React.useState<{
+    x: number
+    y: number
+    items: BstContextMenuItem[]
+  } | null>(null)
+  const ctxMenuRef = React.useRef<HTMLDivElement>(null)
+
+  const onCellContextMenu = (e: React.MouseEvent) => {
+    const td = (e.target as HTMLElement).closest?.('td[data-bst-rowid]') as HTMLElement | null
+    if (!td) return
+    const rowId = td.getAttribute('data-bst-rowid') as string
+    const columnId = td.getAttribute('data-bst-colid') as string
+    // Right-click selects the cell (so Copy has something to act on), Excel-style.
+    if (handle.enableCellSelection) runtime.setActiveCell(rowId, columnId)
+    const defaultItems: BstContextMenuItem[] = []
+    if (handle.enableClipboard) {
+      defaultItems.push({ key: 'copy', label: 'Copy', onSelect: () => void runtime.copySelection() })
+      defaultItems.push({ key: 'copyRow', label: 'Copy row', onSelect: () => void runtime.copyRow(rowId) })
+      defaultItems.push({ key: 'copyCol', label: 'Copy column', onSelect: () => void runtime.copyColumn(columnId) })
+    }
+    if (handle.enableExport && (handle.exportFormats.csv || handle.exportFormats.excel)) {
+      if (defaultItems.length) defaultItems.push({ separator: true })
+      if (handle.exportFormats.csv) defaultItems.push({ key: 'csv', label: 'Export CSV', onSelect: () => void runtime.exportCsv() })
+      if (handle.exportFormats.excel) defaultItems.push({ key: 'xlsx', label: 'Export Excel', onSelect: () => void runtime.exportExcel() })
+    }
+    if (defaultItems.length) defaultItems.push({ separator: true })
+    defaultItems.push({ key: 'autosize', label: 'Autosize column', onSelect: () => autoSizeColumn(columnId) })
+    let row: unknown
+    try {
+      row = (table.getRow?.(rowId, true) as { original?: unknown } | undefined)?.original
+    } catch {
+      row = undefined
+    }
+    const items = handle.getContextMenuItems
+      ? handle.getContextMenuItems({
+          rowId,
+          columnId,
+          value: runtime.sourceValue(rowId, columnId),
+          row: row as never,
+          defaultItems,
+        })
+      : defaultItems
+    if (!items.length) return
+    e.preventDefault()
+    setCtxMenu({ x: e.clientX, y: e.clientY, items })
+  }
+
+  React.useEffect(() => {
+    if (!ctxMenu) return
+    const close = () => setCtxMenu(null)
+    const onDown = (ev: MouseEvent) => {
+      if (ctxMenuRef.current?.contains(ev.target as Node)) return
+      close()
+    }
+    const onKey = (ev: KeyboardEvent) => {
+      if (ev.key === 'Escape') close()
+    }
+    document.addEventListener('mousedown', onDown)
+    document.addEventListener('keydown', onKey)
+    window.addEventListener('scroll', close, true)
+    window.addEventListener('resize', close)
+    return () => {
+      document.removeEventListener('mousedown', onDown)
+      document.removeEventListener('keydown', onKey)
+      window.removeEventListener('scroll', close, true)
+      window.removeEventListener('resize', close)
+    }
+  }, [ctxMenu])
+
   return (
     <BstIconsContext.Provider value={I}>
     <div
@@ -606,6 +680,7 @@ export function BstTable({
         classNames?.root,
       )}
       style={{ ...(handle.fitColumns ? { overflowX: 'hidden' as const } : null), ...styles?.root }}
+      onContextMenu={handle.enableContextMenu ? onCellContextMenu : undefined}
     >
       <table
         className={cx('bst-table-table', classNames?.table)}
@@ -1048,6 +1123,35 @@ export function BstTable({
         </tbody>
       </table>
     </div>
+    {ctxMenu ? (
+      <div
+        ref={ctxMenuRef}
+        className="bst-ctxmenu"
+        role="menu"
+        style={{ position: 'fixed', top: ctxMenu.y, left: ctxMenu.x }}
+      >
+        {ctxMenu.items.map((it, i) =>
+          it.separator ? (
+            <div key={i} className="bst-ctxmenu-sep" role="separator" />
+          ) : (
+            <button
+              key={it.key ?? i}
+              type="button"
+              className="bst-ctxmenu-item"
+              role="menuitem"
+              disabled={it.disabled}
+              onClick={() => {
+                it.onSelect?.()
+                setCtxMenu(null)
+              }}
+            >
+              {it.icon ? <span className="bst-ctxmenu-icon">{it.icon}</span> : null}
+              <span className="bst-ctxmenu-label">{it.label}</span>
+            </button>
+          ),
+        )}
+      </div>
+    ) : null}
     </BstIconsContext.Provider>
   )
 }
@@ -1453,6 +1557,8 @@ const GridCell = React.memo(function GridCell({
       data-dirty={slice.isDirty ? '' : undefined}
       data-active={slice.isActive ? '' : undefined}
       data-error={level === 'error' ? '' : undefined}
+      data-bst-rowid={handle.enableContextMenu ? rowId : undefined}
+      data-bst-colid={handle.enableContextMenu ? columnId : undefined}
     >
       {cellFmt?.hideContent ? null : content}
       {level && slice.errors[0] ? (

@@ -253,6 +253,40 @@ export interface BstTableEngineToggles {
    * keeps its explicit height and clips the wrapped content). Default: false.
    */
   enableAutoRowHeight?: boolean
+  /**
+   * Right-click context menu (AG6) — a menu at the cursor with default actions
+   * (Copy · Copy row · Copy column while clipboard is on; Export CSV / Excel while
+   * export is on; Autosize column) plus any items returned by `getContextMenuItems`.
+   * If the resolved item list is empty the native browser menu is left alone.
+   * Default: false.
+   */
+  enableContextMenu?: boolean
+}
+
+/** One entry in the right-click context menu (AG6). */
+export interface BstContextMenuItem {
+  /** Stable key (React list key). */
+  key?: string
+  /** Menu label. */
+  label?: React.ReactNode
+  /** Invoked when the item is chosen; the menu closes afterwards. */
+  onSelect?: () => void
+  /** Greyed out + non-interactive. */
+  disabled?: boolean
+  /** Render a divider instead of an item (`label` / `onSelect` ignored). */
+  separator?: boolean
+  /** Optional leading icon. */
+  icon?: React.ReactNode
+}
+
+/** Context handed to `getContextMenuItems` — the right-clicked cell + the defaults. */
+export interface BstContextMenuContext<TData extends RowData = any> {
+  rowId: string
+  columnId: string
+  value: unknown
+  row: TData | undefined
+  /** The items Bst-Table would show by default — spread and extend them. */
+  defaultItems: BstContextMenuItem[]
 }
 
 export interface UseBstTableOptions<TData extends RowData> extends BstTableEngineToggles {
@@ -354,6 +388,13 @@ export interface UseBstTableOptions<TData extends RowData> extends BstTableEngin
    * to render nothing for a given row.
    */
   renderDetail?: (row: TData) => React.ReactNode
+  /**
+   * Build the right-click context menu (AG6, needs `enableContextMenu`). Receives
+   * the clicked cell plus `defaultItems` (Copy / Export / …); return the final
+   * list — spread `defaultItems` to keep them, prepend/append your own, or return
+   * a fresh array. Omit to show the defaults.
+   */
+  getContextMenuItems?: (ctx: BstContextMenuContext<TData>) => BstContextMenuItem[]
   /**
    * Row pinning (G1) — freeze rows to the top/bottom of the grid via a leading
    * pin column; pinned rows stay put across sort/filter/pagination and stick

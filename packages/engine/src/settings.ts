@@ -140,6 +140,7 @@ const SETTINGS_META: Record<BstSettingKey, SettingMeta> = {
   enableClipboard: { group: 'Selection & clipboard', default: false, label: 'Copy & paste', hint: 'Ctrl/⌘+C · Ctrl/⌘+V' },
   enableCopyColumn: { group: 'Selection & clipboard', default: true, alwaysShow: true, label: 'Copy column', hint: 'Ctrl/⌘+Space · needs Copy & paste', requires: ['enableClipboard'] },
   enableCopyRow: { group: 'Selection & clipboard', default: true, alwaysShow: true, label: 'Copy row', hint: 'Shift+Space · needs Copy & paste', requires: ['enableClipboard'] },
+  enableContextMenu: { group: 'Selection & clipboard', default: false, alwaysShow: true, label: 'Context menu', hint: 'Right-click a cell for Copy / Export actions (AG6)' },
   // Display
   enableCellSpanning: { group: 'Display', default: false, label: 'Cell spanning', hint: 'Merge repeated cells (A5)' },
   enableConditionalFormatting: {

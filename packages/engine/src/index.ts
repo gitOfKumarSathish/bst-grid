@@ -79,6 +79,8 @@ export type {
   BstStyles,
   BstRowContext,
   BstHeaderSlotContext,
+  BstContextMenuItem,
+  BstContextMenuContext,
 } from './types.js'
 
 // ---- features (v9 registration) ----

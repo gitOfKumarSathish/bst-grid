@@ -1391,3 +1391,51 @@
   opacity: 0.6;
   font-size: 12px;
 }
+
+/* Right-click context menu (AG6) — dep-free popup at the cursor. */
+.bst-ctxmenu {
+  z-index: 1001;
+  min-width: 168px;
+  padding: 4px;
+  background: var(--bst-table-bg);
+  color: var(--bst-table-fg);
+  border: 1px solid var(--bst-table-border);
+  border-radius: 8px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
+  text-align: left;
+  font-weight: 400;
+  font-size: 13px;
+}
+.bst-ctxmenu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.bst-ctxmenu-item:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--bst-table-accent) 12%, transparent);
+}
+.bst-ctxmenu-item:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.bst-ctxmenu-icon {
+  display: inline-flex;
+  flex: none;
+}
+.bst-ctxmenu-label {
+  flex: 1;
+}
+.bst-ctxmenu-sep {
+  height: 1px;
+  margin: 4px 2px;
+  background: var(--bst-table-border);
+}

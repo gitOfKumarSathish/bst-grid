@@ -110,7 +110,7 @@ Everything below ships **free** (MIT/Apache)._
 | AG3 | Print / print-friendly view | 🆓 | ✅ | P5 — **v0.34.0** (`enablePrint`, `runtime.printTable`) |
 | AG4 | Set Filter (distinct-values checklist) | 💷 | ✅ | P6 — `enableSetFilter` + `BstSetFilter` (`{op:'set'}` condition) |
 | AG5 | Status bar (row count + range sum/avg/count) | 💷 | ✅ | P6 — `showStatusBar` + `runtime.getSelectionStats()` |
-| AG6 | Right-click context menu | 💷 | ❌ | P6 |
+| AG6 | Right-click context menu | 💷 | ✅ | P6 — `enableContextMenu` + `getContextMenuItems` (dep-free popup: Copy / Export / Autosize + custom) |
 | AG7 | Tool-panel sidebar (Columns + Filters) | 💷 | ❌ | P6 |
 | AG8 | Find (highlight + jump between matches) | 💷 | ❌ | P6 |
 | AG9 | Row-number column | 💷 | ❌ | P6 |
@@ -135,8 +135,8 @@ Everything below ships **free** (MIT/Apache)._
 | AG28 | Cell flashing on data change | 🆓 | ❌ | P8 |
 | AG29 | Aligned grids (shared column state) | 🆓 | ❌ | P8 |
 
-**Tally:** 29 parity items — ✅ 6 built (P5 export · P6 Set Filter / status bar · P8 auto row height) ·
-❌ 18 missing · 🟡 5 partial. **12 of them are AG Grid Enterprise-paid** — they ship free here.
+**Tally:** 29 parity items — ✅ 7 built (P5 export · P6 Set Filter / status bar / context menu · P8 auto
+row height) · ❌ 17 missing · 🟡 5 partial. **12 of them are AG Grid Enterprise-paid** — they ship free here.
 
 **Already matched (AG Grid Enterprise-paid, shipped free):** cell/range selection · clipboard
 copy/paste · batch editing · row grouping + aggregation · master-detail · sparklines · advanced-filter

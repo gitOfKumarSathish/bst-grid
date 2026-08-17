@@ -531,12 +531,13 @@ Export menu in both adapters (`showExport`).
 
 **Phase 6 — AG-Grid-grade chrome & filtering**  *(in progress)*
 **Set Filter** — distinct-values checklist (`AG4` ✅) · **status bar** — row count + sum/avg/count of
-selection (`AG5` ✅) · right-click context menu (`AG6`) · tool-panel sidebar — Columns + Filters
+selection (`AG5` ✅) · right-click context menu (`AG6` ✅) · tool-panel sidebar — Columns + Filters
 (`AG7`) · Find — highlight + jump (`AG8`) · row-number column (`AG9`) · managed row dragging (`AG10`) ·
 multi-filter per column (`AG11`) · fill handle (`AG12`).
 → *Deliverable:* the chrome + filtering an AG Grid user expects on day one.
 **Shipped:** `AG4` (`enableSetFilter` + `BstSetFilter`, an `{op:'set'}` condition) and `AG5`
-(`showStatusBar` + `runtime.getSelectionStats`). **Remaining:** AG6–AG12.
+(`showStatusBar` + `runtime.getSelectionStats`) and `AG6` (`enableContextMenu` + `getContextMenuItems`).
+**Remaining:** AG7–AG12.
 
 **Phase 7 — Hierarchy, analytics & scale**
 Tree data — self-referencing hierarchy (`AG13`) · pivoting (`AG14`) · integrated charts, range → chart

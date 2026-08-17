@@ -5,6 +5,8 @@ import { bstTableFeatures } from './features.js'
 import type {
   BstClassNames,
   BstStyles,
+  BstContextMenuContext,
+  BstContextMenuItem,
   EditingOptions,
   UseBstTableOptions,
   ValidationOptions,
@@ -70,6 +72,10 @@ export interface BstRuntimeHandle<TData extends RowData> {
   enableRowResize: boolean
   /** Auto row height (AG26) — body cells wrap and rows grow to fit their content. */
   enableAutoRowHeight: boolean
+  /** Right-click context menu (AG6). */
+  enableContextMenu: boolean
+  /** Builds the context-menu items for the clicked cell (given the defaults). */
+  getContextMenuItems?: (ctx: BstContextMenuContext<TData>) => BstContextMenuItem[]
   /** Multi-column grouping (E4) — collapsible group rows + aggregates. */
   enableGrouping: boolean
   /** Conditional-format rules (K3) applied to cells/rows at render. */
@@ -407,6 +413,8 @@ export function useBstTable<TData extends RowData>(opts: UseBstTableOptions<TDat
     enableRowPinning: !!opts.enableRowPinning,
     enableRowResize: !!opts.enableRowResize,
     enableAutoRowHeight: !!opts.enableAutoRowHeight,
+    enableContextMenu: !!opts.enableContextMenu,
+    getContextMenuItems: opts.getContextMenuItems,
     enableGrouping: !!opts.enableGrouping,
     conditionalFormats:
       opts.enableConditionalFormatting !== false ? opts.conditionalFormats : undefined,

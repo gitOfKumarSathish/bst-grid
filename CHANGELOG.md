@@ -9,6 +9,13 @@ this project uses [Semantic Versioning](https://semver.org).
 > affected package README(s) **and** bump the version, in the same change.
 
 ## [Unreleased]
+### Added — Context menu (Phase 6, AG6)
+- **`enableContextMenu`** — a dependency-free **right-click menu** at the cursor. Default items: Copy /
+  Copy row / Copy column (with `enableClipboard`), Export CSV / Excel (with `enableExport`), Autosize
+  column. Reshape or extend via **`getContextMenuItems(ctx) => BstContextMenuItem[]`** (spread
+  `ctx.defaultItems`, add your own). Event-delegated on the scroll box (`data-bst-rowid` / `-colid`);
+  right-click selects the cell. Settings-sheet toggle ("Selection & clipboard"). Tested
+  (`contextMenu.test.tsx`). Closes COVERAGE `AG6`. `@bloomskill/table-engine` (both adapters inherit it).
 ### Added — Settings sheet: section dividers + dependency cascade
 - **Section dividers** — a hairline rule now separates each settings group (both skins), so
   "Data operations / Columns / Rows / …" read as distinct sections (paired with the prominent

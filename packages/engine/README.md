@@ -516,6 +516,7 @@ means *passing the object implies enabled*.
 | `enableCellSelection` | `boolean` | `false` | [Cell/range selection](#selection-keyboard-and-clipboard) + keyboard nav. |
 | `enableClipboard` | `boolean` | `false` | Copy/paste. Implies `enableCellSelection`; paste needs `enableEditing`. |
 | `enableCopyColumn` / `enableCopyRow` | `boolean` | `true` | Sub-toggles of clipboard for whole-column / whole-row copy. |
+| `enableContextMenu` | `boolean` | `false` | [Right-click menu](#selection-keyboard-and-clipboard) (AG6) — Copy / Export / Autosize defaults; customize via `getContextMenuItems`. |
 | `disabled` | `boolean` | `false` | Disable the whole grid (F1). |
 | `rowDisabled` | `(row) => boolean` | — | Disable interaction per row (F2). |
 | `cellDisabled` | `({ row, rowId, columnId }) => boolean` | — | Disable interaction per cell (F4). |
@@ -668,6 +669,11 @@ const table = useBstTable<Task>({
   `getSelectionMatrix` / `copySelection` / `pasteFromText`. `runtime.getSelectionStats()` returns
   `{ count, numericCount, sum, avg, min, max }` over the selection — the AG5 **status bar**
   (`showStatusBar` in the adapters) renders it.
+- **Right-click menu (AG6)** — `enableContextMenu` opens a menu at the cursor with **Copy · Copy row ·
+  Copy column** (while clipboard is on), **Export CSV / Excel** (while export is on) and **Autosize
+  column**. Reshape it with **`getContextMenuItems(ctx) => BstContextMenuItem[]`** — spread
+  `ctx.defaultItems` and add your own (each `{ label, onSelect, disabled?, separator?, icon? }`). Both
+  adapters inherit it; if the resolved list is empty the native browser menu is left alone.
 
 > Selection lives in the interaction store (not `table.setState`) and is materialised at paint from the
 > active/anchor cell ids — moving the cursor re-renders only the cells whose state changed, never the

@@ -127,6 +127,9 @@ export const RULES: Record<string, FlagRule> = {
     requires: ['enableClipboard'],
     note: 'Defaults to ON — set false to disable Shift+Space row copy while keeping the rest of the clipboard.',
   },
+  enableContextMenu: {
+    note: 'Right-click a cell for a menu (AG6). Default items: Copy / Copy row / Copy column (with `enableClipboard`), Export CSV / Excel (with `enableExport`), Autosize column. Reshape or extend them via the `getContextMenuItems(ctx)` callback (spread `ctx.defaultItems`).',
+  },
 
   // ---- Export (AG1–AG3) ----
   enableExport: {
