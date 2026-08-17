@@ -41,6 +41,7 @@ type ExtraEngineSettingKey =
 type ChromeSettingKey =
   | 'showFilterBuilder'
   | 'showFormatBuilder'
+  | 'showFormulaBuilder'
   | 'showDensityToggle'
   | 'showStatusBar'
 
@@ -156,6 +157,13 @@ const SETTINGS_META: Record<BstSettingKey, SettingMeta> = {
     label: 'Format builder',
     hint: 'Toolbar "Formats" button — build rules at runtime (K3)',
     requires: ['enableConditionalFormatting'],
+  },
+  showFormulaBuilder: {
+    group: 'Display',
+    default: false,
+    alwaysShow: true,
+    label: 'Formula builder',
+    hint: 'Toolbar "Formula" button — build calculated columns at runtime (AG17)',
   },
   showDensityToggle: { group: 'Display', default: false, label: 'Density toggle' },
   showStatusBar: { group: 'Display', default: false, label: 'Status bar', hint: 'Row counts + sum / avg / min / max of the selection (AG5)' },

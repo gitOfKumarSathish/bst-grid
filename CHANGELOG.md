@@ -33,8 +33,10 @@ this project uses [Semantic Versioning](https://semver.org).
   **`<BstFormulaBuilder>`** (headless, shared by both skins) lets users add / edit / remove them at
   runtime with a live preview, validation and a function/field help panel. Adapters expose a
   **`showFormulaBuilder`** toolbar button (MUI + shadcn) + an `onFormulaColumnsChange` controlled
-  callback. Editing an expression **live-updates** the grid via a stable-accessor-via-ref + data-bump
-  (TanStack caches accessors by column id). Tested (`formula-expr.test.ts`, `formula.test.tsx`).
+  callback, and a **settings-sheet toggle** (⚙ → Display, `alwaysShow`) so end-users can enable the
+  Formula button themselves. Editing an expression **live-updates** the grid via a
+  stable-accessor-via-ref + data-bump (TanStack caches accessors by column id). Verified live in both
+  skins (MUI + shadcn `theme="inherit"`). Tested (`formula-expr.test.ts`, `formula.test.tsx`).
 
 ### Added — Loading / error overlays (AG23; `@bloomskill/table-engine` + adapters)
 - **`loading`** shows a dep-free spinner overlay over the grid body; **`error`** shows an error

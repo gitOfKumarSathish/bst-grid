@@ -680,6 +680,7 @@ export default function App() {
               {...common}
               data={dataScInherit}
               onDataChange={setDataScInherit}
+              showFormulaBuilder
               showSettings={{ persistKey: 'demo-sc-inherit' }}
             />
           </div>
