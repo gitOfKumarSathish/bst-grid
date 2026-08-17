@@ -4,8 +4,12 @@ import * as React from 'react'
 import {
   useBstSettings,
   applySettingsOverrides,
+  filterSettingsGroups,
+  shouldShowSettingsSearch,
+  isSettingActive,
   BST_SETTINGS_REGISTRY,
 } from '../settings'
+import type { BstSettingsGroup } from '../settings'
 
 type Row = { id: string; name: string }
 const data: Row[] = [{ id: '1', name: 'A' }]
@@ -336,5 +340,139 @@ describe('useBstSettings — batch-editing toggle (enableBatchEditing)', () => {
     const next = applySettingsOverrides(props, { enableBatchEditing: false }) as any
     expect(next.enableBatchEditing).toBe(false)
     expect(next.enableEditing).toEqual({ mode: 'batch', policy: 'commitButFlag' }) // untouched
+  })
+})
+
+// ---- search box helpers (pure) ------------------------------------------------
+const mkGroups = (): BstSettingsGroup[] =>
+  [
+    {
+      name: 'Columns',
+      items: [
+        { key: 'enableColumnPinning', label: 'Pin columns', hint: undefined },
+        { key: 'enableColumnResizing', label: 'Resize columns', hint: undefined },
+      ],
+    },
+    {
+      name: 'Export',
+      items: [
+        { key: 'enableExport', label: 'Export', hint: 'Toolbar Export menu' },
+        { key: 'enablePrint', label: 'Print', hint: 'needs Export' },
+      ],
+    },
+  ] as unknown as BstSettingsGroup[]
+
+describe('filterSettingsGroups (pure)', () => {
+  test('empty / whitespace query returns all groups (fresh copies)', () => {
+    const groups = mkGroups()
+    const out = filterSettingsGroups(groups, '')
+    expect(out.map((g) => g.name)).toEqual(['Columns', 'Export'])
+    expect(filterSettingsGroups(groups, '   ').map((g) => g.name)).toEqual(['Columns', 'Export'])
+    // returns fresh group objects — never the source references (no mutation risk)
+    expect(out[0]).not.toBe(groups[0])
+  })
+
+  test('matches on label, case-insensitively, dropping non-matching groups', () => {
+    const out = filterSettingsGroups(mkGroups(), 'PIN')
+    expect(out).toHaveLength(1)
+    expect(out[0].name).toBe('Columns')
+    expect(out[0].items.map((i) => i.label)).toEqual(['Pin columns'])
+  })
+
+  test('matches on a hint', () => {
+    const out = filterSettingsGroups(mkGroups(), 'toolbar')
+    expect(out).toHaveLength(1)
+    expect(out[0].items.map((i) => i.label)).toEqual(['Export'])
+  })
+
+  test('a matching group name keeps ALL of its items', () => {
+    const out = filterSettingsGroups(mkGroups(), 'export')
+    // "export" matches the Export group name → both its items survive, even
+    // though "Print"'s label does not contain "export".
+    const exportGroup = out.find((g) => g.name === 'Export')!
+    expect(exportGroup.items.map((i) => i.label)).toEqual(['Export', 'Print'])
+  })
+
+  test('no matches → empty array', () => {
+    expect(filterSettingsGroups(mkGroups(), 'zzz')).toEqual([])
+  })
+})
+
+describe('shouldShowSettingsSearch (pure)', () => {
+  test('explicit false never shows; explicit true always shows', () => {
+    expect(shouldShowSettingsSearch(false, 100)).toBe(false)
+    expect(shouldShowSettingsSearch(true, 0)).toBe(true)
+  })
+  test('unset → auto: only for lists longer than a handful', () => {
+    expect(shouldShowSettingsSearch(undefined, 6)).toBe(false)
+    expect(shouldShowSettingsSearch(undefined, 7)).toBe(true)
+  })
+})
+
+// ---- dependency cascade (a parent off disables its dependents) ----------------
+describe('isSettingActive (pure, dependency cascade)', () => {
+  test('a toggle is inactive while a prerequisite is off', () => {
+    expect(isSettingActive('enableExport', {})).toBe(false) // off by default
+    expect(isSettingActive('enableCsvExport', {})).toBe(false) // needs Export
+    expect(isSettingActive('enableCsvExport', { enableExport: true })).toBe(true)
+  })
+  test('resolves transitively through a chain', () => {
+    const on = { enableColumnFilters: true, enableColumnFilterRow: true, enableSetFilter: true }
+    expect(isSettingActive('enableSetFilter', on)).toBe(true)
+    // filter row is on, but its own prerequisite (column filters) is off → the
+    // whole chain below it is inactive.
+    const off = { enableColumnFilters: false, enableColumnFilterRow: true, enableSetFilter: true }
+    expect(isSettingActive('enableColumnFilterRow', off)).toBe(false)
+    expect(isSettingActive('enableSetFilter', off)).toBe(false)
+  })
+})
+
+function DepHarness(props: any) {
+  const { model } = useBstSettings(props, { persist: false })
+  return (
+    <>
+      {model.items.map((it) => (
+        <span key={it.key} data-testid={`dis:${it.key}`}>
+          {String(it.disabled)}
+        </span>
+      ))}
+    </>
+  )
+}
+const dis = (key: string) => screen.queryByTestId(`dis:${key}`)?.textContent
+
+describe('useBstSettings — dependency cascade (item.disabled)', () => {
+  beforeEach(() => window.localStorage.clear())
+
+  test('export sub-toggles disable while Export is off, enable when it is on', () => {
+    const { unmount } = render(<DepHarness data={data} columns={columns} />)
+    expect(dis('enableCsvExport')).toBe('true') // enableExport defaults off
+    expect(dis('enableExcelExport')).toBe('true')
+    expect(dis('enablePrint')).toBe('true')
+    unmount()
+    render(<DepHarness data={data} columns={columns} enableExport />)
+    expect(dis('enableCsvExport')).toBe('false')
+    expect(dis('enablePrint')).toBe('false')
+  })
+
+  test('cascade is transitive: column filters off → filter row AND set filter disabled', () => {
+    render(
+      <DepHarness
+        data={data}
+        columns={columns}
+        enableColumnFilters={false}
+        enableColumnFilterRow
+        enableSetFilter
+      />,
+    )
+    expect(dis('enableColumnFilterRow')).toBe('true')
+    expect(dis('enableSetFilter')).toBe('true')
+  })
+
+  test('toggling a parent live re-enables its dependents', () => {
+    render(<DepHarness data={data} columns={columns} enableClipboard={false} />)
+    // copy column/row require Copy & paste (off) → disabled
+    expect(dis('enableCopyColumn')).toBe('true')
+    expect(dis('enableCopyRow')).toBe('true')
   })
 })

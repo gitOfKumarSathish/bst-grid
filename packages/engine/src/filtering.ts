@@ -149,6 +149,22 @@ export function evalCondition(cell: unknown, raw: unknown): boolean {
     op = 'contains'
     value = raw
   }
+  // Set filter (AG4): `value` is the list of selected values; a row passes if its
+  // value — or, for a multi-value cell, ANY element — is selected. Blank cells match
+  // the '' sentinel. Handled here, BEFORE the empty-value short-circuit below, so an
+  // empty selection correctly matches nothing (rather than being read as inactive).
+  if (op === 'set') {
+    if (!Array.isArray(value)) return true
+    const set = value as unknown[]
+    if (Array.isArray(cell)) {
+      return cell.length === 0
+        ? set.some((v) => str(v) === '')
+        : cell.some((el) => set.some((v) => str(v) === str(el)))
+    }
+    const key = isEmptyVal(cell) ? '' : str(cell)
+    return set.some((v) => str(v) === key)
+  }
+
   // A filter with no value (other than unary ops) is treated as inactive. A
   // `between` is inactive only when BOTH bounds are empty (a one-bound range is a
   // valid one-sided filter — see the `between` case).
@@ -242,6 +258,9 @@ export function isConditionActive(raw: unknown): boolean {
   }
   const unary = op === 'empty' || op === 'notEmpty' || op === 'isTrue' || op === 'isFalse'
   if (unary) return true
+  // A set filter is active whenever a selection array is present (an empty array
+  // means "match nothing", which is still an active filter).
+  if (op === 'set') return Array.isArray(value)
   return !(isEmptyVal(value) && (op !== 'between' || isEmptyVal(value2)))
 }
 

@@ -22,6 +22,9 @@ without touching your data code.
 - ☑️ **Row selection (Phase 3)** — `enableRowSelection` renders a checkbox column (header select-all + per-row) and a toolbar "{n} selected" chip + Clear (`showSelectionInfo`).
 - ↩️ **Undo/redo (Phase 3)** — `enableUndoRedo` adds toolbar Undo/Redo buttons (`showUndoRedo`) wired to the engine's edit history (Ctrl/Cmd+Z / Ctrl/Cmd+Y also work).
 - 📌 **Layout chrome (Phase 3)** — `enableColumnPinning` / `enableColumnOrdering` add pin + move controls to the columns menu (sticky columns, reorder); `showDensityToggle` cycles row-height density; **`enableRowResize`** lets users drag a row's bottom edge to set its height (double-click to reset). **`showColumnEditToggle`** adds a per-column **edit lock/unlock** (✏️) so an end-user can make an editable column read-only at runtime (requires `enableEditing`).
+- 📤 **Export (Phase 5)** — `enableExport` adds a toolbar **Export** menu (`showExport`) — download **CSV**, download **Excel** (`.xlsx`) or **print** — built on the engine's dependency-free serializers (no `exceljs`). Per-format sub-toggles `enableCsvExport` / `enableExcelExport` / `enablePrint`.
+- 🔎 **Set Filter (Phase 6, AG4)** — `enableSetFilter` gives categorical columns an Excel-style **checklist of distinct values** in the filter row (search · select-all/clear · counts · (Blanks)); needs `enableColumnFilterRow`.
+- 📊 **Status bar (Phase 6, AG5)** — `showStatusBar` adds a footer with total / filtered row counts and, when a cell range is selected, the **sum / avg / min / max / count** of its numeric cells.
 - 🔎 **Filter builder (Phase 3, E3)** — `showFilterBuilder` adds a "Filters (n)" button + a panel with per-column condition rows (operator-aware). Add `enableColumnFilterRow` for a second, inline per-column filter row; drag a header to reorder, drag its edge to resize.
 - 🎨 **Conditional-format builder (K3)** — `showFormatBuilder` adds a "Formats (n)" button that opens/closes a panel hosting `<BstConditionalFormatBuilder>`: end-users add / edit / delete `conditionalFormats` rules at runtime (uncontrolled local state by default; pass `onConditionalFormatsChange` to own the rules). Hidden while `enableConditionalFormatting` is off.
 - ⚙️ **Settings sheet** — `showSettings` adds a gear that slides out a right-side **Drawer** where end-users flip this grid's features on/off at runtime (**per table**), saved to `localStorage`. Only features you've provisioned appear — e.g. turn **Copy & paste** off to disable clipboard, no code change.
@@ -124,9 +127,10 @@ Bring your own editors by passing a `cellTypes` registry (e.g. start from `creat
 ### Runtime settings sheet
 
 `showSettings` lets **end-users** customize a grid without touching code — a gear opens a
-right-side sheet of feature toggles. Choices are **per table** and saved to `localStorage`, so
-they survive reloads. Only features you've provisioned are listed (default-on data features plus
-any opt-in feature you enabled), so users can't switch on something the grid isn't wired for.
+right-side sheet of feature toggles under a **highlighted header**, with a **search box** to filter
+the 30+ list. Choices are **per table** and saved to `localStorage`, so they survive reloads. Only
+features you've provisioned are listed (default-on data features plus any opt-in feature you enabled),
+so users can't switch on something the grid isn't wired for.
 
 ```tsx
 <BstTableMui
@@ -147,6 +151,7 @@ any opt-in feature you enabled), so users can't switch on something the grid isn
     features: ['enableSorting', 'enableColumnFilters', 'pagination'], // only these switches
     persistKey: 'people-grid',   // explicit localStorage key (else derived from columns)
     persist: true,               // false → in-memory only
+    search: true,                // search box (default: auto for long lists; false hides it)
   }}
 />
 ```
@@ -195,6 +200,8 @@ Plus the MUI-only chrome props:
 | `showSelectionInfo` | `boolean` | follows `enableRowSelection` | Show the "{n} selected" chip + Clear. |
 | `showUndoRedo` | `boolean` | follows `enableUndoRedo` | Show the Undo/Redo buttons. |
 | `showDensityToggle` | `boolean` | `false` | Show the row-height density button. |
+| `showExport` | `boolean` | follows `enableExport` | Show the Export menu (CSV / Excel / Print). Requires `enableExport`. |
+| `showStatusBar` | `boolean` | `false` | Show the status-bar footer — row counts + sum/avg/min/max/count of the selected range. |
 | `showColumnEditToggle` | `boolean` | `false` | Add a per-column **edit lock/unlock** (✏️) to the Columns menu, so an end-user can make an editable column read-only at runtime. Requires `enableEditing`. |
 | `showFilterBuilder` | `boolean` | `false` | Show the Filters button + filter-builder panel (E3). |
 | `showFormatBuilder` | `boolean` | `false` | Show the Formats button + conditional-format builder panel (K3). Needs `enableConditionalFormatting` (default on). |

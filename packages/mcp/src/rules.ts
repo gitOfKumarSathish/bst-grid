@@ -53,6 +53,10 @@ export const RULES: Record<string, FlagRule> = {
   enableColumnFilterRow: {
     requires: ['enableColumnFilters'],
   },
+  enableSetFilter: {
+    requires: ['enableColumnFilters'],
+    note: 'Excel-style checklist of distinct values per column (AG4), rendered in the per-column filter row — so also turn on `enableColumnFilterRow`. Categorical columns (singleSelect / multiSelect / radio / boolean) are auto-eligible; force or skip per column via `meta.filter: "set" | "condition"`.',
+  },
   fitColumns: {
     conflictsWith: [
       { flag: 'enableColumnResizing', why: '`fitColumns` suppresses the resizers' },
@@ -124,6 +128,23 @@ export const RULES: Record<string, FlagRule> = {
     note: 'Defaults to ON — set false to disable Shift+Space row copy while keeping the rest of the clipboard.',
   },
 
+  // ---- Export (AG1–AG3) ----
+  enableExport: {
+    note: 'Off by default. `true` enables CSV + Excel + Print; pass a `BstExportOptions` object to pick formats / file name / row scope. Drives `runtime.exportCsv` / `exportExcel` / `printTable`; adapters render an "Export" toolbar menu (`showExport`). Dependency-free — the `.xlsx` is a hand-built OOXML package, no exceljs.',
+  },
+  enableCsvExport: {
+    requires: ['enableExport'],
+    note: 'Defaults to ON — set false to hide the CSV item / no-op `runtime.exportCsv` while keeping Excel + Print.',
+  },
+  enableExcelExport: {
+    requires: ['enableExport'],
+    note: 'Defaults to ON — set false to hide the Excel item / no-op `runtime.exportExcel`. Emits a real `.xlsx` (numeric cells typed).',
+  },
+  enablePrint: {
+    requires: ['enableExport'],
+    note: 'Defaults to ON — set false to hide the Print item / no-op `runtime.printTable`.',
+  },
+
   // ---- Display / render ----
   enableCellSpanning: {
     needsOptions: [
@@ -163,6 +184,10 @@ export const RULES: Record<string, FlagRule> = {
   showUndoRedo: { requires: ['enableUndoRedo'] },
   showColumnEditToggle: { requires: ['enableEditing'] },
   showDensityToggle: {},
+  showExport: { requires: ['enableExport'] },
+  showStatusBar: {
+    note: 'Footer with total / filtered row counts (always). The selection sum / avg / min / max / count needs `enableCellSelection`.',
+  },
   showSettings: {
     note: 'Renders a gear → a sheet where END-USERS flip this grid\'s features on/off at runtime, persisted to localStorage.',
   },

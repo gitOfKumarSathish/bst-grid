@@ -38,7 +38,11 @@ type ExtraEngineSettingKey =
   | 'enableCellSpanning'
 
 /** Adapter chrome capabilities the sheet exposes (not part of the engine toggles). */
-type ChromeSettingKey = 'showFilterBuilder' | 'showFormatBuilder' | 'showDensityToggle'
+type ChromeSettingKey =
+  | 'showFilterBuilder'
+  | 'showFormatBuilder'
+  | 'showDensityToggle'
+  | 'showStatusBar'
 
 // Compile-time guard: every "extra" key must be a real `UseBstTableOptions` field,
 // so a rename/removal upstream surfaces here rather than silently dropping a toggle.
@@ -67,6 +71,12 @@ interface SettingMeta {
   /** Short hint rendered under the label. */
   hint?: string
   /**
+   * Prerequisite toggles: this setting is inert unless **every** listed key is
+   * active (transitively). The sheet renders it **disabled** while any prerequisite
+   * is off — mirrors the `requires` edges in `packages/mcp/src/rules.ts`.
+   */
+  requires?: BstSettingKey[]
+  /**
    * Derive the developer-provided value from OTHER props when the flag itself is
    * unset — for toggles whose semantic lives inside an options object (e.g.
    * `enableBatchEditing` follows `enableEditing.mode === 'batch'`). Receives the
@@ -87,6 +97,7 @@ const SETTINGS_META: Record<BstSettingKey, SettingMeta> = {
   enableSorting: { group: 'Data operations', default: true, alwaysShow: true, label: 'Sorting' },
   enableGlobalFilter: { group: 'Data operations', default: true, alwaysShow: true, label: 'Global search', hint: 'The toolbar search box' },
   enableColumnFilters: { group: 'Data operations', default: true, alwaysShow: true, label: 'Column filters' },
+  enableSetFilter: { group: 'Data operations', default: false, alwaysShow: true, label: 'Set filter', hint: 'Checklist of distinct values per column (AG4) · needs the per-column filter row', requires: ['enableColumnFilterRow'] },
   pagination: { group: 'Data operations', default: true, alwaysShow: true, label: 'Pagination', hint: 'Off shows every row' },
   enableGrouping: { group: 'Data operations', default: false, alwaysShow: true, label: 'Row grouping', hint: 'Group rows + aggregates (E4)' },
   // Columns
@@ -94,7 +105,7 @@ const SETTINGS_META: Record<BstSettingKey, SettingMeta> = {
   enableHiding: { group: 'Columns', default: true, alwaysShow: true, label: 'Show / hide columns' },
   enableColumnPinning: { group: 'Columns', default: false, label: 'Pin columns' },
   enableColumnOrdering: { group: 'Columns', default: false, label: 'Reorder columns' },
-  enableColumnFilterRow: { group: 'Columns', default: false, alwaysShow: true, label: 'Per-column filter row', hint: 'Filter inputs under each header · needs Column filters' },
+  enableColumnFilterRow: { group: 'Columns', default: false, alwaysShow: true, label: 'Per-column filter row', hint: 'Filter inputs under each header · needs Column filters', requires: ['enableColumnFilters'] },
   fitColumns: { group: 'Columns', default: false, label: 'Fit columns to width', hint: 'No horizontal scroll (G3)' },
   enableResponsive: { group: 'Columns', default: false, label: 'Responsive columns', hint: 'Hide low-priority columns when narrow (G4)' },
   // Rows
@@ -109,6 +120,7 @@ const SETTINGS_META: Record<BstSettingKey, SettingMeta> = {
     alwaysShow: true,
     label: 'Batch editing',
     hint: 'Edits stay unsaved until Review & save — one batched call · needs Inline editing',
+    requires: ['enableEditing'],
     // The switch reflects the REAL mode: an explicit flag wins, else it follows
     // `enableEditing.mode === 'batch'` — so a `{ mode: 'batch' }` grid shows ON.
     getBase: (p) =>
@@ -118,15 +130,15 @@ const SETTINGS_META: Record<BstSettingKey, SettingMeta> = {
           p.enableEditing !== null &&
           (p.enableEditing as { mode?: string }).mode === 'batch',
   },
-  enableValidation: { group: 'Editing', default: false, label: 'Validation' },
+  enableValidation: { group: 'Editing', default: false, label: 'Validation', requires: ['enableEditing'] },
   enableRowActions: { group: 'Editing', default: false, label: 'Add / delete rows' },
   enableUndoRedo: { group: 'Editing', default: false, label: 'Undo / redo' },
   // Selection & clipboard
   enableRowSelection: { group: 'Selection & clipboard', default: false, label: 'Row selection' },
   enableCellSelection: { group: 'Selection & clipboard', default: false, label: 'Cell selection' },
   enableClipboard: { group: 'Selection & clipboard', default: false, label: 'Copy & paste', hint: 'Ctrl/⌘+C · Ctrl/⌘+V' },
-  enableCopyColumn: { group: 'Selection & clipboard', default: true, alwaysShow: true, label: 'Copy column', hint: 'Ctrl/⌘+Space · needs Copy & paste' },
-  enableCopyRow: { group: 'Selection & clipboard', default: true, alwaysShow: true, label: 'Copy row', hint: 'Shift+Space · needs Copy & paste' },
+  enableCopyColumn: { group: 'Selection & clipboard', default: true, alwaysShow: true, label: 'Copy column', hint: 'Ctrl/⌘+Space · needs Copy & paste', requires: ['enableClipboard'] },
+  enableCopyRow: { group: 'Selection & clipboard', default: true, alwaysShow: true, label: 'Copy row', hint: 'Shift+Space · needs Copy & paste', requires: ['enableClipboard'] },
   // Display
   enableCellSpanning: { group: 'Display', default: false, label: 'Cell spanning', hint: 'Merge repeated cells (A5)' },
   enableConditionalFormatting: {
@@ -136,15 +148,51 @@ const SETTINGS_META: Record<BstSettingKey, SettingMeta> = {
     label: 'Conditional formatting',
     hint: 'Rule-based cell / row styling (K3) — needs `conditionalFormats` rules',
   },
-  showFilterBuilder: { group: 'Display', default: false, label: 'Filter builder' },
+  showFilterBuilder: { group: 'Display', default: false, label: 'Filter builder', requires: ['enableColumnFilters'] },
   showFormatBuilder: {
     group: 'Display',
     default: false,
     alwaysShow: true,
     label: 'Format builder',
     hint: 'Toolbar "Formats" button — build rules at runtime (K3)',
+    requires: ['enableConditionalFormatting'],
   },
   showDensityToggle: { group: 'Display', default: false, label: 'Density toggle' },
+  showStatusBar: { group: 'Display', default: false, label: 'Status bar', hint: 'Row counts + sum / avg / min / max of the selection (AG5)' },
+  // Export (AG1–AG3) — an opt-in capability plus per-format sub-toggles, mirroring
+  // the clipboard pattern (master off; formats default-on, always shown with a
+  // "needs Export" hint) so an end-user can switch export on and pick formats.
+  enableExport: {
+    group: 'Export',
+    default: false,
+    alwaysShow: true,
+    label: 'Export',
+    hint: 'Toolbar Export menu — download CSV / Excel or print',
+  },
+  enableCsvExport: {
+    group: 'Export',
+    default: true,
+    alwaysShow: true,
+    label: 'CSV export',
+    hint: 'needs Export',
+    requires: ['enableExport'],
+  },
+  enableExcelExport: {
+    group: 'Export',
+    default: true,
+    alwaysShow: true,
+    label: 'Excel export',
+    hint: 'needs Export',
+    requires: ['enableExport'],
+  },
+  enablePrint: {
+    group: 'Export',
+    default: true,
+    alwaysShow: true,
+    label: 'Print',
+    hint: 'needs Export',
+    requires: ['enableExport'],
+  },
   // Performance (default-off, but always shown so a user can switch virtualization
   // on themselves for a large grid — like Row grouping)
   enableVirtualization: {
@@ -160,6 +208,7 @@ const SETTINGS_META: Record<BstSettingKey, SettingMeta> = {
     alwaysShow: true,
     label: 'Column virtualization',
     hint: 'Also window wide grids horizontally · needs Row virtualization',
+    requires: ['enableVirtualization'],
   },
 }
 
@@ -178,6 +227,7 @@ interface RegistryEntry {
   default: boolean
   alwaysShow: boolean
   hint?: string
+  requires?: BstSettingKey[]
   getBase?: (props: Record<string, unknown>) => boolean
 }
 
@@ -199,6 +249,7 @@ export const BST_SETTINGS_REGISTRY: readonly RegistryEntry[] = (
     default: m.default,
     alwaysShow: m.alwaysShow ?? false,
     hint: m.hint,
+    requires: m.requires,
     getBase: m.getBase,
   }
 })
@@ -220,6 +271,27 @@ function baseOf(key: BstSettingKey, props: Record<string, unknown>): boolean {
   return resolveBool(props[key], DEFAULT_BY_KEY[key])
 }
 
+/**
+ * Is a setting **effectively active** — on itself AND every prerequisite
+ * (`requires`) transitively active? Drives the sheet's dependency cascade: turning
+ * a parent off disables its dependents, and re-enabling it brings them back. Pure;
+ * exported for testing. `props` should be the override-applied (effective) props.
+ */
+export function isSettingActive(
+  key: BstSettingKey,
+  props: Record<string, unknown>,
+  seen: Set<BstSettingKey> = new Set(),
+): boolean {
+  if (seen.has(key)) return true
+  seen.add(key)
+  if (!baseOf(key, props)) return false
+  const reqs = ENTRY_BY_KEY.get(key)?.requires
+  if (reqs) {
+    for (const r of reqs) if (!isSettingActive(r, props, seen)) return false
+  }
+  return true
+}
+
 /** One toggle in the settings sheet — its live value plus mutators. */
 export interface BstSettingsItem {
   key: BstSettingKey
@@ -231,6 +303,13 @@ export interface BstSettingsItem {
   value: boolean
   /** True when the user has changed this away from the developer-provided value. */
   overridden: boolean
+  /**
+   * A prerequisite (`requires`) is off, so this toggle can't take effect — the
+   * sheet renders it disabled and non-interactive until the parent is back on.
+   */
+  disabled: boolean
+  /** Label of the prerequisite blocking it (for a tooltip), when `disabled`. */
+  disabledBy?: string
   set: (next: boolean) => void
   toggle: () => void
   reset: () => void
@@ -273,6 +352,13 @@ export interface BstSettingsOptions {
   persistKey?: string
   /** Persist the user's choices to `localStorage`. Default `true`. */
   persist?: boolean
+  /**
+   * Show a search box in the sheet to filter the toggle list — the sheet can list
+   * 30+ features, so it's on by default but appears **only once the sheet has more
+   * than a handful of items** (`{@link shouldShowSettingsSearch}`). `true` always
+   * shows it; `false` never. Filters by label / hint / group name.
+   */
+  search?: boolean
 }
 
 /** Overrides map — a subset of keys the user has explicitly set. */
@@ -414,6 +500,8 @@ export function useBstSettings<P extends object>(
       : entry.alwaysShow || base || entry.key in overrides
     if (!shown) continue
     const value = baseOf(entry.key, effRec)
+    // Dependency cascade: disabled while any prerequisite is (transitively) off.
+    const blockingReq = entry.requires?.find((r) => !isSettingActive(r, effRec))
     items.push({
       key: entry.key,
       label: entry.label,
@@ -422,6 +510,8 @@ export function useBstSettings<P extends object>(
       hint: entry.hint,
       value,
       overridden: entry.key in overrides,
+      disabled: blockingReq !== undefined,
+      disabledBy: blockingReq ? ENTRY_BY_KEY.get(blockingReq)?.label : undefined,
       set: (next: boolean) => setOverride(entry.key, next),
       toggle: () => setOverride(entry.key, !value),
       reset: () => clearOverride(entry.key),
@@ -447,4 +537,48 @@ export function useBstSettings<P extends object>(
   }
 
   return { props: effectiveProps, model }
+}
+
+/**
+ * Filter the sheet's groups by a free-text query (case-insensitive), for the
+ * search box. A setting matches on its **label** or **hint**; a group whose
+ * **name** matches keeps all its items (so "export" surfaces the whole Export
+ * section). An empty / whitespace query returns the groups unchanged. Pure — both
+ * adapters share it, like the rest of this model. Returns fresh group objects
+ * (item references reused) so callers never mutate the source model.
+ */
+export function filterSettingsGroups(
+  groups: readonly BstSettingsGroup[],
+  query: string,
+): BstSettingsGroup[] {
+  const q = query.trim().toLowerCase()
+  if (!q) return groups.map((g) => ({ name: g.name, items: g.items.slice() }))
+  const out: BstSettingsGroup[] = []
+  for (const g of groups) {
+    if (g.name.toLowerCase().includes(q)) {
+      out.push({ name: g.name, items: g.items.slice() })
+      continue
+    }
+    const items = g.items.filter(
+      (it) =>
+        it.label.toLowerCase().includes(q) ||
+        (it.hint ? it.hint.toLowerCase().includes(q) : false),
+    )
+    if (items.length) out.push({ name: g.name, items })
+  }
+  return out
+}
+
+/**
+ * Resolve whether the sheet shows its search box. `false` → never; `true` →
+ * always; omitted → auto (only for lists longer than a handful, so a short sheet
+ * stays clutter-free). Keeps both adapters' behaviour identical.
+ */
+export function shouldShowSettingsSearch(
+  search: boolean | undefined,
+  itemCount: number,
+): boolean {
+  if (search === false) return false
+  if (search === true) return true
+  return itemCount > 6
 }

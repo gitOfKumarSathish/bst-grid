@@ -462,6 +462,7 @@ means *passing the object implies enabled*.
 | `enableSorting` | `boolean` | `true` | Column sorting (v9). |
 | `enableGlobalFilter` | `boolean` | `true` | Global search. |
 | `enableColumnFilters` | `boolean` | `true` | Per-column filtering / filter builder. |
+| `enableSetFilter` | `boolean` | `false` | [Set Filter](#filtering) (AG4) — a distinct-values checklist per column in the filter row. Needs `enableColumnFilters` + `enableColumnFilterRow`. |
 | `enableGrouping` | `boolean` | `false` | Multi-column [grouping](#grouping-and-aggregation) + aggregates. |
 | `pagination` | `boolean \| { pageSize?: number }` | `true` (10) | Pagination; `false` shows all rows. |
 
@@ -517,6 +518,13 @@ means *passing the object implies enabled*.
 | `disabled` | `boolean` | `false` | Disable the whole grid (F1). |
 | `rowDisabled` | `(row) => boolean` | — | Disable interaction per row (F2). |
 | `cellDisabled` | `({ row, rowId, columnId }) => boolean` | — | Disable interaction per cell (F4). |
+
+**Export (AG1–AG3)**
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `enableExport` | `boolean \| BstExportOptions` | `false` | [Export](#export-csv--excel--print) as CSV / Excel / print. Object form: `{ csv?, excel?, print?, fileName?, scope?, includeHeaders? }` (an object implies enabled). |
+| `enableCsvExport` / `enableExcelExport` / `enablePrint` | `boolean` | `true` | Per-format sub-toggles of `enableExport` (also the settings-sheet switches). |
 
 **Cells & styling**
 
@@ -656,11 +664,47 @@ const table = useBstTable<Task>({
   all pages** (pre-pagination, in filter+sort order). Gate it with `enableCopyColumn` (default `true`).
 - **Whole-row copy (H2)** — **Shift+Space** / `runtime.copyRow(id)`. Gate with `enableCopyRow` (default `true`).
 - **Drive it programmatically** — via `useBstGrid` → `runtime.setActiveCell` / `moveActive` /
-  `getSelectionMatrix` / `copySelection` / `pasteFromText`.
+  `getSelectionMatrix` / `copySelection` / `pasteFromText`. `runtime.getSelectionStats()` returns
+  `{ count, numericCount, sum, avg, min, max }` over the selection — the AG5 **status bar**
+  (`showStatusBar` in the adapters) renders it.
 
 > Selection lives in the interaction store (not `table.setState`) and is materialised at paint from the
 > active/anchor cell ids — moving the cursor re-renders only the cells whose state changed, never the
 > whole grid.
+
+## Export (CSV / Excel / print)
+
+**Use it.** `enableExport` adds a toolbar **Export** menu — download **CSV**, download **Excel**
+(`.xlsx`) or **print** — and the programmatic API `runtime.exportCsv()` / `exportExcel()` /
+`printTable()`. Values are formatted **per cell type** (so the file matches what the grid shows and
+what copy produces), and the default scope is **every filtered + sorted row across all pages**
+(pre-pagination), not just the visible page.
+
+```tsx
+const table = useBstTable<Row>({
+  data, columns, getRowId: (r) => r.id,
+  enableExport: { fileName: 'people' },   // or `enableExport: true`
+})
+```
+
+**Customize.** Pass a `BstExportOptions` object (an object implies enabled, §12):
+
+| Field | Type | Default | Effect |
+| --- | --- | --- | --- |
+| `csv` / `excel` / `print` | `boolean` | `true` | Which formats the menu offers. Also settable at the top level as `enableCsvExport` / `enableExcelExport` / `enablePrint` — the settings-sheet switches, which win. |
+| `fileName` | `string` | `'export'` | Base download name; the extension is added per format. |
+| `scope` | `'all' \| 'page'` | `'all'` | Export every page (pre-pagination) or just the current page. |
+| `includeHeaders` | `boolean` | `true` | Write the header row. |
+
+- **Dependency-free.** CSV is RFC-4180 (quoted fields, UTF-8 BOM so Excel reads it). The `.xlsx` is a
+  real OOXML package built here from a store-only ZIP + SpreadsheetML — **no `exceljs` / `sheetjs`**;
+  `number` cells are written as typed numeric cells. Print opens a standalone, styled table view.
+- **Per-call overrides.** Each `runtime.export*` accepts `{ scope?, fileName?, includeHeaders?, delimiter? }`
+  (e.g. `runtime.exportCsv({ scope: 'page', delimiter: ';' })`).
+- **Serializers are exported** for custom flows: `toCsv`, `toXlsx`, `buildPrintHtml`, plus
+  `downloadBlob` / `printHtml` (both no-op under SSR).
+- Adapters render the menu via `showExport` (default: follows `enableExport`); action columns and
+  grouped/aggregate rows are skipped automatically.
 
 ## Access control
 
@@ -751,6 +795,12 @@ return (
   number (`= ≠ > < between`), date (on / after / before / between), select (is / is not), boolean.
 - **Per-column filter row** — `enableColumnFilterRow` renders a type-aware input under each header
   (the "dual filter"; coexists with the builder panel).
+- **Set Filter (AG4)** — `enableSetFilter` turns the filter-row control for categorical columns
+  (`singleSelect` / `multiSelect` / `radio` / `boolean`) into an Excel-style **checklist of distinct
+  values** (`BstSetFilter`: search · select-all / clear · per-value counts · a "(Blanks)" bucket).
+  Force it on any column with `meta.filter: 'set'`, or off with `meta.filter: 'condition'`. It writes an
+  `{ op: 'set' }` condition, so it composes with the builder and `bstCondition`. Needs
+  `enableColumnFilters` **and** the filter row visible (`enableColumnFilterRow`).
 - **Compose your own** — the exported `evalCondition`, `operatorsForType`, and `*_OPERATORS` tables let
   you build custom filter UIs. Read active filters via `table.state.columnFilters`.
 
@@ -950,10 +1000,15 @@ const table = useBstTable(effective)   // enable*/show* now reflect the user's c
   wired for) — but a few end-user escape hatches stay **always shown** even unprovisioned: row grouping,
   copy column/row, the per-column filter row, **row resize**, and row/column virtualization. Pass
   `features: BstSettingKey[]` to curate the list.
+- **Search** — the sheet lists 30+ toggles, so adapters render a **search box** (highlighted header +
+  a filter input) that narrows the list by label / hint / group name. On by default, it appears only
+  once the sheet has more than a handful of items; `search: false` hides it, `search: true` always shows
+  it. The matching is the pure helper `filterSettingsGroups(model.groups, query)` — both adapters share it.
 - **Persistence** — on by default under a key derived from your columns; set `persistKey` to disambiguate,
   or `persist: false` for in-memory only.
-- Exports: `applySettingsOverrides(props, overrides)` and `BST_SETTINGS_REGISTRY` (ordered metadata). The
-  list is derived from the engine's own toggle interface, so new features show up automatically.
+- Exports: `applySettingsOverrides(props, overrides)`, `filterSettingsGroups` / `shouldShowSettingsSearch`
+  (the search helpers), and `BST_SETTINGS_REGISTRY` (ordered metadata). The list is derived from the
+  engine's own toggle interface, so new features show up automatically.
 
 ## Virtualization (D1)
 

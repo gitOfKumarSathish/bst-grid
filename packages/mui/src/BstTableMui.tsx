@@ -2,6 +2,8 @@ import * as React from 'react'
 import {
   useBstGrid,
   useBstSettings,
+  filterSettingsGroups,
+  shouldShowSettingsSearch,
   BstTable,
   BstFilterBuilder,
   BstConditionalFormatBuilder,
@@ -33,6 +35,7 @@ import Switch from '@mui/material/Switch'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListSubheader from '@mui/material/ListSubheader'
+import InputAdornment from '@mui/material/InputAdornment'
 import Divider from '@mui/material/Divider'
 import SearchIcon from '@mui/icons-material/Search'
 import ViewColumnIcon from '@mui/icons-material/ViewColumn'
@@ -57,6 +60,7 @@ import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import SegmentIcon from '@mui/icons-material/Segment'
+import FileDownloadIcon from '@mui/icons-material/FileDownload'
 import { useTheme } from '@mui/material/styles'
 import { createMuiPreset } from './celltypes.js'
 import type { BstIconOverrides, IconProps } from '@bloomskill/table-engine'
@@ -95,6 +99,19 @@ export interface BstTableMuiProps<TData extends RowData> extends UseBstTableOpti
   showUndoRedo?: boolean
   /** Row-height density toggle button (compact / normal / comfortable). Default: false. */
   showDensityToggle?: boolean
+  /**
+   * Export menu (CSV / Excel / Print) in the toolbar (AG1–AG3). Requires
+   * `enableExport`; the menu items follow the per-format sub-toggles
+   * (`enableCsvExport` / `enableExcelExport` / `enablePrint`). Default: follows
+   * `enableExport`.
+   */
+  showExport?: boolean
+  /**
+   * Status bar footer (AG5) — total / filtered row count, and, when a cell range
+   * is selected, the sum / avg / min / max / count of its numeric cells. Default:
+   * false.
+   */
+  showStatusBar?: boolean
   /** Filter-builder button + panel (E3). Requires `enableColumnFilters`. Default: false. */
   showFilterBuilder?: boolean
   /**
@@ -160,6 +177,8 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
     showSelectionInfo,
     showUndoRedo,
     showDensityToggle,
+    showExport,
+    showStatusBar,
     showFilterBuilder,
     showFormatBuilder,
     onConditionalFormatsChange,
@@ -191,7 +210,7 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
     cellTypes: preset,
     conditionalFormats: effectiveFormats,
   } as UseBstTableOptions<TData>
-  const { table, runtime } = useBstGrid<TData>(gridOpts)
+  const { table, runtime, handle } = useBstGrid<TData>(gridOpts)
   const theme = useTheme()
   // Forward MUI icons into the engine body so the whole grid is Material-consistent.
   const bodyIcons = React.useMemo<BstIconOverrides>(
@@ -208,7 +227,13 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
     [],
   )
   const [colAnchor, setColAnchor] = React.useState<null | HTMLElement>(null)
+  const [exportAnchor, setExportAnchor] = React.useState<null | HTMLElement>(null)
   const [settingsOpen, setSettingsOpen] = React.useState(false)
+  const [settingsQuery, setSettingsQuery] = React.useState('')
+  const closeSettings = React.useCallback(() => {
+    setSettingsOpen(false)
+    setSettingsQuery('')
+  }, [])
   const [changesOpen, setChangesOpen] = React.useState(false)
   const [saving, setSaving] = React.useState(false)
   const [saveError, setSaveError] = React.useState(false)
@@ -224,6 +249,13 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
   void drafts
   const canUndo = useStoreSelector(runtime.store, (s) => s.undoDepth > 0)
   const canRedo = useStoreSelector(runtime.store, (s) => s.redoDepth > 0)
+  // Re-render the status bar when the selection changes (stats read on render).
+  const selKey = useStoreSelector(runtime.store, (s) =>
+    s.activeCell && s.anchorCell
+      ? `${s.activeCell.rowId}|${s.activeCell.columnId}|${s.anchorCell.rowId}|${s.anchorCell.columnId}|${s.wholeSelect?.id ?? ''}`
+      : '',
+  )
+  void selKey
   // Subscribe to per-column edit overrides so the menu toggle reflects them live.
   const columnEdit = useStoreSelector(runtime.store, (s) => s.columnEdit)
   const colIsEditable = (col: any): boolean =>
@@ -260,6 +292,11 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
   const copyColumnOn = clipboardOn && rest.enableCopyColumn !== false
   const editToggleOn = !!showColumnEditToggle && editingOn
   const densityOn = !!showDensityToggle
+  const statusBarOn = !!showStatusBar
+  const exportFmts = handle.exportFormats
+  const exportEnabled =
+    handle.enableExport && (exportFmts.csv || exportFmts.excel || exportFmts.print)
+  const exportOn = (showExport ?? exportEnabled) && exportEnabled
   const filterBuilderOn = !!showFilterBuilder && (rest.enableColumnFilters ?? true)
   const formatBuilderOn = !!showFormatBuilder && rest.enableConditionalFormatting !== false
   const [formatsOpen, setFormatsOpen] = React.useState(false)
@@ -278,6 +315,10 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
   }, [rest.columns])
   const settingsOn = settingsEnabled && settings.items.length > 0
   const settingsTitle = settingsOptions?.title ?? 'Table settings'
+  const settingsSearchOn = shouldShowSettingsSearch(settingsOptions?.search, settings.items.length)
+  const settingsGroups = settingsSearchOn
+    ? filterSettingsGroups(settings.groups, settingsQuery)
+    : settings.groups
   const activeFilterCount = (table.state.columnFilters ?? []).length
   const paginationEnabled = rest.pagination !== false
   const paginationBarOn = (showPagination ?? paginationEnabled) && paginationEnabled
@@ -292,6 +333,7 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
       selectionInfoOn ||
       undoRedoOn ||
       densityOn ||
+      exportOn ||
       filterBuilderOn ||
       formatBuilderOn ||
       settingsOn)
@@ -312,6 +354,10 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
   const total = table.getRowCount()
   const from = total === 0 ? 0 : pg.pageIndex * pg.pageSize + 1
   const to = Math.min((pg.pageIndex + 1) * pg.pageSize, total)
+  // Status bar (AG5): pre-filter total + selection aggregates.
+  const statusBarTotal = table.getPreFilteredRowModel().rows.length
+  const selStats = statusBarOn ? runtime.getSelectionStats() : null
+  const fmtStat = (n: number) => n.toLocaleString(undefined, { maximumFractionDigits: 2 })
   const colLabel = (col: any) =>
     typeof col.columnDef.header === 'string' ? col.columnDef.header : col.id
 
@@ -437,6 +483,53 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
             </Button>
           )}
           <span style={{ flex: 1 }} />
+          {exportOn && (
+            <>
+              <Button
+                size="small"
+                startIcon={<FileDownloadIcon />}
+                onClick={(e) => setExportAnchor(e.currentTarget)}
+              >
+                Export
+              </Button>
+              <Menu
+                anchorEl={exportAnchor}
+                open={!!exportAnchor}
+                onClose={() => setExportAnchor(null)}
+              >
+                {exportFmts.csv && (
+                  <MenuItem
+                    onClick={() => {
+                      runtime.exportCsv()
+                      setExportAnchor(null)
+                    }}
+                  >
+                    Download CSV
+                  </MenuItem>
+                )}
+                {exportFmts.excel && (
+                  <MenuItem
+                    onClick={() => {
+                      runtime.exportExcel()
+                      setExportAnchor(null)
+                    }}
+                  >
+                    Download Excel
+                  </MenuItem>
+                )}
+                {exportFmts.print && (
+                  <MenuItem
+                    onClick={() => {
+                      runtime.printTable()
+                      setExportAnchor(null)
+                    }}
+                  >
+                    Print
+                  </MenuItem>
+                )}
+              </Menu>
+            </>
+          )}
           {undoRedoOn && (
             <>
               <IconButton
@@ -648,7 +741,7 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
       )}
 
       {settingsOn && (
-        <Drawer anchor="right" open={settingsOpen} onClose={() => setSettingsOpen(false)}>
+        <Drawer anchor="right" open={settingsOpen} onClose={closeSettings}>
           <Box sx={{ width: 320, display: 'flex', flexDirection: 'column', height: '100%' }}>
             <Stack
               direction="row"
@@ -657,8 +750,8 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
                 alignItems: 'center',
                 px: 2,
                 py: 1.5,
-                borderBottom: 1,
-                borderColor: 'divider',
+                bgcolor: 'primary.main',
+                color: 'primary.contrastText',
               }}
             >
               <Typography variant="subtitle1" sx={{ fontWeight: 600, flex: 1 }}>
@@ -667,19 +760,61 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
               <IconButton
                 size="small"
                 aria-label="Close settings"
-                onClick={() => setSettingsOpen(false)}
+                onClick={closeSettings}
+                sx={{ color: 'inherit' }}
               >
                 <CloseIcon fontSize="small" />
               </IconButton>
             </Stack>
+            {settingsSearchOn && (
+              <Box sx={{ px: 2, py: 1.25, borderBottom: 1, borderColor: 'divider' }}>
+                <TextField
+                  size="small"
+                  fullWidth
+                  autoFocus
+                  placeholder="Search settings…"
+                  value={settingsQuery}
+                  onChange={(e) => setSettingsQuery(e.target.value)}
+                  slotProps={{
+                    input: {
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <SearchIcon fontSize="small" />
+                        </InputAdornment>
+                      ),
+                    },
+                  }}
+                />
+              </Box>
+            )}
             <Box sx={{ flex: 1, overflowY: 'auto' }}>
-              {settings.groups.map((group) => (
+              {settingsGroups.length === 0 && (
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ px: 2, py: 3, textAlign: 'center' }}
+                >
+                  No settings match “{settingsQuery}”.
+                </Typography>
+              )}
+              {settingsGroups.map((group, gi) => (
                 <List
                   key={group.name}
                   dense
                   disablePadding
+                  sx={gi > 0 ? { borderTop: 1, borderColor: 'divider' } : undefined}
                   subheader={
-                    <ListSubheader disableSticky sx={{ lineHeight: '32px', fontWeight: 600 }}>
+                    <ListSubheader
+                      disableSticky
+                      sx={{
+                        lineHeight: '40px',
+                        fontWeight: 700,
+                        fontSize: '0.75rem',
+                        letterSpacing: '0.07em',
+                        textTransform: 'uppercase',
+                        color: 'text.primary',
+                      }}
+                    >
                       {group.name}
                     </ListSubheader>
                   }
@@ -687,17 +822,26 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
                   {group.items.map((item) => (
                     <ListItem
                       key={item.key}
+                      sx={item.disabled ? { opacity: 0.5 } : undefined}
                       secondaryAction={
                         <Switch
                           edge="end"
                           size="small"
-                          checked={item.value}
+                          checked={item.value && !item.disabled}
+                          disabled={item.disabled}
                           onChange={(e) => item.set(e.target.checked)}
                           slotProps={{ input: { 'aria-label': item.label } }}
                         />
                       }
                     >
-                      <ListItemText primary={item.label} secondary={item.hint} />
+                      <ListItemText
+                        primary={item.label}
+                        secondary={
+                          item.disabled && item.disabledBy
+                            ? `Needs ${item.disabledBy}`
+                            : item.hint
+                        }
+                      />
                     </ListItem>
                   ))}
                 </List>
@@ -925,6 +1069,39 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
           >
             <ChevronRightIcon />
           </IconButton>
+        </Stack>
+      )}
+
+      {statusBarOn && (
+        <Stack
+          direction="row"
+          spacing={1}
+          sx={{
+            alignItems: 'center',
+            px: 1.5,
+            py: 0.75,
+            borderTop: 1,
+            borderColor: 'divider',
+            fontSize: 13,
+            color: 'text.secondary',
+            flexWrap: 'wrap',
+          }}
+        >
+          <span>
+            {total.toLocaleString()} {total === 1 ? 'row' : 'rows'}
+            {total < statusBarTotal ? ` (of ${statusBarTotal.toLocaleString()})` : ''}
+          </span>
+          {rowSelectionOn && selectedCount > 0 && <span>· {selectedCount} selected</span>}
+          <span style={{ flex: 1 }} />
+          {selStats && selStats.numericCount > 0 && (
+            <span>
+              Sum {fmtStat(selStats.sum)} · Avg {fmtStat(selStats.avg)} · Min {fmtStat(selStats.min)} ·
+              Max {fmtStat(selStats.max)} · Count {selStats.count}
+            </span>
+          )}
+          {selStats && selStats.numericCount === 0 && selStats.count > 1 && (
+            <span>Count {selStats.count}</span>
+          )}
         </Stack>
       )}
     </Paper>

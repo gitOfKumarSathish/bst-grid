@@ -68,7 +68,7 @@ const spanColumns: BstTableColumn<SpanRowT>[] = [
 const groupColumns: BstTableColumn<Person>[] = [
   { id: 'role', accessorKey: 'role', header: 'Role', meta: { type: 'text' } },
   { id: 'name', accessorKey: 'name', header: 'Name', meta: { type: 'text' } },
-  { id: 'plan', accessorKey: 'plan', header: 'Plan', meta: { type: 'text' } },
+  { id: 'plan', accessorKey: 'plan', header: 'Plan', meta: { type: 'text', filter: 'set' } },
   {
     id: 'salary', accessorKey: 'salary', header: 'Salary (Σ)', aggregationFn: 'sum',
     meta: { type: 'number', align: 'right', cellMeta: { currency: 'USD', precision: 0 } },
@@ -378,6 +378,8 @@ export default function App() {
     showDensityToggle: true, // compact / normal / comfortable
     showFilterBuilder: true, // per-column condition builder (E3)
     enableColumnFilterRow: true, // per-column filter inputs under the header ("dual filter")
+    enableSetFilter: true, // AG4: categorical columns (see role/plan) get a distinct-values checklist
+    showStatusBar: true, // AG5: footer — row counts + selection sum/avg/min/max
     enableExpanding: true, // master-detail (A4): click ▸ for a detail panel
     renderDetail: (r: Person) => (
       <div
@@ -545,6 +547,7 @@ export default function App() {
             showFormatBuilder // K3: 🎨 Formats button → conditional-format rule builder
             conditionalFormats={cfRules}
             onConditionalFormatsChange={setCfRules}
+            enableExport={{ fileName: 'people' }} // Phase 5 (AG1–AG3): CSV / Excel / Print toolbar menu
             showSettings={{ persistKey: 'demo-mui' }}
           />
         </section>
@@ -562,6 +565,7 @@ export default function App() {
             showFormatBuilder // K3: 🎨 Formats button → conditional-format rule builder
             conditionalFormats={cfRules}
             onConditionalFormatsChange={setCfRules}
+            enableExport={{ fileName: 'people' }} // Phase 5 (AG1–AG3): CSV / Excel / Print toolbar menu
             showSettings={{ persistKey: 'demo-sc' }}
           />
         </section>

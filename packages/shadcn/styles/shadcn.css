@@ -453,12 +453,55 @@
   align-items: center;
   gap: 8px;
   padding: 14px 16px;
+  /* Soft highlighted header band — a muted accent fill (not the heavy primary)
+     with a hairline divider, so the title reads as a header without a harsh block.
+     `--sc-accent` and `--sc-fg` co-flip, so it stays right in light and dark. */
+  background: var(--sc-accent);
+  color: var(--sc-fg);
   border-bottom: 1px solid var(--sc-border);
+}
+/* Ghost the header close button — the base .sc-btn has a solid --sc-bg fill +
+   border that would sit as a chunky box on the band; keep it borderless so it
+   reads as a header affordance, icon in the foreground colour. */
+.sc-sheet-header .sc-btn {
+  color: var(--sc-fg);
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+.sc-sheet-header .sc-btn:hover {
+  background: color-mix(in srgb, var(--sc-fg) 10%, transparent);
+  border-color: transparent;
 }
 .sc-sheet-title {
   flex: 1;
   font-weight: 600;
   font-size: 15px;
+}
+/* Search box under the header — filters the (30+) toggle list */
+.sc-sheet-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--sc-border);
+}
+.sc-sheet-search-icon {
+  position: absolute;
+  left: 26px;
+  color: var(--sc-muted);
+  pointer-events: none;
+}
+.sc-sheet-search .sc-input {
+  width: 100%;
+  min-width: 0;
+  padding-left: 32px;
+}
+.sc-sheet-empty {
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--sc-muted);
+  font-size: 13px;
 }
 .sc-sheet-body {
   flex: 1;
@@ -468,13 +511,17 @@
 .sc-sheet-group {
   padding: 4px 0 8px;
 }
+/* Divider line above each section (between consecutive groups). */
+.sc-sheet-group + .sc-sheet-group {
+  border-top: 1px solid var(--sc-border);
+}
 .sc-sheet-group-label {
-  padding: 8px 16px 4px;
-  font-size: 11px;
-  font-weight: 600;
+  padding: 12px 16px 4px;
+  font-size: 12px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--sc-muted);
+  letter-spacing: 0.06em;
+  color: var(--sc-fg);
 }
 .sc-sheet-row {
   display: flex;
@@ -485,6 +532,14 @@
 }
 .sc-sheet-row:hover {
   background: var(--sc-accent);
+}
+/* A prerequisite is off → the toggle is disabled and dimmed (dependency cascade). */
+.sc-sheet-row-disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.sc-sheet-row-disabled:hover {
+  background: transparent;
 }
 .sc-sheet-row-text {
   flex: 1;

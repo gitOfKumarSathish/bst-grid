@@ -10,6 +10,74 @@ this project uses [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+## [0.35.0] — 2026-08-17
+### Added — Set Filter + status bar (Phase 6, AG4–AG5)
+- **Set Filter (`enableSetFilter`, AG4)** — an Excel-style **checklist of distinct values** per column
+  in the filter row (`BstSetFilter`: search · select-all / clear · per-value counts · a "(Blanks)"
+  bucket). A new `{ op: 'set' }` condition on the existing `bstCondition` filterFn, so it composes with
+  the filter builder; multi-value cells match on any element; selecting every value clears the filter,
+  an empty selection matches nothing. Categorical columns (`singleSelect`/`multiSelect`/`radio`/
+  `boolean`) are auto-eligible; `meta.filter: 'set' | 'condition'` forces or opts out. Needs
+  `enableColumnFilters` + `enableColumnFilterRow`. Exported `BstSetFilter`. `@bloomskill/table-engine`.
+- **Status bar (`showStatusBar`, AG5)** — an adapter footer with total / filtered row counts and, when
+  a cell range is selected, the **sum · avg · min · max · count** of its numeric cells via new
+  **`runtime.getSelectionStats()`** (exported `BstSelectionStats`). MUI + shadcn.
+- Both are settings-sheet toggles (`enableSetFilter` → "Data operations", `showStatusBar` → "Display").
+  Tested (`setFilter.test.tsx`, `selectionStats.test.ts`). Closes COVERAGE `AG4`–`AG5`; see `Plan.md`
+  PART 3 "Phase 6".
+### Fixed — engine
+- Set Filter popover no longer inherits the header cell's centred / bold typography — the panel owns
+  its own text layout, so each value's label is left-aligned immediately beside its checkbox.
+### Added — Settings sheet: search box + highlighted header
+- The runtime settings sheet (`showSettings`) now renders a **highlighted header band**, **prominent
+  uppercase section headings** (Data operations, Columns, …), and — because the sheet can list 30+
+  toggles — a **search box** that filters the list by **label / hint / group name**. Search is on by
+  default (appears once the sheet has more than a handful of items); hide it with
+  `showSettings={{ search: false }}`, force it with `search: true`.
+- New pure, headless helpers on `@bloomskill/table-engine`, shared by both adapters:
+  **`filterSettingsGroups(groups, query)`** and **`shouldShowSettingsSearch(search, itemCount)`**.
+- Both skins updated: MUI (Drawer — `primary` header bar + `TextField` search) and shadcn
+  (`.sc-sheet-header` soft muted-accent band + `.sc-sheet-search` input); each shows a "No settings
+  match …" empty state and clears the query when the sheet closes.
+
+> Builds on the **0.34.0** Export slice documented below; shipped together in this publish.
+
+## [0.34.0] — 2026-08-17
+### Added — Export: CSV / Excel / print (Phase 5, AG1–AG3)
+- **`enableExport`** (`boolean | BstExportOptions`) adds a toolbar **Export** menu (`showExport`) and
+  the runtime API `runtime.exportCsv()` / `exportExcel()` / `printTable()`. Values are formatted
+  **per cell type** (the file matches the grid and copy output); the default scope is **every filtered
+  + sorted row across all pages** (pre-pagination), configurable to the current page via
+  `scope: 'page'`. `@bloomskill/table-engine`.
+- **Dependency-free** serializers, all exported: `toCsv` (RFC-4180 + UTF-8 BOM), `toXlsx` (a real
+  `.xlsx` — a hand-built store-only ZIP + SpreadsheetML with typed numeric cells, **no `exceljs` /
+  `sheetjs`**), `buildPrintHtml`, plus `downloadBlob` / `printHtml` DOM glue (both SSR-safe no-ops).
+- Per-format sub-toggles **`enableCsvExport` / `enableExcelExport` / `enablePrint`** (default on) gate
+  each menu item and `runtime.export*` method, and are **settings-sheet switches** (new "Export"
+  group, always shown) so an end-user can switch export on and choose formats themselves.
+- Adapters render the menu — MUI `Menu`, shadcn Radix `DropdownMenu` (`@bloomskill/table-mui`,
+  `@bloomskill/table-shadcn`). Action columns and grouped / aggregate rows are skipped automatically.
+- Tested (`export.test.ts`: CSV escaping/BOM/scope, `.xlsx` ZIP + OOXML structure, print HTML,
+  per-format gating). Closes COVERAGE `AG1`–`AG3`; see `Plan.md` PART 3 "Phase 5".
+
+### Changed — `@bloomskill/table-engine`
+- **Row resize (G2) is now always shown in the settings sheet** (`enableRowResize`, "Rows" group,
+  `alwaysShow: true`). Like row/column virtualization, an end-user can switch row resizing on from
+  the ⚙ settings sheet without any developer wiring — previously the toggle only appeared once a
+  developer had already enabled it in code, so it looked missing. Also wired into the demo
+  (`apps/demo`) so the behaviour is visible live.
+
+### Fixed — `@bloomskill/table-mcp` (stale coverage in tool docs / validator)
+- `bst_get_feature`'s description and examples no longer claim **D1 row/column virtualization** is
+  "NOT implemented" — it (and A2 infinite scroll) shipped in 0.33.0. The not-built example now cites
+  **I5** (live/WebSocket merge), the one standing ❌ leaf.
+- `bst_validate_config` no longer flags **`uploadFile`/`deleteFile`** as not-built — the formal
+  `DataSource` file verbs (I3) shipped, so the stale `NOT_BUILT` rule is removed.
+- The **PDF** `NOT_BUILT` rule is narrowed to *thumbnails* only (the in-cell pdf.js render, still
+  deferred); PDF **preview** is built (`BstFilePreview`), so "pdf preview" is no longer refused.
+- Stale `enableVirtualization`-as-not-built examples in `validate.ts` comments swapped for genuine
+  gaps (`onWebSocketUpdate` / I5).
+
 ## [0.33.1] — 2026-08-13
 ### Fixed — coordinate-space refactor (Tier 2; `@bloomskill/table-engine`)
 - Cell selection / keyboard nav / paste now build their coordinate space from the **painted**

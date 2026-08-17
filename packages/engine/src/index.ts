@@ -15,6 +15,8 @@ export type { BstIcons, BstIconOverrides, IconProps, IconComponent } from './ico
 
 // ---- filter builder (E3) ----
 export { BstFilterBuilder } from './BstFilterBuilder.js'
+export { BstSetFilter } from './BstSetFilter.js'
+export type { BstSetFilterProps, BstSetFilterOption } from './BstSetFilter.js'
 export {
   operatorsForType,
   operatorArity,
@@ -91,6 +93,28 @@ export type { BstCellSpan, BstSpanContext, SpanPlan, SpanRow, SpanCol } from './
 export { computeAutoWidth, measureTextWidth } from './autosize.js'
 export type { AutoSizeOptions } from './autosize.js'
 
+// Export (Phase 5, AG1–AG3) — dep-free CSV / Excel / print serializers + DOM glue.
+export {
+  toCsv,
+  toXlsx,
+  buildPrintHtml,
+  downloadBlob,
+  printHtml,
+  ensureExtension,
+  EXPORT_MIME,
+} from './export.js'
+export type {
+  BstExportColumn,
+  BstExportMatrix,
+  BstExportOptions,
+  BstExportRunOptions,
+  BstExportFormat,
+  BstExportScope,
+  CsvOptions,
+  XlsxOptions,
+  PrintOptions,
+} from './export.js'
+
 // ---- conditional formatting (K3) ----
 export { BstConditionalFormatBuilder } from './BstConditionalFormatBuilder.js'
 export type { BstFormatBuilderColumn } from './BstConditionalFormatBuilder.js'
@@ -104,7 +128,13 @@ export type {
 } from './formatting.js'
 
 // ---- runtime settings sheet (§12 chrome — per-table feature toggles) ----
-export { useBstSettings, applySettingsOverrides, BST_SETTINGS_REGISTRY } from './settings.js'
+export {
+  useBstSettings,
+  applySettingsOverrides,
+  filterSettingsGroups,
+  shouldShowSettingsSearch,
+  BST_SETTINGS_REGISTRY,
+} from './settings.js'
 export type {
   BstSettingKey,
   BstSettingsItem,
@@ -210,6 +240,7 @@ export type {
   CommitPolicy,
   VisualIndex,
   MoveActiveOptions,
+  BstSelectionStats,
 } from './runtime.js'
 export { runValidators, hasBlockingError } from './validation/validate.js'
 

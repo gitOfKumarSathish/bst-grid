@@ -2,6 +2,8 @@ import * as React from 'react'
 import {
   useBstGrid,
   useBstSettings,
+  filterSettingsGroups,
+  shouldShowSettingsSearch,
   BstTable,
   BstFilterBuilder,
   BstConditionalFormatBuilder,
@@ -74,6 +76,18 @@ export interface BstTableShadcnProps<TData extends RowData> extends UseBstTableO
   showUndoRedo?: boolean
   /** Row-height density toggle button (compact / normal / comfortable). Default: false. */
   showDensityToggle?: boolean
+  /**
+   * Export menu (CSV / Excel / Print) in the toolbar (AG1–AG3). Requires
+   * `enableExport`; items follow the per-format sub-toggles (`enableCsvExport` /
+   * `enableExcelExport` / `enablePrint`). Default: follows `enableExport`.
+   */
+  showExport?: boolean
+  /**
+   * Status bar footer (AG5) — total / filtered row count, and, when a cell range
+   * is selected, the sum / avg / min / max / count of its numeric cells. Default:
+   * false.
+   */
+  showStatusBar?: boolean
   /** Filter-builder button + panel (E3). Requires `enableColumnFilters`. Default: false. */
   showFilterBuilder?: boolean
   /**
@@ -191,6 +205,8 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
     showSelectionInfo,
     showUndoRedo,
     showDensityToggle,
+    showExport,
+    showStatusBar,
     showFilterBuilder,
     showFormatBuilder,
     onConditionalFormatsChange,
@@ -222,7 +238,7 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
     cellTypes: preset,
     conditionalFormats: effectiveFormats,
   } as UseBstTableOptions<TData>
-  const { table, runtime } = useBstGrid<TData>(gridOpts)
+  const { table, runtime, handle } = useBstGrid<TData>(gridOpts)
   const I = React.useMemo(() => resolveIcons(icons), [icons])
   // Forward the resolved chrome icons into the engine body for the overlapping
   // slots, so the whole grid uses one icon set. Sort arrows + file-type icons
@@ -254,6 +270,13 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
   void drafts
   const canUndo = useStoreSelector(runtime.store, (s) => s.undoDepth > 0)
   const canRedo = useStoreSelector(runtime.store, (s) => s.redoDepth > 0)
+  // Re-render the status bar when the selection changes (stats read on render).
+  const selKey = useStoreSelector(runtime.store, (s) =>
+    s.activeCell && s.anchorCell
+      ? `${s.activeCell.rowId}|${s.activeCell.columnId}|${s.anchorCell.rowId}|${s.anchorCell.columnId}|${s.wholeSelect?.id ?? ''}`
+      : '',
+  )
+  void selKey
   // Subscribe to the per-column edit overrides so the menu toggle reflects them live.
   const columnEdit = useStoreSelector(runtime.store, (s) => s.columnEdit)
   // A column is edit-capable (gets the toggle) when it declares `meta.editable`.
@@ -270,6 +293,12 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
     setDensity((d) => (d === 'normal' ? 'compact' : d === 'compact' ? 'comfortable' : 'normal'))
   const [filtersOpen, setFiltersOpen] = React.useState(false)
   const [settingsOpen, setSettingsOpen] = React.useState(false)
+  const [settingsQuery, setSettingsQuery] = React.useState('')
+  // Clear the search whenever the sheet closes (covers every close path: overlay,
+  // close button, Escape) so it reopens fresh.
+  React.useEffect(() => {
+    if (!settingsOpen) setSettingsQuery('')
+  }, [settingsOpen])
   const [changesOpen, setChangesOpen] = React.useState(false)
   const [saving, setSaving] = React.useState(false)
   const [saveError, setSaveError] = React.useState(false)
@@ -330,6 +359,11 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
   const copyColumnOn = clipboardOn && rest.enableCopyColumn !== false
   const editToggleOn = !!showColumnEditToggle && editingOn
   const densityOn = !!showDensityToggle
+  const statusBarOn = !!showStatusBar
+  const exportFmts = handle.exportFormats
+  const exportEnabled =
+    handle.enableExport && (exportFmts.csv || exportFmts.excel || exportFmts.print)
+  const exportOn = (showExport ?? exportEnabled) && exportEnabled
   const filterBuilderOn = !!showFilterBuilder && (rest.enableColumnFilters ?? true)
   const formatBuilderOn = !!showFormatBuilder && rest.enableConditionalFormatting !== false
   const [formatsOpen, setFormatsOpen] = React.useState(false)
@@ -348,6 +382,10 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
   }, [rest.columns])
   const settingsOn = settingsEnabled && settings.items.length > 0
   const settingsTitle = settingsOptions?.title ?? 'Table settings'
+  const settingsSearchOn = shouldShowSettingsSearch(settingsOptions?.search, settings.items.length)
+  const settingsGroups = settingsSearchOn
+    ? filterSettingsGroups(settings.groups, settingsQuery)
+    : settings.groups
 
   // Focus-trap the dependency-free slide-over sheets (#20): focus enters on open,
   // Tab cycles within, and focus is restored to the opener on close.
@@ -367,6 +405,7 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
       selectionInfoOn ||
       undoRedoOn ||
       densityOn ||
+      exportOn ||
       filterBuilderOn ||
       formatBuilderOn ||
       settingsOn)
@@ -375,6 +414,10 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
   const total = table.getRowCount()
   const from = total === 0 ? 0 : pg.pageIndex * pg.pageSize + 1
   const to = Math.min((pg.pageIndex + 1) * pg.pageSize, total)
+  // Status bar (AG5): pre-filter total + selection aggregates.
+  const statusBarTotal = table.getPreFilteredRowModel().rows.length
+  const selStats = statusBarOn ? runtime.getSelectionStats() : null
+  const fmtStat = (n: number) => n.toLocaleString(undefined, { maximumFractionDigits: 2 })
   const colLabel = (col: any) =>
     typeof col.columnDef.header === 'string' ? col.columnDef.header : col.id
 
@@ -462,6 +505,61 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
             </button>
           )}
           <span style={{ flex: 1 }} />
+          {exportOn && (
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger asChild>
+                <button className="sc-btn" aria-label="Export">
+                  {/* Inline download glyph (lucide idiom), so no icon-slot churn. */}
+                  <svg
+                    width={16}
+                    height={16}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" x2="12" y1="15" y2="3" />
+                  </svg>
+                  Export
+                  <I.chevronDown size={16} />
+                </button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Portal>
+                <DropdownMenu.Content className={menuClass} align="end" sideOffset={4}>
+                  {exportFmts.csv && (
+                    <DropdownMenu.Item
+                      className="sc-menu-item"
+                      onSelect={() => runtime.exportCsv()}
+                    >
+                      Download CSV
+                    </DropdownMenu.Item>
+                  )}
+                  {exportFmts.excel && (
+                    <DropdownMenu.Item
+                      className="sc-menu-item"
+                      onSelect={() => runtime.exportExcel()}
+                    >
+                      Download Excel
+                    </DropdownMenu.Item>
+                  )}
+                  {exportFmts.print && (
+                    <DropdownMenu.Item
+                      className="sc-menu-item"
+                      onSelect={() => runtime.printTable()}
+                    >
+                      Print
+                    </DropdownMenu.Item>
+                  )}
+                </DropdownMenu.Content>
+              </DropdownMenu.Portal>
+            </DropdownMenu.Root>
+          )}
           {undoRedoOn && (
             <>
               <button
@@ -681,22 +779,50 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
                 <I.close size={16} />
               </button>
             </div>
+            {settingsSearchOn && (
+              <div className="sc-sheet-search">
+                <I.search size={15} className="sc-sheet-search-icon" />
+                <input
+                  type="search"
+                  className="sc-input"
+                  placeholder="Search settings…"
+                  aria-label="Search settings"
+                  value={settingsQuery}
+                  onChange={(e) => setSettingsQuery(e.target.value)}
+                />
+              </div>
+            )}
             <div className="sc-sheet-body">
-              {settings.groups.map((group) => (
+              {settingsGroups.length === 0 && (
+                <div className="sc-sheet-empty">No settings match “{settingsQuery}”.</div>
+              )}
+              {settingsGroups.map((group) => (
                 <div key={group.name} className="sc-sheet-group">
                   <div className="sc-sheet-group-label">{group.name}</div>
                   {group.items.map((item) => (
-                    <label key={item.key} className="sc-sheet-row">
+                    <label
+                      key={item.key}
+                      className={`sc-sheet-row${item.disabled ? ' sc-sheet-row-disabled' : ''}`}
+                    >
                       <span className="sc-sheet-row-text">
                         <span>{item.label}</span>
-                        {item.hint && <span className="sc-sheet-hint">{item.hint}</span>}
+                        {(item.disabled && item.disabledBy
+                          ? `Needs ${item.disabledBy}`
+                          : item.hint) && (
+                          <span className="sc-sheet-hint">
+                            {item.disabled && item.disabledBy
+                              ? `Needs ${item.disabledBy}`
+                              : item.hint}
+                          </span>
+                        )}
                       </span>
                       <input
                         type="checkbox"
                         className="sc-switch-input"
                         role="switch"
                         aria-label={item.label}
-                        checked={item.value}
+                        checked={item.value && !item.disabled}
+                        disabled={item.disabled}
                         onChange={(e) => item.set(e.target.checked)}
                       />
                     </label>
@@ -880,6 +1006,28 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
           >
             <I.chevronRight size={18} />
           </button>
+        </div>
+      )}
+
+      {statusBarOn && (
+        <div className="sc-footer sc-statusbar">
+          <span className="sc-muted">
+            {total.toLocaleString()} {total === 1 ? 'row' : 'rows'}
+            {total < statusBarTotal ? ` (of ${statusBarTotal.toLocaleString()})` : ''}
+          </span>
+          {rowSelectionOn && selectedCount > 0 && (
+            <span className="sc-muted">· {selectedCount} selected</span>
+          )}
+          <span style={{ flex: 1 }} />
+          {selStats && selStats.numericCount > 0 && (
+            <span className="sc-muted">
+              Sum {fmtStat(selStats.sum)} · Avg {fmtStat(selStats.avg)} · Min {fmtStat(selStats.min)} ·
+              Max {fmtStat(selStats.max)} · Count {selStats.count}
+            </span>
+          )}
+          {selStats && selStats.numericCount === 0 && selStats.count > 1 && (
+            <span className="sc-muted">Count {selStats.count}</span>
+          )}
         </div>
       )}
     </div>

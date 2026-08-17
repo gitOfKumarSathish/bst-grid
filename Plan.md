@@ -508,6 +508,54 @@ column-virtualization flip-on, server-side grouping, viz cell types.
 
 ---
 
+### Phases 5–8 — AG Grid parity roadmap  *(post-original-spec, added 2026-08-13)*
+
+Phases 1–4 deliver the original 58-leaf spec. A 2026-08-13 audit against **AG Grid** (Community +
+Enterprise) found Bst-Table already matches most AG Grid **Enterprise** paid features — range
+selection, clipboard, batch editing, grouping + aggregation, master-detail, sparklines, advanced-filter
+builder, server row model — all shipped **free**. The remaining parity gaps schedule as four new phases
+(easy → hard). Full analysis: [`docs/ag-grid-gap-analysis.md`](docs/ag-grid-gap-analysis.md); status
+IDs **`AG1–AG29`** in [`COVERAGE.md`](COVERAGE.md). These map to Milestones A–D in the gap doc.
+
+**Phase 4 remainder (parity-relevant, already in Phase 4 scope):** i18n / localeText (`AG19`) ·
+a11y / ARIA grid audit (`AG20`) · grid-state save/restore API (`AG21`) · live / WebSocket updates —
+I5 (`AG22`) · formal loading / error overlays (`AG23`).
+
+**Phase 5 — Export & interop**  *(✅ shipped v0.34.0)*
+CSV export (`AG1`) · Excel `.xlsx` export (`AG2`) · print / print-friendly view (`AG3`). Delivered
+**dependency-free** — `toCsv` / `toXlsx` (hand-built store-only ZIP + OOXML, **no ExcelJS**) /
+`buildPrintHtml`, gated by `enableExport` (+ per-format `enableCsvExport`/`enableExcelExport`/
+`enablePrint` settings switches), driven by `runtime.exportCsv`/`exportExcel`/`printTable`, with an
+Export menu in both adapters (`showExport`).
+→ *Deliverable:* every grid can download CSV / Excel and print.
+
+**Phase 6 — AG-Grid-grade chrome & filtering**  *(in progress)*
+**Set Filter** — distinct-values checklist (`AG4` ✅) · **status bar** — row count + sum/avg/count of
+selection (`AG5` ✅) · right-click context menu (`AG6`) · tool-panel sidebar — Columns + Filters
+(`AG7`) · Find — highlight + jump (`AG8`) · row-number column (`AG9`) · managed row dragging (`AG10`) ·
+multi-filter per column (`AG11`) · fill handle (`AG12`).
+→ *Deliverable:* the chrome + filtering an AG Grid user expects on day one.
+**Shipped:** `AG4` (`enableSetFilter` + `BstSetFilter`, an `{op:'set'}` condition) and `AG5`
+(`showStatusBar` + `runtime.getSelectionStats`). **Remaining:** AG6–AG12.
+
+**Phase 7 — Hierarchy, analytics & scale**
+Tree data — self-referencing hierarchy (`AG13`) · pivoting (`AG14`) · integrated charts, range → chart
+(`AG15`) · advanced server-side row model — server group/pivot/tree + lazy expand (`AG16`) ·
+calculated / formula columns (`AG17`) · cell notes / comments (`AG18`).
+→ *Deliverable:* enterprise-heavyweight analytics + true server-side scale.
+
+**Phase 8 — Polish & parity tail**
+RTL (`AG24`) · row/column move+sort animations (`AG25`) · auto row height (`AG26`) · auto-generate
+columns (`AG27`) · cell flashing on change (`AG28`) · aligned grids (`AG29`).
+→ *Deliverable:* the last-mile polish.
+
+Each item ships behind a §12 toggle (`enable*` / `show*`) with the full Definition of Done (demo +
+README + CHANGELOG + version bump). Every **AG Grid Enterprise-paid** capability above (Set Filter,
+status bar, context menu, tool panels, fill handle, tree data, pivoting, integrated charts, advanced
+SSRM, cell notes, multi-filter) ships **free** — MIT/Apache only, per the licensing constraint.
+
+---
+
 ## PART 4 — Spec gaps to add + v9 gotchas
 
 ### Add (missing for a workflow-tier grid)
@@ -679,3 +727,14 @@ nobody. **Result: 44/58 clean, 14 findings, all closed or converted to an open q
       + the `CLAUDE.md` §12 registry. **Tail (deferred):** draggable **row-resize** (G2) and **D3
       sampled auto-size** were not in the shipped layout slice; **Phase 4** (server DataSource / 1M
       tier, infinite scroll, viz cells, live updates, a11y/perf hardening) is next.
+- [ ] **Phase 4 remainder** — server DataSource / virtualization / infinite scroll / viz cells shipped;
+      **still open:** i18n (`AG19`), a11y/ARIA audit (`AG20`), grid-state save/restore API (`AG21`),
+      live/WebSocket updates I5 (`AG22`), formal loading/error overlays (`AG23`).
+- [x] **Phase 5 — Export (AG1–AG3) shipped** (v0.34.0) — CSV / Excel (`.xlsx`, dependency-free) / print
+      via `enableExport` + `runtime.exportCsv`/`exportExcel`/`printTable`; both adapters render the
+      Export menu (`showExport`). `export.test.ts` green.
+- [ ] **Phase 6 in progress** — ✅ Set Filter (`AG4`) + status bar (`AG5`) shipped; **remaining:**
+      context menu (`AG6`), tool-panel sidebar (`AG7`), Find (`AG8`), row-number column (`AG9`), row
+      drag (`AG10`), multi-filter (`AG11`), fill handle (`AG12`).
+- [ ] **Phases 7–8 — AG Grid parity roadmap** — hierarchy/analytics P7 · polish P8. See PART 3
+      "Phases 5–8", the `AG1–AG29` matrix in `COVERAGE.md`, and `docs/ag-grid-gap-analysis.md`.

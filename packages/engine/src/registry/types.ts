@@ -61,6 +61,14 @@ export interface BstColumnMeta<TData extends RowData = any, TValue = any> {
   disabled?: boolean | ((row: TData) => boolean)
   /** Options for option-based cells (singleSelect / multiSelect / radio). */
   options?: BstOption[]
+  /**
+   * Per-column filter UI in the filter row (AG4). With `enableSetFilter` on,
+   * `'set'` forces the **Set Filter** (a checklist of distinct values) for this
+   * column, and `'condition'` opts back into the default operator input. When
+   * unset, categorical columns (`singleSelect` / `multiSelect` / `radio` /
+   * `boolean`) use the Set Filter and the rest use the condition input.
+   */
+  filter?: 'set' | 'condition'
   /** Display format: an `Intl.*` options bag, or a shorthand string. */
   format?: string | Record<string, unknown>
   /** BCP-47 locale for number / date parse + format. */

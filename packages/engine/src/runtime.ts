@@ -18,6 +18,21 @@ import type {
   FieldError,
 } from './registry/types.js'
 import { hasBlockingError, runValidators } from './validation/validate.js'
+import {
+  toCsv,
+  toXlsx,
+  buildPrintHtml,
+  downloadBlob,
+  printHtml,
+  ensureExtension,
+  EXPORT_MIME,
+} from './export.js'
+import type {
+  BstExportColumn,
+  BstExportMatrix,
+  BstExportRunOptions,
+  BstExportScope,
+} from './export.js'
 
 export type SaveTrigger = 'enter' | 'blur' | 'explicit'
 export type CommitPolicy = 'blockCommitOnError' | 'commitButFlag'
@@ -81,6 +96,22 @@ export interface VisualIndex {
   c: number
 }
 
+/** Aggregate of the current cell selection — shown in the status bar (AG5). */
+export interface BstSelectionStats {
+  /** Total selected cells (real data rows only). */
+  count: number
+  /** How many of the selected cells hold a numeric value. */
+  numericCount: number
+  /** Sum of the numeric cells. */
+  sum: number
+  /** Mean of the numeric cells (0 when none). */
+  avg: number
+  /** Min of the numeric cells (0 when none). */
+  min: number
+  /** Max of the numeric cells (0 when none). */
+  max: number
+}
+
 /** Options for `moveActive` — how the keyboard cursor should step. */
 export interface MoveActiveOptions {
   /** Keep the anchor and only move the focus end (Shift+Arrow range grow). */
@@ -103,6 +134,8 @@ export interface RuntimeCtx<TData extends RowData> {
   getRowId: (row: TData, index: number) => string
   metaByColumn: Map<string, BstColumnMeta<TData>>
   fieldByColumn: Map<string, string>
+  /** `columnId → header text` (string header, else the column id) — for export. */
+  headerByColumn: Map<string, string>
   columnIds: string[]
   /** Row ids in current visual (post sort/filter/pagination) order. */
   visibleRowIds: string[]
@@ -124,6 +157,21 @@ export interface RuntimeCtx<TData extends RowData> {
   /** Row-copy (H2) enabled. `false` disables `selectRow`/`copyRow`. Default: true. */
   enableCopyRow?: boolean
   enableUndoRedo: boolean
+  // ---- export (Phase 5, AG1–AG3) ----
+  /** Export capability on. `false` makes every `export*` method a no-op. */
+  enableExport?: boolean
+  /** CSV export enabled (sub-toggle of `enableExport`). Default: true. */
+  enableCsvExport?: boolean
+  /** Excel export enabled (sub-toggle of `enableExport`). Default: true. */
+  enableExcelExport?: boolean
+  /** Print enabled (sub-toggle of `enableExport`). Default: true. */
+  enablePrint?: boolean
+  /** Base download file name (extension added per format). Default `'export'`. */
+  exportFileName?: string
+  /** Default row scope for exports — `'all'` pages or the current `'page'`. */
+  exportScope?: BstExportScope
+  /** Default header inclusion for exports. Default true. */
+  exportIncludeHeaders?: boolean
   policy: CommitPolicy
   saveOn: SaveTrigger[]
   /** `mode: 'batch'` — every commit (and paste) defers to a draft; nothing
@@ -208,6 +256,9 @@ export interface BstRuntime<TData extends RowData> {
   visualIndexOf: (rowId: string, columnId: string) => VisualIndex | null
   /** The row / column ids inside the current selection rectangle (visual order). */
   getSelectionMatrix: () => { rowIds: string[]; columnIds: string[] } | null
+  /** Aggregate stats (count / sum / avg / min / max) over the current selection —
+   *  the AG5 status bar reads this. `null` when nothing is selected. */
+  getSelectionStats: () => BstSelectionStats | null
 
   // ---- clipboard (H1–H4) ----
   /** TSV of the current selection (values formatted per cell type), or `null`. */
@@ -224,6 +275,22 @@ export interface BstRuntime<TData extends RowData> {
   copyRow: (rowId: string) => Promise<string>
   /** Parse TSV and write it from the selection's top-left, honouring editability. */
   pasteFromText: (text: string) => void
+
+  // ---- export (Phase 5, AG1–AG3) ----
+  /** Build the export payload — headers + formatted display strings (+ raw values
+   *  for numeric Excel typing) for the current columns/rows. Skips action columns
+   *  and non-data (group/aggregate) rows. Scope `'all'` = every filtered+sorted
+   *  row across all pages (default); `'page'` = the current page only. */
+  getExportMatrix: (opts?: { scope?: BstExportScope }) => BstExportMatrix
+  /** Serialize to CSV and trigger a download; returns the CSV text (`''` when
+   *  export or CSV is off). */
+  exportCsv: (opts?: BstExportRunOptions) => string
+  /** Serialize to an Excel `.xlsx` and trigger a download; returns the bytes
+   *  (empty when export or Excel is off). */
+  exportExcel: (opts?: BstExportRunOptions) => Uint8Array
+  /** Open a print view and invoke the print dialog; returns the print HTML (`''`
+   *  when export or print is off). */
+  printTable: (opts?: BstExportRunOptions) => string
 
   // ---- resolution helpers (read by the renderer) ----
   isCellEditable: (rowId: string, columnId: string) => boolean
@@ -1051,6 +1118,42 @@ export function createRuntime<TData extends RowData>(
     }
   }
 
+  /** Parse a cell value to a finite number, or null (non-numeric / blank). */
+  const toNum = (v: unknown): number | null => {
+    if (typeof v === 'number') return Number.isFinite(v) ? v : null
+    if (typeof v === 'string' && v.trim() !== '') {
+      const n = Number(v)
+      return Number.isFinite(n) ? n : null
+    }
+    return null
+  }
+
+  const getSelectionStats = (): BstSelectionStats | null => {
+    const m = getSelectionMatrix()
+    if (!m) return null
+    let count = 0
+    const nums: number[] = []
+    for (const rid of m.rowIds) {
+      if (!isDataRow(rid)) continue
+      for (const cid of m.columnIds) {
+        count++
+        const n = toNum(draftAwareValue(rid, cid))
+        if (n != null) nums.push(n)
+      }
+    }
+    if (count === 0) return null
+    const numericCount = nums.length
+    const sum = nums.reduce((a, b) => a + b, 0)
+    return {
+      count,
+      numericCount,
+      sum,
+      avg: numericCount ? sum / numericCount : 0,
+      min: numericCount ? Math.min(...nums) : 0,
+      max: numericCount ? Math.max(...nums) : 0,
+    }
+  }
+
   /* ------------------------------------------------------------- clipboard */
 
   const cellClipboardText = (rowId: string, columnId: string): string =>
@@ -1217,6 +1320,79 @@ export function createRuntime<TData extends RowData>(
     }
   }
 
+  /* --------------------------------------------------------------- export */
+
+  /** Columns to export — visible leaf columns minus pure-UI action columns. */
+  const exportColumnIds = (): string[] =>
+    ctx.visibleColumnIds.filter((id) => {
+      const t = metaOf(id).type
+      return t !== 'action' && t !== 'actionMenu'
+    })
+
+  const getExportMatrix = (opts?: { scope?: BstExportScope }): BstExportMatrix => {
+    const scope = opts?.scope ?? ctx.exportScope ?? 'all'
+    const colIds = exportColumnIds()
+    const columns: BstExportColumn[] = colIds.map((id) => ({
+      id,
+      header: ctx.headerByColumn.get(id) ?? id,
+      numeric: metaOf(id).type === 'number',
+    }))
+    const scoped =
+      scope === 'page'
+        ? ctx.visibleRowIds
+        : ctx.allRowIds.length
+          ? ctx.allRowIds
+          : ctx.visibleRowIds
+    // Only real data rows — grouped / aggregated / phantom rows carry no cell value.
+    const rowIds = scoped.filter((rid) => isDataRow(rid))
+    const rows: string[][] = []
+    const values: unknown[][] = []
+    for (const rid of rowIds) {
+      rows.push(colIds.map((cid) => formatValue(cid, draftAwareValue(rid, cid))))
+      values.push(colIds.map((cid) => draftAwareValue(rid, cid)))
+    }
+    return { columns, rows, values }
+  }
+
+  const exportBaseName = (opts?: BstExportRunOptions): string =>
+    opts?.fileName ?? ctx.exportFileName ?? 'export'
+
+  const exportHeaders = (opts?: BstExportRunOptions): boolean =>
+    opts?.includeHeaders ?? ctx.exportIncludeHeaders ?? true
+
+  const exportCsv = (opts?: BstExportRunOptions): string => {
+    if (!ctx.enableExport || ctx.enableCsvExport === false) return ''
+    const includeHeaders = exportHeaders(opts)
+    const csv = toCsv(getExportMatrix({ scope: opts?.scope }), {
+      includeHeaders,
+      delimiter: opts?.delimiter,
+    })
+    downloadBlob(ensureExtension(exportBaseName(opts), 'csv'), EXPORT_MIME.csv, csv)
+    return csv
+  }
+
+  const exportExcel = (opts?: BstExportRunOptions): Uint8Array => {
+    if (!ctx.enableExport || ctx.enableExcelExport === false) return new Uint8Array()
+    const includeHeaders = exportHeaders(opts)
+    const bytes = toXlsx(getExportMatrix({ scope: opts?.scope }), {
+      includeHeaders,
+      sheetName: exportBaseName(opts),
+    })
+    downloadBlob(ensureExtension(exportBaseName(opts), 'xlsx'), EXPORT_MIME.xlsx, bytes)
+    return bytes
+  }
+
+  const printTable = (opts?: BstExportRunOptions): string => {
+    if (!ctx.enableExport || ctx.enablePrint === false) return ''
+    const includeHeaders = exportHeaders(opts)
+    const html = buildPrintHtml(getExportMatrix({ scope: opts?.scope }), {
+      title: exportBaseName(opts),
+      includeHeaders,
+    })
+    printHtml(html)
+    return html
+  }
+
   /* -------------------------------------------------------------- render glue */
 
   const buildCellApi = (
@@ -1278,6 +1454,7 @@ export function createRuntime<TData extends RowData>(
     clearSelection,
     visualIndexOf,
     getSelectionMatrix,
+    getSelectionStats,
     getSelectionClipboardText,
     getColumnClipboardText,
     getRowClipboardText,
@@ -1285,6 +1462,10 @@ export function createRuntime<TData extends RowData>(
     copyColumn,
     copyRow,
     pasteFromText,
+    getExportMatrix,
+    exportCsv,
+    exportExcel,
+    printTable,
     isCellEditable,
     isRowDisabled,
     isCellDisabled,

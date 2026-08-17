@@ -2,6 +2,7 @@ import * as React from 'react'
 import { flexRender } from '@tanstack/react-table'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { virtualizationBypassReason } from './virtualization.js'
+import { BstSetFilter } from './BstSetFilter.js'
 import { getBstRuntime } from './useBstTable.js'
 import type { BstRuntimeHandle } from './useBstTable.js'
 import { cellKey } from './interaction/store.js'
@@ -805,7 +806,7 @@ export function BstTable({
                       className={'bst-colfilter-th' + (pinnedLeft ? ' bst-pinned-left' : '')}
                       style={{ width: widthOf(col.id, col.getSize?.()), ...(pinnedLeft ? { left: pinLeft } : {}) }}
                     >
-                      <ColumnFilterCell column={col} />
+                      <ColumnFilterCell column={col} table={table} handle={handle} />
                     </th>
                   )
                 },
@@ -1074,7 +1075,15 @@ function SelectAllCheckbox({ table }: { table: any }) {
  * operator-aware `bstCondition` filterFn — so it and the filter-builder panel
  * are two views of the same state. The control shape follows `meta.type`.
  */
-function ColumnFilterCell({ column }: { column: any }) {
+function ColumnFilterCell({
+  column,
+  table,
+  handle,
+}: {
+  column: any
+  table?: any
+  handle?: BstRuntimeHandle<any>
+}) {
   const meta = (column.columnDef.meta ?? {}) as any
   const type = (meta.type ?? 'text') as string
   if (column.getCanFilter?.() === false || type === 'action') return null
@@ -1083,6 +1092,21 @@ function ColumnFilterCell({ column }: { column: any }) {
     typeof column.columnDef.header === 'string' && column.columnDef.header
       ? column.columnDef.header
       : column.id
+
+  // Set Filter (AG4): a distinct-values checklist for categorical / opted-in
+  // columns (needs `enableSetFilter`). `meta.filter: 'condition'` opts back out.
+  const setEligible =
+    !!handle?.enableSetFilter &&
+    meta.filter !== 'condition' &&
+    (meta.filter === 'set' ||
+      type === 'singleSelect' ||
+      type === 'multiSelect' ||
+      type === 'radio' ||
+      type === 'boolean')
+  if (setEligible && table) {
+    return <BstSetFilter column={column} table={table} label={label} />
+  }
+
   const clearOr = (v: unknown, op: string) =>
     v == null || v === '' ? column.setFilterValue(undefined) : column.setFilterValue({ op, value: v })
 

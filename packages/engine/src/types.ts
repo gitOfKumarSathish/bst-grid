@@ -6,6 +6,7 @@ import type { CellRenderProps } from './registry/types.js'
 import type { BstCellSpan, BstSpanContext } from './spanning.js'
 import type { BstFormatRule } from './formatting.js'
 import type { VirtualizationOptions } from './virtualization.js'
+import type { BstExportOptions } from './export.js'
 import type { BstSaveEvent, CommitPolicy, SaveTrigger } from './runtime.js'
 
 /** A Bst-Table column definition, pre-bound to the engine's feature set. */
@@ -95,6 +96,15 @@ export interface BstTableEngineToggles {
   enableGlobalFilter?: boolean
   /** Per-column filtering behaviour (drives the E3 filter builder). Maps to v9 `enableColumnFilters`. Default: true. */
   enableColumnFilters?: boolean
+  /**
+   * Set Filter (AG4) — an Excel-style **checklist of distinct values** per column,
+   * rendered in the per-column filter row. When on, categorical columns
+   * (`singleSelect` / `multiSelect` / `radio` / `boolean`) use the checklist; any
+   * column can force it via `meta.filter: 'set'` or opt out via
+   * `meta.filter: 'condition'`. Needs `enableColumnFilters` + the filter row
+   * (`enableColumnFilterRow`) to be visible. Default: false.
+   */
+  enableSetFilter?: boolean
   /** Column show/hide behaviour. Maps to v9 `enableHiding`. Default: true. */
   enableHiding?: boolean
   /** Column resizing. Maps to v9 `enableColumnResizing`. Default: true. */
@@ -209,6 +219,32 @@ export interface BstTableEngineToggles {
    * headers or cell spanning is active. Default false.
    */
   enableColumnVirtualization?: boolean
+  /**
+   * Export (Phase 5, AG1–AG3) — download the grid as **CSV** / **Excel** (`.xlsx`)
+   * or open a **print** view. `true` enables all three; pass a
+   * {@link BstExportOptions} object to choose formats and set the file name / row
+   * scope (an object implies enabled, §12). Opt-in. Default false. Adapters render
+   * an "Export" toolbar menu (`showExport`); drive it programmatically via
+   * `runtime.exportCsv()` / `runtime.exportExcel()` / `runtime.printTable()`.
+   * **Dependency-free** — the `.xlsx` is a hand-built OOXML package, no `exceljs`.
+   */
+  enableExport?: boolean | BstExportOptions
+  /**
+   * CSV export sub-toggle (AG1). `false` hides the CSV menu item and makes
+   * `runtime.exportCsv()` a no-op, while keeping Excel/Print. Needs
+   * `enableExport`. Default: true.
+   */
+  enableCsvExport?: boolean
+  /**
+   * Excel `.xlsx` export sub-toggle (AG2). `false` hides the Excel menu item and
+   * makes `runtime.exportExcel()` a no-op. Needs `enableExport`. Default: true.
+   */
+  enableExcelExport?: boolean
+  /**
+   * Print sub-toggle (AG3). `false` hides the Print menu item and makes
+   * `runtime.printTable()` a no-op. Needs `enableExport`. Default: true.
+   */
+  enablePrint?: boolean
 }
 
 export interface UseBstTableOptions<TData extends RowData> extends BstTableEngineToggles {

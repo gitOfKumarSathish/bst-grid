@@ -11,6 +11,7 @@ import type {
 } from './types.js'
 import type { BstCellSpan, BstSpanContext } from './spanning.js'
 import type { BstFormatRule } from './formatting.js'
+import type { BstExportOptions, BstExportScope } from './export.js'
 import { createRuntime } from './runtime.js'
 import type { BstRuntime, CommitPolicy, RuntimeCtx, SaveTrigger } from './runtime.js'
 import { createDefaultRegistry } from './registry/defaults.js'
@@ -37,6 +38,8 @@ export interface BstRuntimeHandle<TData extends RowData> {
   enableColumnOrdering: boolean
   /** Per-column header filter row is rendered (Phase 3, "dual filter"). */
   enableColumnFilterRow: boolean
+  /** Set Filter (AG4) — eligible columns show a distinct-values checklist in the filter row. */
+  enableSetFilter: boolean
   /** Cell/range selection + keyboard nav is active (Phase 3). */
   enableCellSelection: boolean
   /** Clipboard copy/paste is active (Phase 3). */
@@ -84,6 +87,10 @@ export interface BstRuntimeHandle<TData extends RowData> {
   onReachEnd?: () => void
   /** Rows-from-end that trigger `onReachEnd`. Default 8. */
   endReachedThreshold?: number
+  /** Export (AG1–AG3) is enabled — adapters render the "Export" toolbar menu. */
+  enableExport: boolean
+  /** Which export formats are on (CSV / Excel / Print) — filters the menu items. */
+  exportFormats: { csv: boolean; excel: boolean; print: boolean }
 }
 
 /** Column ids whose column def carries a user-authored `cell` renderer. */
@@ -126,6 +133,31 @@ function resolveValidation(
   return { enabled, policy: o.policy ?? fallbackPolicy }
 }
 
+/**
+ * Resolve the export toggles (Phase 5, AG1–AG3). `enableExport` is the master
+ * (`boolean | BstExportOptions`, an object implying enabled); the top-level
+ * per-format flags (`enableCsvExport`/`enableExcelExport`/`enablePrint`, the
+ * settings-sheet switches) win over the object's `csv`/`excel`/`print` fields.
+ */
+function resolveExport(
+  v: boolean | BstExportOptions | undefined,
+  csv?: boolean,
+  excel?: boolean,
+  print?: boolean,
+) {
+  const enabled = v === true || (typeof v === 'object' && v !== null)
+  const o = typeof v === 'object' && v !== null ? v : {}
+  return {
+    enabled,
+    csv: csv ?? o.csv ?? true,
+    excel: excel ?? o.excel ?? true,
+    print: print ?? o.print ?? true,
+    fileName: o.fileName ?? 'export',
+    scope: (o.scope ?? 'all') as BstExportScope,
+    includeHeaders: o.includeHeaders ?? true,
+  }
+}
+
 function buildCtx<TData extends RowData>(
   table: any,
   opts: UseBstTableOptions<TData>,
@@ -138,11 +170,14 @@ function buildCtx<TData extends RowData>(
 
   const metaByColumn = new Map<string, BstColumnMeta<TData>>()
   const fieldByColumn = new Map<string, string>()
+  const headerByColumn = new Map<string, string>()
   const columnIds: string[] = []
 
   for (const col of table.getAllLeafColumns() as any[]) {
     const id: string = col.id
     columnIds.push(id)
+    const header = col.columnDef.header
+    headerByColumn.set(id, typeof header === 'string' ? header : id)
     const rawMeta = (col.columnDef.meta ?? {}) as BstColumnMeta<TData>
     const cellType = registry.get(rawMeta.type)
     const merged: BstColumnMeta<TData> = {
@@ -163,6 +198,12 @@ function buildCtx<TData extends RowData>(
 
   const editing = resolveEditing(opts.enableEditing, opts.enableBatchEditing)
   const validation = resolveValidation(opts.enableValidation, editing.policy)
+  const exp = resolveExport(
+    opts.enableExport,
+    opts.enableCsvExport,
+    opts.enableExcelExport,
+    opts.enablePrint,
+  )
 
   // Visual (paint-order) maps — the coordinate space selection + keyboard nav
   // operate in. Row order is post sort/filter/pagination; column order is the
@@ -207,6 +248,7 @@ function buildCtx<TData extends RowData>(
     getRowId,
     metaByColumn,
     fieldByColumn,
+    headerByColumn,
     columnIds,
     visibleRowIds,
     allRowIds,
@@ -220,6 +262,13 @@ function buildCtx<TData extends RowData>(
     enableCopyColumn: opts.enableCopyColumn,
     enableCopyRow: opts.enableCopyRow,
     enableUndoRedo: !!opts.enableUndoRedo,
+    enableExport: exp.enabled,
+    enableCsvExport: exp.csv,
+    enableExcelExport: exp.excel,
+    enablePrint: exp.print,
+    exportFileName: exp.fileName,
+    exportScope: exp.scope,
+    exportIncludeHeaders: exp.includeHeaders,
     policy: validation.policy,
     saveOn: editing.saveOn,
     batchEditing: editing.mode === 'batch',
@@ -340,6 +389,7 @@ export function useBstTable<TData extends RowData>(opts: UseBstTableOptions<TDat
     enableColumnPinning: !!opts.enableColumnPinning,
     enableColumnOrdering: !!opts.enableColumnOrdering,
     enableColumnFilterRow: !!opts.enableColumnFilterRow && (opts.enableColumnFilters ?? true),
+    enableSetFilter: !!opts.enableSetFilter && (opts.enableColumnFilters ?? true),
     enableCellSelection: ctx.enableCellSelection,
     enableClipboard: ctx.enableClipboard,
     enableUndoRedo: ctx.enableUndoRedo,
@@ -362,6 +412,12 @@ export function useBstTable<TData extends RowData>(opts: UseBstTableOptions<TDat
     virtualization: resolveVirtualization(opts.enableVirtualization, opts.enableColumnVirtualization),
     onReachEnd: opts.onReachEnd,
     endReachedThreshold: opts.endReachedThreshold,
+    enableExport: !!ctx.enableExport,
+    exportFormats: {
+      csv: ctx.enableCsvExport !== false,
+      excel: ctx.enableExcelExport !== false,
+      print: ctx.enablePrint !== false,
+    },
   }
   ;(table as unknown as Record<symbol, unknown>)[BST_RUNTIME] = handle
 

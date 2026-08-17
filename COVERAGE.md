@@ -4,6 +4,11 @@ _2026-08-13, synced at **v0.32.2**. Compares the `CLAUDE.md` §11 requirement le
 (A1–M2) against what has shipped (`CHANGELOG` v0.1.0 → v0.32.2), verified against the
 engine + adapter source. Re-run when a version ships._
 
+> **Two matrices below.** (1) the original 58-leaf spec (A1–M2, immediately following); (2) **AG Grid
+> parity gaps** (`AG1–AG29`, at the bottom) — capabilities beyond the original spec, from the
+> 2026-08-13 AG Grid audit ([`docs/ag-grid-gap-analysis.md`](docs/ag-grid-gap-analysis.md)), phased in
+> `Plan.md` PART 3 "Phases 5–8".
+
 **Legend:** ✅ built · 🟡 partial · ❌ missing (needs the Phase-4 foundation / a new dep)
 **Tally:** ✅ 54 built · 🟡 3 partial · ❌ 1 missing (of 58). _(I3 file ops now ✅ — formal `DataSource.uploadFile`/`deleteFile`/`getFileUrl` verbs + `createFileHandlers` bridge on top of the cell-level upload/delete; D1 row/column virtualization + A2 infinite scroll shipped on `@tanstack/react-virtual` → both ✅, leaving I5 the only ❌; v0.30.0 — batch editing + `getChangeSet` + single-call `onSave` → I4 now partial; v0.28.0 server DataSource foundation → A3 server pagination done; v0.25.0 G2 row resize; v0.23.0 B1 QR/barcode + J2 rich-text)_
 
@@ -88,3 +93,51 @@ I4 **backend reconcile** (the change-set + single-call `onSave` half landed in v
 server's response back into cells/rows is what remains) · I5 live/WebSocket merge · the 1M migration
 tier proven end-to-end (A6).
 **Smaller / dep-gated:** B5 in-cell PDF **thumbnail** (pdf.js) — click-to-preview + upload/delete already ship (`BstFilePreview` + `cellMeta.onUpload`/`onDelete` + the formal `DataSource` file verbs).
+
+---
+
+## AG Grid parity gaps (beyond the original 58 leaves)
+
+_Added 2026-08-13 from an audit vs **AG Grid** Community + Enterprise — full analysis in
+[`docs/ag-grid-gap-analysis.md`](docs/ag-grid-gap-analysis.md), phased in `Plan.md` PART 3
+(Phase-4 remainder → Phase 8). **AG tier** = where AG Grid gates it: 🆓 Community · 💷 Enterprise (paid).
+Everything below ships **free** (MIT/Apache)._
+
+| ID | Feature | AG tier | Status | Target phase |
+|---|---|---|---|---|
+| AG1 | CSV export | 🆓 | ✅ | P5 — **v0.34.0** (`enableExport`, dep-free `toCsv`) |
+| AG2 | Excel (.xlsx) export | 💷 | ✅ | P5 — **v0.34.0** (`enableExcelExport`, dep-free `toXlsx` — real OOXML, no exceljs) |
+| AG3 | Print / print-friendly view | 🆓 | ✅ | P5 — **v0.34.0** (`enablePrint`, `runtime.printTable`) |
+| AG4 | Set Filter (distinct-values checklist) | 💷 | ✅ | P6 — `enableSetFilter` + `BstSetFilter` (`{op:'set'}` condition) |
+| AG5 | Status bar (row count + range sum/avg/count) | 💷 | ✅ | P6 — `showStatusBar` + `runtime.getSelectionStats()` |
+| AG6 | Right-click context menu | 💷 | ❌ | P6 |
+| AG7 | Tool-panel sidebar (Columns + Filters) | 💷 | ❌ | P6 |
+| AG8 | Find (highlight + jump between matches) | 💷 | ❌ | P6 |
+| AG9 | Row-number column | 💷 | ❌ | P6 |
+| AG10 | Managed row dragging (reorder) | 🆓 | ❌ | P6 |
+| AG11 | Multi-filter (stack filter types per column) | 💷 | ❌ | P6 |
+| AG12 | Fill handle (drag-to-fill range) | 💷 | ❌ | P6 |
+| AG13 | Tree data (self-referencing hierarchy) | 💷 | ❌ | P7 |
+| AG14 | Pivoting | 💷 | ❌ | P7 |
+| AG15 | Integrated charts (range → chart) | 💷 | ❌ | P7 |
+| AG16 | Advanced server-side row model (server group/pivot/tree, lazy expand) | 💷 | 🟡 | P7 |
+| AG17 | Calculated / formula columns | 💷 | 🟡 | P7 |
+| AG18 | Cell notes / comments | 💷 | ❌ | P7 |
+| AG19 | Localization / i18n (localeText) | 🆓 | ❌ | P4 |
+| AG20 | Accessibility / ARIA grid audit | 🆓 | 🟡 | P4 |
+| AG21 | Grid-state save/restore API | 🆓 | 🟡 | P4 |
+| AG22 | Live / streaming updates (I5, WebSocket merge) | — | ❌ | P4 |
+| AG23 | Formal loading / error overlays | 🆓 | 🟡 | P4/P5 |
+| AG24 | RTL support | 🆓 | ❌ | P8 |
+| AG25 | Row / column animations | 🆓 | ❌ | P8 |
+| AG26 | Auto row height (content-measured) | 🆓 | 🟡 | P8 |
+| AG27 | Auto-generate columns from data | 🆓 | ❌ | P8 |
+| AG28 | Cell flashing on data change | 🆓 | ❌ | P8 |
+| AG29 | Aligned grids (shared column state) | 🆓 | ❌ | P8 |
+
+**Tally:** 29 parity items — ✅ 5 built (P5 export + P6 Set Filter / status bar) · ❌ 18 missing ·
+🟡 6 partial. **12 of them are AG Grid Enterprise-paid** — they ship free here.
+
+**Already matched (AG Grid Enterprise-paid, shipped free):** cell/range selection · clipboard
+copy/paste · batch editing · row grouping + aggregation · master-detail · sparklines · advanced-filter
+builder · server row model. See "Built beyond the original spec" above and `CLAUDE.md` §12.

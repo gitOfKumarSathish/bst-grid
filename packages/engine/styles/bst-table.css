@@ -1265,3 +1265,117 @@
 .bst-virtual-spacer {
   pointer-events: none;
 }
+
+/* Set Filter (AG4) — per-column checklist in the filter row + its popover. */
+.bst-setfilter-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  width: 100%;
+  cursor: pointer;
+  text-align: left;
+}
+.bst-setfilter-trigger.bst-setfilter-active {
+  border-color: var(--bst-table-accent);
+  background: color-mix(in srgb, var(--bst-table-accent) 8%, var(--bst-table-bg));
+}
+.bst-setfilter-triglabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bst-setfilter-caret {
+  flex: none;
+  opacity: 0.6;
+  font-size: 10px;
+}
+.bst-setfilter-panel {
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  max-height: 320px;
+  padding: 6px;
+  background: var(--bst-table-bg);
+  color: var(--bst-table-fg);
+  border: 1px solid var(--bst-table-border);
+  border-radius: 8px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
+  /* The panel renders inside the header cell, so neutralise any inherited header
+     typography (centre-align, bold, uppercase) — a menu owns its own text layout.
+     Individual properties (not the `font` shorthand, which would reset the
+     family to an invalid `inherit` when `--bst-table-font` is unset). */
+  text-align: left;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 1.4;
+  font-style: normal;
+  text-transform: none;
+  letter-spacing: normal;
+}
+.bst-setfilter-search {
+  margin-bottom: 6px;
+}
+.bst-setfilter-actions {
+  display: flex;
+  gap: 12px;
+  padding: 2px 4px 6px;
+  border-bottom: 1px solid var(--bst-table-border);
+  margin-bottom: 4px;
+}
+.bst-setfilter-link {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--bst-table-accent);
+}
+.bst-setfilter-link:hover {
+  text-decoration: underline;
+}
+.bst-setfilter-list {
+  overflow-y: auto;
+  min-height: 0;
+}
+.bst-setfilter-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 13px;
+  text-align: left;
+}
+.bst-setfilter-item input[type='checkbox'] {
+  flex: none;
+  margin: 0;
+}
+.bst-setfilter-item:hover {
+  background: color-mix(in srgb, var(--bst-table-accent) 10%, transparent);
+}
+.bst-setfilter-item input {
+  accent-color: var(--bst-table-accent);
+}
+.bst-setfilter-label {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  font-weight: 400;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bst-setfilter-count {
+  flex: none;
+  opacity: 0.55;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.bst-setfilter-empty {
+  padding: 8px 6px;
+  opacity: 0.6;
+  font-size: 12px;
+}
