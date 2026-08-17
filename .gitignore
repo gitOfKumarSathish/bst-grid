@@ -13,4 +13,5 @@ packages/mcp/.typecheck-scaffold/
 
 # Local planning docs — personal, kept OUT of the repo / remote
 docs/column-builder-spec.md
+docs/column-builder-build-plan.md
 docs/angular-port-feasibility.md
