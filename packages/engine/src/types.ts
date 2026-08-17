@@ -67,6 +67,8 @@ export interface BstClassNames<TData extends RowData = any> {
   row?: string | ((ctx: BstRowContext<TData>) => string | undefined)
   cell?: string | ((ctx: CellRenderProps<TData>) => string | undefined)
   empty?: string
+  /** Loading / error overlay container (AG23). */
+  overlay?: string
 }
 
 /** Inline styles / CSS variables per structural slot — parallels {@link BstClassNames}. */
@@ -83,6 +85,8 @@ export interface BstStyles<TData extends RowData = any> {
   row?: React.CSSProperties | ((ctx: BstRowContext<TData>) => React.CSSProperties | undefined)
   cell?: React.CSSProperties | ((ctx: CellRenderProps<TData>) => React.CSSProperties | undefined)
   empty?: React.CSSProperties
+  /** Loading / error overlay container (AG23). */
+  overlay?: React.CSSProperties
 }
 
 /**
@@ -396,4 +400,21 @@ export interface UseBstTableOptions<TData extends RowData> extends BstTableEngin
   onReachEnd?: () => void
   /** How many rows from the end trigger `onReachEnd`. Default 8. */
   endReachedThreshold?: number
+  /**
+   * AG23 — show a **loading overlay** (a spinner over the grid body). Translucent,
+   * so existing rows stay visible during a refresh; on an initial load it covers
+   * the empty body. Pair with server mode / `useBstDataSource` (wire it to the
+   * source's loading state). Default false.
+   */
+  loading?: boolean
+  /**
+   * AG23 — show an **error overlay** with this message / node over the grid body.
+   * Any truthy value shows the overlay and takes precedence over `loading`; put a
+   * retry button in `renderError` for a full error state. Default undefined.
+   */
+  error?: React.ReactNode
+  /** Custom loading-overlay content (default: a spinner + "Loading…"). */
+  renderLoading?: () => React.ReactNode
+  /** Custom error-overlay content (default: a ⚠ glyph + the `error` node). */
+  renderError?: (error: React.ReactNode) => React.ReactNode
 }

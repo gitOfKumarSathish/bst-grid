@@ -1379,3 +1379,56 @@
   opacity: 0.6;
   font-size: 12px;
 }
+
+/* AG23 — loading / error overlays. A position:relative viewport wraps the scroll
+   box so the overlay covers the viewport without scrolling with the rows. */
+.bst-table-viewport {
+  position: relative;
+}
+.bst-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--bst-table-radius);
+  background: color-mix(in srgb, var(--bst-table-bg) 72%, transparent);
+  color: var(--bst-table-fg);
+  font-family: var(--bst-table-font);
+}
+.bst-overlay-error {
+  color: var(--bst-table-danger, #dc2626);
+  background: color-mix(in srgb, var(--bst-table-bg) 85%, transparent);
+}
+.bst-overlay-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px;
+  font-size: 13.5px;
+}
+.bst-overlay-msg {
+  max-width: 42ch;
+  text-align: center;
+  line-height: 1.5;
+}
+.bst-spinner {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 3px solid color-mix(in srgb, var(--bst-table-muted) 40%, transparent);
+  border-top-color: var(--bst-table-accent);
+  animation: bst-spin 0.7s linear infinite;
+}
+@keyframes bst-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bst-spinner {
+    animation-duration: 1.8s;
+  }
+}

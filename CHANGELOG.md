@@ -9,6 +9,25 @@ this project uses [Semantic Versioning](https://semver.org).
 > affected package README(s) **and** bump the version, in the same change.
 
 ## [Unreleased]
+### Added — Calculated / formula columns (AG17; `@bloomskill/table-engine`)
+- **`meta.formula`** turns a column into a **computed column** — `formula: (row, ctx) => value`.
+  The derived value flows through TanStack's accessor, so **sorting, filtering, grouping and
+  `aggregationFn` all operate on it**, and the cell still renders + formats via the column's `type`
+  (a `number` formula formats as currency, a `date` formula as a date, …). `ctx.rows` is the full
+  pre-pagination data (running totals / ratios) and `ctx.index` the row position. Dep-free — a
+  function, never a string `eval`. Columns re-normalize only when the column list changes (data
+  changes never rebuild them); the transform is exported as `normalizeFormulaColumns`. Not a
+  settings toggle (per-column config). Tested (`formula.test.tsx`).
+
+### Added — Loading / error overlays (AG23; `@bloomskill/table-engine` + adapters)
+- **`loading`** shows a dep-free spinner overlay over the grid body; **`error`** shows an error
+  overlay (takes precedence over loading). Both sit in a `position:relative` viewport wrapper so
+  they cover the viewport without scrolling with the rows; theme-aware + reduced-motion aware, with
+  ARIA roles (`status` / `alert`). Customize via `renderLoading` / `renderError`, or style the new
+  `classNames.overlay` / `styles.overlay` slot. Complements the existing empty ("No rows") state and
+  flows through both adapters via `...rest` (no adapter wiring). Not a settings toggle (render
+  state). Tested (`overlays.test.tsx`).
+
 ### Added — Settings sheet: section dividers + dependency cascade
 - **Section dividers** — a hairline rule now separates each settings group (both skins), so
   "Data operations / Columns / Rows / …" read as distinct sections (paired with the prominent

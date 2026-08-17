@@ -134,6 +134,75 @@ const respColumns: BstTableColumn<Person>[] = [
  * horizontal windowing for the 40 metric columns. Everything else (sort, search,
  * cell selection, clipboard) works unchanged over the full dataset.
  */
+// Calculated / formula columns (AG17) — a per-row formula + a cross-row one.
+const formulaColumns: BstTableColumn<Person>[] = [
+  { id: 'name', accessorKey: 'name', header: 'Name', meta: { type: 'text' } },
+  {
+    id: 'salary', accessorKey: 'salary', header: 'Salary', sortFn: 'basic',
+    meta: { type: 'number', align: 'right', cellMeta: { currency: 'USD', precision: 0 } },
+  },
+  {
+    id: 'monthly', header: 'Monthly', // computed: salary / 12
+    meta: {
+      type: 'number', align: 'right', cellMeta: { currency: 'USD', precision: 0 },
+      formula: (r: Person) => Math.round((r.salary ?? 0) / 12),
+    },
+  },
+  {
+    id: 'share', header: '% of payroll', // computed across all rows (ctx.rows)
+    meta: {
+      type: 'number', align: 'right', cellMeta: { precision: 1 },
+      formula: (r: Person, ctx) => {
+        const total = ctx.rows.reduce((s, x) => s + (x.salary ?? 0), 0)
+        return total ? Math.round(((r.salary ?? 0) / total) * 1000) / 10 : 0
+      },
+    },
+  },
+]
+
+// Loading / error overlays (AG23) — an interactive toggle between the states.
+function OverlaySection() {
+  const [mode, setMode] = React.useState<'idle' | 'loading' | 'error'>('loading')
+  const btn = (m: 'idle' | 'loading' | 'error', label: string) => (
+    <button
+      onClick={() => setMode(m)}
+      style={{
+        padding: '4px 10px', marginRight: 6, borderRadius: 6,
+        border: '1px solid #8884', cursor: 'pointer',
+        background: mode === m ? '#3b82f6' : 'transparent',
+        color: mode === m ? '#fff' : 'inherit',
+      }}
+    >
+      {label}
+    </button>
+  )
+  return (
+    <section>
+      <h3 style={{ margin: '0 0 8px' }}>Loading / error overlays (AG23)</h3>
+      <div style={{ ...box, marginBottom: 8 }}>
+        <code>loading</code> shows a spinner overlay; <code>error</code> shows an error overlay (and
+        wins over loading). Both cover the grid without scrolling with the rows, are theme +
+        reduced-motion aware, and complement the empty state.
+        <div style={{ marginTop: 8 }}>
+          {btn('idle', 'Idle')}
+          {btn('loading', 'Loading')}
+          {btn('error', 'Error')}
+        </div>
+      </div>
+      <BstTableMui<Person>
+        data={people.slice(0, 5)}
+        columns={columns.slice(0, 4)}
+        getRowId={(r) => r.id}
+        loading={mode === 'loading'}
+        error={mode === 'error' ? 'Could not reach the server. Please retry.' : undefined}
+        pagination={false}
+        showToolbar={false}
+        styles={{ root: { minHeight: 200 } }}
+      />
+    </section>
+  )
+}
+
 function VirtualizationSection() {
   const cellCount = (wideVirtualRows.length * wideVirtualColumns.length).toLocaleString();
   return (
@@ -758,6 +827,25 @@ export default function App() {
             showToolbar={false}
           />
         </section>
+
+        <section>
+          <h3 style={{ margin: '0 0 8px' }}>Calculated / formula columns (AG17)</h3>
+          <div style={{ ...box, marginBottom: 8 }}>
+            <code>meta.formula</code> derives a cell value instead of reading a field. <b>Monthly</b> =
+            salary ÷ 12 (per row); <b>% of payroll</b> uses <code>ctx.rows</code> for the grand total.
+            Both still format via their <code>type</code> and sort by the computed value — click a
+            computed header.
+          </div>
+          <BstTableMui<Person>
+            data={people.slice(0, 6)}
+            columns={formulaColumns}
+            getRowId={(r) => r.id}
+            pagination={false}
+            showToolbar={false}
+          />
+        </section>
+
+        <OverlaySection />
 
         <section>
           <h3 style={{ margin: '0 0 8px' }}>Grouping (E4)</h3>

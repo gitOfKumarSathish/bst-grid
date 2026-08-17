@@ -203,6 +203,8 @@ settings (e.g. `pagination={{ pageSize: 25 }}`). Follow a link for the full guid
 | [Width-aware chips (fit to column)](#cellmeta-by-cell-type) | `cellMeta.fitChips` on `multiSelect` | `false` |
 | [File preview + upload/delete (B5/I3)](#cellmeta-by-cell-type) | `meta.type: 'files'` + `cellMeta.onUpload`/`onDelete` | click-to-preview on |
 | [Cell spanning (merge cells)](#cell-spanning) | `enableCellSpanning` | `false` |
+| [Calculated / formula columns (AG17)](#calculated-columns) | `meta.formula` | — |
+| [Loading / error overlays (AG23)](#loading-and-error-overlays) | `loading` / `error` | `false` / — |
 | [Custom CSS slots](#custom-css) | `classNames` / `styles` | — |
 | [Conditional formatting](#conditional-formatting) | `conditionalFormats` + `enableConditionalFormatting` | on when rules present |
 | [Injectable body icons](#body-icons) | `icons` | built-in SVGs |
@@ -249,6 +251,7 @@ const columns: BstTableColumn<Person>[] = [
 | Field | Type | Default | What it does |
 | --- | --- | --- | --- |
 | `type` | `string` | `'text'` | Which [cell type](#cell-types) renders/edits this column. |
+| `formula` | `(row, ctx) => value` | — | [Calculated column](#calculated-columns) (AG17): derive the value instead of reading a field; sort/filter/group/aggregate see it and the `type` still formats it. `ctx.rows`/`ctx.index` for running totals. Needs an explicit `id`. |
 | `editable` | `boolean \| (row) => boolean` | `false` | Opt the column into [inline editing](#editing-and-validation) — statically, or per row. |
 | `disabled` | `boolean \| (row) => boolean` | — | [Access control](#access-control) (F3/F4): disable the whole column, or per row/cell. A disabled cell is muted and non-editable, but stays selectable/copyable. |
 | `options` | [`BstOption[]`](#options-bstoption) | — | Choices for `singleSelect` / `multiSelect` / `radio`. |
@@ -454,6 +457,10 @@ means *passing the object implies enabled*.
 | `columns` | `BstTableColumn<TData>[]` | — | Column definitions. |
 | `getRowId` | `(row, index) => string` | index | Stable row identity — **required** for editing/selection, recommended always. |
 | `initialState` | `object` | — | Extra TanStack initial state (`sorting`, `columnFilters`, `grouping`, …). |
+| `loading` | `boolean` | `false` | [Loading overlay](#loading-and-error-overlays) (AG23) — a spinner over the grid body. |
+| `error` | `ReactNode` | — | [Error overlay](#loading-and-error-overlays) (AG23) — shown over the body; takes precedence over `loading`. |
+| `renderLoading` | `() => ReactNode` | — | Custom loading-overlay content (default: spinner + "Loading…"). |
+| `renderError` | `(error) => ReactNode` | — | Custom error-overlay content (default: ⚠ + the error node). |
 
 **Data operations**
 
@@ -921,6 +928,47 @@ useBstTable<Row>({
 - It's render-only (no v9 dependency), so it composes with sort/filter/paginate. Because covered cells
   leave the DOM, prefer spanning for **display** grids (or keep spanned columns out of cell editing). The
   planner `computeCellSpans` is exported.
+
+## Calculated columns
+
+**Use it.** Give a column a **`meta.formula`** and its value is *computed* from the row instead of
+read from a field (AG17). Because the result flows through a real accessor, **sorting, filtering,
+grouping and `aggregationFn` all operate on the computed value**, and the cell still renders and
+formats through its `type`.
+
+```tsx
+const columns: BstTableColumn<Line>[] = [
+  { id: 'qty', accessorKey: 'qty', header: 'Qty', meta: { type: 'number' } },
+  { id: 'price', accessorKey: 'price', header: 'Price', meta: { type: 'number', cellMeta: { currency: 'USD' } } },
+  // computed — no accessorKey, needs an explicit id
+  { id: 'total', header: 'Total', aggregationFn: 'sum', meta: {
+    type: 'number', cellMeta: { currency: 'USD' },
+    formula: (row) => row.qty * row.price,
+  } },
+]
+```
+
+- **Cross-row math** — `formula: (row, ctx) => …` gets `ctx.rows` (the full, pre-pagination data) and
+  `ctx.index`, e.g. a share of the grand total: `(r, c) => r.amount / c.rows.reduce((s,x)=>s+x.amount,0)`.
+- **Dep-free & safe** — a function, never a string `eval`. Formula columns re-normalize only when the
+  column list changes (data edits don't rebuild them). The transform is exported as
+  `normalizeFormulaColumns` if you build column defs yourself.
+
+## Loading and error overlays
+
+**Use it.** `loading` shows a spinner overlay over the grid body; `error` shows an error overlay
+(and wins over `loading`) — AG23. Both cover the viewport without scrolling with the rows, are
+theme- and reduced-motion-aware, and carry ARIA roles (`status` / `alert`). They complement the
+built-in empty ("No rows") state and flow through the MUI / shadcn adapters unchanged.
+
+```tsx
+const { data, error, isLoading } = useQuery(...)
+<BstTableMui data={data ?? []} columns={columns} loading={isLoading} error={error?.message} />
+```
+
+- **Customize** — `renderLoading={() => …}` / `renderError={(err) => …}` replace the defaults; the
+  `classNames.overlay` / `styles.overlay` slot restyles the container.
+- During a refresh the overlay is translucent, so existing rows stay visible behind the spinner.
 
 ## Custom CSS
 

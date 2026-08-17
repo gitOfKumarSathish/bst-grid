@@ -269,6 +269,11 @@ Plus the shadcn-only chrome props:
 style the root / header / row / cell / … parts, or a whole column via `meta.cellClassName` /
 `meta.headerClassName`. See the engine's
 [Custom CSS](https://www.npmjs.com/package/@bloomskill/table-engine#custom-css).
+
+**Loading / error + formula columns:** `loading` / `error` (+ `renderLoading` / `renderError`, AG23)
+and per-column `meta.formula` (AG17) are engine features forwarded here unchanged — see
+[Loading and error overlays](https://www.npmjs.com/package/@bloomskill/table-engine#loading-and-error-overlays)
+and [Calculated columns](https://www.npmjs.com/package/@bloomskill/table-engine#calculated-columns).
 Use the adapter's `className` / `style` for the outer card.
 
 **Toggle convention:** `enable*` controls engine behaviour, `show*` controls chrome.

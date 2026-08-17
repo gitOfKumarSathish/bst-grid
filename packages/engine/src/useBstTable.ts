@@ -18,6 +18,7 @@ import { createDefaultRegistry } from './registry/defaults.js'
 import type { CellTypeRegistry } from './registry/registry.js'
 import type { BstColumnMeta } from './registry/types.js'
 import { resolveVirtualization } from './virtualization.js'
+import { normalizeFormulaColumns } from './formula.js'
 import type { ResolvedVirtualization } from './virtualization.js'
 
 const DEFAULT_PAGE_SIZE = 10
@@ -91,6 +92,14 @@ export interface BstRuntimeHandle<TData extends RowData> {
   enableExport: boolean
   /** Which export formats are on (CSV / Excel / Print) — filters the menu items. */
   exportFormats: { csv: boolean; excel: boolean; print: boolean }
+  /** AG23 — loading overlay (spinner) is shown over the body. */
+  loading: boolean
+  /** AG23 — error overlay node (takes precedence over `loading`). */
+  error?: React.ReactNode
+  /** Custom loading-overlay content (default spinner + "Loading…"). */
+  renderLoading?: () => React.ReactNode
+  /** Custom error-overlay content (default ⚠ + the error node). */
+  renderError?: (error: React.ReactNode) => React.ReactNode
 }
 
 /** Column ids whose column def carries a user-authored `cell` renderer. */
@@ -296,6 +305,16 @@ export function useBstTable<TData extends RowData>(opts: UseBstTableOptions<TDat
   const pageSize =
     typeof pag === 'object' ? (pag.pageSize ?? DEFAULT_PAGE_SIZE) : DEFAULT_PAGE_SIZE
 
+  // AG17 — formula columns. `dataRef` hands each formula the full dataset WITHOUT
+  // making the (memoized) column defs depend on `data`, so typing/editing never
+  // rebuilds columns; they re-normalize only when the column list itself changes.
+  const dataRef = React.useRef(opts.data)
+  dataRef.current = opts.data
+  const normalizedColumns = React.useMemo(
+    () => normalizeFormulaColumns(opts.columns, dataRef),
+    [opts.columns],
+  )
+
   // Server mode (Plan.md §5) — pass through to v9 ONLY the manual/controlled
   // options the caller actually set. Passing `state`/`on*Change` as `undefined`
   // makes v9 treat state as controlled-but-unmanaged and freezes the grid, so we
@@ -326,7 +345,7 @@ export function useBstTable<TData extends RowData>(opts: UseBstTableOptions<TDat
   const table = useTable({
     features: bstTableFeatures,
     data: opts.data,
-    columns: opts.columns,
+    columns: normalizedColumns,
     getRowId: opts.getRowId,
     globalFilterFn: 'includesString',
     enableSorting: opts.enableSorting ?? true,
@@ -418,6 +437,10 @@ export function useBstTable<TData extends RowData>(opts: UseBstTableOptions<TDat
       excel: ctx.enableExcelExport !== false,
       print: ctx.enablePrint !== false,
     },
+    loading: !!opts.loading,
+    error: opts.error,
+    renderLoading: opts.renderLoading,
+    renderError: opts.renderError,
   }
   ;(table as unknown as Record<symbol, unknown>)[BST_RUNTIME] = handle
 

@@ -594,8 +594,38 @@ export function BstTable({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rowVirtActive, activeRowId])
 
+  // AG23 — loading / error overlays over the grid body. Error wins over loading.
+  // Rendered inside a position:relative viewport wrapper so they cover the scroll
+  // area without scrolling with the rows. Props reach the engine through the
+  // adapters' `...rest` spread, so both skins get overlays for free.
+  const overlayError = handle.error
+  const showOverlayError = overlayError != null && overlayError !== false && overlayError !== ''
+  const showOverlayLoading = handle.loading && !showOverlayError
+  const overlayNode =
+    showOverlayError || showOverlayLoading ? (
+      <div
+        className={cx(
+          'bst-overlay',
+          showOverlayError ? 'bst-overlay-error' : 'bst-overlay-loading',
+          classNames?.overlay,
+        )}
+        style={styles?.overlay}
+        role={showOverlayError ? 'alert' : 'status'}
+        aria-live="polite"
+      >
+        {showOverlayError
+          ? handle.renderError
+            ? handle.renderError(overlayError)
+            : <DefaultErrorOverlay error={overlayError} />
+          : handle.renderLoading
+            ? handle.renderLoading()
+            : <DefaultLoadingOverlay />}
+      </div>
+    ) : null
+
   return (
     <BstIconsContext.Provider value={I}>
+    <div className="bst-table-viewport">
     <div
       ref={scrollRef}
       className={cx('bst-table-scroll', rowVirtActive && 'bst-virtualized', className, classNames?.root)}
@@ -1042,7 +1072,33 @@ export function BstTable({
         </tbody>
       </table>
     </div>
+    {overlayNode}
+    </div>
     </BstIconsContext.Provider>
+  )
+}
+
+/** AG23 default loading overlay — a dep-free CSS spinner + label. */
+function DefaultLoadingOverlay() {
+  return (
+    <div className="bst-overlay-box">
+      <span className="bst-spinner" aria-hidden="true" />
+      <div className="bst-overlay-msg">Loading…</div>
+    </div>
+  )
+}
+
+/** AG23 default error overlay — an inline-SVG warning glyph + the error node. */
+function DefaultErrorOverlay({ error }: { error: React.ReactNode }) {
+  return (
+    <div className="bst-overlay-box">
+      <svg className="bst-overlay-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+        <path d="M12 2 22 20H2L12 2Z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+        <path d="M12 9v5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        <circle cx="12" cy="17.5" r="1.15" fill="currentColor" />
+      </svg>
+      <div className="bst-overlay-msg">{error}</div>
+    </div>
   )
 }
 

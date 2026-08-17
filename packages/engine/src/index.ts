@@ -208,11 +208,15 @@ export type {
   CellEditProps,
   CellValidateContext,
   BstColumnMeta,
+  BstFormulaContext,
   BstOption,
   BstCellApi,
   FieldError,
   FieldErrorLevel,
 } from './registry/types.js'
+
+// ---- AG17 formula / calculated columns ----
+export { normalizeFormulaColumns } from './formula.js'
 
 // ---- interaction store + runtime (editing / validation / rows) ----
 export {

@@ -37,6 +37,14 @@ export interface BstOption {
   disabled?: boolean
 }
 
+/** Context passed to a `meta.formula` calculated column (AG17). */
+export interface BstFormulaContext<TData extends RowData = any> {
+  /** All rows (pre-pagination, source order) — for running totals / ratios. */
+  rows: TData[]
+  /** This row's index within `rows`. */
+  index: number
+}
+
 /**
  * Per-column meta the registry + features read. Authored on `columnDef.meta`
  * and typed via the `columnMeta` slot on `tableFeatures` (no global declaration
@@ -99,6 +107,19 @@ export interface BstColumnMeta<TData extends RowData = any, TValue = any> {
   responsivePriority?: number
   /** Text alignment for read + edit. */
   align?: 'left' | 'center' | 'right'
+  /**
+   * Calculated / formula column (AG17). When set, the cell VALUE is **derived**
+   * by this function instead of read from a row field — a computed column. It
+   * composes with `type` (a `number` formula still formats as currency, a `date`
+   * formula still formats as a date, …); sorting, filtering and `aggregationFn`
+   * all see the computed value. `ctx.rows` is the full (pre-pagination) data for
+   * running totals / ratios and `ctx.index` is the row's position. Runs once per
+   * visible cell — keep it cheap. Dep-free: a function, never a string `eval`.
+   *
+   * A formula column needs an explicit `id` (it has no `accessorKey`); any
+   * `accessorKey` also set is ignored.
+   */
+  formula?: (row: TData, ctx: BstFormulaContext<TData>) => TValue
   /** Action-column button config (B10). */
   actions?: {
     edit?: boolean
