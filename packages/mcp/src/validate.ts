@@ -167,8 +167,8 @@ export function validateConfig(
   const mentioned = [...resolved.keys()]
 
   // 1. Unknown props — the most common hallucination, and the cheapest to catch.
-  //    A prop that names a known-missing capability (e.g. `enableVirtualization`)
-  //    is left to step 2, which reports the spec leaf (D1) and the real
+  //    A prop that names a known-missing capability (e.g. `onWebSocketUpdate`)
+  //    is left to step 2, which reports the spec leaf (I5) and the real
   //    workaround — strictly more useful than a bare "unknown option", and it
   //    stops one invented prop from producing two errors.
   for (const prop of unknownProps(source, corpus)) {
@@ -182,7 +182,7 @@ export function validateConfig(
   }
 
   // 2. Capabilities that do not exist. Matched on the scrubbed source, so an
-  //    invented prop (`enableVirtualization`, `rowVirtualizer`) is caught but a
+  //    invented prop (`enableLiveUpdates`, `onWebSocketUpdate`) is caught but a
   //    column literally named `pdfPreview` or `liveCount` is not.
   for (const gap of NOT_BUILT) {
     if (!gap.match.test(src)) continue

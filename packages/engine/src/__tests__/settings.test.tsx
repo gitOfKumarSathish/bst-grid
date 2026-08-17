@@ -92,6 +92,7 @@ const ALWAYS_VISIBLE_OPT_INS = [
   'Per-column filter row',
   'Row virtualization',
   'Column virtualization',
+  'Resize rows',
 ]
 // The remaining opt-in newer features that appear only once provisioned.
 const HIDDEN_UNTIL_PROVISIONED = NEWER_LABELS.filter((l) => !ALWAYS_VISIBLE_OPT_INS.includes(l))
@@ -215,6 +216,14 @@ describe('useBstSettings — newer features (added after the sheet shipped)', ()
     expect(txt('groups')).toContain('Performance')
     expect(txt('labels')).toContain('Row virtualization')
     expect(txt('labels')).toContain('Column virtualization')
+  })
+
+  test('row resize (G2) is discoverable — shown in the Rows group even unprovisioned', () => {
+    // Like virtualization, row resize is an end-user escape hatch: switch it on
+    // from the settings sheet without any developer wiring (alwaysShow).
+    render(<LabelsFor data={data} columns={columns} />)
+    expect(txt('groups')).toContain('Rows')
+    expect(txt('labels')).toContain('Resize rows')
   })
 
   test('conditional formatting is always offered (default on), rules or not', () => {

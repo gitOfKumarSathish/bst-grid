@@ -102,7 +102,7 @@ live / WebSocket merge (I5) isn't built.
 | Tool | What it answers |
 | --- | --- |
 | `bst_search_docs` | Free-text search across every README, feature, cell type, coverage row, API signature and example. **Start here when unsure.** |
-| `bst_get_feature` | One flag (layer · type · default · maps-to · status · **dependencies**), one spec leaf (`D1` → ❌ NOT BUILT + workaround), or the whole 61-flag registry. |
+| `bst_get_feature` | One flag (layer · type · default · maps-to · status · **dependencies**), one spec leaf (`I5` → ❌ NOT BUILT + workaround), or the whole flag registry. |
 | `bst_get_cell_type` | A `meta.type` renderer: value shape, editability, `cellMeta` fields. Or all 17. |
 | `bst_get_api` | The exact signature of any `@bloomskill/table-engine` export, read from the built `.d.ts` (150 entries). |
 | `bst_get_example` | Full source of one of the six runnable example apps. |

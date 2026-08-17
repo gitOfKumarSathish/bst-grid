@@ -737,6 +737,25 @@ export default function App() {
         </section>
 
         <section>
+          <h3 style={{ margin: '0 0 8px' }}>Row resize (G2)</h3>
+          <div style={{ ...box, marginBottom: 8 }}>
+            <code>enableRowResize</code>: hover a row's <b>bottom edge</b> and drag to set its
+            height — the whole row's cells grow/shrink and taller content gets room to wrap.{' '}
+            <b>Double-click</b> the handle to reset a row. Heights are local UI state. This toggle is{' '}
+            <b>always shown in the settings sheet</b> (⚙ → Rows), so an end-user can switch it on
+            themselves — no developer wiring required.
+          </div>
+          <BstTableMui<Person>
+            data={people.slice(0, 6)}
+            columns={columns.slice(0, 5)}
+            getRowId={(r) => r.id}
+            enableRowResize
+            pagination={false}
+            showToolbar={false}
+          />
+        </section>
+
+        <section>
           <h3 style={{ margin: '0 0 8px' }}>Grouping (E4)</h3>
           <div style={{ ...box, marginBottom: 8 }}>
             <code>enableGrouping</code>: rows are grouped by <b>Role</b>, each header showing a{' '}

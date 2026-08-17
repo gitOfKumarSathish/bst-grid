@@ -945,9 +945,11 @@ const table = useBstTable(effective)   // enable*/show* now reflect the user's c
 **Customize.**
 
 - **Which toggles appear** — every instance-level boolean toggle, grouped: **Data operations · Columns ·
-  Rows · Editing · Selection & clipboard · Display**. Default-on data features always show; opt-in
+  Rows · Editing · Selection & clipboard · Display**. Default-on data features always show; most opt-in
   features appear only once you've provisioned them (so a user can't switch on something the grid isn't
-  wired for). Pass `features: BstSettingKey[]` to curate the list.
+  wired for) — but a few end-user escape hatches stay **always shown** even unprovisioned: row grouping,
+  copy column/row, the per-column filter row, **row resize**, and row/column virtualization. Pass
+  `features: BstSettingKey[]` to curate the list.
 - **Persistence** — on by default under a key derived from your columns; set `persistKey` to disambiguate,
   or `persist: false` for in-memory only.
 - Exports: `applySettingsOverrides(props, overrides)` and `BST_SETTINGS_REGISTRY` (ordered metadata). The

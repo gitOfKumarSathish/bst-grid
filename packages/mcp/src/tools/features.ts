@@ -12,7 +12,7 @@ const inputSchema = {
   requirement: z
     .string()
     .optional()
-    .describe("A spec leaf id, e.g. 'D1' (virtualization) or 'H4' (paste) — use to ask 'is X supported?'"),
+    .describe("A spec leaf id, e.g. 'I5' (live updates) or 'H4' (paste) — use to ask 'is X supported?'"),
   group: z
     .string()
     .optional()
@@ -30,9 +30,9 @@ const inputSchema = {
 
 /**
  * The feature/coverage tool. Deliberately folds in the spec matrix: an agent
- * asking "does Bst-Table do virtualization?" must get **no** with the workaround,
- * not a plausible invention. Coverage lives one argument away from features
- * because they are the same question asked two ways.
+ * asking "does Bst-Table do live WebSocket updates?" must get **no** with the
+ * workaround, not a plausible invention. Coverage lives one argument away from
+ * features because they are the same question asked two ways.
  */
 export function registerFeatureTool(server: McpServer, corpus: BstCorpus): void {
   server.registerTool(
@@ -43,7 +43,7 @@ export function registerFeatureTool(server: McpServer, corpus: BstCorpus): void 
 
 Every Bst-Table capability is a per-instance flag in one of two layers: \`enable*\` = engine behaviour (resolved in \`useBstTable\`), \`show*\` = adapter chrome (resolved in the MUI/shadcn adapter). Data features default ON; heavy features (editing, selection, clipboard) default OFF.
 
-ALWAYS check here before claiming Bst-Table supports something. ${corpus.requirements.filter((r) => r.status !== 'built').length} of the ${corpus.requirements.length} spec leaves are partial or missing — notably D1 (row/column virtualization) and I5 (WebSocket/live merge), which are NOT implemented.
+ALWAYS check here before claiming Bst-Table supports something. ${corpus.requirements.filter((r) => r.status !== 'built').length} of the ${corpus.requirements.length} spec leaves are partial or missing — notably I5 (external / WebSocket live-merge), which is NOT built. (Row/column virtualization D1 and infinite scroll A2 ARE built — do not assume otherwise.)
 
 Args (all optional — with none, returns the full registry):
   - flag (string): one flag/prop name, e.g. 'enableClipboard'
@@ -60,7 +60,7 @@ Returns:
 
 Examples:
   - flag="enableClipboard" -> the toggle, and that it implies enableCellSelection while paste needs enableEditing
-  - requirement="D1" -> ❌ NOT BUILT, with the server-DataSource workaround
+  - requirement="I5" -> ❌ NOT BUILT, with the replace-the-data-prop workaround
   - kind="toggle", layer="engine" -> every engine behaviour flag
 
 Error handling:

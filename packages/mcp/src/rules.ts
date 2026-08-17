@@ -210,15 +210,9 @@ export const NOT_BUILT: Array<{ match: RegExp; requirement: string; instead: str
       'Live/WebSocket merge is NOT built. Push external updates by replacing the `data` prop; there is no conflict policy against in-flight edits yet.',
   },
   {
-    match: /pdf[\s_-]*(thumbnail|preview)/i,
+    match: /pdf[\s_-]*thumbnail/i,
     requirement: 'B5',
     instead:
-      'PDF thumbnails are NOT built (they need pdf.js). The `files` cell type shows image thumbnails and a file-type icon fallback.',
-  },
-  {
-    match: /uploadFile|deleteFile|file[\s_-]*upload/i,
-    requirement: 'I3',
-    instead:
-      'File upload/delete DataSource verbs are NOT built. Viewing files and thumbnails works; handle upload in your own code and pass the resulting `FileRef` into the row.',
+      'In-cell PDF *thumbnails* are NOT built (they need pdf.js). PDF *preview* IS built — click a file cell to open it in the native browser PDF viewer (`BstFilePreview`); the cell shows image thumbnails and a file-type icon fallback. Upload/delete via `cellMeta.onUpload`/`onDelete` or the `DataSource` file verbs is also built (I3).',
   },
 ]
