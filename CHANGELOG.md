@@ -9,6 +9,25 @@ this project uses [Semantic Versioning](https://semver.org).
 > affected package README(s) **and** bump the version, in the same change.
 
 ## [Unreleased]
+### Added — Settings sheet: section dividers + dependency cascade
+- **Section dividers** — a hairline rule now separates each settings group (both skins), so
+  "Data operations / Columns / Rows / …" read as distinct sections (paired with the prominent
+  uppercase section headings).
+- **Dependency cascade** — a toggle whose prerequisite is off now renders **disabled** (dimmed,
+  non-interactive) and shows "Needs \<parent\>": CSV / Excel / Print disable when **Export** is off;
+  Copy column / row when **Copy & paste** is off; the per-column filter row + Set filter when
+  **Column filters** is off; Batch editing + Validation when **Inline editing** is off; Column
+  virtualization when **Row virtualization** is off; the filter / format builders behind their
+  engines. Resolution is **transitive** and reverses — turning the parent back on re-enables the
+  dependents. Backed by a new `requires` edge on the settings registry (mirrors the flag graph in
+  `packages/mcp/src/rules.ts`) and a new pure export **`isSettingActive(key, props)`**.
+- **Dependency tree connectors** — where a parent and its dependents share a section, the sheet now
+  draws a **dotted branch connector** (Bitbucket-commit-graph style) from the parent down into each
+  child, so the grouping reads at a glance (Export → CSV / Excel / Print; Inline editing → Batch
+  editing / Validation; Copy & paste → Copy column / row; Row virtualization → Column virtualization;
+  Conditional formatting → Format builder). Cross-section prerequisites stay text-only. The model
+  exposes `parentKey` / `lastChild` on each `BstSettingsItem`; adapters render the branch (MUI dotted
+  pseudo-elements, shadcn `.sc-dep-child` / `.sc-dep-last`).
 
 ## [0.35.0] — 2026-08-17
 ### Added — Set Filter + status bar (Phase 6, AG4–AG5)

@@ -432,14 +432,18 @@ function DepHarness(props: any) {
   return (
     <>
       {model.items.map((it) => (
-        <span key={it.key} data-testid={`dis:${it.key}`}>
-          {String(it.disabled)}
-        </span>
+        <React.Fragment key={it.key}>
+          <span data-testid={`dis:${it.key}`}>{String(it.disabled)}</span>
+          <span data-testid={`par:${it.key}`}>{it.parentKey ?? ''}</span>
+          <span data-testid={`last:${it.key}`}>{String(!!it.lastChild)}</span>
+        </React.Fragment>
       ))}
     </>
   )
 }
 const dis = (key: string) => screen.queryByTestId(`dis:${key}`)?.textContent
+const par = (key: string) => screen.queryByTestId(`par:${key}`)?.textContent
+const last = (key: string) => screen.queryByTestId(`last:${key}`)?.textContent
 
 describe('useBstSettings — dependency cascade (item.disabled)', () => {
   beforeEach(() => window.localStorage.clear())
@@ -474,5 +478,22 @@ describe('useBstSettings — dependency cascade (item.disabled)', () => {
     // copy column/row require Copy & paste (off) → disabled
     expect(dis('enableCopyColumn')).toBe('true')
     expect(dis('enableCopyRow')).toBe('true')
+  })
+
+  test('tree hierarchy links in-group children to their parent; flags the last child', () => {
+    render(<DepHarness data={data} columns={columns} />)
+    // Export group: Export → CSV / Excel / Print, Print last.
+    expect(par('enableExport')).toBe('') // the parent itself has none
+    expect(par('enableCsvExport')).toBe('enableExport')
+    expect(par('enablePrint')).toBe('enableExport')
+    expect(last('enableCsvExport')).toBe('false')
+    expect(last('enablePrint')).toBe('true')
+  })
+
+  test('cross-group prerequisites stay unlinked (no connector across sections)', () => {
+    // Set filter needs the per-column filter row, which lives in the "Columns"
+    // group — a different section — so Set filter gets no in-group parent link.
+    render(<DepHarness data={data} columns={columns} />)
+    expect(par('enableSetFilter')).toBe('')
   })
 })

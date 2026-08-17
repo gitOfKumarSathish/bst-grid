@@ -126,9 +126,12 @@ options, commits on close — MUI parity, no extra dependency). Override with a
 
 `showSettings` lets **end-users** customize a grid without touching code — a gear slides out a
 right-side **Sheet** of feature toggles (dependency-free, honours `dark`) under a **highlighted
-header**, with a **search box** to filter the 30+ list. Choices are **per table** and saved to
-`localStorage`, so they survive reloads. Only features you've provisioned are listed, so users can't
-switch on something the grid isn't wired for.
+header**, with a **search box** to filter the 30+ list. Sections are **divider-separated** with
+prominent headings, a **dotted branch connector** links each parent to its dependents (git-graph
+style), and **dependent toggles disable automatically** when their prerequisite is off (switch
+**Export** off and CSV/Excel/Print grey out). Choices are **per table** and saved to `localStorage`,
+so they survive reloads. Only features you've provisioned are listed, so users can't switch on
+something the grid isn't wired for.
 
 ```tsx
 <BstTableShadcn

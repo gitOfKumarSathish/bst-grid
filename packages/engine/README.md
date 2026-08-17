@@ -1004,6 +1004,14 @@ const table = useBstTable(effective)   // enable*/show* now reflect the user's c
   a filter input) that narrows the list by label / hint / group name. On by default, it appears only
   once the sheet has more than a handful of items; `search: false` hides it, `search: true` always shows
   it. The matching is the pure helper `filterSettingsGroups(model.groups, query)` — both adapters share it.
+- **Dependencies** — sub-features whose prerequisite is off render **disabled** (dimmed, "Needs
+  \<parent\>"): e.g. CSV/Excel/Print follow **Export**, Copy column/row follow **Copy & paste**, the
+  per-column filter row + Set filter follow **Column filters**. The cascade is **transitive** and
+  reverses when the parent is switched back on. Declared as `requires` edges on the registry (mirrors
+  `packages/mcp/src/rules.ts`); the resolver is the pure export `isSettingActive(key, props)`. Where a
+  parent and its dependents share a section, the sheet draws a **dotted branch connector** (git-graph
+  style) from parent to child — `parentKey` / `lastChild` on each item carry the tree. Sections are
+  separated by a divider with prominent uppercase headings.
 - **Persistence** — on by default under a key derived from your columns; set `persistKey` to disambiguate,
   or `persist: false` for in-memory only.
 - Exports: `applySettingsOverrides(props, overrides)`, `filterSettingsGroups` / `shouldShowSettingsSearch`

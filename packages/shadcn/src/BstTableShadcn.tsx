@@ -802,7 +802,9 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
                   {group.items.map((item) => (
                     <label
                       key={item.key}
-                      className={`sc-sheet-row${item.disabled ? ' sc-sheet-row-disabled' : ''}`}
+                      className={`sc-sheet-row${item.disabled ? ' sc-sheet-row-disabled' : ''}${
+                        item.parentKey ? ' sc-dep-child' : ''
+                      }${item.lastChild ? ' sc-dep-last' : ''}`}
                     >
                       <span className="sc-sheet-row-text">
                         <span>{item.label}</span>

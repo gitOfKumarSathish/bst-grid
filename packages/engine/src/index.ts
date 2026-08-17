@@ -133,6 +133,7 @@ export {
   applySettingsOverrides,
   filterSettingsGroups,
   shouldShowSettingsSearch,
+  isSettingActive,
   BST_SETTINGS_REGISTRY,
 } from './settings.js'
 export type {

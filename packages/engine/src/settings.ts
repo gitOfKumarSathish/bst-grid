@@ -310,6 +310,16 @@ export interface BstSettingsItem {
   disabled: boolean
   /** Label of the prerequisite blocking it (for a tooltip), when `disabled`. */
   disabledBy?: string
+  /**
+   * The prerequisite this item hangs off **within the same group** — set when the
+   * required parent is also rendered in this section, so the sheet can draw a
+   * tree/branch connector from parent to child. Cross-group prerequisites (parent
+   * in another section) stay unlinked; the "Needs …" hint still names them.
+   */
+  parentKey?: BstSettingKey
+  /** This is the last child of its `parentKey` in the group — the connector's
+   *  vertical branch line stops at this row. */
+  lastChild?: boolean
   set: (next: boolean) => void
   toggle: () => void
   reset: () => void
@@ -526,6 +536,22 @@ export function useBstSettings<P extends object>(
       groups.push(g)
     }
     g.items.push(it)
+  }
+
+  // Tree connectors: link a child to a prerequisite that's visible in the SAME
+  // group (parent → child branch), and mark the last child so the adapter's
+  // connector line stops there. Cross-group prerequisites stay unlinked.
+  for (const g of groups) {
+    const inGroup = new Set(g.items.map((it) => it.key))
+    for (const it of g.items) {
+      const parent = ENTRY_BY_KEY.get(it.key)?.requires?.find((r) => inGroup.has(r))
+      if (parent) it.parentKey = parent
+    }
+    for (let i = 0; i < g.items.length; i++) {
+      const it = g.items[i]
+      if (!it.parentKey) continue
+      it.lastChild = !g.items.some((n, j) => j > i && n.parentKey === it.parentKey)
+    }
   }
 
   const model: BstSettingsModel = {

@@ -541,6 +541,32 @@
 .sc-sheet-row-disabled:hover {
   background: transparent;
 }
+/* Dotted branch connector (Bitbucket-style) from a parent row to each dependent
+   child: a vertical line down the gutter + a horizontal elbow into the row. */
+.sc-sheet-row.sc-dep-child {
+  position: relative;
+  padding-left: 34px;
+}
+.sc-sheet-row.sc-dep-child::before {
+  content: '';
+  position: absolute;
+  left: 22px;
+  top: 0;
+  bottom: 0;
+  border-left: 1.5px dotted var(--sc-muted);
+}
+.sc-sheet-row.sc-dep-child::after {
+  content: '';
+  position: absolute;
+  left: 22px;
+  top: 50%;
+  width: 9px;
+  border-top: 1.5px dotted var(--sc-muted);
+}
+/* Last child → the vertical line stops at the elbow (branch terminates). */
+.sc-sheet-row.sc-dep-last::before {
+  bottom: 50%;
+}
 .sc-sheet-row-text {
   flex: 1;
   display: flex;

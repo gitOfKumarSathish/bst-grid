@@ -128,7 +128,10 @@ Bring your own editors by passing a `cellTypes` registry (e.g. start from `creat
 
 `showSettings` lets **end-users** customize a grid without touching code — a gear opens a
 right-side sheet of feature toggles under a **highlighted header**, with a **search box** to filter
-the 30+ list. Choices are **per table** and saved to `localStorage`, so they survive reloads. Only
+the 30+ list. Sections are **divider-separated** with prominent headings, a **dotted branch connector**
+links each parent to its dependents (git-graph style), and **dependent toggles disable automatically**
+when their prerequisite is off (switch **Export** off and CSV/Excel/Print grey out). Choices are **per
+table** and saved to `localStorage`, so they survive reloads. Only
 features you've provisioned are listed (default-on data features plus any opt-in feature you enabled),
 so users can't switch on something the grid isn't wired for.
 

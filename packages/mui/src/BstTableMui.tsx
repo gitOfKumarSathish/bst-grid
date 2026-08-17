@@ -822,7 +822,36 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
                   {group.items.map((item) => (
                     <ListItem
                       key={item.key}
-                      sx={item.disabled ? { opacity: 0.5 } : undefined}
+                      sx={{
+                        ...(item.disabled ? { opacity: 0.5 } : {}),
+                        ...(item.parentKey
+                          ? {
+                              pl: '32px',
+                              position: 'relative',
+                              // Dotted branch connector from the parent row above
+                              // (Bitbucket-style): a vertical line down the gutter…
+                              '&::before': {
+                                content: '""',
+                                position: 'absolute',
+                                left: '20px',
+                                top: 0,
+                                bottom: item.lastChild ? '50%' : 0,
+                                borderLeft: '1.5px dotted',
+                                borderColor: 'text.secondary',
+                              },
+                              // …and a horizontal elbow into this row.
+                              '&::after': {
+                                content: '""',
+                                position: 'absolute',
+                                left: '20px',
+                                top: '50%',
+                                width: '9px',
+                                borderTop: '1.5px dotted',
+                                borderColor: 'text.secondary',
+                              },
+                            }
+                          : {}),
+                      }}
                       secondaryAction={
                         <Switch
                           edge="end"
