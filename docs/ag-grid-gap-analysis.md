@@ -1,6 +1,6 @@
 # Bst-Table vs AG Grid — Gap Analysis & Build Roadmap
 
-**Date:** 2026-08-13 · **Bst-Table version:** 0.33.1 · **Compared against:** AG Grid Community + Enterprise (official feature matrix, ag-grid.com/license-pricing, fetched 2026-08-13).
+**Date:** 2026-08-13 (updated 2026-08-17) · **Bst-Table version:** 0.37.0 · **Compared against:** AG Grid Community + Enterprise (official feature matrix, ag-grid.com/license-pricing, fetched 2026-08-13).
 
 > **Method.** No AG Grid MCP is connected to this session (the connector registry has none). This
 > compares AG Grid's published Community/Enterprise matrix against our own `@bloomskill/table-mcp`
@@ -22,7 +22,7 @@ sparklines, and a server row model are all shipped and free. The real gaps clust
 5. **Tool-panel sidebar** (docked Columns + Filters panels).
 6. **Pivoting** and **Tree Data** (self-referencing hierarchy).
 
-Plus production-hardening: **i18n/localeText**, **full grid-state save/restore**, and an **ARIA a11y audit**.
+Plus production-hardening: **i18n/localeText** and an **ARIA a11y audit** (grid-state save/restore ✅ shipped).
 
 ---
 
@@ -76,7 +76,7 @@ Legend — **AG tier:** 🆓 Community · 💷 Enterprise (paid). **Status:** �
 | 3 | **Print / print-friendly view** | 🆓 | ✅ v0.34.0 | S | `runtime.printTable` opens a standalone styled table view. |
 | 4 | **Set Filter** (checkbox list of distinct values, search, select-all) | 💷 | ✅ P6 | M | Shipped: `enableSetFilter` + `BstSetFilter` — `{op:'set'}` condition on the existing `bstCondition` filterFn. |
 | 5 | **Status bar** (total/filtered row count + sum·avg·min·max·count of selection) | 💷 | ✅ P6 | M | Shipped: `showStatusBar` footer + `runtime.getSelectionStats()`. |
-| 6 | **Grid state save/restore API** (`getState`/`applyState`: sort+filter+columns+order+width+pin+group+visibility) | 🆓 | 🟡 | M | We persist *settings toggles* only. Reporting needs full per-user view snapshots. |
+| 6 | **Grid state save/restore API** (`getState`/`applyState`: sort+filter+columns+order+width+pin+group+visibility) | 🆓 | ✅ | M | Shipped: `getGridState`/`applyGridState`/`loadGridState`/`saveGridState`/`resetGridState` + the `useBstGridState` hook + adapters' one-line `gridState={{ key }}`. Full per-user view snapshot (`BstGridState`, version-stamped), stale-column-safe on restore. |
 | 7 | **Localization / i18n** (`localeText` map, number/date locale) | 🆓 | ❌ | M | All chrome text is hardcoded English. Blocks non-English deployments. |
 | 8 | **Accessibility audit + ARIA grid roles** (roles, `aria-*`, focus mgmt, screen-reader) | 🆓 | 🟡 | M | We have keyboard nav; needs a formal `role="grid"` pass + axe audit for WCAG. |
 | 9 | **Formal loading / error / no-rows overlays** | 🆓 | 🟡 | S | `empty` slot exists; add first-class loading spinner + error overlay components. |
@@ -124,9 +124,9 @@ Legend — **AG tier:** 🆓 Community · 💷 Enterprise (paid). **Status:** �
 > **Phase mapping (`Plan.md` PART 3).** Milestone A → finish **Phase 4** hardening + **Phase 5** (export) ·
 > B → **Phase 6** · C → **Phase 7** · D → **Phase 8**. Per-feature status IDs `AG1–AG29` live in `COVERAGE.md`.
 
-**Milestone A — "Production-ready" (P0):** Export (CSV → Excel → print) · Set Filter · Status bar ·
-Grid-state API · i18n · a11y audit · overlays. *These are the items whose absence blocks real
-adoption and the ones AG Grid users notice missing on day one.*
+**Milestone A — "Production-ready" (P0):** Export (CSV → Excel → print) ✅ · Set Filter ✅ · Status bar ✅ ·
+Grid-state API ✅ · i18n · a11y audit · overlays. *These are the items whose absence blocks real
+adoption and the ones AG Grid users notice missing on day one — **i18n + a11y + overlays remain**.*
 
 **Milestone B — "Feels like AG Grid" (P1):** Context menu · Tool-panel sidebar · Fill handle · Find ·
 Row drag · Row-number column. *(Tree Data + Pivoting are P1 in value but L in effort — schedule as

@@ -5,6 +5,8 @@ import {
   filterSettingsGroups,
   shouldShowSettingsSearch,
   useToolbarOverflow,
+  useBstGridState,
+  loadGridState,
   BstTable,
   BstFilterBuilder,
   BstConditionalFormatBuilder,
@@ -17,6 +19,8 @@ import type {
   BstCellEdit,
   BstFormatRule,
   BstFormatBuilderColumn,
+  BstGridStateOptions,
+  BstTableInstance,
 } from '@bloomskill/table-engine'
 import type { RowData } from '@tanstack/react-table'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
@@ -121,6 +125,15 @@ export interface BstTableShadcnProps<TData extends RowData> extends UseBstTableO
    * the shortcuts active on this grid. `boolean`, or `{ platform }` to force
    * ⌘/Ctrl key rendering (default auto-detects). Default: false (opt-in). */
   showShortcuts?: boolean | { platform?: 'mac' | 'pc' | 'auto' }
+  /**
+   * Grid-state save/restore (AG21). Pass `{ key }` to persist this grid's **view**
+   * — sort · filter · column order/size/visibility/pinning · grouping · … — to
+   * `localStorage` and restore it on the next mount. One prop does both: it seeds
+   * `initialState` from the stored snapshot (unless you passed your own) and writes
+   * changes back (debounced). Accepts the full `BstGridStateOptions`. Distinct from
+   * `showSettings`, which toggles *features*.
+   */
+  gridState?: BstGridStateOptions
   /** Page-size choices in the pagination bar. Default: [5, 10, 20, 50]. */
   pageSizeOptions?: number[]
   /** Custom class name on the outer card (the whole component). Fine-grained
@@ -184,6 +197,21 @@ function useFocusTrap(active: boolean) {
   return ref
 }
 
+/**
+ * Null-rendering child that wires grid-state persistence (AG21) via the engine
+ * hook — rendered only when `gridState` is set, so other grids pay nothing.
+ */
+function GridStatePersist<TData extends RowData>({
+  table,
+  options,
+}: {
+  table: BstTableInstance<TData>
+  options: BstGridStateOptions
+}) {
+  useBstGridState(table, options)
+  return null
+}
+
 export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps<TData>) {
   // Runtime settings sheet: overrides applied to `props` up front so every §12
   // `enable*`/`show*` toggle downstream reflects the user's choices (§12 chrome).
@@ -219,6 +247,7 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
     showColumnEditToggle,
     showSettings: _showSettings,
     showShortcuts,
+    gridState,
     pageSizeOptions = [5, 10, 20, 50],
     className,
     style,
@@ -240,8 +269,16 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
   }
 
   const preset = React.useMemo(() => cellTypes ?? createShadcnPreset(), [cellTypes])
+  // Grid-state restore (AG21): seed initialState from the stored snapshot once
+  // (mount-only), unless the caller passed their own. Save-on-change is the child.
+  const restoredInitialState = React.useMemo(
+    () => rest.initialState ?? (gridState ? loadGridState(gridState.key, gridState.storage) : undefined),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  )
   const gridOpts = {
     ...rest,
+    initialState: restoredInitialState,
     cellTypes: preset,
     conditionalFormats: effectiveFormats,
   } as UseBstTableOptions<TData>
@@ -500,6 +537,7 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
 
   return (
     <div className={'sc-card' + themeClass + (className ? ' ' + className : '')} style={style}>
+      {gridState ? <GridStatePersist table={table} options={gridState} /> : null}
       {toolbarOn && (
         <div className="sc-toolbar" ref={toolbarRef}>
           {title && <span className="sc-title">{title}</span>}

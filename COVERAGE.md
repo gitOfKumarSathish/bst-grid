@@ -1,7 +1,7 @@
 # Bst-Table — Spec coverage matrix (58 leaves)
 
-_2026-08-13, synced at **v0.32.2**. Compares the `CLAUDE.md` §11 requirement leaves
-(A1–M2) against what has shipped (`CHANGELOG` v0.1.0 → v0.32.2), verified against the
+_2026-08-13, synced at **v0.38.0**. Compares the `CLAUDE.md` §11 requirement leaves
+(A1–M2) against what has shipped (`CHANGELOG` v0.1.0 → v0.38.0), verified against the
 engine + adapter source. Re-run when a version ships._
 
 > **Two matrices below.** (1) the original 58-leaf spec (A1–M2, immediately following); (2) **AG Grid
@@ -10,7 +10,7 @@ engine + adapter source. Re-run when a version ships._
 > `Plan.md` PART 3 "Phases 5–8".
 
 **Legend:** ✅ built · 🟡 partial · ❌ missing (needs the Phase-4 foundation / a new dep)
-**Tally:** ✅ 54 built · 🟡 3 partial · ❌ 1 missing (of 58). _(I3 file ops now ✅ — formal `DataSource.uploadFile`/`deleteFile`/`getFileUrl` verbs + `createFileHandlers` bridge on top of the cell-level upload/delete; D1 row/column virtualization + A2 infinite scroll shipped on `@tanstack/react-virtual` → both ✅, leaving I5 the only ❌; v0.30.0 — batch editing + `getChangeSet` + single-call `onSave` → I4 now partial; v0.28.0 server DataSource foundation → A3 server pagination done; v0.25.0 G2 row resize; v0.23.0 B1 QR/barcode + J2 rich-text)_
+**Tally:** ✅ 55 built · 🟡 2 partial · ❌ 1 missing (of 58). _(**B5 now ✅** — in-cell **PDF thumbnail** (`cellMeta.pdfThumbnail`, rendered by **pdf.js** via an injected renderer — engine stays dep-free), the last B5 gap; I3 file ops ✅ — formal `DataSource.uploadFile`/`deleteFile`/`getFileUrl` verbs + `createFileHandlers` bridge on top of the cell-level upload/delete; D1 row/column virtualization + A2 infinite scroll shipped on `@tanstack/react-virtual` → both ✅, leaving I5 the only ❌; v0.30.0 — batch editing + `getChangeSet` + single-call `onSave` → I4 now partial; v0.28.0 server DataSource foundation → A3 server pagination done; v0.25.0 G2 row resize; v0.23.0 B1 QR/barcode + J2 rich-text)_
 
 | ID | Requirement | Status | Where / why |
 |---|---|---|---|
@@ -24,7 +24,7 @@ engine + adapter source. Re-run when a version ships._
 | B2 | Number (currency/precision/formats) | ✅ | P2 — `Intl` formats · **ERP field formats** (`cellMeta.pattern`: Aadhaar/Verhoeff, PIN, card/Luhn) |
 | B3 | Date / time | ✅ | P2 |
 | B4 | Boolean | ✅ | P2 (now an injectable check icon) |
-| B5 | Files & attachments | 🟡 | file cell + image thumbnails + file-type icons + **click-to-preview** (`BstFilePreview`: image inline · **PDF via the browser's native iframe**, dep-free) + configurable **upload/delete** (`cellMeta.onUpload`/`onDelete`); only an in-cell **PDF thumbnail** render (pdf.js) still deferred |
+| B5 | Files & attachments | ✅ | file cell + image thumbnails + file-type icons + **in-cell PDF thumbnail** (`cellMeta.pdfThumbnail` — page 1 rendered by **pdf.js** to an `<img>`; engine stays dep-free, app injects `createPdfjsThumbnailer(pdfjs)` via `<BstPdfThumbnailerProvider>`) + **click-to-preview** (`BstFilePreview`: image inline · PDF native iframe, `data:`→`blob:`) + configurable **upload/delete** (`cellMeta.onUpload`/`onDelete`); a server raster (`thumbnailUrl`) wins when present |
 | B6 | Single select | ✅ | P2 (inline overlay editor) |
 | B7 | Multi select (chips/overflow) | ✅ | P2 · **width-aware chips** (`cellMeta.fitChips` — fit to column width) |
 | B8 | Radio group | ✅ | P2 |
@@ -92,7 +92,7 @@ This closes A2 and the client-side 10k tier of A6. What still builds on the serv
 I4 **backend reconcile** (the change-set + single-call `onSave` half landed in v0.30.0; applying the
 server's response back into cells/rows is what remains) · I5 live/WebSocket merge · the 1M migration
 tier proven end-to-end (A6).
-**Smaller / dep-gated:** B5 in-cell PDF **thumbnail** (pdf.js) — click-to-preview + upload/delete already ship (`BstFilePreview` + `cellMeta.onUpload`/`onDelete` + the formal `DataSource` file verbs).
+**B5 — done:** the in-cell PDF **thumbnail** renders page 1 via **pdf.js** (`cellMeta.pdfThumbnail` + an injected renderer — `createPdfjsThumbnailer` / `<BstPdfThumbnailerProvider>`; the engine itself never imports pdf.js), joining click-to-preview + upload/delete (`BstFilePreview` + `cellMeta.onUpload`/`onDelete` + the formal `DataSource` file verbs). A server raster (`thumbnailUrl`) still wins when present.
 
 ---
 
@@ -125,7 +125,7 @@ Everything below ships **free** (MIT/Apache)._
 | AG18 | Cell notes / comments | 💷 | ❌ | P7 |
 | AG19 | Localization / i18n (localeText) | 🆓 | ❌ | P4 |
 | AG20 | Accessibility / ARIA grid audit | 🆓 | 🟡 | P4 |
-| AG21 | Grid-state save/restore API | 🆓 | 🟡 | P4 |
+| AG21 | Grid-state save/restore API | 🆓 | ✅ | P4 — `getGridState`/`applyGridState`/`loadGridState`/`useBstGridState` (+ adapters' one-line `gridState={{ key }}`); full view snapshot, stale-column-safe |
 | AG22 | Live / streaming updates (I5, WebSocket merge) | — | ❌ | P4 |
 | AG23 | Formal loading / error overlays | 🆓 | 🟡 | P4/P5 |
 | AG24 | RTL support | 🆓 | ❌ | P8 |
@@ -135,8 +135,9 @@ Everything below ships **free** (MIT/Apache)._
 | AG28 | Cell flashing on data change | 🆓 | ❌ | P8 |
 | AG29 | Aligned grids (shared column state) | 🆓 | ❌ | P8 |
 
-**Tally:** 29 parity items — ✅ 7 built (P5 export · P6 Set Filter / status bar / context menu · P8 auto
-row height) · ❌ 17 missing · 🟡 5 partial. **12 of them are AG Grid Enterprise-paid** — they ship free here.
+**Tally:** 29 parity items — ✅ 8 built (P5 export · P6 Set Filter / status bar / context menu · P8 auto
+row height · **P4 grid-state save/restore AG21**) · ❌ 16 missing · 🟡 4 partial · ⏭️ 1 skipped (AG7 sidebar).
+**12 of them are AG Grid Enterprise-paid** — they ship free here.
 
 **Already matched (AG Grid Enterprise-paid, shipped free):** cell/range selection · clipboard
 copy/paste · batch editing · row grouping + aggregation · master-detail · sparklines · advanced-filter

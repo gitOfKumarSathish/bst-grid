@@ -808,6 +808,31 @@
   object-fit: cover;
   border: 1px solid var(--bst-table-border);
 }
+/* In-cell PDF thumbnail (B5) — page 1 rendered by pdf.js to an <img>. Portrait,
+   clipped; the type icon shows while it renders or if no renderer is available. */
+.bst-file-thumb-pdf {
+  position: relative;
+  width: 40px;
+  height: 52px;
+  overflow: hidden;
+  background: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+.bst-file-thumb-pdf-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--bst-table-muted);
+}
+.bst-file-thumb-pdf-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
 .bst-file-icon {
   font-size: 16px;
   color: var(--bst-table-muted);

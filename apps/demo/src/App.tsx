@@ -8,8 +8,19 @@ import {
   useBstDataSource,
   useBstInfiniteDataSource,
   createClientDataSource,
+  clearGridState,
+  useBstTable,
+  BstTable,
+  BstPdfThumbnailerProvider,
+  createPdfjsThumbnailer,
 } from '@bloomskill/table-engine';
 import type { BstTableColumn, BstFormatRule } from '@bloomskill/table-engine';
+// pdf.js powers the in-cell PDF thumbnails (B5). The engine never imports pdf.js —
+// the app owns it (and its worker), then injects a renderer via the provider.
+import * as pdfjsLib from 'pdfjs-dist';
+import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
+const pdfThumbnailer = createPdfjsThumbnailer(pdfjsLib);
 import CssBaseline from '@mui/material/CssBaseline';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
@@ -23,6 +34,7 @@ import '@bloomskill/table-shadcn/styles.css';
 import {
   columns,
   people,
+  pdfDoc,
   newPerson,
   dbTables,
   dbTableColumns,
@@ -335,6 +347,226 @@ function ErpFormatsSection() {
   );
 }
 
+// Files & attachments (B5) — image thumbnails + in-cell PDF thumbnails
+// (`cellMeta.pdfThumbnail`). `pdfDoc` (from ./data) builds a real content-rich,
+// offline PDF so both the thumbnail and the click-preview show a document.
+const demoAvatar =
+  'data:image/svg+xml;utf8,' +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="64" height="64" fill="#6366f1"/><circle cx="32" cy="24" r="12" fill="#c7d2fe"/><rect x="14" y="40" width="36" height="18" rx="9" fill="#c7d2fe"/></svg>',
+  );
+
+type DocRow = {
+  id: string;
+  vendor: string;
+  attachments: Array<{ name: string; url?: string; contentType?: string; thumbnailUrl?: string }>;
+};
+
+const docRows: DocRow[] = [
+  {
+    id: '1',
+    vendor: 'Acme Corp',
+    attachments: [
+      { name: 'invoice-2041.pdf', url: pdfDoc('INVOICE 2041'), contentType: 'application/pdf' },
+      { name: 'logo.svg', url: demoAvatar, contentType: 'image/svg+xml' },
+    ],
+  },
+  {
+    id: '2',
+    vendor: 'Globex',
+    attachments: [
+      { name: 'msa-signed.pdf', url: pdfDoc('MSA SIGNED'), contentType: 'application/pdf' },
+      { name: 'w9.pdf', url: pdfDoc('FORM W-9'), contentType: 'application/pdf' },
+    ],
+  },
+  {
+    id: '3',
+    vendor: 'Initech',
+    attachments: [
+      // A server-generated raster thumbnail (thumbnailUrl) wins over the native render.
+      { name: 'scan.pdf', url: pdfDoc('SCAN'), thumbnailUrl: demoAvatar, contentType: 'application/pdf' },
+    ],
+  },
+];
+
+const docColumns: BstTableColumn<DocRow>[] = [
+  { id: 'vendor', accessorKey: 'vendor', header: 'Vendor', meta: { type: 'text' } },
+  {
+    id: 'attachments',
+    accessorKey: 'attachments',
+    header: 'Attachments',
+    meta: { type: 'files', cellMeta: { pdfThumbnail: true } },
+  },
+];
+
+/**
+ * Grid state — save / restore view (AG21). The MUI adapter's one-line
+ * `gridState={{ key }}` prop persists this grid's view (sort · filter · column
+ * order/size/visibility/pinning · grouping) to `localStorage` and restores it on
+ * mount. Interact, then reload the page — the view comes back.
+ */
+const gsColumns: BstTableColumn<Person>[] = [
+  { id: 'name', accessorKey: 'name', header: 'Name', meta: { type: 'text' } },
+  { id: 'role', accessorKey: 'role', header: 'Role', meta: { type: 'text' } },
+  {
+    id: 'salary',
+    accessorKey: 'salary',
+    header: 'Salary',
+    meta: { type: 'number', align: 'right', cellMeta: { currency: 'USD', precision: 0 } },
+  },
+  { id: 'plan', accessorKey: 'plan', header: 'Plan', meta: { type: 'text' } },
+  { id: 'email', accessorKey: 'email', header: 'Email', meta: { type: 'text' } },
+];
+
+const GRID_STATE_KEY = 'demo-people-view';
+
+function GridStateSection() {
+  const [nonce, setNonce] = React.useState(0);
+  const [stored, setStored] = React.useState('');
+  React.useEffect(() => {
+    const read = () => {
+      try {
+        setStored(window.localStorage.getItem('bst-table:state:' + GRID_STATE_KEY) ?? '');
+      } catch {
+        /* storage blocked */
+      }
+    };
+    read();
+    const id = setInterval(read, 600);
+    return () => clearInterval(id);
+  }, [nonce]);
+  return (
+    <section>
+      <h3 style={{ margin: '0 0 8px' }}>Grid state — save / restore view (AG21)</h3>
+      <div style={{ ...box, marginBottom: 8 }}>
+        <b>Sort, resize, reorder, hide or pin</b> a column below — then <b>reload the page</b>. The
+        grid restores your exact view. It's one prop:{' '}
+        <code>gridState={'{{'} key: '{GRID_STATE_KEY}' {'}}'}</code> — it seeds{' '}
+        <code>initialState</code> from <code>localStorage</code> and writes changes back (debounced).
+        Distinct from the settings gear (which toggles <i>features</i>). The live snapshot on the
+        right is what's persisted.
+      </div>
+      <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+        <div style={{ flex: '1 1 420px', minWidth: 0 }}>
+          <button
+            type="button"
+            onClick={() => {
+              clearGridState(GRID_STATE_KEY);
+              setNonce((n) => n + 1);
+            }}
+            style={{ marginBottom: 8, padding: '4px 10px', cursor: 'pointer' }}
+          >
+            Reset saved view
+          </button>
+          <BstTableMui<Person>
+            key={nonce}
+            title="People (your saved view)"
+            data={people}
+            columns={gsColumns}
+            getRowId={(r) => r.id}
+            gridState={{ key: GRID_STATE_KEY }}
+            enableColumnPinning
+            enableColumnOrdering
+            showDensityToggle
+            pagination={false}
+          />
+        </div>
+        <pre
+          style={{
+            ...box,
+            flex: '0 1 300px',
+            margin: 0,
+            maxHeight: 320,
+            overflow: 'auto',
+            fontSize: 12,
+            lineHeight: 1.5,
+          }}
+        >
+          {stored ? JSON.stringify(JSON.parse(stored), null, 2) : '// interact with the grid…'}
+        </pre>
+      </div>
+    </section>
+  );
+}
+
+const fileSubhead: React.CSSProperties = {
+  margin: '0 0 6px',
+  fontSize: 13,
+  fontWeight: 600,
+  opacity: 0.7,
+};
+
+/**
+ * The B5 files example on the **headless engine table** (`useBstTable` +
+ * `<BstTable>`) — the "main table" both adapters wrap. The `files` read cell
+ * (image + PDF thumbnails) is engine-level, so it renders identically here with no
+ * adapter chrome.
+ */
+function FilesMainTable() {
+  const table = useBstTable<DocRow>({
+    data: docRows,
+    columns: docColumns,
+    getRowId: (r) => r.id,
+    pagination: false,
+  });
+  return (
+    <div style={{ ...box, padding: 0, overflow: 'auto' }}>
+      <div className="bst-table-root">
+        <BstTable table={table} />
+      </div>
+    </div>
+  );
+}
+
+function FilesSection({ dark }: { dark: boolean }) {
+  return (
+    <section>
+      <h3 style={{ margin: '0 0 8px' }}>Files &amp; attachments — image + PDF thumbnails (B5)</h3>
+      <div style={{ ...box, marginBottom: 8 }}>
+        The <code>files</code> cell shows an <b>image thumbnail</b> for pictures and, with{' '}
+        <code>cellMeta.pdfThumbnail: true</code>, an <b>in-cell PDF thumbnail</b> of page 1 —
+        rendered by <b>pdf.js</b>. The engine never imports pdf.js; this app injects a renderer
+        (<code>createPdfjsThumbnailer(pdfjs)</code>) via{' '}
+        <code>&lt;BstPdfThumbnailerProvider&gt;</code>. <b>Click any file</b> to open the full preview.
+        A server-generated raster (<code>thumbnailUrl</code>, see <i>Initech</i>) wins over the live
+        render. The read cell is <b>engine-level</b>, so the <b>same</b> <code>files</code> column
+        renders identically across all three below — the MUI adapter, the shadcn adapter and the
+        headless main table.
+      </div>
+      <div style={{ display: 'grid', gap: 16 }}>
+        <div>
+          <h4 style={fileSubhead}>MUI adapter</h4>
+          <BstTableMui<DocRow>
+            title="Vendor documents"
+            data={docRows}
+            columns={docColumns}
+            getRowId={(r) => r.id}
+            pagination={false}
+            showSearch={false}
+          />
+        </div>
+        <div>
+          <h4 style={fileSubhead}>shadcn / Radix adapter</h4>
+          <BstTableShadcn<DocRow>
+            title="Vendor documents"
+            dark={dark}
+            icons={lucideIcons}
+            data={docRows}
+            columns={docColumns}
+            getRowId={(r) => r.id}
+            pagination={false}
+            showSearch={false}
+          />
+        </div>
+        <div>
+          <h4 style={fileSubhead}>Main table — headless engine &lt;BstTable/&gt;</h4>
+          <FilesMainTable />
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function App() {
   const [dark, setDark] = React.useState(false);
   const [rowMode, setRowMode] = React.useState(false);
@@ -432,6 +664,7 @@ export default function App() {
   };
 
   return (
+    <BstPdfThumbnailerProvider renderer={pdfThumbnailer}>
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <style>{`
@@ -845,6 +1078,10 @@ export default function App() {
 
         <ErpFormatsSection />
 
+        <GridStateSection />
+
+        <FilesSection dark={dark} />
+
         <VirtualizationSection />
 
         <InfiniteScrollSection />
@@ -859,5 +1096,6 @@ export default function App() {
         </footer>
       </div>
     </ThemeProvider>
+    </BstPdfThumbnailerProvider>
   );
 }

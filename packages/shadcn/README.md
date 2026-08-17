@@ -17,7 +17,7 @@ so you can switch skins without changing your data code.
 
 - 🧱 **Drop-in shadcn-style grid** — one `<BstTableShadcn />` component.
 - 🎛 **Radix DropdownMenu** column-visibility menu; shadcn-style search & pagination.
-- ✏️ **Editing (Phase 2)** at MUI parity — native-control editors for the full B-series, a dependency-free **modal** for long-text & file popups (the **files** modal adds **click-to-preview** — images inline · PDFs in the native viewer — and configurable **upload/delete** via `cellMeta.onUpload`/`onDelete`), **Add row** button + unsaved **Save / Discard** bar, inline error rings. Wired via `createShadcnPreset()`.
+- ✏️ **Editing (Phase 2)** at MUI parity — native-control editors for the full B-series, a dependency-free **modal** for long-text & file popups (the **files** modal adds **click-to-preview** — images inline · PDFs in the native viewer — and configurable **upload/delete** via `cellMeta.onUpload`/`onDelete`; read cells show image thumbnails and, with `cellMeta.pdfThumbnail` + a `<BstPdfThumbnailerProvider>` (pdf.js), an in-cell **PDF page-1 thumbnail**), **Add row** button + unsaved **Save / Discard** bar, inline error rings. Wired via `createShadcnPreset()`.
 - ⌨️ **Selection · keyboard nav · clipboard (Phase 3)** — pass `enableCellSelection` / `enableClipboard`; range selection, Arrow/Tab/Home/End navigation, and copy/paste (TSV) come from the shared grid body, no extra chrome required. The **Columns menu** gains a **Copy-column** button (the pluggable `copy` icon) per column — copies the whole column across **all pages** (also Ctrl/Cmd+Space). Whole-column and whole-row copy are sub-toggles: **`enableCopyColumn`** / **`enableCopyRow`** (both default `true`; Shift+Space copies a row).
 - ☑️ **Row selection (Phase 3)** — `enableRowSelection` renders a checkbox column (header select-all + per-row) and a toolbar "{n} selected" badge + Clear (`showSelectionInfo`).
 - ↩️ **Undo/redo (Phase 3)** — `enableUndoRedo` adds toolbar Undo/Redo buttons (`showUndoRedo`) wired to the engine's edit history (Ctrl/Cmd+Z / Ctrl/Cmd+Y also work).
@@ -28,6 +28,7 @@ so you can switch skins without changing your data code.
 - 🔎 **Filter builder (Phase 3, E3)** — `showFilterBuilder` adds a "Filters (n)" button + a panel with per-column condition rows (operator-aware). Add `enableColumnFilterRow` for a second, inline per-column filter row; drag a header to reorder, drag its edge to resize.
 - 🎨 **Conditional-format builder (K3)** — `showFormatBuilder` adds a "Formats (n)" button that opens/closes a panel hosting `<BstConditionalFormatBuilder>`: end-users add / edit / delete `conditionalFormats` rules at runtime (uncontrolled local state by default; pass `onConditionalFormatsChange` to own the rules). Hidden while `enableConditionalFormatting` is off.
 - ⚙️ **Settings sheet** — `showSettings` adds a gear that opens a dependency-free right-side **sheet** (shadcn "Sheet" style) where end-users flip this grid's features on/off at runtime (**per table**), saved to `localStorage`. Only provisioned features appear — e.g. turn **Copy & paste** off to disable clipboard, no code change. Honours `dark`.
+- 💾 **Grid state save/restore (AG21)** — `gridState={{ key: 'orders' }}` persists this grid's **view** (sort · filter · column order/size/visibility/pinning · grouping) to `localStorage` and restores it on the next mount — a per-user view that survives reloads, in one prop.
 - ⌨️ **Keyboard-shortcuts overlay** — `showShortcuts` adds a **"?" button** (also opens on the `?` key) → a theme-aware overlay listing the keyboard shortcuts **active on this grid** (grouped · searchable · ⌘/Ctrl-aware; force with `showShortcuts={{ platform: 'mac' }}`); it shows only what's wired (selection / clipboard / editing / undo).
 - 🧹 **Leaner toolbar** — **Add row** sits in a footer bar under the table, and **Undo/Redo · Density · Formats** collapse into a single **"⋯ More"** menu (Radix `DropdownMenu`).
 - 🗂️ **Review-changes sheet** — with `enableEditing={{ mode: 'batch' }}` every edit stays an unsaved draft; the toolbar shows **"{n} unsaved" + Review & save**, opening a sheet that lists each edit (**row · column · old → new**) with per-change revert and the final **Save** — which fires **ONE** `onSave` call for the whole batch (cell-wise `changes`, row-wise `rows[].patch`, or grid-wise `next`), never a request per cell. A failed call keeps every draft. End-users can switch batch mode on/off themselves from the ⚙ settings sheet ("Editing" → **Batch editing**, `enableBatchEditing`).
@@ -211,6 +212,50 @@ tokens instead:
 `--input` / `--ring` / `--primary(-foreground)` / `--radius` and the host font, so the grid matches
 your theme — including dark, which your app's `.dark` class already drives.
 
+### Files columns — images & PDFs
+
+A `files` column (`meta.type: 'files'`) holds attachments; its value is `FileRef[]`
+(`{ name?, url?, thumbnailUrl?, contentType? }`). **Images thumbnail automatically** — no setup:
+
+```tsx
+const columns = [
+  { id: 'photos', accessorKey: 'photos', header: 'Photos', meta: { type: 'files' } },
+]
+// rows: photos: [{ name: 'logo.png', url: 'https://…/logo.png', contentType: 'image/png' }]
+```
+
+**PDF page-1 thumbnails** need pdf.js (the engine never bundles it — you own it + its worker).
+Install `pdfjs-dist`, set `cellMeta.pdfThumbnail: true` on the column, and wrap the grid in the provider:
+
+```tsx
+import * as pdfjs from 'pdfjs-dist'
+import PdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?worker' // Vite
+import { BstPdfThumbnailerProvider, createPdfjsThumbnailer } from '@bloomskill/table-engine'
+import { BstTableShadcn } from '@bloomskill/table-shadcn'
+
+pdfjs.GlobalWorkerOptions.workerPort = new PdfWorker()
+const pdfThumbs = createPdfjsThumbnailer(pdfjs)
+
+const columns = [
+  { id: 'docs', accessorKey: 'docs', header: 'Docs',
+    meta: { type: 'files', cellMeta: { pdfThumbnail: true } } },
+]
+// rows: docs: [{ name: 'invoice.pdf', url: 'https://…/invoice.pdf', contentType: 'application/pdf' }]
+
+export function App() {
+  return (
+    <BstPdfThumbnailerProvider renderer={pdfThumbs}>
+      <BstTableShadcn data={rows} columns={columns} getRowId={(r) => r.id} />
+    </BstPdfThumbnailerProvider>
+  )
+}
+```
+
+Images in the same column keep thumbnailing; a file with a `thumbnailUrl` skips pdf.js. Without the
+provider, `pdfThumbnail: true` is harmless (the PDF keeps its icon). Click any file for a full-size
+preview. Full guide + other bundlers' worker setup:
+[engine README → Files columns](https://www.npmjs.com/package/@bloomskill/table-engine#files-columns--images--pdfs).
+
 ## Props
 
 Extends **every** [`useBstTable` option](https://www.npmjs.com/package/@bloomskill/table-engine#options-reference)
@@ -263,6 +308,7 @@ Plus the shadcn-only chrome props:
 | `showFormatBuilder` | `boolean` | `false` | Show the Formats button + conditional-format builder panel (K3). Needs `enableConditionalFormatting` (default on). |
 | `onConditionalFormatsChange` | `(rules) => void` | — | Own the builder's rule edits (controlled mode); omit for local, uncontrolled edits. |
 | `showSettings` | `boolean \| BstSettingsOptions` | `false` | Gear → a right-side settings **sheet** of per-table feature toggles, persisted to `localStorage`. Object form: `{ features?, title?, persistKey?, persist? }`. |
+| `gridState` | `BstGridStateOptions` | — | **Grid-state save/restore (AG21).** `{ key: 'orders' }` persists this grid's **view** — sort · filter · column order/size/visibility/pinning · grouping — to `localStorage` and restores it on the next mount (seeds `initialState` + writes changes back, debounced). Full options: `{ key, storage?, persist?, debounceMs?, include?, exclude? }`. Distinct from `showSettings` (which toggles *features*). |
 | `pageSizeOptions` | `number[]` | `[5,10,20,50]` | Rows-per-page choices. |
 | `className` | `string` | — | Custom class on the outer card (added after `sc-card` / `sc-dark`). |
 | `style` | `CSSProperties` | — | Inline style on the outer card. |

@@ -16,7 +16,7 @@ without touching your data code.
 
 - 🧱 **Drop-in MUI grid** — one `<BstTableMui />` component.
 - 🔎 **Global search** box, **columns** visibility menu, **pagination** bar — all MUI.
-- ✏️ **MUI cell editors (Phase 2)** for the full B-series — `TextField` (text/number/date via native input types), `Select`/multi-`Select` (open on edit, single-select commits on pick, multi-select shows per-option **checkboxes** + colour swatches and commits on close), `Radio`, `Checkbox`/`Switch`, and `Dialog` popup editors for long text & files. The **files** editor adds **click-to-preview** (images inline · PDFs in the browser's native viewer) and configurable **upload/delete** via `cellMeta.onUpload`/`onDelete`. Wired via `createMuiPreset()`. The `Select` editors are flagged `overlayEditor` so their portalled menu doesn't discard the edit on open.
+- ✏️ **MUI cell editors (Phase 2)** for the full B-series — `TextField` (text/number/date via native input types), `Select`/multi-`Select` (open on edit, single-select commits on pick, multi-select shows per-option **checkboxes** + colour swatches and commits on close), `Radio`, `Checkbox`/`Switch`, and `Dialog` popup editors for long text & files. The **files** editor adds **click-to-preview** (images inline · PDFs in the browser's native viewer) and configurable **upload/delete** via `cellMeta.onUpload`/`onDelete`; read cells show image thumbnails and, with `cellMeta.pdfThumbnail` + a `<BstPdfThumbnailerProvider>` (pdf.js), an in-cell **PDF page-1 thumbnail**. Wired via `createMuiPreset()`. The `Select` editors are flagged `overlayEditor` so their portalled menu doesn't discard the edit on open.
 - 🧪 **Editing + validation chrome** — **Add row** button, an unsaved-changes **Save / Discard** bar, inline error rings + messages.
 - ⌨️ **Selection · keyboard nav · clipboard (Phase 3)** — pass `enableCellSelection` / `enableClipboard`; the grid body handles range selection, Arrow/Tab/Home/End navigation, and copy/paste (TSV). No extra MUI wiring needed. The **Columns menu** gains a **Copy-column** button (📋) per column — copies the whole column across **all pages** (also Ctrl/Cmd+Space). Whole-column and whole-row copy are sub-toggles: **`enableCopyColumn`** / **`enableCopyRow`** (both default `true`; Shift+Space copies a row).
 - ☑️ **Row selection (Phase 3)** — `enableRowSelection` renders a checkbox column (header select-all + per-row) and a toolbar "{n} selected" chip + Clear (`showSelectionInfo`).
@@ -28,6 +28,7 @@ without touching your data code.
 - 🔎 **Filter builder (Phase 3, E3)** — `showFilterBuilder` adds a "Filters (n)" button + a panel with per-column condition rows (operator-aware). Add `enableColumnFilterRow` for a second, inline per-column filter row; drag a header to reorder, drag its edge to resize.
 - 🎨 **Conditional-format builder (K3)** — `showFormatBuilder` adds a "Formats (n)" button that opens/closes a panel hosting `<BstConditionalFormatBuilder>`: end-users add / edit / delete `conditionalFormats` rules at runtime (uncontrolled local state by default; pass `onConditionalFormatsChange` to own the rules). Hidden while `enableConditionalFormatting` is off.
 - ⚙️ **Settings sheet** — `showSettings` adds a gear that slides out a right-side **Drawer** where end-users flip this grid's features on/off at runtime (**per table**), saved to `localStorage`. Only features you've provisioned appear — e.g. turn **Copy & paste** off to disable clipboard, no code change.
+- 💾 **Grid state save/restore (AG21)** — `gridState={{ key: 'orders' }}` persists this grid's **view** (sort · filter · column order/size/visibility/pinning · grouping) to `localStorage` and restores it on the next mount — a per-user view that survives reloads, in one prop.
 - ⌨️ **Keyboard-shortcuts overlay** — `showShortcuts` adds a **"?" button** (also opens on the `?` key) → a theme-aware overlay listing the keyboard shortcuts **active on this grid** (grouped · searchable · ⌘/Ctrl-aware; force with `showShortcuts={{ platform: 'mac' }}`); it shows only what's wired (selection / clipboard / editing / undo).
 - 🧹 **Leaner toolbar** — **Add row** sits in a footer bar under the table, and **Undo/Redo · Density · Formats** collapse into a single **"⋯ More"** menu.
 - 🗂️ **Review-changes sheet** — with `enableEditing={{ mode: 'batch' }}` every edit stays an unsaved draft; the toolbar shows **"{n} unsaved" + Review & save**, opening a sheet that lists each edit (**row · column · old → new**) with per-change revert and the final **Save** — which fires **ONE** `onSave` call for the whole batch (cell-wise `changes`, row-wise `rows[].patch`, or grid-wise `next`), never a request per cell. A failed call keeps every draft. End-users can switch batch mode on/off themselves from the ⚙ settings sheet ("Editing" → **Batch editing**, `enableBatchEditing`).
@@ -164,6 +165,51 @@ so users can't switch on something the grid isn't wired for.
 The same headless model powers both skins — it's the engine's `useBstSettings` hook
 ([docs](https://www.npmjs.com/package/@bloomskill/table-engine#runtime-settings-sheet)).
 
+### Files columns — images & PDFs
+
+A `files` column (`meta.type: 'files'`) holds attachments; its value is `FileRef[]`
+(`{ name?, url?, thumbnailUrl?, contentType? }`). **Images thumbnail automatically** — no setup:
+
+```tsx
+const columns = [
+  { id: 'photos', accessorKey: 'photos', header: 'Photos', meta: { type: 'files' } },
+]
+// rows: photos: [{ name: 'logo.png', url: 'https://…/logo.png', contentType: 'image/png' }]
+```
+
+**PDF page-1 thumbnails** need pdf.js (the engine never bundles it — you own it + its worker).
+Install `pdfjs-dist`, then set `cellMeta.pdfThumbnail: true` on the column and wrap the grid in the
+provider:
+
+```tsx
+import * as pdfjs from 'pdfjs-dist'
+import PdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?worker' // Vite
+import { BstPdfThumbnailerProvider, createPdfjsThumbnailer } from '@bloomskill/table-engine'
+import { BstTableMui } from '@bloomskill/table-mui'
+
+pdfjs.GlobalWorkerOptions.workerPort = new PdfWorker()
+const pdfThumbs = createPdfjsThumbnailer(pdfjs)
+
+const columns = [
+  { id: 'docs', accessorKey: 'docs', header: 'Docs',
+    meta: { type: 'files', cellMeta: { pdfThumbnail: true } } },
+]
+// rows: docs: [{ name: 'invoice.pdf', url: 'https://…/invoice.pdf', contentType: 'application/pdf' }]
+
+export function App() {
+  return (
+    <BstPdfThumbnailerProvider renderer={pdfThumbs}>
+      <BstTableMui data={rows} columns={columns} getRowId={(r) => r.id} />
+    </BstPdfThumbnailerProvider>
+  )
+}
+```
+
+Images in the same column keep thumbnailing; a file with a `thumbnailUrl` skips pdf.js. Without the
+provider, `pdfThumbnail: true` is harmless (the PDF keeps its icon). Click any file for a full-size
+preview. Full guide + other bundlers' worker setup:
+[engine README → Files columns](https://www.npmjs.com/package/@bloomskill/table-engine#files-columns--images--pdfs).
+
 ## Props
 
 Extends **every** [`useBstTable` option](https://www.npmjs.com/package/@bloomskill/table-engine#options-reference)
@@ -212,6 +258,7 @@ Plus the MUI-only chrome props:
 | `showFormatBuilder` | `boolean` | `false` | Show the Formats button + conditional-format builder panel (K3). Needs `enableConditionalFormatting` (default on). |
 | `onConditionalFormatsChange` | `(rules) => void` | — | Own the builder's rule edits (controlled mode); omit for local, uncontrolled edits. |
 | `showSettings` | `boolean \| BstSettingsOptions` | `false` | Gear → a right-side settings **sheet** (Drawer) of per-table feature toggles, persisted to `localStorage`. Object form: `{ features?, title?, persistKey?, persist? }`. |
+| `gridState` | `BstGridStateOptions` | — | **Grid-state save/restore (AG21).** `{ key: 'orders' }` persists this grid's **view** — sort · filter · column order/size/visibility/pinning · grouping — to `localStorage` and restores it on the next mount (seeds `initialState` + writes changes back, debounced). Full options: `{ key, storage?, persist?, debounceMs?, include?, exclude? }`. Distinct from `showSettings` (which toggles *features*). |
 | `pageSizeOptions` | `number[]` | `[5,10,20,50]` | Rows-per-page choices. |
 | `className` | `string` | — | Custom class on the outer card (the whole component). |
 | `style` | `CSSProperties` | — | Inline style on the outer card. |

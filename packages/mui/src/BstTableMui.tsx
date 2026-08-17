@@ -5,6 +5,8 @@ import {
   filterSettingsGroups,
   shouldShowSettingsSearch,
   useToolbarOverflow,
+  useBstGridState,
+  loadGridState,
   BstTable,
   BstFilterBuilder,
   BstConditionalFormatBuilder,
@@ -17,6 +19,8 @@ import type {
   BstCellEdit,
   BstFormatRule,
   BstFormatBuilderColumn,
+  BstGridStateOptions,
+  BstTableInstance,
 } from '@bloomskill/table-engine'
 import type { RowData } from '@tanstack/react-table'
 import Paper from '@mui/material/Paper'
@@ -146,6 +150,16 @@ export interface BstTableMuiProps<TData extends RowData> extends UseBstTableOpti
    * the shortcuts active on this grid. `boolean`, or `{ platform }` to force
    * ⌘/Ctrl key rendering (default auto-detects). Default: false (opt-in). */
   showShortcuts?: boolean | { platform?: 'mac' | 'pc' | 'auto' }
+  /**
+   * Grid-state save/restore (AG21). Pass `{ key }` to persist this grid's **view**
+   * — sort · filter · column order/size/visibility/pinning · grouping · … — to
+   * `localStorage` and restore it on the next mount (a per-user "view" that
+   * survives reloads). One prop does both: it seeds `initialState` from the stored
+   * snapshot (unless you passed your own) and writes changes back (debounced).
+   * Accepts the full `BstGridStateOptions` (`storage` / `persist` / `debounceMs` /
+   * `include` / `exclude`). Distinct from `showSettings`, which toggles *features*.
+   */
+  gridState?: BstGridStateOptions
   /** Page-size choices in the pagination bar. Default: [5, 10, 20, 50]. */
   pageSizeOptions?: number[]
   /** Custom class name on the outer card (the whole component). Fine-grained
@@ -153,6 +167,22 @@ export interface BstTableMuiProps<TData extends RowData> extends UseBstTableOpti
   className?: string
   /** Inline style on the outer card. */
   style?: React.CSSProperties
+}
+
+/**
+ * Null-rendering child that wires grid-state persistence (AG21) via the engine
+ * hook. Rendered only when `gridState` is set, so grids that don't use it pay
+ * nothing (no per-render snapshot).
+ */
+function GridStatePersist<TData extends RowData>({
+  table,
+  options,
+}: {
+  table: BstTableInstance<TData>
+  options: BstGridStateOptions
+}) {
+  useBstGridState(table, options)
+  return null
 }
 
 /**
@@ -192,6 +222,7 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
     showColumnEditToggle,
     showSettings: _showSettings,
     showShortcuts,
+    gridState,
     pageSizeOptions = [5, 10, 20, 50],
     className,
     style,
@@ -213,8 +244,18 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
   }
 
   const preset = React.useMemo(() => cellTypes ?? createMuiPreset(), [cellTypes])
+  // Grid-state restore (AG21): seed initialState from the stored snapshot once,
+  // unless the caller passed their own initialState. Read once on mount so a later
+  // save doesn't re-seed. Persistence (save-on-change) is the child below.
+  const restoredInitialState = React.useMemo(
+    () => rest.initialState ?? (gridState ? loadGridState(gridState.key, gridState.storage) : undefined),
+    // mount-only: the key/storage identify one stored view
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  )
   const gridOpts = {
     ...rest,
+    initialState: restoredInitialState,
     cellTypes: preset,
     conditionalFormats: effectiveFormats,
   } as UseBstTableOptions<TData>
@@ -456,6 +497,7 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
         boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
       }}
     >
+      {gridState ? <GridStatePersist table={table} options={gridState} /> : null}
       {toolbarOn && (
         <Stack
           ref={toolbarRef}

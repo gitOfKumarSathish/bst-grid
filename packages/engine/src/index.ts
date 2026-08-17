@@ -147,6 +147,36 @@ export type {
   BstSettingsOverrides,
 } from './settings.js'
 
+// ---- grid-state save/restore (AG21 — per-user view snapshots) ----
+export {
+  useBstGridState,
+  getGridState,
+  applyGridState,
+  resetGridState,
+  emptyGridState,
+  loadGridState,
+  saveGridState,
+  clearGridState,
+  BST_GRID_STATE_KEYS,
+  BST_GRID_STATE_VERSION,
+} from './gridState.js'
+export type {
+  BstGridState,
+  BstGridStateKey,
+  BstGridStateSelect,
+  BstGridStateOptions,
+  BstGridStateController,
+  BstGridStateStorage,
+} from './gridState.js'
+
+// ---- in-cell PDF thumbnails (B5 — pdf.js-backed, injected) ----
+export {
+  BstPdfThumbnailerProvider,
+  useBstPdfThumbnailer,
+  createPdfjsThumbnailer,
+} from './pdfThumbnail.js'
+export type { PdfThumbnailRenderer, PdfThumbnailerOptions } from './pdfThumbnail.js'
+
 // ---- keyboard shortcuts (in-UI overlay + headless registry) ----
 export { BstShortcuts } from './BstShortcuts.js'
 export type { BstShortcutsProps } from './BstShortcuts.js'

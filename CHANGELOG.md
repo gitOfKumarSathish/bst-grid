@@ -9,6 +9,89 @@ this project uses [Semantic Versioning](https://semver.org).
 > affected package README(s) **and** bump the version, in the same change.
 
 ## [Unreleased]
+
+## [0.38.0] — 2026-08-17
+### Changed — B5 in-cell PDF thumbnails now render via pdf.js (reliable)
+- The native-`<iframe>` thumbnail (0.36.0–0.37.1) **did not paint** in Chrome — the browser won't
+  render a PDF in a tiny frame, and its newer viewer ignores the chrome-hiding params. Replaced it
+  with a **pdf.js**-rendered raster `<img>` (the tool `CLAUDE.md` §6 named for this all along), which
+  renders page 1 reliably in every browser.
+- The engine stays **dependency-free** — it never imports `pdf.js`. The app provides it (and owns its
+  worker) and injects a renderer:
+  - **`createPdfjsThumbnailer(pdfjs, opts?)`** — renders page 1 to a canvas → a cached PNG `data:` URL.
+    Accepts the pdf.js module or a `() => import('pdfjs-dist')` loader (lazy). `opts`: `scale`, `cache`,
+    `createCanvas`.
+  - **`<BstPdfThumbnailerProvider renderer={…}>`** — supplies the renderer grid-wide (any adapter);
+    `useBstPdfThumbnailer()` reads it.
+  - `cellMeta.pdfThumbnail` now accepts `true` (use the provider's renderer) **or a
+    `PdfThumbnailRenderer` function** (per-column). With no renderer, PDFs keep the file-type icon —
+    nothing breaks.
+- The full-size click **preview** (`BstFilePreview`) still uses the native `<iframe>` (with the
+  `data:`→`blob:` fix from 0.37.1 — that path *does* work at full size).
+- New engine exports: `BstPdfThumbnailerProvider`, `useBstPdfThumbnailer`, `createPdfjsThumbnailer` +
+  types `PdfThumbnailRenderer`, `PdfThumbnailerOptions`. Demo wires pdf.js (`pdfjs-dist` devDep, Vite
+  `?worker`) and shows real PDF thumbnails in the MUI + shadcn + headless grids. Tested:
+  `pdfThumbnail.test.ts` (render flow, data: decode, cache, lazy load, failure) + `filePreview.test.tsx`.
+- **Docs:** new step-by-step **"Files columns — images & PDFs"** guide (engine README) — how to
+  configure a `files` column, the `FileRef` shape, the image path (zero setup) and the PDF path
+  (install pdf.js → provider → `pdfThumbnail: true`), incl. worker setup per bundler. Both adapter
+  READMEs get the adapter-specific quick setup.
+
+## [0.37.1] — 2026-08-17
+### Fixed — B5 PDF thumbnail/preview: render `data:` PDFs in Chrome
+- Chrome & Edge refuse to render a `data:application/pdf` URL inside an `<iframe>` (data: gets an
+  opaque origin and the built-in PDF viewer is blocked), so an in-cell **PDF thumbnail** — or the
+  full **preview** — came up blank for offline/data-URL PDFs while images (which use `<img>`) rendered
+  fine. The engine now converts a `data:` PDF URL to a same-document **`blob:` URL** (which Chrome
+  renders reliably) for both the thumbnail and `BstFilePreview`; `http(s):` / `blob:` URLs pass
+  through unchanged, and the blob is revoked on unmount. Tested in `filePreview.test.tsx`.
+- Demo: the shared `files` column (People grid — MUI **and** shadcn adapters) now sets
+  `cellMeta.pdfThumbnail: true`, and its demo PDFs are valid one-page docs (correct xref), so PDF
+  thumbnails show in the main grids, not just the dedicated Files section.
+
+## [0.37.0] — 2026-08-17
+### Added — Grid-state save/restore (AG21): per-user view snapshots
+- New engine module: **`getGridState`** / **`applyGridState`** / **`resetGridState`** /
+  **`emptyGridState`** snapshot and restore a grid's **view** — sort · filter · global filter · column
+  order/size/visibility/pinning · grouping · expansion · row pinning · selection · pagination — as
+  plain, version-stamped JSON (`BstGridState`). This is the AG21 gap; it complements the settings
+  sheet (which toggles *features*, not view layout).
+- **`applyGridState` drops entries for columns that no longer exist**, so a saved view survives a
+  column-set change instead of wedging the grid. `include` / `exclude` narrow which slices are
+  captured/restored.
+- Persistence: **`loadGridState`** / **`saveGridState`** / **`clearGridState`** (namespaced under
+  `bst-table:state:<key>` in `localStorage`; any `storage` accepted) + the **`useBstGridState(table, {
+  key })`** hook that auto-persists on change (debounced) and returns
+  `{ getState, applyState, save, clear, reset, storageKey }`. Feed `loadGridState(key)` into
+  `useBstTable({ initialState })` for a flash-free restore.
+- **Adapters:** one-line **`gridState={{ key }}`** on `<BstTableMui>` / `<BstTableShadcn>` seeds
+  `initialState` from storage **and** persists changes — via a null-rendering child, so grids that
+  don't use it pay nothing.
+- v9 detail: v9 removed `table.getState()`; this reads `table.store.state` and restores through the
+  per-slice setters. New demo section "Grid state — save / restore view"; tested in
+  `gridState.test.tsx` (12 cases). Closes **AG21** in `COVERAGE.md` (parity now ✅ 8 / 🟡 4 / ❌ 16).
+
+### Fixed — MCP corpus: stale "PDF thumbnails not built" claim
+- Removed the `NOT_BUILT` rule for in-cell PDF thumbnails (`packages/mcp/src/rules.ts`) — they shipped
+  in v0.36.0 (`cellMeta.pdfThumbnail`), so the MCP server no longer tells agents the feature is missing.
+
+## [0.36.0] — 2026-08-17
+### Added — Files: in-cell PDF thumbnail (`cellMeta.pdfThumbnail`) — completes B5
+- The **`files`** read cell now renders a **PDF as an in-cell page-1 thumbnail** when a column sets
+  **`cellMeta.pdfThumbnail: true`** — drawn by the browser's **native PDF viewer** in a clipped
+  `<iframe>`, **dependency-free (no `pdf.js`)**. Previously a PDF only showed a generic file-type icon
+  while images already showed an `<img>` thumbnail; this brings PDFs to parity.
+- The thumbnail frame is `pointer-events:none` (a click still opens the full-screen `BstFilePreview`),
+  `loading="lazy"` (offscreen rows don't fetch), and keeps the PDF icon behind it as a fallback for
+  browsers that can't inline-render.
+- A **server-generated raster** in `thumbnailUrl` still wins — it renders as a plain `<img>`, so
+  backends that pre-generate crisp thumbnails are unaffected.
+- **Opt-in per column** (default `false`), so grids with many PDFs don't pay for N live renders unless
+  asked. Both the **MUI** and **shadcn** skins inherit it (read renderer lives in the engine). New demo
+  section "Files & attachments"; tested in `filePreview.test.tsx`.
+- Closes the **last B5 gap** in `COVERAGE.md` — the original 58-leaf spec is now **55 ✅ / 2 🟡 / 1 ❌**
+  (only I5 live/WebSocket updates remains missing).
+
 ### Changed — Smart header: toolbar declutter + responsive overflow (Phases 1–2)
 - **Add row moved out of the toolbar to a footer bar** under the table (both skins) — it's a data
   action, so it now sits with the rows, not the view controls.

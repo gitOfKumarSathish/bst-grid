@@ -14,6 +14,8 @@ import type { BstIcons } from '../icons.js'
 import { qrCellType, barcodeCellType, richTextCellType } from '../cells/celltypes.js'
 import { resolveFieldFormat } from '../cells/formats.js'
 import type { FieldFormat } from '../cells/formats.js'
+import { useBstPdfThumbnailer } from '../pdfThumbnail.js'
+import type { PdfThumbnailRenderer } from '../pdfThumbnail.js'
 
 /* ------------------------------------------------------------------ helpers */
 
@@ -152,9 +154,46 @@ function isImageFile(f: FileRefLike): boolean {
   return /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(f.name ?? f.url ?? '')
 }
 
-/** PDF — previewed inline via the browser's native `<iframe>` viewer (no pdf.js). */
+/** PDF — thumbnail via pdf.js (a renderer), preview via the browser's native viewer. */
 function isPdfFile(f: FileRefLike): boolean {
   return f.contentType === 'application/pdf' || /\.pdf(\?|#|$)/i.test(f.name ?? f.url ?? '')
+}
+
+/**
+ * Chrome (and Edge) refuse to render a `data:application/pdf` URL inside an
+ * `<iframe>`/`<embed>` — data: gets an opaque origin and the built-in PDF viewer is
+ * blocked, so the frame comes up blank. Convert such URLs to a same-document
+ * `blob:` URL, which renders reliably; `http(s):` / `blob:` URLs pass through
+ * unchanged. Returns `undefined` until the blob is ready (one tick). Used by the
+ * full-size click **preview** (`BstFilePreview`) — the small in-cell thumbnail uses
+ * pdf.js instead, since the native viewer won't paint a PDF at thumbnail size.
+ */
+function usePdfViewUrl(url: string | undefined): string | undefined {
+  const isDataPdf = !!url && /^data:application\/pdf/i.test(url)
+  const [src, setSrc] = React.useState<string | undefined>(() => (isDataPdf ? undefined : url))
+  React.useEffect(() => {
+    if (!url || !isDataPdf) {
+      setSrc(url)
+      return
+    }
+    let blobUrl: string | undefined
+    try {
+      const comma = url.indexOf(',')
+      const meta = url.slice(0, comma)
+      const payload = url.slice(comma + 1)
+      const bytes = /;base64/i.test(meta)
+        ? Uint8Array.from(atob(payload), (c) => c.charCodeAt(0))
+        : new TextEncoder().encode(decodeURIComponent(payload))
+      blobUrl = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }))
+      setSrc(blobUrl)
+    } catch {
+      setSrc(url) // best-effort: fall back to the data: URL
+    }
+    return () => {
+      if (blobUrl) URL.revokeObjectURL(blobUrl)
+    }
+  }, [url, isDataPdf])
+  return src
 }
 
 function fileIconSlot(f: FileRefLike): keyof BstIcons {
@@ -201,12 +240,59 @@ function Chip({ opt, value }: { opt?: BstOption; value: string }) {
   )
 }
 
-function FileChip({ file, onClick }: { file: FileRefLike; onClick?: () => void }) {
+/**
+ * In-cell PDF thumbnail (B5) — page 1 rendered by **pdf.js** (via the injected
+ * {@link PdfThumbnailRenderer}) to a raster `<img>`. Shows the PDF icon while the
+ * render is in flight or if it fails/returns null (e.g. no pdf.js installed), so it
+ * degrades gracefully. A server raster (`thumbnailUrl`) wins earlier, in `FileChip`.
+ */
+function PdfThumb({ file, renderer }: { file: FileRefLike; renderer: PdfThumbnailRenderer }) {
+  const icons = useBstIcons()
+  const PdfI = icons.filePdf
+  const [img, setImg] = React.useState<string | null>(null)
+  React.useEffect(() => {
+    let alive = true
+    setImg(null)
+    if (file.url) {
+      renderer(file.url, { width: 44, height: 58 })
+        .then((r) => alive && setImg(r))
+        .catch(() => alive && setImg(null))
+    }
+    return () => {
+      alive = false
+    }
+  }, [file.url, renderer])
+  return (
+    <span className="bst-file-thumb bst-file-thumb-pdf" aria-hidden="true">
+      {img ? (
+        <img className="bst-file-thumb-pdf-img" src={img} alt="" />
+      ) : (
+        <span className="bst-file-thumb-pdf-icon">
+          <PdfI size={16} />
+        </span>
+      )}
+    </span>
+  )
+}
+
+function FileChip({
+  file,
+  onClick,
+  pdfThumb,
+  pdfRenderer,
+}: {
+  file: FileRefLike
+  onClick?: () => void
+  pdfThumb?: boolean
+  pdfRenderer?: PdfThumbnailRenderer | null
+}) {
   const icons = useBstIcons()
   const label = file.name ?? file.url ?? 'file'
   let inner: React.ReactNode
   if (isImageFile(file)) {
     inner = <img className="bst-file-thumb" src={file.thumbnailUrl ?? file.url} alt={label} />
+  } else if (pdfThumb && pdfRenderer && isPdfFile(file) && file.url) {
+    inner = <PdfThumb file={file} renderer={pdfRenderer} />
   } else {
     const FileI = icons[fileIconSlot(file)]
     inner = (
@@ -263,6 +349,8 @@ export function BstFilePreview({
   const name = file.name ?? 'Preview'
   const img = isImageFile(file as FileRefLike)
   const pdf = isPdfFile(file as FileRefLike)
+  // Chrome can't render a data: PDF in an <iframe> — resolve to a blob: URL.
+  const pdfViewUrl = usePdfViewUrl(url)
   return (
     <div
       className="bst-file-preview-backdrop"
@@ -296,7 +384,7 @@ export function BstFilePreview({
           ) : img ? (
             <img className="bst-file-preview-img" src={url} alt={name} />
           ) : pdf ? (
-            <iframe className="bst-file-preview-frame" src={url} title={name} />
+            <iframe className="bst-file-preview-frame" src={pdfViewUrl} title={name} />
           ) : (
             <div className="bst-file-preview-empty">
               No inline preview for this file type.{' '}
@@ -314,18 +402,29 @@ export function BstFilePreview({
 /**
  * Read-mode `files` cell: file chips (image thumbnail / type icon + name) that
  * open {@link BstFilePreview} on click. Disable click-to-preview per column with
- * `cellMeta.preview: false`.
+ * `cellMeta.preview: false`. Set `cellMeta.pdfThumbnail: true` to render PDFs as a
+ * page-1 thumbnail — needs a {@link PdfThumbnailRenderer} from
+ * `BstPdfThumbnailerProvider` (or pass one directly as `cellMeta.pdfThumbnail`).
  */
 function FilesCell({ files, meta }: { files: FileRefLike[]; meta: BstColumnMeta }) {
   const [preview, setPreview] = React.useState<FileRefLike | null>(null)
   const cm = (meta.cellMeta ?? {}) as Record<string, unknown>
   const canPreview = cm.preview !== false
+  const ctxRenderer = useBstPdfThumbnailer()
+  // `cellMeta.pdfThumbnail` may be `true` (use the provider's renderer) or a
+  // renderer function (per-column override). No renderer → PDFs keep the icon.
+  const cellRenderer =
+    typeof cm.pdfThumbnail === 'function' ? (cm.pdfThumbnail as PdfThumbnailRenderer) : null
+  const pdfRenderer = cellRenderer ?? ctxRenderer
+  const pdfThumb = !!cm.pdfThumbnail && !!pdfRenderer
   return (
     <span className="bst-cell-files">
       {files.map((f, i) => (
         <FileChip
           key={i}
           file={f}
+          pdfThumb={pdfThumb}
+          pdfRenderer={pdfRenderer}
           onClick={canPreview && f.url ? () => setPreview(f) : undefined}
         />
       ))}

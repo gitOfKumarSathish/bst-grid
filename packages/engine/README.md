@@ -29,6 +29,7 @@ component-library styling**, so you pair it with a skin:
 &nbsp;· [`meta` reference](#meta-reference)
 &nbsp;· [Cell types](#cell-types)
 &nbsp;· [`cellMeta` by cell type](#cellmeta-by-cell-type)
+&nbsp;· [Files columns — images & PDFs](#files-columns--images--pdfs)
 
 **Grid options**
 &nbsp;· [`useBstTable` options](#options-reference)
@@ -49,6 +50,7 @@ component-library styling**, so you pair it with a skin:
 &nbsp;· [Custom CSS](#custom-css)
 &nbsp;· [Body icons](#body-icons)
 &nbsp;· [Runtime settings sheet](#runtime-settings-sheet)
+&nbsp;· [Grid state (save / restore views)](#grid-state--save--restore-views-ag21)
 &nbsp;· [Server mode (DataSource)](#server-mode-datasource)
 
 **Reference** &nbsp;· [Exports](#exports) &nbsp;· [Requirements](#requirements) &nbsp;· [License](#license)
@@ -201,12 +203,13 @@ settings (e.g. `pagination={{ pageSize: 25 }}`). Follow a link for the full guid
 | [QR · barcode · rich text](#cell-types) | `meta.type: 'qr' \| 'barcode' \| 'richText'` | — |
 | [ERP field formats (Aadhaar · PAN · GSTIN · IBAN · Luhn …)](#cellmeta-by-cell-type) | `cellMeta.pattern` on `text` / `number` | — |
 | [Width-aware chips (fit to column)](#cellmeta-by-cell-type) | `cellMeta.fitChips` on `multiSelect` | `false` |
-| [File preview + upload/delete (B5/I3)](#cellmeta-by-cell-type) | `meta.type: 'files'` + `cellMeta.onUpload`/`onDelete` | click-to-preview on |
+| [File preview + upload/delete (B5/I3)](#cellmeta-by-cell-type) | `meta.type: 'files'` + `cellMeta.onUpload`/`onDelete` · **PDF thumbnail** `cellMeta.pdfThumbnail` | click-to-preview on |
 | [Cell spanning (merge cells)](#cell-spanning) | `enableCellSpanning` | `false` |
 | [Custom CSS slots](#custom-css) | `classNames` / `styles` | — |
 | [Conditional formatting](#conditional-formatting) | `conditionalFormats` + `enableConditionalFormatting` | on when rules present |
 | [Injectable body icons](#body-icons) | `icons` | built-in SVGs |
 | [Runtime settings sheet](#runtime-settings-sheet) | `useBstSettings` (`showSettings` in adapters) | `false` |
+| [Grid state save/restore (AG21)](#grid-state--save--restore-views-ag21) | `useBstGridState` / `loadGridState` (`gridState={{ key }}` in adapters) | off (opt-in) |
 | [Server-side DataSource](#server-mode-datasource) | `useBstDataSource(source)` | client mode |
 
 ---
@@ -285,7 +288,7 @@ hot path; the MUI / shadcn adapters supply richer **editors** for the same types
 | `multiSelect` | chips + `+N more` overflow | `string[]` | ✅ checkbox dropdown | `maxChips`, `fitChips` |
 | `radio` | badge | `string \| null` | ✅ radio group | `layout` |
 | `hyperlink` | anchor | `string` or `{ href, label }` | ✅ url input | `target` |
-| `files` | thumbnail / icon + name · **click to preview** (image inline, PDF native viewer) | `FileRef[]` (`{ name, url, thumbnailUrl?, contentType? }`) | popup: add/remove (adapters) | `preview`, `onUpload`, `onDelete`, `accept` |
+| `files` | image thumbnail / **PDF thumbnail** (`pdfThumbnail`) / icon + name · **click to preview** (image inline, PDF native viewer) | `FileRef[]` (`{ name, url, thumbnailUrl?, contentType? }`) | popup: add/remove (adapters) | `preview`, `pdfThumbnail`, `onUpload`, `onDelete`, `accept` |
 | `sparkline` | inline SVG line / area / bar | `number[]` (or `"1,2,3"`) | read-only | `variant`, `width`, `height`, `color`, `min`, `max`, `showValue` |
 | `kpi` | value + trend delta chip + mini-spark | `number` or `{ value, delta?, data? }` | read-only | `invertDelta`, `deltaPercent`, `sparkWidth` |
 | `qr` | inline-SVG QR code (byte mode, v1–10) | `string` | ✅ input | `ecLevel`, `size`, `margin` |
@@ -358,19 +361,17 @@ use outside the grid too.
 | --- | --- | --- |
 | `target` | `string` | Anchor `target`. Default `'_blank'`. |
 
-**`files`** — value is `FileRef[]` (`{ name?, url?, thumbnailUrl?, contentType? }`). Read cells show a
-thumbnail (images) or file-type icon + name; **click a file to preview it** — images render inline,
-**PDFs open in the browser's native viewer** (`<iframe>`, no `pdf.js`), everything else offers an
-open/download link. The adapters' popup editor adds / removes files.
+**`files`** — an attachments cell (images, PDFs, any file). The full how-to is
+[**Files columns — images & PDFs**](#files-columns--images--pdfs) below; in short, the value is a
+`FileRef[]`, image files thumbnail automatically, and PDFs thumbnail once you wire pdf.js.
 
 | `cellMeta` | Type | Effect |
 | --- | --- | --- |
 | `preview` | `boolean` | Click-to-preview. Default `true` (a file needs a `url` to preview). |
+| `pdfThumbnail` | `boolean \| PdfThumbnailRenderer` | Render PDFs as an in-cell page-1 thumbnail via **pdf.js**. `true` uses the renderer from `<BstPdfThumbnailerProvider>`; a function is a per-column renderer. Default `false`. Falls back to the icon with no renderer; `thumbnailUrl` wins when present. |
 | `onUpload` | `(file: File) => FileRef \| Promise<FileRef>` | Called for each picked file — upload it and return the stored ref (busy state shown). Without it, the editor keeps a local object URL so preview still works offline. |
 | `onDelete` | `(file: FileRef) => void \| Promise<void>` | Called before a file is removed (e.g. delete it on the server). |
 | `accept` / `multiple` | `string` / `boolean` | Passed to the file `<input>`. |
-
-Programmatic: the preview overlay is exported as **`BstFilePreview`** — reuse it in your own file UI.
 
 **`sparkline`** — value is `number[]` (or a comma string).
 
@@ -438,6 +439,103 @@ meta: {
 | `image` | `string` (url) | Free-form image. |
 | `description` | `string` | Secondary text (rich editors). |
 | `disabled` | `boolean` | Non-selectable option. |
+
+<a id="files-columns--images--pdfs"></a>
+
+### Files columns — images & PDFs
+
+The `files` cell (`meta.type: 'files'`) holds one or more attachments. The value is a **`FileRef[]`**:
+
+```ts
+type FileRef = {
+  name?: string          // label; also used to infer the file type from the extension
+  url?: string           // link to the file — needed for click-preview AND PDF thumbnails
+  thumbnailUrl?: string  // OPTIONAL pre-made image (e.g. a server thumbnail) — always wins
+  contentType?: string   // e.g. 'image/png', 'application/pdf' — the most reliable type hint
+}
+```
+
+**What renders**, decided per file, in this order:
+
+1. a `thumbnailUrl` → a plain `<img>` (use this for server-generated thumbnails of anything);
+2. else an **image** (`contentType: image/*`, or a `.png/.jpg/.gif/.webp/.svg…` name) → `<img src={url}>`;
+3. else a **PDF** with `pdfThumbnail` on **and** a renderer available → a pdf.js page-1 render;
+4. else the **file-type icon + name**.
+
+Clicking any file opens a **preview** overlay (images inline, PDFs in the browser's native viewer).
+
+#### Image column — zero setup
+
+Images thumbnail automatically. Just give each file a `url` (or a `thumbnailUrl`):
+
+```tsx
+const columns = [
+  { id: 'photos', accessorKey: 'photos', header: 'Photos', meta: { type: 'files' } },
+]
+const rows = [
+  { id: '1', photos: [{ name: 'logo.png', url: 'https://cdn.example/logo.png', contentType: 'image/png' }] },
+]
+```
+
+#### PDF column — page-1 thumbnails (needs pdf.js)
+
+A PDF shows a **type icon** by default. To render page 1 as a thumbnail: **(1)** turn on
+`cellMeta.pdfThumbnail`, and **(2)** provide a **pdf.js** renderer. The engine never bundles pdf.js —
+you own it and its worker, so it fits your bundler and stays out of everyone else's build.
+
+**1. Install pdf.js**
+
+```bash
+npm install pdfjs-dist
+```
+
+**2. Create a renderer once and wrap your tables in the provider** (works with any adapter):
+
+```tsx
+import * as pdfjs from 'pdfjs-dist'
+import PdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?worker' // Vite (other bundlers below)
+import { BstPdfThumbnailerProvider, createPdfjsThumbnailer } from '@bloomskill/table-engine'
+
+pdfjs.GlobalWorkerOptions.workerPort = new PdfWorker()
+const pdfThumbs = createPdfjsThumbnailer(pdfjs)
+
+export function App() {
+  return (
+    <BstPdfThumbnailerProvider renderer={pdfThumbs}>
+      <BstTableMui data={rows} columns={columns} />   {/* or BstTableShadcn / <BstTable> */}
+    </BstPdfThumbnailerProvider>
+  )
+}
+```
+
+**3. Turn the thumbnail on for the column** (each PDF needs a `url`):
+
+```tsx
+const columns = [
+  {
+    id: 'docs', accessorKey: 'docs', header: 'Docs',
+    meta: { type: 'files', cellMeta: { pdfThumbnail: true } },
+  },
+]
+const rows = [
+  { id: '1', docs: [{ name: 'invoice.pdf', url: 'https://files.example/invoice.pdf', contentType: 'application/pdf' }] },
+]
+```
+
+Done — in the same column, images still thumbnail as `<img>` and PDFs render page 1. A file with a
+`thumbnailUrl` skips pdf.js entirely. Without a provider, `pdfThumbnail: true` is harmless (the PDF
+keeps its icon).
+
+**Notes**
+
+- **Worker setup by bundler.** Vite: `?worker` (above). webpack 5 / Next.js:
+  `pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString()`.
+- **Lazy-load pdf.js** (keep it out of your initial bundle): pass a loader —
+  `createPdfjsThumbnailer(() => import('pdfjs-dist'))` — so pdf.js is fetched when the first thumbnail renders.
+- **Per-column renderer** (instead of the provider): `cellMeta.pdfThumbnail: pdfThumbs`.
+- `createPdfjsThumbnailer(pdfjs, opts?)` options: `scale` (crispness, default 1.5), `cache` (default true).
+- **Upload / delete** files with `cellMeta.onUpload` / `onDelete` (see the `files` row in
+  [cellMeta by cell type](#cellmeta-by-cell-type)); the full-size preview overlay is exported as `BstFilePreview`.
 
 ---
 
@@ -1029,6 +1127,51 @@ const table = useBstTable(effective)   // enable*/show* now reflect the user's c
   (the search helpers), and `BST_SETTINGS_REGISTRY` (ordered metadata). The list is derived from the
   engine's own toggle interface, so new features show up automatically.
 
+## Grid state — save / restore views (AG21)
+
+Persist a grid's **view** — sort · filter · global filter · column order/size/visibility/pinning ·
+grouping · expansion · row pinning · selection · pagination — so a **per-user view** survives reloads.
+This is distinct from the settings sheet above (which toggles *features*); grid state captures how the
+data is currently *arranged*.
+
+The snapshot (`BstGridState`) is plain, version-stamped JSON — safe to store per user or send to a
+server. `applyGridState` **drops entries for columns that no longer exist**, so a saved view survives a
+column-set change instead of wedging the grid.
+
+```tsx
+import { useBstTable, loadGridState, useBstGridState } from '@bloomskill/table-engine'
+
+function Grid() {
+  // 1) restore on mount (flash-free) by seeding initialState from storage
+  const table = useBstTable({ data, columns, initialState: loadGridState('orders') })
+  // 2) persist changes back (debounced)
+  const view = useBstGridState(table, { key: 'orders' })
+  return (
+    <>
+      <button onClick={view.reset}>Reset view</button>
+      <BstTable table={table} />
+    </>
+  )
+}
+```
+
+**Adapters** wrap both steps in one prop — `gridState={{ key: 'orders' }}` on `<BstTableMui>` /
+`<BstTableShadcn>` seeds `initialState` from storage and persists changes for you.
+
+| Export | Kind | Purpose |
+| --- | --- | --- |
+| `getGridState(table, select?)` | fn | Snapshot the current view as `BstGridState`. |
+| `applyGridState(table, state, select?)` | fn | Restore a (partial) snapshot; ignores stale column ids. |
+| `resetGridState(table, select?)` | fn | Clear the view (sort/filter/layout/grouping) to defaults. |
+| `loadGridState(key, storage?)` | fn | Read a persisted snapshot (→ feed `initialState`). |
+| `saveGridState(key, state, storage?)` | fn | Write a snapshot to storage. |
+| `clearGridState(key, storage?)` | fn | Remove a persisted snapshot. |
+| `useBstGridState(table, opts)` | hook | Auto-persist on change; returns `{ getState, applyState, save, clear, reset, storageKey }`. |
+
+`select` = `{ include?, exclude? }` (a subset of `BstGridStateKey`); hook `opts` =
+`{ key, storage?, persist?, debounceMs?, include?, exclude? }`. Snapshots are namespaced under
+`bst-table:state:<key>` in `localStorage` by default (pass any `storage` — e.g. `sessionStorage`).
+
 ## Virtualization (D1)
 
 > **Available since 0.33.0** — row/column windowing on `@tanstack/react-virtual` (see [`COVERAGE.md`](../../COVERAGE.md)).
@@ -1187,6 +1330,14 @@ preview fallback. New exports: `createFileHandlers`, types `BstFileRef`, `DataSo
 **Settings** — `useBstSettings` · `applySettingsOverrides` · `BST_SETTINGS_REGISTRY` + types
 `BstSettingKey`, `BstSettingsItem`, `BstSettingsGroup`, `BstSettingsModel`, `BstSettingsOptions`,
 `BstSettingsOverrides`.
+
+**Grid state (AG21)** — `getGridState` · `applyGridState` · `resetGridState` · `emptyGridState` ·
+`loadGridState` · `saveGridState` · `clearGridState` · `useBstGridState` · `BST_GRID_STATE_KEYS` ·
+`BST_GRID_STATE_VERSION` + types `BstGridState`, `BstGridStateKey`, `BstGridStateSelect`,
+`BstGridStateOptions`, `BstGridStateController`, `BstGridStateStorage`.
+
+**PDF thumbnails (B5)** — `BstPdfThumbnailerProvider` · `useBstPdfThumbnailer` · `createPdfjsThumbnailer`
++ types `PdfThumbnailRenderer`, `PdfThumbnailerOptions`. Needs `pdfjs-dist` (yours to install).
 
 **Filtering (E3)** — `evalCondition` · `isConditionActive` · `operatorsForType` · `operatorArity` ·
 `filterFn_bstCondition` · `TEXT_OPERATORS` / `NUMBER_OPERATORS` / `DATE_OPERATORS` /

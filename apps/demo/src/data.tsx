@@ -8,17 +8,59 @@ const svgDoc = (label: string, color: string) =>
   encodeURIComponent(
     `<svg xmlns="http://www.w3.org/2000/svg" width="480" height="320"><rect width="480" height="320" fill="${color}"/><text x="240" y="176" font-family="system-ui" font-size="30" fill="#fff" text-anchor="middle">${label}</text></svg>`,
   )
-const pdfDoc = (title: string) => {
-  const body = `BT /F1 20 Tf 24 92 Td (${title}) Tj ET`
+/**
+ * A real, content-rich one-page PDF (data URL) so the B5 **PDF thumbnail** and the
+ * click **preview** clearly show a document — a little invoice-style page with a
+ * coloured header band, line items and a border. Correct xref + base64; verified
+ * parseable by pypdf (strict), so Chrome/Firefox render it. `title` sets the header.
+ */
+export const pdfDoc = (title: string) => {
+  const esc = (s: string) => s.replace(/([\\()])/g, '\\$1')
+  const t = esc(title)
+  const content = [
+    'q',
+    '0.235 0.306 0.549 rg', // header band (indigo)
+    '0 400 320 52 re',
+    'f',
+    '1 1 1 rg', // white header title
+    `BT /F1 20 Tf 22 418 Td (${t}) Tj ET`,
+    '0.13 0.13 0.16 rg',
+    'BT /F1 12 Tf 22 368 Td (Bst-Table Pvt Ltd - demo document) Tj ET',
+    '0.45 0.47 0.52 rg',
+    'BT /F1 10 Tf 22 348 Td (Ref BST-2026-0817     Date 2026-08-17) Tj ET',
+    '0.13 0.13 0.16 rg',
+    'BT /F1 11 Tf 22 300 Td (Item) Tj 210 0 Td (Amount) Tj ET',
+    '0.80 0.80 0.83 RG 0.8 w',
+    '22 292 m 298 292 l S',
+    'BT /F1 11 Tf 22 270 Td (Grid engine license) Tj 210 0 Td (1200) Tj ET',
+    'BT /F1 11 Tf 22 250 Td (Priority support - annual) Tj 210 0 Td (400) Tj ET',
+    'BT /F1 11 Tf 22 230 Td (Onboarding & training) Tj 210 0 Td (250) Tj ET',
+    '22 218 m 298 218 l S',
+    '0.235 0.306 0.549 rg',
+    'BT /F1 13 Tf 22 196 Td (Total) Tj 205 0 Td (1850) Tj ET',
+    '0.70 0.70 0.74 RG 1 w',
+    '8 8 304 436 re S', // page border
+    'Q',
+  ].join('\n')
+  const objs = [
+    '<< /Type /Catalog /Pages 2 0 R >>',
+    '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+    '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 320 452] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>',
+    `<< /Length ${content.length} >>\nstream\n${content}\nendstream`,
+    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',
+  ]
+  let body = '%PDF-1.4\n'
+  const offsets: number[] = []
+  objs.forEach((o, i) => {
+    offsets.push(body.length)
+    body += `${i + 1} 0 obj\n${o}\nendobj\n`
+  })
+  const xrefStart = body.length
+  let xref = `xref\n0 ${objs.length + 1}\n0000000000 65535 f \n`
+  offsets.forEach((off) => (xref += String(off).padStart(10, '0') + ' 00000 n \n'))
   const pdf =
-    `%PDF-1.4\n` +
-    `1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n` +
-    `2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n` +
-    `3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 320 160]/Resources<</Font<</F1 4 0 R>>>>/Contents 5 0 R>>endobj\n` +
-    `4 0 obj<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>endobj\n` +
-    `5 0 obj<</Length ${body.length}>>stream\n${body}\nendstream endobj\n` +
-    `trailer<</Root 1 0 R>>`
-  return 'data:application/pdf,' + encodeURIComponent(pdf)
+    body + xref + `trailer\n<< /Size ${objs.length + 1} /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF`
+  return 'data:application/pdf;base64,' + btoa(pdf)
 }
 
 export type Person = {
@@ -145,6 +187,10 @@ export const columns: BstTableColumn<Person>[] = [
     meta: {
       type: 'files', editable: true,
       cellMeta: {
+        // B5: render PDFs as an in-cell page-1 thumbnail (via pdf.js — the app wires
+        // a <BstPdfThumbnailerProvider> in App.tsx) instead of a type icon. Images
+        // already thumbnail; a server `thumbnailUrl` (if present) still wins.
+        pdfThumbnail: true,
         // Click a file to preview it (image inline · PDF in the native viewer).
         // onUpload/onDelete are where you'd call your backend; here they simulate it
         // (a 400 ms delay + a local object URL so the preview works offline).

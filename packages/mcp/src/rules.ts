@@ -243,10 +243,4 @@ export const NOT_BUILT: Array<{ match: RegExp; requirement: string; instead: str
     instead:
       'Live/WebSocket merge is NOT built. Push external updates by replacing the `data` prop; there is no conflict policy against in-flight edits yet.',
   },
-  {
-    match: /pdf[\s_-]*thumbnail/i,
-    requirement: 'B5',
-    instead:
-      'In-cell PDF *thumbnails* are NOT built (they need pdf.js). PDF *preview* IS built — click a file cell to open it in the native browser PDF viewer (`BstFilePreview`); the cell shows image thumbnails and a file-type icon fallback. Upload/delete via `cellMeta.onUpload`/`onDelete` or the `DataSource` file verbs is also built (I3).',
-  },
 ]

@@ -403,3 +403,53 @@ describe('@bloomskill/table-mui — Batch editing toggle in the settings sheet',
     expect(screen.queryByRole('button', { name: /Review & save/i })).toBeNull()
   })
 })
+
+describe('BstTableMui — gridState prop (AG21)', () => {
+  function makeStorage() {
+    const map = new Map<string, string>()
+    return {
+      map,
+      getItem: (k: string) => (map.has(k) ? map.get(k)! : null),
+      setItem: (k: string, v: string) => void map.set(k, v),
+      removeItem: (k: string) => void map.delete(k),
+    }
+  }
+
+  test('restores a persisted view on mount (column hidden)', () => {
+    const storage = makeStorage()
+    // a saved view that hides the Age column
+    storage.map.set(
+      'bst-table:state:mui-view',
+      JSON.stringify({ version: 1, columnVisibility: { age: false } }),
+    )
+    render(
+      <BstTableMui<Person>
+        data={seed}
+        columns={columns}
+        getRowId={(r) => r.id}
+        gridState={{ key: 'mui-view', storage, debounceMs: 0 }}
+      />,
+    )
+    // Name + Role headers present, Age restored-hidden
+    expect(screen.getByRole('columnheader', { name: /Name/ })).toBeInTheDocument()
+    expect(screen.queryByRole('columnheader', { name: /^Age/ })).toBeNull()
+  })
+
+  test('persists a sort change to storage (save-on-change)', () => {
+    const storage = makeStorage()
+    render(
+      <BstTableMui<Person>
+        data={seed}
+        columns={columns}
+        getRowId={(r) => r.id}
+        gridState={{ key: 'mui-view2', storage, debounceMs: 0 }}
+      />,
+    )
+    // click the Name header's sort button → the GridStatePersist child writes it out
+    fireEvent.click(screen.getByRole('button', { name: 'Name' }))
+    const raw = storage.map.get('bst-table:state:mui-view2')
+    expect(raw).toBeDefined()
+    const saved = JSON.parse(raw!)
+    expect(saved.sorting?.[0]?.id).toBe('name')
+  })
+})
