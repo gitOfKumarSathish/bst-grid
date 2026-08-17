@@ -7,6 +7,7 @@ import {
   BstTable,
   BstFilterBuilder,
   BstConditionalFormatBuilder,
+  BstShortcuts,
   useStoreSelector,
 } from '@bloomskill/table-engine'
 import type {
@@ -139,6 +140,9 @@ export interface BstTableMuiProps<TData extends RowData> extends UseBstTableOpti
    * provisioned appear; e.g. disabling "Copy & paste" here turns off clipboard.
    */
   showSettings?: boolean | BstSettingsOptions
+  /** Keyboard-shortcuts help button (⌨) + overlay; also opens on `?`. Lists only
+   * the shortcuts active on this grid. Default: false (opt-in). */
+  showShortcuts?: boolean
   /** Page-size choices in the pagination bar. Default: [5, 10, 20, 50]. */
   pageSizeOptions?: number[]
   /** Custom class name on the outer card (the whole component). Fine-grained
@@ -184,6 +188,7 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
     onConditionalFormatsChange,
     showColumnEditToggle,
     showSettings: _showSettings,
+    showShortcuts,
     pageSizeOptions = [5, 10, 20, 50],
     className,
     style,
@@ -737,6 +742,7 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
               <SettingsIcon fontSize="small" />
             </IconButton>
           )}
+          {showShortcuts && <BstShortcuts table={table} />}
         </Stack>
       )}
 

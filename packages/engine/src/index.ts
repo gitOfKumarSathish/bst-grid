@@ -147,6 +147,21 @@ export type {
   BstSettingsOverrides,
 } from './settings.js'
 
+// ---- keyboard shortcuts (in-UI overlay + headless registry) ----
+export { BstShortcuts } from './BstShortcuts.js'
+export type { BstShortcutsProps } from './BstShortcuts.js'
+export {
+  BST_SHORTCUTS_REGISTRY,
+  resolveActiveShortcuts,
+  formatShortcutToken,
+} from './shortcuts.js'
+export type {
+  BstShortcut,
+  ShortcutCategory,
+  ResolvedShortcut,
+  ResolvedShortcutGroup,
+} from './shortcuts.js'
+
 // ---- cell-type registry (Plan.md §2.3) ----
 export { createCellTypeRegistry, defineCellType } from './registry/registry.js'
 export type { CellTypeRegistry } from './registry/registry.js'

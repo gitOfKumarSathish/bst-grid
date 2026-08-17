@@ -48,6 +48,12 @@ export interface BstRuntimeHandle<TData extends RowData> {
   enableClipboard: boolean
   /** Undo/redo is active (Phase 3, C5). */
   enableUndoRedo: boolean
+  /** Inline editing is active — read by the shortcuts overlay (`<BstShortcuts>`). */
+  enableEditing: boolean
+  /** Whole-column copy gesture is active (clipboard on + not opted out). */
+  enableCopyColumn: boolean
+  /** Whole-row copy gesture is active (clipboard on + not opted out). */
+  enableCopyRow: boolean
   /**
    * Column ids the caller supplied an explicit `columnDef.cell` for. v9 always
    * populates a *default* `cell`, so this is how the renderer knows to honour a
@@ -401,6 +407,9 @@ export function useBstTable<TData extends RowData>(opts: UseBstTableOptions<TDat
     enableCellSelection: ctx.enableCellSelection,
     enableClipboard: ctx.enableClipboard,
     enableUndoRedo: ctx.enableUndoRedo,
+    enableEditing: !!ctx.enableEditing,
+    enableCopyColumn: !!ctx.enableClipboard && ctx.enableCopyColumn !== false,
+    enableCopyRow: !!ctx.enableClipboard && ctx.enableCopyRow !== false,
     userCellColumns: collectUserCellColumns(
       opts.columns as unknown as ReadonlyArray<Record<string, unknown>>,
     ),

@@ -37,6 +37,10 @@ interface BstSettingsOptions {
   persistKey?: string
   /** Persist choices to localStorage. Default true. */
   persist?: boolean
+  /** Show a search box to filter the (30+) toggle list — by label / hint / group.
+   *  Default: auto (appears once the sheet has more than a handful of items);
+   *  `true` always shows it, `false` hides it. */
+  search?: boolean
 }
 ```
 

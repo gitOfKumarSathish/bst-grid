@@ -197,6 +197,9 @@ export const RULES: Record<string, FlagRule> = {
   showSettings: {
     note: 'Renders a gear → a sheet where END-USERS flip this grid\'s features on/off at runtime, persisted to localStorage.',
   },
+  showShortcuts: {
+    note: 'A "?" button + dep-free overlay listing the keyboard shortcuts ACTIVE on this grid — filtered by enableCellSelection / enableClipboard / enableEditing / enableUndoRedo / copy toggles. Also opens on the ? key. Backed by BST_SHORTCUTS_REGISTRY + resolveActiveShortcuts.',
+  },
 }
 
 /** Non-boolean options that are inert unless a flag is on. */

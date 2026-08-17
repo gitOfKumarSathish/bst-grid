@@ -111,7 +111,7 @@ Everything below ships **free** (MIT/Apache)._
 | AG4 | Set Filter (distinct-values checklist) | 💷 | ✅ | P6 — `enableSetFilter` + `BstSetFilter` (`{op:'set'}` condition) |
 | AG5 | Status bar (row count + range sum/avg/count) | 💷 | ✅ | P6 — `showStatusBar` + `runtime.getSelectionStats()` |
 | AG6 | Right-click context menu | 💷 | ✅ | P6 — `enableContextMenu` + `getContextMenuItems` (dep-free popup: Copy / Export / Autosize + custom) |
-| AG7 | Tool-panel sidebar (Columns + Filters) | 💷 | ❌ | P6 |
+| AG7 | Tool-panel sidebar (Columns + Filters) | 💷 | ⏭️ skip | **Deliberately not built** (2026-08-17) — redundant with the toolbar's **Columns** menu (show/hide · pin · reorder · group) + **Filters** button. Was prototyped (`showSidebar` + `BstColumnPanel`) and reverted. |
 | AG8 | Find (highlight + jump between matches) | 💷 | ❌ | P6 |
 | AG9 | Row-number column | 💷 | ❌ | P6 |
 | AG10 | Managed row dragging (reorder) | 🆓 | ❌ | P6 |

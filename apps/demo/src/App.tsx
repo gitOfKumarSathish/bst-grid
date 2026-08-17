@@ -551,6 +551,7 @@ export default function App() {
             onConditionalFormatsChange={setCfRules}
             enableExport={{ fileName: 'people' }} // Phase 5 (AG1–AG3): CSV / Excel / Print toolbar menu
             showSettings={{ persistKey: 'demo-mui' }}
+            showShortcuts // ⌨ keyboard-shortcuts overlay (also opens on ?)
           />
         </section>
 
@@ -569,6 +570,7 @@ export default function App() {
             onConditionalFormatsChange={setCfRules}
             enableExport={{ fileName: 'people' }} // Phase 5 (AG1–AG3): CSV / Excel / Print toolbar menu
             showSettings={{ persistKey: 'demo-sc' }}
+            showShortcuts // ⌨ keyboard-shortcuts overlay (also opens on ?)
           />
         </section>
 

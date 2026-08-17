@@ -86,7 +86,7 @@ Legend — **AG tier:** 🆓 Community · 💷 Enterprise (paid). **Status:** �
 | # | Feature | AG tier | Status | Effort | Why it matters |
 | --- | --- | --- | --- | --- | --- |
 | 10 | **Right-click context menu** (copy, export, autosize, pin, group — configurable) | 💷 | ✅ P6 | M | Shipped: `enableContextMenu` + `getContextMenuItems` — dep-free popup with Copy / Export / Autosize defaults + custom items. |
-| 11 | **Tool-panel sidebar** (docked Columns panel + Filters panel) | 💷 | ❌ | M/L | Settings sheet ≠ docked tool panels. Enterprise-grade column/filter management. |
+| 11 | **Tool-panel sidebar** (docked Columns panel + Filters panel) | 💷 | ⏭️ skip | M/L | **Deliberately not built** — redundant with the toolbar's Columns menu (show/hide · pin · reorder · group) + Filters button. Prototyped and reverted 2026-08-17. |
 | 12 | **Fill handle** (drag corner to fill/increment a range) | 💷 | ❌ | M | Excel muscle-memory; builds on existing range selection. |
 | 13 | **Find** (search box that highlights + jumps between matches, not filter) | 💷 | ❌ | M | Distinct from global filter (which hides non-matches). |
 | 14 | **Tree Data** (self-referencing parent/child hierarchy, one column) | 💷 | ❌ | L | We have master-detail + grouping, not recursive tree data. Common for BOM/org/folder data. |

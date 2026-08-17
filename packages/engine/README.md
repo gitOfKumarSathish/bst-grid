@@ -674,6 +674,9 @@ const table = useBstTable<Task>({
   column**. Reshape it with **`getContextMenuItems(ctx) => BstContextMenuItem[]`** — spread
   `ctx.defaultItems` and add your own (each `{ label, onSelect, disabled?, separator?, icon? }`). Both
   adapters inherit it; if the resolved list is empty the native browser menu is left alone.
+- **Shortcuts overlay** — `showShortcuts` (in the adapters) adds a **"?" button** + a dep-free overlay
+  listing the shortcuts **active on this grid** (also opens on `?`). Headless: `<BstShortcuts table={table} />`
+  + `BST_SHORTCUTS_REGISTRY` + the pure `resolveActiveShortcuts(flags, query)` / `formatShortcutToken`.
 
 > Selection lives in the interaction store (not `table.setState`) and is materialised at paint from the
 > active/anchor cell ids — moving the cursor re-renders only the cells whose state changed, never the

@@ -9,6 +9,18 @@ this project uses [Semantic Versioning](https://semver.org).
 > affected package README(s) **and** bump the version, in the same change.
 
 ## [Unreleased]
+### Added — In-UI keyboard-shortcuts overlay (`showShortcuts`)
+- A toolbar **"?" button** + a dependency-free, theme-aware **overlay** that lists the keyboard
+  shortcuts **active on this grid** — grouped (Navigate · Edit · Clipboard · History), searchable,
+  platform-aware (⌘ vs Ctrl). Also opens on the **`?`** key. The list is filtered to what's actually
+  wired: `enableCellSelection` / `enableClipboard` / `enableEditing` / `enableUndoRedo` /
+  `enableCopyColumn` / `enableCopyRow`.
+- New engine exports: **`BstShortcuts`** (component), **`BST_SHORTCUTS_REGISTRY`**,
+  **`resolveActiveShortcuts(flags, query)`**, **`formatShortcutToken`**. The registry mirrors the real
+  `onKeyDown` handler and is guarded by `shortcuts.test.tsx`.
+- Both skins add the `showShortcuts` toolbar button (off by default, opt-in). `@bloomskill/table-mui` +
+  `@bloomskill/table-shadcn`.
+
 ### Added — Context menu (Phase 6, AG6)
 - **`enableContextMenu`** — a dependency-free **right-click menu** at the cursor. Default items: Copy /
   Copy row / Copy column (with `enableClipboard`), Export CSV / Excel (with `enableExport`), Autosize
