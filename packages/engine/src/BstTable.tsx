@@ -3,6 +3,8 @@ import { flexRender } from '@tanstack/react-table'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { virtualizationBypassReason } from './virtualization.js'
 import { BstSetFilter } from './BstSetFilter.js'
+import { combineFilterConditions } from './filtering.js'
+import type { FilterCondition, FilterConditionGroup } from './filtering.js'
 import { getBstRuntime } from './useBstTable.js'
 import type { BstRuntimeHandle } from './useBstTable.js'
 import { cellKey } from './interaction/store.js'
@@ -1180,52 +1182,33 @@ function SelectAllCheckbox({ table }: { table: any }) {
 }
 
 /**
- * Per-column filter control (Phase 3, "dual filter"). Reads/writes the column's
- * own `columnFilters` entry via `setFilterValue({ op, value })` using the
- * operator-aware `bstCondition` filterFn — so it and the filter-builder panel
- * are two views of the same state. The control shape follows `meta.type`.
+ * The condition input (operator-less, type-appropriate) for one filter slot — a
+ * select for option/boolean columns, else a text / number / date input. Bound to a
+ * `{ op, value }` condition via `value` / `onChange`, so it works standalone in the
+ * filter row **or** as one part of a stacked multi-filter (AG11).
  */
-function ColumnFilterCell({
+function ConditionInput({
   column,
-  table,
-  handle,
+  value,
+  onChange,
+  label,
 }: {
   column: any
-  table?: any
-  handle?: BstRuntimeHandle<any>
+  value: FilterCondition | undefined
+  onChange: (c: FilterCondition | undefined) => void
+  label: string
 }) {
   const meta = (column.columnDef.meta ?? {}) as any
   const type = (meta.type ?? 'text') as string
-  if (column.getCanFilter?.() === false || type === 'action') return null
-  const raw = column.getFilterValue?.() as { op?: string; value?: unknown } | undefined
-  const label =
-    typeof column.columnDef.header === 'string' && column.columnDef.header
-      ? column.columnDef.header
-      : column.id
-
-  // Set Filter (AG4): a distinct-values checklist for categorical / opted-in
-  // columns (needs `enableSetFilter`). `meta.filter: 'condition'` opts back out.
-  const setEligible =
-    !!handle?.enableSetFilter &&
-    meta.filter !== 'condition' &&
-    (meta.filter === 'set' ||
-      type === 'singleSelect' ||
-      type === 'multiSelect' ||
-      type === 'radio' ||
-      type === 'boolean')
-  if (setEligible && table) {
-    return <BstSetFilter column={column} table={table} label={label} />
-  }
-
   const clearOr = (v: unknown, op: string) =>
-    v == null || v === '' ? column.setFilterValue(undefined) : column.setFilterValue({ op, value: v })
+    v == null || v === '' ? onChange(undefined) : onChange({ op, value: v })
 
   if (type === 'singleSelect' || type === 'multiSelect' || type === 'radio') {
     return (
       <select
         className="bst-input bst-colfilter"
         aria-label={`Filter ${label}`}
-        value={String(raw?.value ?? '')}
+        value={String(value?.value ?? '')}
         onChange={(e) => clearOr(e.target.value, 'equals')}
       >
         <option value="">All</option>
@@ -1238,7 +1221,7 @@ function ColumnFilterCell({
     )
   }
   if (type === 'boolean') {
-    const cur = raw?.op === 'isTrue' ? 'true' : raw?.op === 'isFalse' ? 'false' : ''
+    const cur = value?.op === 'isTrue' ? 'true' : value?.op === 'isFalse' ? 'false' : ''
     return (
       <select
         className="bst-input bst-colfilter"
@@ -1246,7 +1229,7 @@ function ColumnFilterCell({
         value={cur}
         onChange={(e) => {
           const v = e.target.value
-          column.setFilterValue(v ? { op: v === 'true' ? 'isTrue' : 'isFalse' } : undefined)
+          onChange(v ? { op: v === 'true' ? 'isTrue' : 'isFalse' } : undefined)
         }}
       >
         <option value="">All</option>
@@ -1262,9 +1245,113 @@ function ColumnFilterCell({
       type={inputType}
       aria-label={`Filter ${label}`}
       placeholder="Filter…"
-      value={String(raw?.value ?? '')}
+      value={String(value?.value ?? '')}
       onChange={(e) => clearOr(e.target.value, 'contains')}
     />
+  )
+}
+
+/**
+ * Stacked **multi-filter** (AG11) — renders each configured filter part (a Set
+ * Filter or a condition input) bound to its own slot in the column's compound
+ * `{ op:'and', conditions }` value, so a row must satisfy every part.
+ */
+function MultiColumnFilter({
+  column,
+  table,
+  handle,
+  parts,
+  label,
+}: {
+  column: any
+  table: any
+  handle?: BstRuntimeHandle<any>
+  parts: Array<'set' | 'condition'>
+  label: string
+}) {
+  const group = column.getFilterValue?.() as FilterConditionGroup | undefined
+  const conditions = group?.conditions ?? []
+  const setPart = (i: number, cond: FilterCondition | undefined) => {
+    const next = parts.map((_, j) => (j === i ? cond : conditions[j]))
+    column.setFilterValue(combineFilterConditions(next, 'and'))
+  }
+  return (
+    <div className="bst-multifilter">
+      {parts.map((part, i) => (
+        <div className="bst-multifilter-part" key={i}>
+          {part === 'set' && handle?.enableSetFilter ? (
+            <BstSetFilter
+              column={column}
+              table={table}
+              label={label}
+              value={conditions[i] as { op?: string; value?: string[] } | undefined}
+              onChange={(c) => setPart(i, c)}
+            />
+          ) : (
+            <ConditionInput
+              column={column}
+              value={conditions[i]}
+              onChange={(c) => setPart(i, c)}
+              label={label}
+            />
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/**
+ * Per-column filter control (Phase 3, "dual filter"). Reads/writes the column's
+ * own `columnFilters` entry via `setFilterValue({ op, value })` using the
+ * operator-aware `bstCondition` filterFn — so it and the filter-builder panel
+ * are two views of the same state. The control shape follows `meta.type`; an
+ * array `meta.filter` **stacks** several (multi-filter, AG11).
+ */
+function ColumnFilterCell({
+  column,
+  table,
+  handle,
+}: {
+  column: any
+  table?: any
+  handle?: BstRuntimeHandle<any>
+}) {
+  const meta = (column.columnDef.meta ?? {}) as any
+  const type = (meta.type ?? 'text') as string
+  if (column.getCanFilter?.() === false || type === 'action') return null
+  const label =
+    typeof column.columnDef.header === 'string' && column.columnDef.header
+      ? column.columnDef.header
+      : column.id
+
+  // Multi-filter (AG11): an array `meta.filter` with 2+ parts stacks those filters.
+  const filterMeta = meta.filter as 'set' | 'condition' | Array<'set' | 'condition'> | undefined
+  if (handle?.enableMultiFilter && Array.isArray(filterMeta) && filterMeta.length > 1 && table) {
+    return (
+      <MultiColumnFilter column={column} table={table} handle={handle} parts={filterMeta} label={label} />
+    )
+  }
+  // Single filter — when multi is off, an array collapses to its first entry.
+  const single = Array.isArray(filterMeta) ? filterMeta[0] : filterMeta
+
+  // Set Filter (AG4): a distinct-values checklist for categorical / opted-in
+  // columns (needs `enableSetFilter`). `'condition'` opts back out.
+  const setEligible =
+    !!handle?.enableSetFilter &&
+    single !== 'condition' &&
+    (single === 'set' ||
+      type === 'singleSelect' ||
+      type === 'multiSelect' ||
+      type === 'radio' ||
+      type === 'boolean')
+  if (setEligible && table) {
+    return <BstSetFilter column={column} table={table} label={label} />
+  }
+
+  const raw = column.getFilterValue?.() as FilterCondition | undefined
+  return (
+    <ConditionInput column={column} value={raw} onChange={(c) => column.setFilterValue(c)} label={label} />
   )
 }
 

@@ -23,13 +23,14 @@ export {
   evalCondition,
   isConditionActive,
   filterFn_bstCondition,
+  combineFilterConditions,
   TEXT_OPERATORS,
   NUMBER_OPERATORS,
   DATE_OPERATORS,
   SELECT_OPERATORS,
   BOOLEAN_OPERATORS,
 } from './filtering.js'
-export type { FilterOperator, FilterCondition } from './filtering.js'
+export type { FilterOperator, FilterCondition, FilterConditionGroup } from './filtering.js'
 
 // ---- DataSource (server tier — manual sort / filter / paginate; Plan.md §5) ----
 export { createClientDataSource, createServerDataSource, createFileHandlers } from './datasource.js'

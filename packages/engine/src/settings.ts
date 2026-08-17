@@ -98,6 +98,7 @@ const SETTINGS_META: Record<BstSettingKey, SettingMeta> = {
   enableGlobalFilter: { group: 'Data operations', default: true, alwaysShow: true, label: 'Global search', hint: 'The toolbar search box' },
   enableColumnFilters: { group: 'Data operations', default: true, alwaysShow: true, label: 'Column filters' },
   enableSetFilter: { group: 'Data operations', default: false, alwaysShow: true, label: 'Set filter', hint: 'Checklist of distinct values per column (AG4) · needs the per-column filter row', requires: ['enableColumnFilterRow'] },
+  enableMultiFilter: { group: 'Data operations', default: false, alwaysShow: true, label: 'Multi-filter', hint: 'Stack several filter types on one column via array meta.filter (AG11) · needs the per-column filter row', requires: ['enableColumnFilterRow'] },
   pagination: { group: 'Data operations', default: true, alwaysShow: true, label: 'Pagination', hint: 'Off shows every row' },
   enableGrouping: { group: 'Data operations', default: false, alwaysShow: true, label: 'Row grouping', hint: 'Group rows + aggregates (E4)' },
   // Columns

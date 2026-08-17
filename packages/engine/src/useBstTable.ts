@@ -42,6 +42,8 @@ export interface BstRuntimeHandle<TData extends RowData> {
   enableColumnFilterRow: boolean
   /** Set Filter (AG4) — eligible columns show a distinct-values checklist in the filter row. */
   enableSetFilter: boolean
+  /** Multi-filter (AG11) — columns with an array `meta.filter` stack those filters. */
+  enableMultiFilter: boolean
   /** Cell/range selection + keyboard nav is active (Phase 3). */
   enableCellSelection: boolean
   /** Clipboard copy/paste is active (Phase 3). */
@@ -404,6 +406,10 @@ export function useBstTable<TData extends RowData>(opts: UseBstTableOptions<TDat
     enableColumnOrdering: !!opts.enableColumnOrdering,
     enableColumnFilterRow: !!opts.enableColumnFilterRow && (opts.enableColumnFilters ?? true),
     enableSetFilter: !!opts.enableSetFilter && (opts.enableColumnFilters ?? true),
+    enableMultiFilter:
+      !!opts.enableMultiFilter &&
+      (opts.enableColumnFilters ?? true) &&
+      !!opts.enableColumnFilterRow,
     enableCellSelection: ctx.enableCellSelection,
     enableClipboard: ctx.enableClipboard,
     enableUndoRedo: ctx.enableUndoRedo,

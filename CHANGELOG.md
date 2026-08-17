@@ -10,6 +10,23 @@ this project uses [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+## [0.39.0] — 2026-08-17
+### Added — Multi-filter (AG11): stack filter types on one column
+- `enableMultiFilter` lets a column **stack several filter types** in its filter row. A column opts in
+  with an **array** `meta.filter` (e.g. `['condition', 'set']`), which renders those filters stacked;
+  a row must satisfy **all** of them (**AND**). Closes AG11 (parity now ✅ 9 / 🟡 4 / ❌ 15).
+- Stored as a compound **`{ op: 'and', conditions }`** value the existing `bstCondition` filterFn
+  understands — so it composes with the filter builder and server mode. New engine exports:
+  **`combineFilterConditions`** + type **`FilterConditionGroup`**; `evalCondition` / `isConditionActive`
+  now handle the group (AND/OR of the active slots; inactive slots don't restrict).
+- `BstSetFilter` gained an optional controlled `value` / `onChange` so it can be one **slot** of a
+  stacked filter (backward compatible — standalone mode unchanged). The condition input was extracted
+  to a reusable `ConditionInput`. Needs `enableColumnFilters` + `enableColumnFilterRow` (a `'set'` part
+  needs `enableSetFilter`); with `enableMultiFilter` off, an array `meta.filter` falls back to its first
+  entry.
+- Settings-sheet toggle ("Data operations"); demo stacks contains + a distinct-names checklist on the
+  **Name** column (both skins). Tested in `multiFilter.test.tsx` (10 cases).
+
 ## [0.38.0] — 2026-08-17
 ### Changed — B5 in-cell PDF thumbnails now render via pdf.js (reliable)
 - The native-`<iframe>` thumbnail (0.36.0–0.37.1) **did not paint** in Chrome — the browser won't

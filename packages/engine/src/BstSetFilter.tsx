@@ -31,6 +31,14 @@ export interface BstSetFilterProps {
   table: any
   /** Accessible label; defaults to the column header / id. */
   label?: string
+  /**
+   * Controlled slot (multi-filter, AG11). When `onChange` is given, the checklist
+   * reads/writes this `{ op:'set', value }` condition instead of the column's whole
+   * filter value — so it can be one part of a stacked filter. Omit both for the
+   * default standalone mode (drives `column.setFilterValue` directly).
+   */
+  value?: { op?: string; value?: string[] }
+  onChange?: (condition: { op: 'set'; value: string[] } | undefined) => void
 }
 
 const BLANK = ''
@@ -83,7 +91,13 @@ function computeOptions(column: any, table: any): BstSetFilterOption[] {
   return opts
 }
 
-export function BstSetFilter({ column, table, label }: BstSetFilterProps) {
+export function BstSetFilter({ column, table, label, value, onChange }: BstSetFilterProps) {
+  // Controlled slot (multi-filter) vs standalone (drives the column filter value).
+  const controlled = typeof onChange === 'function'
+  const getFV = () =>
+    (controlled ? value : column.getFilterValue?.()) as { op?: string; value?: string[] } | undefined
+  const setFV = (c: { op: 'set'; value: string[] } | undefined) =>
+    controlled ? onChange!(c) : column.setFilterValue(c)
   const [open, setOpen] = React.useState(false)
   const [query, setQuery] = React.useState('')
   const [pos, setPos] = React.useState<{ top: number; left: number; width: number } | null>(null)
@@ -97,7 +111,7 @@ export function BstSetFilter({ column, table, label }: BstSetFilterProps) {
   )
   const allValues = React.useMemo(() => options.map((o) => o.value), [options])
 
-  const filterValue = column.getFilterValue?.() as { op?: string; value?: string[] } | undefined
+  const filterValue = getFV()
   const selected =
     filterValue?.op === 'set' && Array.isArray(filterValue.value) ? new Set(filterValue.value) : null
   const allChecked = selected === null
@@ -105,8 +119,8 @@ export function BstSetFilter({ column, table, label }: BstSetFilterProps) {
   const activeCount = selected ? selected.size : allValues.length
 
   const apply = (checked: string[]) => {
-    if (allValues.length > 0 && checked.length === allValues.length) column.setFilterValue(undefined)
-    else column.setFilterValue({ op: 'set', value: checked })
+    if (allValues.length > 0 && checked.length === allValues.length) setFV(undefined)
+    else setFV({ op: 'set', value: checked })
   }
   const toggle = (v: string) => {
     const cur = selected ? new Set(selected) : new Set(allValues)
@@ -181,13 +195,13 @@ export function BstSetFilter({ column, table, label }: BstSetFilterProps) {
             onChange={(e) => setQuery(e.target.value)}
           />
           <div className="bst-setfilter-actions">
-            <button type="button" className="bst-setfilter-link" onClick={() => column.setFilterValue(undefined)}>
+            <button type="button" className="bst-setfilter-link" onClick={() => setFV(undefined)}>
               Select all
             </button>
             <button
               type="button"
               className="bst-setfilter-link"
-              onClick={() => column.setFilterValue({ op: 'set', value: [] })}
+              onClick={() => setFV({ op: 'set', value: [] })}
             >
               Clear
             </button>

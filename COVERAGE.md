@@ -1,7 +1,7 @@
 # Bst-Table — Spec coverage matrix (58 leaves)
 
-_2026-08-13, synced at **v0.38.0**. Compares the `CLAUDE.md` §11 requirement leaves
-(A1–M2) against what has shipped (`CHANGELOG` v0.1.0 → v0.38.0), verified against the
+_2026-08-13, synced at **v0.39.0**. Compares the `CLAUDE.md` §11 requirement leaves
+(A1–M2) against what has shipped (`CHANGELOG` v0.1.0 → v0.39.0), verified against the
 engine + adapter source. Re-run when a version ships._
 
 > **Two matrices below.** (1) the original 58-leaf spec (A1–M2, immediately following); (2) **AG Grid
@@ -115,7 +115,7 @@ Everything below ships **free** (MIT/Apache)._
 | AG8 | Find (highlight + jump between matches) | 💷 | ❌ | P6 |
 | AG9 | Row-number column | 💷 | ❌ | P6 |
 | AG10 | Managed row dragging (reorder) | 🆓 | ❌ | P6 |
-| AG11 | Multi-filter (stack filter types per column) | 💷 | ❌ | P6 |
+| AG11 | Multi-filter (stack filter types per column) | 💷 | ✅ | P6 — `enableMultiFilter` + array `meta.filter` (e.g. `['condition','set']`); stacked in the filter row, AND-combined via `combineFilterConditions` / `FilterConditionGroup` |
 | AG12 | Fill handle (drag-to-fill range) | 💷 | ❌ | P6 |
 | AG13 | Tree data (self-referencing hierarchy) | 💷 | ❌ | P7 |
 | AG14 | Pivoting | 💷 | ❌ | P7 |
@@ -135,9 +135,9 @@ Everything below ships **free** (MIT/Apache)._
 | AG28 | Cell flashing on data change | 🆓 | ❌ | P8 |
 | AG29 | Aligned grids (shared column state) | 🆓 | ❌ | P8 |
 
-**Tally:** 29 parity items — ✅ 8 built (P5 export · P6 Set Filter / status bar / context menu · P8 auto
-row height · **P4 grid-state save/restore AG21**) · ❌ 16 missing · 🟡 4 partial · ⏭️ 1 skipped (AG7 sidebar).
-**12 of them are AG Grid Enterprise-paid** — they ship free here.
+**Tally:** 29 parity items — ✅ 9 built (P5 export · P6 Set Filter / status bar / context menu /
+**multi-filter AG11** · P8 auto row height · P4 grid-state save/restore AG21) · ❌ 15 missing · 🟡 4 partial ·
+⏭️ 1 skipped (AG7 sidebar). **12 of them are AG Grid Enterprise-paid** — they ship free here.
 
 **Already matched (AG Grid Enterprise-paid, shipped free):** cell/range selection · clipboard
 copy/paste · batch editing · row grouping + aggregation · master-detail · sparklines · advanced-filter

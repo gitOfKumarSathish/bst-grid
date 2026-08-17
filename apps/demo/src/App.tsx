@@ -611,6 +611,7 @@ export default function App() {
     showFilterBuilder: true, // per-column condition builder (E3)
     enableColumnFilterRow: true, // per-column filter inputs under the header ("dual filter")
     enableSetFilter: true, // AG4: categorical columns (see role/plan) get a distinct-values checklist
+    enableMultiFilter: true, // AG11: the Name column stacks a "contains" input + a set checklist (meta.filter: ['condition','set'])
     showStatusBar: true, // AG5: footer — row counts + selection sum/avg/min/max
     enableAutoRowHeight: true, // AG26: rows grow to fit wrapped content (browser-measured)
     enableContextMenu: true, // AG6: right-click a cell → Copy / Export / Autosize (+ getContextMenuItems)

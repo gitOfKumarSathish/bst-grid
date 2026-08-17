@@ -1220,6 +1220,18 @@
 .bst-colfilter::placeholder {
   color: var(--bst-table-muted);
 }
+/* Multi-filter (AG11) — stack the parts vertically inside one filter-row cell. */
+.bst-multifilter {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.bst-multifilter-part {
+  display: flex;
+}
+.bst-multifilter-part > * {
+  width: 100%;
+}
 .bst-colfilter:focus {
   outline: none;
   border-color: var(--bst-table-accent);

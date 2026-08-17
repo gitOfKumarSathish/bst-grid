@@ -102,7 +102,7 @@ Legend — **AG tier:** 🆓 Community · 💷 Enterprise (paid). **Status:** �
 | 19 | **Advanced server-side row model** (server-side grouping/pivot/tree, lazy group expand, transactions) | 💷 | 🟡 | L | DataSource covers sort/filter/page; not lazy server grouping. Needed at 1M-row tier. |
 | 20 | **Calculated / formula columns** (derived values + expression columns) | 💷 | 🟡 | M | TanStack `accessorFn` gives derived values; no first-class calc/expression column UI. |
 | 21 | **Cell notes / comments** | 💷 | ❌ | M | Per-cell annotation popovers. |
-| 22 | **Multi-filter** (stack e.g. text + set on one column) | 💷 | ❌ | S/M | Combine filter types per column. |
+| 22 | **Multi-filter** (stack e.g. text + set on one column) | 💷 | ✅ | S/M | Shipped: `enableMultiFilter` + array `meta.filter` (e.g. `['condition','set']`) stacks filters in the row, AND-combined. |
 | 23 | **Cell flashing on data change** (highlight changed cells) | 🆓 | ❌ | S | Live-data feedback; pairs with the (unbuilt) I5 WebSocket merge. |
 | 24 | **Live/streaming updates (I5)** (WebSocket/parent merge with dirty-cell conflict policy) | — | ❌ | L | Listed NOT BUILT in COVERAGE.md; needed for real-time grids. |
 

@@ -561,6 +561,7 @@ means *passing the object implies enabled*.
 | `enableGlobalFilter` | `boolean` | `true` | Global search. |
 | `enableColumnFilters` | `boolean` | `true` | Per-column filtering / filter builder. |
 | `enableSetFilter` | `boolean` | `false` | [Set Filter](#filtering) (AG4) — a distinct-values checklist per column in the filter row. Needs `enableColumnFilters` + `enableColumnFilterRow`. |
+| `enableMultiFilter` | `boolean` | `false` | [Multi-filter](#filtering) (AG11) — a column with an array `meta.filter` (e.g. `['condition','set']`) stacks those filters (AND). Needs `enableColumnFilters` + `enableColumnFilterRow`. |
 | `enableGrouping` | `boolean` | `false` | Multi-column [grouping](#grouping-and-aggregation) + aggregates. |
 | `pagination` | `boolean \| { pageSize?: number }` | `true` (10) | Pagination; `false` shows all rows. |
 
@@ -909,6 +910,17 @@ return (
   Force it on any column with `meta.filter: 'set'`, or off with `meta.filter: 'condition'`. It writes an
   `{ op: 'set' }` condition, so it composes with the builder and `bstCondition`. Needs
   `enableColumnFilters` **and** the filter row visible (`enableColumnFilterRow`).
+- **Multi-filter (AG11)** — `enableMultiFilter` lets a column **stack several filter types**. Set its
+  `meta.filter` to an **array** (e.g. `['condition', 'set']`) and the filter row shows those filters
+  stacked; a row must satisfy **all** of them (AND). Stored as a compound
+  `{ op: 'and', conditions }` value the same `bstCondition` filterFn understands (helpers
+  `combineFilterConditions` + type `FilterConditionGroup`). A `'set'` part also needs `enableSetFilter`;
+  when `enableMultiFilter` is off, an array `meta.filter` falls back to its first entry.
+
+  ```tsx
+  { id: 'name', accessorKey: 'name', header: 'Name',
+    meta: { type: 'text', filter: ['condition', 'set'] } } // "contains" input + distinct-values checklist
+  ```
 - **Compose your own** — the exported `evalCondition`, `operatorsForType`, and `*_OPERATORS` tables let
   you build custom filter UIs. Read active filters via `table.state.columnFilters`.
 
@@ -1339,9 +1351,10 @@ preview fallback. New exports: `createFileHandlers`, types `BstFileRef`, `DataSo
 **PDF thumbnails (B5)** — `BstPdfThumbnailerProvider` · `useBstPdfThumbnailer` · `createPdfjsThumbnailer`
 + types `PdfThumbnailRenderer`, `PdfThumbnailerOptions`. Needs `pdfjs-dist` (yours to install).
 
-**Filtering (E3)** — `evalCondition` · `isConditionActive` · `operatorsForType` · `operatorArity` ·
-`filterFn_bstCondition` · `TEXT_OPERATORS` / `NUMBER_OPERATORS` / `DATE_OPERATORS` /
-`SELECT_OPERATORS` / `BOOLEAN_OPERATORS` + types `FilterOperator`, `FilterCondition`.
+**Filtering (E3 / AG11)** — `evalCondition` · `isConditionActive` · `combineFilterConditions` ·
+`operatorsForType` · `operatorArity` · `filterFn_bstCondition` · `TEXT_OPERATORS` / `NUMBER_OPERATORS` /
+`DATE_OPERATORS` / `SELECT_OPERATORS` / `BOOLEAN_OPERATORS` + types `FilterOperator`, `FilterCondition`,
+`FilterConditionGroup`.
 
 **Conditional formatting (K3)** — `evalCellFormat` · `evalRowFormat` · `DEFAULT_FORMAT_PRESETS` + types
 `BstFormatRule`, `BstFormatScope`, `BstFormatContext`, `FormatResult`, `BstFormatPreset`.

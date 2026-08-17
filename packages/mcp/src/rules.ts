@@ -57,6 +57,10 @@ export const RULES: Record<string, FlagRule> = {
     requires: ['enableColumnFilters'],
     note: 'Excel-style checklist of distinct values per column (AG4), rendered in the per-column filter row — so also turn on `enableColumnFilterRow`. Categorical columns (singleSelect / multiSelect / radio / boolean) are auto-eligible; force or skip per column via `meta.filter: "set" | "condition"`.',
   },
+  enableMultiFilter: {
+    requires: ['enableColumnFilters', 'enableColumnFilterRow'],
+    note: 'Multi-filter (AG11) — stack several filter types on ONE column. Opt a column in with an ARRAY `meta.filter`, e.g. `meta.filter: ["condition", "set"]`, which stacks those filters in its filter row; a row must satisfy all of them (AND). A `"set"` part also needs `enableSetFilter`. When off, an array `meta.filter` falls back to its first entry.',
+  },
   fitColumns: {
     conflictsWith: [
       { flag: 'enableColumnResizing', why: '`fitColumns` suppresses the resizers' },

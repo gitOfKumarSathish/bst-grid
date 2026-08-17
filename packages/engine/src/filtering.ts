@@ -19,6 +19,41 @@ export interface FilterCondition {
   value2?: unknown
 }
 
+/**
+ * A compound of column conditions combined with `and` / `or` — the value a
+ * **multi-filter** column stores (AG11), so several filter types (e.g. a text
+ * condition **+** a Set Filter) stack on ONE column. `evalCondition` /
+ * `isConditionActive` understand it, so it flows through the same `bstCondition`
+ * filterFn as a single condition. Slots are positional (one per filter part) and
+ * may be `undefined` (an empty part), so the stacked widgets keep a stable index.
+ */
+export interface FilterConditionGroup {
+  op: 'and' | 'or'
+  conditions: (FilterCondition | undefined)[]
+}
+
+/** A value is a compound group (vs a single condition) when it carries `conditions`. */
+function isGroup(raw: unknown): raw is FilterConditionGroup {
+  return (
+    typeof raw === 'object' &&
+    raw !== null &&
+    Array.isArray((raw as FilterConditionGroup).conditions)
+  )
+}
+
+/**
+ * Combine several conditions into the value a **multi-filter** column stores.
+ * Keeps every slot (positional, `undefined` allowed) so the stacked widgets stay
+ * aligned; returns `undefined` when no slot is active (so the column reads as
+ * unfiltered). `op` defaults to `and` (AG-Grid multi-filter semantics).
+ */
+export function combineFilterConditions(
+  conditions: (FilterCondition | undefined)[],
+  op: 'and' | 'or' = 'and',
+): FilterConditionGroup | undefined {
+  return conditions.some((c) => isConditionActive(c)) ? { op, conditions } : undefined
+}
+
 export const TEXT_OPERATORS: FilterOperator[] = [
   { op: 'contains', label: 'contains' },
   { op: 'notContains', label: 'does not contain' },
@@ -138,6 +173,15 @@ const includesArr = (cell: unknown, value: unknown): boolean =>
 /** Evaluate a `{ op, value }` condition (or a bare value → contains) on a cell. */
 export function evalCondition(cell: unknown, raw: unknown): boolean {
   if (raw == null) return true
+  // Compound group (multi-filter, AG11): AND / OR of the active sub-conditions.
+  // Inactive slots (half-built / empty) don't restrict, matching a single filter.
+  if (isGroup(raw)) {
+    const active = raw.conditions.filter((c) => isConditionActive(c)) as FilterCondition[]
+    if (active.length === 0) return true
+    return raw.op === 'or'
+      ? active.some((c) => evalCondition(cell, c))
+      : active.every((c) => evalCondition(cell, c))
+  }
   let op: string
   let value: unknown
   let value2: unknown
@@ -245,6 +289,8 @@ export function evalCondition(cell: unknown, raw: unknown): boolean {
  */
 export function isConditionActive(raw: unknown): boolean {
   if (raw == null) return false
+  // A multi-filter group is active if any of its slots is.
+  if (isGroup(raw)) return raw.conditions.some((c) => isConditionActive(c))
   let op: string
   let value: unknown
   let value2: unknown

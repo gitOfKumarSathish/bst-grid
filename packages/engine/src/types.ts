@@ -105,6 +105,14 @@ export interface BstTableEngineToggles {
    * (`enableColumnFilterRow`) to be visible. Default: false.
    */
   enableSetFilter?: boolean
+  /**
+   * Multi-filter (AG11) — **stack several filter types on one column**. A column
+   * opts in with `meta.filter` as an array (e.g. `['condition', 'set']`), which
+   * renders the listed filters **stacked** in its filter row; a row must satisfy
+   * **all** of them (AND). Needs `enableColumnFilters` + `enableColumnFilterRow`
+   * (and `enableSetFilter` for a `'set'` part). Default: false.
+   */
+  enableMultiFilter?: boolean
   /** Column show/hide behaviour. Maps to v9 `enableHiding`. Default: true. */
   enableHiding?: boolean
   /** Column resizing. Maps to v9 `enableColumnResizing`. Default: true. */

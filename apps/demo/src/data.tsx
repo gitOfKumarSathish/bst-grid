@@ -118,7 +118,9 @@ function emailNotTaken(value: unknown): Promise<FieldError[]> {
 export const columns: BstTableColumn<Person>[] = [
   {
     id: 'name', accessorKey: 'name', header: 'Name', sortFn: 'alphanumeric', size: 150,
-    meta: { type: 'text', editable: true, cellMeta: { required: true } },
+    // Multi-filter (AG11): stack a "contains" text input + a distinct-names
+    // checklist in the filter row (needs enableMultiFilter). A row must match both.
+    meta: { type: 'text', editable: true, cellMeta: { required: true }, filter: ['condition', 'set'] },
   },
   {
     id: 'email', accessorKey: 'email', header: 'Email (async)', size: 200,
