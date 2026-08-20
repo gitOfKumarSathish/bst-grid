@@ -259,6 +259,42 @@ describe('@bloomskill/table-mui — settings sheet', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Customize' }))
     expect(screen.getByRole('switch', { name: 'Sorting' })).toBeInTheDocument()
   })
+
+  test('enabling "Sticky header" caps the body + pins the header via the engine class', () => {
+    const { container } = render(
+      <BstTableMui data={seed} columns={columns} getRowId={(r) => r.id} showSettings={{ persist: false }} />,
+    )
+    const scroll = () => container.querySelector('.bst-table-scroll') as HTMLElement
+    expect(scroll().classList.contains('bst-sticky-header')).toBe(false)
+    fireEvent.click(screen.getByRole('button', { name: 'Table settings' }))
+    const sw = screen.getByRole('switch', { name: 'Sticky header' })
+    expect(sw).not.toBeChecked()
+    fireEvent.click(sw)
+    expect(scroll().classList.contains('bst-sticky-header')).toBe(true)
+    expect(scroll().style.getPropertyValue('--bst-max-height')).toBe('440px')
+  })
+})
+
+describe('@bloomskill/table-mui — "Rows per page" All option', () => {
+  test('pageSizeOptions can include "all" to show every (filtered) row', () => {
+    render(
+      <BstTableMui
+        data={seed}
+        columns={columns}
+        getRowId={(r) => r.id}
+        pagination={{ pageSize: 1 }}
+        pageSizeOptions={[1, 'all']}
+      />,
+    )
+    // Page 1 shows a single row.
+    expect(screen.getByText('Charlie')).toBeInTheDocument()
+    expect(screen.queryByText('Alice')).toBeNull()
+    // Pick "All" from the rows-per-page select → every row renders.
+    fireEvent.mouseDown(screen.getByRole('combobox'))
+    fireEvent.click(screen.getByRole('option', { name: 'All' }))
+    expect(screen.getByText('Charlie')).toBeInTheDocument()
+    expect(screen.getByText('Alice')).toBeInTheDocument()
+  })
 })
 
 describe('@bloomskill/table-mui — select editors are overlay editors', () => {

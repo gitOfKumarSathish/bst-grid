@@ -163,6 +163,7 @@ settings (e.g. `pagination={{ pageSize: 25 }}`). Follow a link for the full guid
 | [Column reordering](#column-layout) | `enableColumnOrdering` | `false` |
 | [Fit to viewport (no h-scroll)](#column-layout) | `fitColumns` | `false` |
 | [Responsive hiding](#column-layout) | `enableResponsive` + `meta.responsivePriority` | `false` |
+| [Sticky-header viewport](#row-layout) | `enableStickyHeader` | `false` |
 | [Per-column filter row](#filtering) | `enableColumnFilterRow` | `false` |
 
 #### 📋 Rows
@@ -575,7 +576,12 @@ means *passing the object implies enabled*.
 | `enableColumnOrdering` | `boolean` | `false` | Column reorder (menu + header drag). |
 | `fitColumns` | `boolean` | `false` | Fit all columns to the viewport — no horizontal scroll (G3). |
 | `enableResponsive` | `boolean` | `false` | Hide lowest-priority columns when narrow (G4). No-op under `fitColumns`. |
+| `enableStickyHeader` | `boolean \| { maxHeight?: number \| string; maxRows?: number }` | `false` | Cap the body to a bounded height so rows scroll under a pinned header + filter row (G3/G4). `maxHeight` = px number / CSS length; `maxRows` = approx row count; default 440px. Skipped when `enableVirtualization` is on (it already does this). |
 | `enableColumnFilterRow` | `boolean` | `false` | Per-column filter inputs under the header. |
+| `enableRowNumbers` | `boolean` | `false` | [Row-number column](#row-numbers-auto-columns--overlays) (AG9) — a leading `#` column numbering the current view (continuous across pages; reflects sort + filter). Non-interactive; **pinned sticky-left by default** (stays leftmost even when other columns are pinned); stays out of sort / filter / columns menu / export. |
+| `rowNumberHeader` | `ReactNode` | `'#'` | Header for the row-number column. |
+| `enableAutoColumns` | `boolean` | `false` | [Auto-generate columns](#row-numbers-auto-columns--overlays) (AG27) — infer columns from the data when `columns` is empty. Ignored once `columns` is non-empty. |
+| `autoColumns` | `AutoColumnsOptions` | — | Tune auto-generation: `{ sampleRows?, include?, exclude?, header?, inferType? }`. |
 
 **Rows**
 
@@ -626,6 +632,17 @@ means *passing the object implies enabled*.
 | --- | --- | --- | --- |
 | `enableExport` | `boolean \| BstExportOptions` | `false` | [Export](#export-csv--excel--print) as CSV / Excel / print. Object form: `{ csv?, excel?, print?, fileName?, scope?, includeHeaders? }` (an object implies enabled). |
 | `enableCsvExport` / `enableExcelExport` / `enablePrint` | `boolean` | `true` | Per-format sub-toggles of `enableExport` (also the settings-sheet switches). |
+
+**Loading / error overlays (AG23)**
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `enableOverlays` | `boolean` | `true` | [Loading / error overlays](#row-numbers-auto-columns--overlays) — paint an overlay while `loading` or on `error`. Set `false` to manage those states yourself. |
+| `loading` | `boolean` | — | Show the loading overlay. Usually wired from `useBstDataSource(...).loading`. |
+| `error` | `ReactNode \| Error \| null` | — | Show the error overlay (error wins over loading). Usually `useBstDataSource(...).error`. |
+| `overlayText` | `{ loading?: string; error?: string }` | — | Override the default labels ("Loading…" / the error message). |
+| `renderLoadingOverlay` | `() => ReactNode` | — | Fully custom loading overlay. |
+| `renderErrorOverlay` | `(error) => ReactNode` | — | Fully custom error overlay. |
 
 **Cells & styling**
 
@@ -980,6 +997,7 @@ Adapters add a **density** toggle (`showDensityToggle` → `data-bst-density` �
 | **Row pinning** | `enableRowPinning` | Leading pin column; the toggle cycles a row **top → bottom → unpinned**. Pinned rows survive sort/filter/pagination and stick while the body scrolls. |
 | **Row resizing** | `enableRowResize` | Drag any row's **bottom edge** to set its height (min 24px; **double-click** resets). Heights are local UI state. |
 | **Auto row height** | `enableAutoRowHeight` | Body cells **wrap** and each row grows to fit its content — **browser-measured, no JS**. Opt a single column in with `meta.wrapText`. A manually-resized row keeps its set height and clips the wrapped content (AG26). |
+| **Sticky-header viewport** | `enableStickyHeader` | Caps the scroll box to a bounded height so rows scroll under a **sticky header + filter row** instead of the table growing taller as the page size grows (G3/G4). `true` → 440px; `{ maxHeight: 500 }` / `{ maxHeight: '60vh' }` / `{ maxRows: 10 }` to size it. Already included in `enableVirtualization`, so the standalone class is skipped when windowing is on. Height overridable via `styles.root` / the `--bst-max-height` var. |
 
 ```tsx
 useBstTable<Order>({
@@ -988,6 +1006,39 @@ useBstTable<Order>({
   getRowCanExpand: (row) => row.lineItems.length > 0,
   renderDetail: (row) => <OrderLines items={row.lineItems} />,
 })
+```
+
+## Row numbers, auto-columns & overlays
+
+Three zero-config conveniences, each a §12 toggle (all appear in the runtime settings sheet):
+
+**Row numbers (AG9)** — `enableRowNumbers` prepends a leading, non-interactive `#` column that
+numbers the **current view**: numbering is continuous across pages and follows the active sort +
+filter (not the raw data order). It never sorts, filters, hides, resizes or reorders, so it stays out
+of the columns menu, filter row and export. It is **pinned to the start (sticky-left) by default**, so
+it stays the leftmost column even when you pin another column, and stays visible during horizontal
+scroll. Override the header with `rowNumberHeader`.
+
+**Auto-generate columns (AG27)** — `enableAutoColumns` infers columns from the data **when you pass
+no `columns`** (an empty array): one column per key found across a sample of rows, with the cell type
+guessed (number / boolean / date, else text) and a humanized header (`unitPrice` → "Unit Price").
+Explicit columns always win. The pure helper is exported too:
+
+```tsx
+import { autoGenerateColumns } from '@bloomskill/table-engine'
+const columns = autoGenerateColumns(rows, { exclude: ['id'], sampleRows: 100 })
+// or just: useBstTable({ data, columns: [], enableAutoColumns: true, getRowId })
+```
+
+**Loading / error overlays (AG23)** — `enableOverlays` (on by default) paints an overlay over the
+grid while `loading` is true or when `error` is set (error wins). Wire it to a server source and it
+works for free — `useBstDataSource` / `useBstInfiniteDataSource` expose `loading` + `error` on their
+`tableProps`:
+
+```tsx
+const { tableProps } = useBstDataSource(source)   // carries loading + error
+return <BstTableMui data={rows} columns={columns} getRowId={(r) => r.id} {...tableProps} />
+// customize: overlayText={{ loading: 'Fetching…' }} / renderErrorOverlay={(e) => <MyError e={e} />}
 ```
 
 ## Conditional formatting

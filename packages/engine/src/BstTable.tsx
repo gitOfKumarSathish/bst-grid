@@ -670,18 +670,44 @@ export function BstTable({
     }
   }, [ctxMenu])
 
+  // Loading / error overlays (AG23). Error wins when both are set. The overlay
+  // covers the (non-scrolling) viewport wrapper, so it stays put as the body
+  // scrolls beneath it.
+  const overlayError = handle.error
+  const showOverlayError =
+    handle.enableOverlays &&
+    overlayError != null &&
+    overlayError !== false &&
+    overlayError !== ''
+  const showOverlayLoading =
+    handle.enableOverlays && !!handle.loading && !showOverlayError
+  const overlayActive = showOverlayLoading || showOverlayError
+
+  // Sticky-header viewport (G3/G4): bound the scroll box + pin the header. Row
+  // virtualization already does this via `.bst-virtualized`, so only add the
+  // standalone class when windowing is off (avoids a double max-height rule).
+  const stickyActive = handle.stickyHeader.enabled && !rowVirtActive
+
   return (
     <BstIconsContext.Provider value={I}>
+    <div className="bst-table-viewport" style={{ position: 'relative' }}>
     <div
       ref={scrollRef}
       className={cx(
         'bst-table-scroll',
         rowVirtActive && 'bst-virtualized',
+        stickyActive && 'bst-sticky-header',
         handle.enableAutoRowHeight && 'bst-auto-rowheight',
         className,
         classNames?.root,
       )}
-      style={{ ...(handle.fitColumns ? { overflowX: 'hidden' as const } : null), ...styles?.root }}
+      style={{
+        ...(handle.fitColumns ? { overflowX: 'hidden' as const } : null),
+        ...(stickyActive
+          ? ({ '--bst-max-height': handle.stickyHeader.maxHeight } as React.CSSProperties)
+          : null),
+        ...styles?.root,
+      }}
       onContextMenu={handle.enableContextMenu ? onCellContextMenu : undefined}
     >
       <table
@@ -1124,6 +1150,43 @@ export function BstTable({
           )}
         </tbody>
       </table>
+    </div>
+    {overlayActive ? (
+      <div
+        className={cx(
+          'bst-overlay',
+          showOverlayError ? 'bst-overlay-error' : 'bst-overlay-loading',
+        )}
+        role="status"
+        aria-live="polite"
+      >
+        {showOverlayError
+          ? handle.renderErrorOverlay
+            ? handle.renderErrorOverlay(overlayError)
+            : (
+                <span className="bst-overlay-text bst-overlay-errtext" role="alert">
+                  {handle.overlayText?.error ??
+                    (React.isValidElement(overlayError)
+                      ? overlayError
+                      : overlayError instanceof Error
+                        ? overlayError.message
+                        : typeof overlayError === 'string'
+                          ? overlayError
+                          : 'Something went wrong')}
+                </span>
+              )
+          : handle.renderLoadingOverlay
+            ? handle.renderLoadingOverlay()
+            : (
+                <>
+                  <span className="bst-overlay-spinner" aria-hidden="true" />
+                  <span className="bst-overlay-text">
+                    {handle.overlayText?.loading ?? 'Loading…'}
+                  </span>
+                </>
+              )}
+      </div>
+    ) : null}
     </div>
     {ctxMenu ? (
       <div

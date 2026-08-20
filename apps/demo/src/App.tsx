@@ -458,6 +458,78 @@ function MultiFilterSection() {
   );
 }
 
+/**
+ * AG27 — auto-generate columns. The grid is given `columns={[]}` + `enableAutoColumns`,
+ * so it infers one column per key in the data, with a guessed cell type + humanized header.
+ */
+const autoRows = [
+  { sku: 'A-100', productName: 'Widget', unitPrice: 12.5, inStock: true, addedOn: '2024-01-04' },
+  { sku: 'A-101', productName: 'Gadget', unitPrice: 8, inStock: false, addedOn: '2024-02-11' },
+  { sku: 'A-102', productName: 'Gizmo', unitPrice: 21.75, inStock: true, addedOn: '2024-03-19' },
+];
+function AutoColumnsSection() {
+  return (
+    <section>
+      <h3 style={{ margin: '0 0 8px' }}>Auto-generate columns from data (AG27)</h3>
+      <div style={{ ...box, marginBottom: 8 }}>
+        No <code>columns</code> are passed — just <code>columns=&#123;[]&#125;</code> +{' '}
+        <code>enableAutoColumns</code>. The grid infers one column per data key (first-seen order),
+        guessing the cell type (<b>number</b> for <code>unitPrice</code>, <b>boolean</b> for{' '}
+        <code>inStock</code>, <b>date</b> for <code>addedOn</code>) and humanizing the header
+        (<code>unitPrice</code> → "Unit Price"). Explicit columns always win over inference.
+      </div>
+      <BstTableMui
+        title="Inferred columns"
+        data={autoRows}
+        columns={[]}
+        enableAutoColumns
+        getRowId={(r) => r.sku}
+        pagination={false}
+        showSearch={false}
+      />
+    </section>
+  );
+}
+
+/**
+ * AG23 — loading / error overlays. Toggle the two states to see the engine's
+ * overlays paint over the grid. `useBstDataSource` feeds these automatically in a
+ * real server grid; here they're driven by buttons for the demo.
+ */
+function OverlaysSection() {
+  const [loading, setLoading] = React.useState(false);
+  const [errored, setErrored] = React.useState(false);
+  return (
+    <section>
+      <h3 style={{ margin: '0 0 8px' }}>Loading / error overlays (AG23)</h3>
+      <div style={{ ...box, marginBottom: 8 }}>
+        <code>enableOverlays</code> (on by default) paints an overlay while <code>loading</code> is
+        true or when <code>error</code> is set (error wins). A server grid wired with{' '}
+        <code>useBstDataSource</code> gets both for free — its <code>tableProps</code> carry{' '}
+        <code>loading</code> + <code>error</code>. Toggle them here:
+        <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+          <button onClick={() => { setLoading((v) => !v); setErrored(false); }}>
+            {loading ? 'Stop loading' : 'Show loading'}
+          </button>
+          <button onClick={() => { setErrored((v) => !v); setLoading(false); }}>
+            {errored ? 'Clear error' : 'Show error'}
+          </button>
+        </div>
+      </div>
+      <BstTableMui<Person>
+        title="Overlays"
+        data={people.slice(0, 5)}
+        columns={columns}
+        getRowId={(r) => r.id}
+        loading={loading}
+        error={errored ? new Error('Failed to load rows — please retry.') : null}
+        pagination={false}
+        showSearch={false}
+      />
+    </section>
+  );
+}
+
 const GRID_STATE_KEY = 'demo-people-view';
 
 function GridStateSection() {
@@ -653,7 +725,9 @@ export default function App() {
     enableSetFilter: true, // AG4: categorical columns (see role/plan) get a distinct-values checklist
     showStatusBar: true, // AG5: footer — row counts + selection sum/avg/min/max
     enableAutoRowHeight: true, // AG26: rows grow to fit wrapped content (browser-measured)
+    enableStickyHeader: { maxRows: 12 }, // G3/G4: cap the body → sticky header + body scroll (try a bigger page size / "All")
     enableContextMenu: true, // AG6: right-click a cell → Copy / Export / Autosize (+ getContextMenuItems)
+    enableRowNumbers: true, // AG9: leading # column numbering the current view
     enableExpanding: true, // master-detail (A4): click ▸ for a detail panel
     renderDetail: (r: Person) => (
       <div
@@ -818,7 +892,7 @@ export default function App() {
             {...customCss}
             data={dataMui}
             onDataChange={setDataMui}
-            pageSizeOptions={[8, 16, 50]}
+            pageSizeOptions={[8, 16, 50, 'all']} // 'all' → show every row (scrolls inside the sticky-header box)
             showColumnEditToggle // G/F4: per-column edit lock in the Columns menu
             showFormatBuilder // K3: 🎨 Formats button → conditional-format rule builder
             conditionalFormats={cfRules}
@@ -838,6 +912,7 @@ export default function App() {
             {...customCss}
             data={dataSc}
             onDataChange={setDataSc}
+            pageSizeOptions={[8, 16, 50, 'all']} // 'all' → show every row (scrolls inside the sticky-header box)
             showColumnEditToggle // G/F4: per-column edit lock in the Columns menu
             showFormatBuilder // K3: 🎨 Formats button → conditional-format rule builder
             conditionalFormats={cfRules}
@@ -1122,6 +1197,10 @@ export default function App() {
         <GridStateSection />
 
         <MultiFilterSection />
+
+        <AutoColumnsSection />
+
+        <OverlaysSection />
 
         <FilesSection dark={dark} />
 

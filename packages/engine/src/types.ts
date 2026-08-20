@@ -6,6 +6,7 @@ import type { CellRenderProps } from './registry/types.js'
 import type { BstCellSpan, BstSpanContext } from './spanning.js'
 import type { BstFormatRule } from './formatting.js'
 import type { VirtualizationOptions } from './virtualization.js'
+import type { BstStickyHeaderOptions } from './stickyHeader.js'
 import type { BstExportOptions } from './export.js'
 import type { BstSaveEvent, CommitPolicy, SaveTrigger } from './runtime.js'
 
@@ -132,6 +133,18 @@ export interface BstTableEngineToggles {
    * `fitColumns`. Default: false.
    */
   enableResponsive?: boolean
+  /**
+   * Sticky-header viewport (G3/G4) — cap the scrollable body to a bounded height so
+   * the rows scroll **inside** the grid under a header (and per-column filter row)
+   * that stays pinned, instead of the whole table growing taller as the page size
+   * grows. `true` uses a default height (440px); pass an object to size it by pixels
+   * (`{ maxHeight }`) or by a number of visible rows (`{ maxRows }`). An object
+   * implies enabled (§12). Opt-in. Default: false. Row virtualization
+   * (`enableVirtualization`) already includes this behaviour — it also caps the body
+   * and sticks the header — so this is the same viewport **without** row windowing,
+   * for small / medium grids. The height is overridable via `styles.root`.
+   */
+  enableStickyHeader?: boolean | BstStickyHeaderOptions
   /** Column pinning (sticky left/right). Maps to v9 `enableColumnPinning`. Default: false. */
   enableColumnPinning?: boolean
   /**
@@ -269,6 +282,33 @@ export interface BstTableEngineToggles {
    * Default: false.
    */
   enableContextMenu?: boolean
+  /**
+   * Row-number column (AG9) — a leading, non-interactive `#` column showing each
+   * row's 1-based position in the **current view** (continuous across pages;
+   * reflects sort + filter). It never sorts, filters, hides, resizes, reorders or
+   * pins, and stays out of the columns menu / filter row / export. Header defaults
+   * to `#` — override with `rowNumberHeader`. Default: false.
+   */
+  enableRowNumbers?: boolean
+  /**
+   * Auto-generate columns from data (AG27) — when **no `columns` are supplied**
+   * (an empty array), infer them from the row data: one column per key found in a
+   * sample of rows, with the cell type guessed from the value (number / boolean /
+   * date / text) and a humanized header. Ignored the moment `columns` is
+   * non-empty, so explicit columns always win. Tune via `autoColumns`. Default:
+   * false.
+   */
+  enableAutoColumns?: boolean
+  /**
+   * Loading / error overlays (AG23) — render a formal overlay over the grid while
+   * `loading` is true or when `error` is set, instead of leaving the body blank or
+   * stale. On by default so a grid wired to a server `DataSource`
+   * (`useBstDataSource`, which reports `loading`/`error`) shows them for free; set
+   * `false` to suppress the overlays and manage those states yourself. Feed the
+   * state via `loading` / `error`; customize via `overlayText`,
+   * `renderLoadingOverlay`, `renderErrorOverlay`. Default: true.
+   */
+  enableOverlays?: boolean
 }
 
 /** One entry in the right-click context menu (AG6). */
@@ -453,4 +493,43 @@ export interface UseBstTableOptions<TData extends RowData> extends BstTableEngin
   onReachEnd?: () => void
   /** How many rows from the end trigger `onReachEnd`. Default 8. */
   endReachedThreshold?: number
+  /** Header for the row-number column (AG9, `enableRowNumbers`). Default `'#'`. */
+  rowNumberHeader?: React.ReactNode
+  /** Tuning for auto-generated columns (AG27, `enableAutoColumns`). */
+  autoColumns?: AutoColumnsOptions
+  /**
+   * Loading state (AG23) — while true the grid shows a loading overlay (unless
+   * `enableOverlays` is false). Usually wired from `useBstDataSource(...).loading`.
+   */
+  loading?: boolean
+  /**
+   * Error state (AG23) — when set the grid shows an error overlay (unless
+   * `enableOverlays` is false). Accepts an `Error`, a message string, or any React
+   * node. Usually wired from `useBstDataSource(...).error`.
+   */
+  error?: React.ReactNode | Error | null
+  /** Overlay label overrides (AG23). Defaults: "Loading…" / the error message. */
+  overlayText?: { loading?: string; error?: string }
+  /** Fully custom loading overlay (AG23) — replaces the default spinner + text. */
+  renderLoadingOverlay?: () => React.ReactNode
+  /** Fully custom error overlay (AG23) — receives the `error` value. */
+  renderErrorOverlay?: (error: unknown) => React.ReactNode
+}
+
+/** Tuning for auto-generated columns (AG27). All optional. */
+export interface AutoColumnsOptions {
+  /** How many rows to sample when collecting keys. Default 50. */
+  sampleRows?: number
+  /** Only generate these keys (in this order). Omit → every key found. */
+  include?: string[]
+  /** Never generate columns for these keys (e.g. an internal id). */
+  exclude?: string[]
+  /** Turn a data key into a column header. Default: humanize (`unitPrice` → "Unit Price"). */
+  header?: (key: string) => string
+  /**
+   * Infer a Bst cell type (`meta.type`) from a key + a sample value. Return
+   * `undefined` to leave the column untyped (plain text). Omit → the built-in
+   * guesser (number / boolean / date, else text).
+   */
+  inferType?: (key: string, sampleValue: unknown) => string | undefined
 }

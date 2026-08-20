@@ -517,9 +517,14 @@ builder, server row model — all shipped **free**. The remaining parity gaps sc
 (easy → hard). Full analysis: [`docs/ag-grid-gap-analysis.md`](docs/ag-grid-gap-analysis.md); status
 IDs **`AG1–AG29`** in [`COVERAGE.md`](COVERAGE.md). These map to Milestones A–D in the gap doc.
 
-**Phase 4 remainder (parity-relevant, already in Phase 4 scope):** i18n / localeText (`AG19`) ·
-a11y / ARIA grid audit (`AG20`) · grid-state save/restore API (`AG21`) · live / WebSocket updates —
-I5 (`AG22`) · formal loading / error overlays (`AG23`).
+**Phase 4 remainder (parity-relevant, already in Phase 4 scope):** i18n / localeText (`AG19` — ⚪ **now optional**, see below) ·
+a11y / ARIA grid audit (`AG20`) · grid-state save/restore API (`AG21` ✅) · live / WebSocket updates —
+I5 (`AG22`) · formal loading / error overlays (`AG23` ✅ **v0.40.0** — `enableOverlays` + `loading`/`error`).
+
+> **⚪ Out of scope (optional, 2026-08-20).** Three parity items are **kept but deliberately not
+> scheduled** — no phase owns them: **cell notes / comments (`AG18`)**, **i18n / localeText
+> (`AG19`)**, **RTL (`AG24`)**. Rationale in [`COVERAGE.md`](COVERAGE.md) "Optional — kept but out of
+> scope". They can be picked up later if an app needs them.
 
 **Phase 5 — Export & interop**  *(✅ shipped v0.34.0)*
 CSV export (`AG1`) · Excel `.xlsx` export (`AG2`) · print / print-friendly view (`AG3`). Delivered
@@ -536,8 +541,10 @@ selection (`AG5` ✅) · right-click context menu (`AG6` ✅) · tool-panel side
 multi-filter per column (`AG11`) · fill handle (`AG12`).
 → *Deliverable:* the chrome + filtering an AG Grid user expects on day one.
 **Shipped:** `AG4` (`enableSetFilter` + `BstSetFilter`, an `{op:'set'}` condition) and `AG5`
-(`showStatusBar` + `runtime.getSelectionStats`) and `AG6` (`enableContextMenu` + `getContextMenuItems`).
-**Remaining:** AG7–AG12.
+(`showStatusBar` + `runtime.getSelectionStats`) and `AG6` (`enableContextMenu` + `getContextMenuItems`)
+and `AG9` (`enableRowNumbers` + `rowNumberHeader`, **v0.40.0** — leading `#` column, settings-toggle)
+and `AG11` (`enableMultiFilter`).
+**Remaining:** AG7 (⏭️ skipped) · AG8 · AG10 · AG12.
 
 **Phase 7 — Hierarchy, analytics & scale**
 Tree data — self-referencing hierarchy (`AG13`) · pivoting (`AG14`) · integrated charts, range → chart
@@ -546,10 +553,12 @@ calculated / formula columns (`AG17`) · cell notes / comments (`AG18`).
 → *Deliverable:* enterprise-heavyweight analytics + true server-side scale.
 
 **Phase 8 — Polish & parity tail**  *(in progress)*
-RTL (`AG24`) · row/column move+sort animations (`AG25`) · **auto row height** (`AG26` ✅) · auto-generate
-columns (`AG27`) · cell flashing on change (`AG28`) · aligned grids (`AG29`).
+RTL (`AG24` — ⚪ **now optional**, see above) · row/column move+sort animations (`AG25`) · **auto row
+height** (`AG26` ✅) · auto-generate columns (`AG27` ✅) · cell flashing on change (`AG28`) · aligned
+grids (`AG29`).
 → *Deliverable:* the last-mile polish.
-**Shipped:** `AG26` — `enableAutoRowHeight` + `meta.wrapText` (CSS wrap; browser-measured, dep-free).
+**Shipped:** `AG26` — `enableAutoRowHeight` + `meta.wrapText` (CSS wrap; browser-measured, dep-free) ·
+`AG27` — `enableAutoColumns` + `autoColumns` + `autoGenerateColumns(data, opts)` (**v0.40.0**).
 
 Each item ships behind a §12 toggle (`enable*` / `show*`) with the full Definition of Done (demo +
 README + CHANGELOG + version bump). Every **AG Grid Enterprise-paid** capability above (Set Filter,

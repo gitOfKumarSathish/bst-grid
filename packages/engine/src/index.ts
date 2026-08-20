@@ -69,6 +69,24 @@ export type {
   VirtualizationCompat,
 } from './virtualization.js'
 
+// ---- sticky-header viewport (G3/G4) ----
+export {
+  resolveStickyHeader,
+  STICKY_DEFAULT_MAX_HEIGHT_PX,
+  STICKY_ROW_PX,
+  STICKY_HEADER_PX,
+} from './stickyHeader.js'
+export type { BstStickyHeaderOptions, ResolvedStickyHeader } from './stickyHeader.js'
+
+// ---- pagination "Rows per page" helpers (incl. the `'all'` choice) ----
+export {
+  resolvePageSizeChoices,
+  pageSizeForChoice,
+  PAGE_SIZE_ALL,
+  PAGE_SIZE_ALL_APPLIED,
+} from './pagination.js'
+export type { BstPageSizeOption, BstPageSizeChoice } from './pagination.js'
+
 // ---- options / column types ----
 export type {
   BstTableColumn,
@@ -82,7 +100,17 @@ export type {
   BstHeaderSlotContext,
   BstContextMenuItem,
   BstContextMenuContext,
+  AutoColumnsOptions,
 } from './types.js'
+
+// ---- column helpers: auto-generate (AG27) + row-number (AG9) ----
+export {
+  autoGenerateColumns,
+  humanizeKey,
+  inferCellType,
+  ROW_NUMBER_COLUMN_ID,
+  RESERVED_COLUMN_PREFIX,
+} from './columns.js'
 
 // ---- features (v9 registration) ----
 export { bstTableFeatures } from './features.js'
