@@ -22,6 +22,7 @@ without touching your data code.
 - ☑️ **Row selection (Phase 3)** — `enableRowSelection` renders a checkbox column (header select-all + per-row) and a toolbar "{n} selected" chip + Clear (`showSelectionInfo`).
 - ↩️ **Undo/redo (Phase 3)** — `enableUndoRedo` adds toolbar Undo/Redo buttons (`showUndoRedo`) wired to the engine's edit history (Ctrl/Cmd+Z / Ctrl/Cmd+Y also work).
 - 📌 **Layout chrome (Phase 3)** — `enableColumnPinning` / `enableColumnOrdering` add pin + move controls to the columns menu (sticky columns, reorder); `showDensityToggle` cycles row-height density; **`enableRowResize`** lets users drag a row's bottom edge to set its height (double-click to reset). **`showColumnEditToggle`** adds a per-column **edit lock/unlock** (✏️) so an end-user can make an editable column read-only at runtime (requires `enableEditing`).
+- 👁️ **Hide / show columns** — with `enableHiding` (on by default) the **Columns menu** gives each column an **eye / eye-off** toggle (👁 visible · 🚫 hidden) beside the pin/reorder/copy/edit controls — the one-click per-column hide affordance, alongside the existing visibility checkbox. The runtime settings sheet exposes the same capability as **Show / hide columns**.
 - 📤 **Export (Phase 5)** — `enableExport` adds a toolbar **Export** menu (`showExport`) — download **CSV**, download **Excel** (`.xlsx`) or **print** — built on the engine's dependency-free serializers (no `exceljs`). Per-format sub-toggles `enableCsvExport` / `enableExcelExport` / `enablePrint`.
 - 🔎 **Set Filter (Phase 6, AG4)** — `enableSetFilter` gives categorical columns an Excel-style **checklist of distinct values** in the filter row (search · select-all/clear · counts · (Blanks)); needs `enableColumnFilterRow`.
 - 🔎 **Multi-filter (AG11)** — `enableMultiFilter` lets a column **stack filter types** via an array `meta.filter` (e.g. `['condition', 'set']`): the filters render stacked in the row and a row must satisfy all of them (AND). Needs `enableColumnFilterRow`.
@@ -243,7 +244,7 @@ Plus the MUI-only chrome props:
 | `title` | `string` | — | Optional toolbar title. |
 | `showToolbar` | `boolean` | `true` | Show the top toolbar. |
 | `showSearch` | `boolean` | `true` | Show the global search box. |
-| `showColumnsMenu` | `boolean` | `true` | Show the column-visibility menu. |
+| `showColumnsMenu` | `boolean` | `true` | Show the column-visibility menu. Each column gets a checkbox **and** an **eye / eye-off** hide-toggle (plus pin/reorder/copy/edit controls when those features are on). Requires `enableHiding` (default on). |
 | `showPagination` | `boolean` | `true` | Show the pagination bar. |
 | `showAddRow` | `boolean` | follows `enableRowActions` | Show the **Add row** button. |
 | `showSaveBar` | `boolean` | follows `enableEditing` | Show the unsaved-changes Save/Discard bar. |

@@ -18,6 +18,8 @@ import {
   IconX,
   IconCopy,
   IconPencil,
+  IconEye,
+  IconEyeOff,
 } from '@tabler/icons-react'
 import type { BstShadcnIcons } from './types.js'
 
@@ -45,6 +47,8 @@ export const tablerIcons: BstShadcnIcons = {
   close: IconX,
   copy: IconCopy,
   edit: IconPencil,
+  eye: IconEye,
+  eyeOff: IconEyeOff,
 }
 
 export default tablerIcons

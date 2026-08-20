@@ -799,8 +799,9 @@ export default function App() {
             <li><b>Custom CSS</b> — toggle <em>Custom CSS</em> (top-right): consumer <code>classNames</code>/
               <code>styles</code> slots add the indigo header, zebra rows, struck-through inactive rows,
               green high salaries and the card outline — your own CSS, composed over the theme.</li>
-            <li><b>Pin &amp; reorder</b> — the <em>Columns</em> menu: 📌 pins a column (Name is pinned by
-              default — scroll right to see it stay), ‹ › move it left/right.</li>
+            <li><b>Pin &amp; reorder &amp; hide</b> — the <em>Columns</em> menu: 📌 pins a column (Name is pinned by
+              default — scroll right to see it stay), ‹ › move it left/right, and the 👁 eye toggle
+              hides/shows a column (or use its checkbox).</li>
             <li><b>Access control</b> — tick <em>Lock inactive rows</em>: inactive people grey out and
               can’t be edited (grid → row → column → cell cascade).</li>
             <li><b>Editing / validation / cell types</b> — double-click Name / Age / Salary / Website;

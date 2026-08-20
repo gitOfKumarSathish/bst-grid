@@ -54,6 +54,8 @@ import RedoIcon from '@mui/icons-material/Redo'
 import PushPinIcon from '@mui/icons-material/PushPin'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import EditIcon from '@mui/icons-material/Edit'
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import DensityMediumIcon from '@mui/icons-material/DensityMedium'
 import FilterListIcon from '@mui/icons-material/FilterList'
 import FormatColorFillIcon from '@mui/icons-material/FormatColorFill'
@@ -316,7 +318,8 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
 
   // chrome follows behaviour (§12)
   const searchOn = showSearch && (rest.enableGlobalFilter ?? true)
-  const colsMenuOn = showColumnsMenu && (rest.enableHiding ?? true)
+  const hidingOn = rest.enableHiding ?? true
+  const colsMenuOn = showColumnsMenu && hidingOn
   const editingOn = !!rest.enableEditing
   const rowActionsOn = !!rest.enableRowActions
   const rowSelectionOn = !!rest.enableRowSelection
@@ -710,6 +713,28 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
                       onClick={() => col.toggleVisibility()}
                       sx={{ cursor: 'pointer', mr: 1 }}
                     />
+                    {hidingOn && (
+                      <IconButton
+                        size="small"
+                        color={col.getIsVisible() ? 'default' : 'primary'}
+                        aria-label={
+                          col.getIsVisible()
+                            ? `Hide ${colLabel(col)}`
+                            : `Show ${colLabel(col)}`
+                        }
+                        title={col.getIsVisible() ? 'Hide column' : 'Show column'}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          col.toggleVisibility()
+                        }}
+                      >
+                        {col.getIsVisible() ? (
+                          <VisibilityIcon fontSize="inherit" />
+                        ) : (
+                          <VisibilityOffIcon fontSize="inherit" />
+                        )}
+                      </IconButton>
+                    )}
                     {orderingOn && (
                       <>
                         <IconButton

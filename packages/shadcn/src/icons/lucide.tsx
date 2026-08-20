@@ -18,6 +18,8 @@ import {
   X,
   Copy,
   Pencil,
+  Eye,
+  EyeOff,
 } from 'lucide-react'
 import type { BstShadcnIcons } from './types.js'
 
@@ -45,6 +47,8 @@ export const lucideIcons: BstShadcnIcons = {
   close: X,
   copy: Copy,
   edit: Pencil,
+  eye: Eye,
+  eyeOff: EyeOff,
 }
 
 export default lucideIcons

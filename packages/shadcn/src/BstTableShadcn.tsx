@@ -719,6 +719,31 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
                         {col.getIsVisible() ? <I.check size={14} /> : null}
                       </span>
                       <span style={{ flex: 1 }}>{colLabel(col)}</span>
+                      {hidingOn && (
+                        // Hide/show this column — the explicit "eye" affordance
+                        // alongside the row's visibility checkbox. is-active = hidden.
+                        <button
+                          className={
+                            'sc-menu-btn' + (col.getIsVisible() ? '' : ' is-active')
+                          }
+                          aria-label={
+                            col.getIsVisible()
+                              ? `Hide ${colLabel(col)}`
+                              : `Show ${colLabel(col)}`
+                          }
+                          title={col.getIsVisible() ? 'Hide column' : 'Show column'}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            col.toggleVisibility()
+                          }}
+                        >
+                          {col.getIsVisible() ? (
+                            <I.eye size={14} />
+                          ) : (
+                            <I.eyeOff size={14} />
+                          )}
+                        </button>
+                      )}
                       {orderingOn && (
                         <>
                           <button

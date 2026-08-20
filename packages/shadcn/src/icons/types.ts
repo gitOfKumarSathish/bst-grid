@@ -63,6 +63,10 @@ export interface BstShadcnIcons {
   copy: IconComponent
   /** Per-column edit lock/unlock control in the Columns menu. */
   edit: IconComponent
+  /** Hide a currently-visible column (Columns menu) — the "eye" glyph. */
+  eye: IconComponent
+  /** Show a currently-hidden column (Columns menu) — the "eye-off" glyph. */
+  eyeOff: IconComponent
 }
 
 /** A partial icon map — the shape of the `icons` prop and every preset factory input. */
@@ -89,4 +93,6 @@ export const ICON_SLOTS: (keyof BstShadcnIcons)[] = [
   'close',
   'copy',
   'edit',
+  'eye',
+  'eyeOff',
 ]

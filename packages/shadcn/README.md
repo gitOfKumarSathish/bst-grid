@@ -22,6 +22,7 @@ so you can switch skins without changing your data code.
 - ☑️ **Row selection (Phase 3)** — `enableRowSelection` renders a checkbox column (header select-all + per-row) and a toolbar "{n} selected" badge + Clear (`showSelectionInfo`).
 - ↩️ **Undo/redo (Phase 3)** — `enableUndoRedo` adds toolbar Undo/Redo buttons (`showUndoRedo`) wired to the engine's edit history (Ctrl/Cmd+Z / Ctrl/Cmd+Y also work).
 - 📌 **Layout chrome (Phase 3)** — `enableColumnPinning` / `enableColumnOrdering` add pin + move controls to the Radix columns menu; `showDensityToggle` cycles row-height density; **`enableRowResize`** lets users drag a row's bottom edge to set its height (double-click to reset). **`showColumnEditToggle`** adds a per-column **edit lock/unlock** (✏️) so an end-user can make an editable column read-only at runtime (requires `enableEditing`).
+- 👁️ **Hide / show columns** — with `enableHiding` (on by default) the **Columns menu** gives each column an **eye / eye-off** toggle (the pluggable `eye` / `eyeOff` icon slots) beside the pin/reorder/copy/edit controls — the one-click per-column hide affordance, alongside the existing visibility checkmark. The runtime settings sheet exposes the same capability as **Show / hide columns**.
 - 📤 **Export (Phase 5)** — `enableExport` adds a toolbar **Export** menu (`showExport`, a Radix dropdown) — download **CSV**, download **Excel** (`.xlsx`) or **print** — built on the engine's dependency-free serializers (no `exceljs`). Per-format sub-toggles `enableCsvExport` / `enableExcelExport` / `enablePrint`.
 - 🔎 **Set Filter (Phase 6, AG4)** — `enableSetFilter` gives categorical columns an Excel-style **checklist of distinct values** in the filter row (search · select-all/clear · counts · (Blanks)); needs `enableColumnFilterRow`.
 - 🔎 **Multi-filter (AG11)** — `enableMultiFilter` lets a column **stack filter types** via an array `meta.filter` (e.g. `['condition', 'set']`): the filters render stacked in the row and a row must satisfy all of them (AND). Needs `enableColumnFilterRow`.
@@ -189,7 +190,8 @@ import { Search } from 'lucide-react'
 
 With no `icons` prop, the grid renders built-in lucide-styled SVGs (zero dependency). Slots:
 `search` · `filter` · `format` · `columns` · `chevronLeft` / `chevronRight` / `chevronDown` · `check` ·
-`pin` · `plus` · `save` · `undo` · `redo` · `density` · `group` · `settings` · `close`.
+`pin` · `plus` · `save` · `undo` · `redo` · `density` · `group` · `settings` · `close` · `copy` · `edit` ·
+`eye` / `eyeOff` (the per-column hide/show toggle in the Columns menu).
 
 Your icon set also **themes the grid body** — the overlapping slots (pin, boolean check, expander
 chevrons, remove) are forwarded into `<BstTable>`, so the cells match the toolbar. Sort arrows and
@@ -293,7 +295,7 @@ Plus the shadcn-only chrome props:
 | `icons` | `Partial<BstShadcnIcons>` | built-in SVGs | Icon overrides / preset. Unspecified slots use the lucide-styled defaults. |
 | `showToolbar` | `boolean` | `true` | Show the top toolbar. |
 | `showSearch` | `boolean` | `true` | Show the global search box. |
-| `showColumnsMenu` | `boolean` | `true` | Show the Radix column menu. |
+| `showColumnsMenu` | `boolean` | `true` | Show the Radix column menu. Each column gets a visibility checkbox **and** an **eye / eye-off** hide-toggle (plus pin/reorder/copy/edit controls when those features are on). Requires `enableHiding` (default on). |
 | `showPagination` | `boolean` | `true` | Show the pagination bar. |
 | `showAddRow` | `boolean` | follows `enableRowActions` | Show the **Add row** button. |
 | `showSaveBar` | `boolean` | follows `enableEditing` | Show the unsaved-changes Save/Discard bar. |

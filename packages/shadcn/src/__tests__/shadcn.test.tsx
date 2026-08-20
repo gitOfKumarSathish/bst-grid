@@ -193,6 +193,20 @@ describe('@bloomskill/table-shadcn — columns menu (portaled)', () => {
       await screen.findByRole('button', { name: 'Allow Name editing' }),
     ).toBeInTheDocument()
   })
+
+  test('hide toggle in the menu hides/shows a column (enableHiding)', async () => {
+    const user = userEvent.setup()
+    render(<BstTableShadcn data={seed} columns={columns} getRowId={(r) => r.id} />)
+    expect(screen.getByRole('columnheader', { name: /Age/i })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /Columns/i }))
+    await screen.findByRole('menu')
+    // Age is visible → the eye toggle offers to HIDE it.
+    await user.click(screen.getByRole('button', { name: 'Hide Age' }))
+    // The toggle flips to offer SHOW…
+    expect(await screen.findByRole('button', { name: 'Show Age' })).toBeInTheDocument()
+    // …and the column drops out of the header.
+    expect(screen.queryByRole('columnheader', { name: /Age/i })).toBeNull()
+  })
 })
 
 describe('@bloomskill/table-shadcn — settings sheet', () => {

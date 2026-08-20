@@ -18,6 +18,8 @@ import {
   X,
   Copy,
   Pencil,
+  Eye,
+  EyeSlash,
 } from '@phosphor-icons/react'
 import type { BstShadcnIcons } from './types.js'
 
@@ -46,6 +48,8 @@ export const phosphorIcons: BstShadcnIcons = {
   close: X,
   copy: Copy,
   edit: Pencil,
+  eye: Eye,
+  eyeOff: EyeSlash,
 }
 
 export default phosphorIcons

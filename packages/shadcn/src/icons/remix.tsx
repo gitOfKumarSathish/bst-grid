@@ -18,6 +18,8 @@ import {
   RiCloseLine,
   RiFileCopyLine,
   RiPencilLine,
+  RiEyeLine,
+  RiEyeOffLine,
 } from '@remixicon/react'
 import type { BstShadcnIcons } from './types.js'
 
@@ -45,6 +47,8 @@ export const remixIcons: BstShadcnIcons = {
   close: RiCloseLine,
   copy: RiFileCopyLine,
   edit: RiPencilLine,
+  eye: RiEyeLine,
+  eyeOff: RiEyeOffLine,
 }
 
 export default remixIcons

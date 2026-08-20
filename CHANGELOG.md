@@ -9,6 +9,20 @@ this project uses [Semantic Versioning](https://semver.org).
 > affected package README(s) **and** bump the version, in the same change.
 
 ## [Unreleased]
+### Added — Per-column hide/show (eye) toggle in the Columns menu
+- The **Columns menu** now gives every column a one-click **eye / eye-off** visibility toggle
+  (aria `Hide <col>` / `Show <col>`) beside the existing pin / reorder / copy / edit controls, in
+  **both** the MUI and shadcn adapters. It sits next to — and stays in sync with — the per-column
+  visibility checkbox, and calls the engine's `col.toggleVisibility()`. Hidden columns stay listed
+  in the menu (it iterates `getAllLeafColumns`) so they can be restored. Gated by the existing
+  **`enableHiding`** flag (on by default); the runtime settings sheet already exposes the same
+  capability as **Show / hide columns** (unchanged).
+- shadcn: two new pluggable icon slots — **`eye`** / **`eyeOff`** — added to every preset
+  (`default`, `lucide`, `tabler`, `phosphor`, `remix`, `hugeicons`) and to `ICON_SLOTS`. MUI uses
+  `@mui/icons-material` `Visibility` / `VisibilityOff`.
+- No new flag (reuses `enableHiding`), so no settings-sheet or MCP-rules change. Tested in
+  `mui.test.tsx` + `shadcn.test.tsx` (hide drops the column from the header; the toggle flips to
+  Show); `icons.test.tsx` now covers the two new slots across all presets.
 
 ## [0.39.0] — 2026-08-17
 ### Added — Multi-filter (AG11): stack filter types on one column

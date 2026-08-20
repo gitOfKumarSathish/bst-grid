@@ -150,6 +150,25 @@ describe('@bloomskill/table-mui — layout chrome (Phase 3)', () => {
     expect(screen.queryByRole('button', { name: /Lock .* editing/ })).toBeNull()
   })
 
+  test('column menu hide toggle hides/shows a column (enableHiding)', () => {
+    render(<BstTableMui data={seed} columns={columns} getRowId={(r) => r.id} />)
+    expect(headerLabels()).toContain('Age')
+    fireEvent.click(screen.getByRole('button', { name: /Columns/i }))
+    // Age is visible → the eye toggle offers to HIDE it.
+    fireEvent.click(screen.getByRole('button', { name: 'Hide Age' }))
+    // Column drops out of the header…
+    expect(headerLabels()).not.toContain('Age')
+    // …and the toggle flips to offer SHOW (proves the reactive visibility state).
+    expect(screen.getByRole('button', { name: 'Show Age' })).toBeInTheDocument()
+  })
+
+  test('no Columns menu (and no hide toggle) when enableHiding is off', () => {
+    render(
+      <BstTableMui data={seed} columns={columns} getRowId={(r) => r.id} enableHiding={false} />,
+    )
+    expect(screen.queryByRole('button', { name: /Columns/i })).toBeNull()
+  })
+
   test('filter-builder button toggles a working panel', () => {
     render(<BstTableMui data={seed} columns={columns} getRowId={(r) => r.id} showFilterBuilder />)
     expect(screen.queryByRole('button', { name: '+ Add filter' })).toBeNull()

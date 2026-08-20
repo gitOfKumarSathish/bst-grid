@@ -20,6 +20,8 @@ import {
   Cancel01Icon,
   Copy01Icon,
   Edit01Icon,
+  ViewIcon,
+  ViewOffSlashIcon,
 } from '@hugeicons/core-free-icons'
 import type { BstShadcnIcons, IconComponent, IconProps } from './types.js'
 
@@ -60,6 +62,8 @@ export const hugeiconsIcons: BstShadcnIcons = {
   close: wrap('close', Cancel01Icon),
   copy: wrap('copy', Copy01Icon),
   edit: wrap('edit', Edit01Icon),
+  eye: wrap('eye', ViewIcon),
+  eyeOff: wrap('eyeOff', ViewOffSlashIcon),
 }
 
 export default hugeiconsIcons
