@@ -9,6 +9,7 @@ packages/mcp/.typecheck-scaffold/
 
 # Claude Code local (personal) settings
 .claude/settings.local.json
+.claude/launch.json
 .git.root-backup/
 
 # Local planning docs — personal, kept OUT of the repo/remote AND the MCP corpus
