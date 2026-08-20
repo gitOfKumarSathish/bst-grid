@@ -12,6 +12,8 @@ import {
   BstConditionalFormatBuilder,
   BstShortcuts,
   useStoreSelector,
+  resolvePageSizeChoices,
+  pageSizeForChoice,
 } from '@bloomskill/table-engine'
 import type {
   UseBstTableOptions,
@@ -21,6 +23,7 @@ import type {
   BstFormatBuilderColumn,
   BstGridStateOptions,
   BstTableInstance,
+  BstPageSizeOption,
 } from '@bloomskill/table-engine'
 import type { RowData } from '@tanstack/react-table'
 import Paper from '@mui/material/Paper'
@@ -162,8 +165,12 @@ export interface BstTableMuiProps<TData extends RowData> extends UseBstTableOpti
    * `include` / `exclude`). Distinct from `showSettings`, which toggles *features*.
    */
   gridState?: BstGridStateOptions
-  /** Page-size choices in the pagination bar. Default: [5, 10, 20, 50]. */
-  pageSizeOptions?: number[]
+  /**
+   * Page-size choices in the pagination bar. Default: `[5, 10, 20, 50]`. Include
+   * the string `'all'` to offer an **All** entry that shows every (filtered) row —
+   * e.g. `[10, 25, 50, 'all']`.
+   */
+  pageSizeOptions?: BstPageSizeOption[]
   /** Custom class name on the outer card (the whole component). Fine-grained
    * slots go on `classNames` (forwarded to the grid body). */
   className?: string
@@ -422,6 +429,8 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
   const total = table.getRowCount()
   const from = total === 0 ? 0 : pg.pageIndex * pg.pageSize + 1
   const to = Math.min((pg.pageIndex + 1) * pg.pageSize, total)
+  // "Rows per page" choices (numeric sizes + an optional `'all'` → every row).
+  const pageSizeSelect = resolvePageSizeChoices(pageSizeOptions, pg.pageSize)
   // Status bar (AG5): pre-filter total + selection aggregates.
   const statusBarTotal = table.getPreFilteredRowModel().rows.length
   const selStats = statusBarOn ? runtime.getSelectionStats() : null
@@ -439,9 +448,9 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
     const missing = leafIds.filter((id) => !kept.includes(id))
     return [...kept, ...missing]
   }
-  const orderedColumns = orderingOn
-    ? orderNow().map((id) => colById.get(id))
-    : table.getAllLeafColumns()
+  const orderedColumns = (
+    orderingOn ? orderNow().map((id) => colById.get(id)) : table.getAllLeafColumns()
+  ).filter((c: any) => c && !String(c.id).startsWith('__bst')) // hide the row-number column (AG9)
   const moveColumn = (colId: string, dir: -1 | 1) => {
     const order = orderNow()
     const i = order.indexOf(colId)
@@ -1274,13 +1283,13 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
           </Typography>
           <Select
             size="small"
-            value={pg.pageSize}
-            onChange={(e) => table.setPageSize(Number(e.target.value))}
+            value={pageSizeSelect.value}
+            onChange={(e) => table.setPageSize(pageSizeForChoice(Number(e.target.value)))}
             sx={{ height: 32 }}
           >
-            {pageSizeOptions.map((n) => (
-              <MenuItem key={n} value={n}>
-                {n}
+            {pageSizeSelect.choices.map((c) => (
+              <MenuItem key={c.value} value={c.value}>
+                {c.label}
               </MenuItem>
             ))}
           </Select>

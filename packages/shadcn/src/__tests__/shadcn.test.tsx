@@ -255,6 +255,43 @@ describe('@bloomskill/table-shadcn — settings sheet', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Table settings' }))
     expect(screen.getByRole('switch', { name: 'Copy & paste' })).not.toBeChecked()
   })
+
+  test('enabling "Sticky header" caps the body + pins the header via the engine class', () => {
+    const { container } = render(
+      <BstTableShadcn data={seed} columns={columns} getRowId={(r) => r.id} showSettings={{ persist: false }} />,
+    )
+    const scroll = () => container.querySelector('.bst-table-scroll') as HTMLElement
+    expect(scroll().classList.contains('bst-sticky-header')).toBe(false)
+    fireEvent.click(screen.getByRole('button', { name: 'Table settings' }))
+    const sw = screen.getByRole('switch', { name: 'Sticky header' })
+    expect(sw).not.toBeChecked()
+    fireEvent.click(sw)
+    expect(scroll().classList.contains('bst-sticky-header')).toBe(true)
+    expect(scroll().style.getPropertyValue('--bst-max-height')).toBe('440px')
+  })
+})
+
+describe('@bloomskill/table-shadcn — "Rows per page" All option', () => {
+  test('pageSizeOptions can include "all" to show every (filtered) row', () => {
+    render(
+      <BstTableShadcn
+        data={seed}
+        columns={columns}
+        getRowId={(r) => r.id}
+        pagination={{ pageSize: 1 }}
+        pageSizeOptions={[1, 'all']}
+      />,
+    )
+    // Page 1 shows a single row.
+    expect(screen.getByText('Charlie')).toBeInTheDocument()
+    expect(screen.queryByText('Alice')).toBeNull()
+    // The native select offers an "All" option; choosing it shows every row.
+    const select = screen.getByRole('combobox') as HTMLSelectElement
+    const allOption = within(select).getByRole('option', { name: 'All' }) as HTMLOptionElement
+    fireEvent.change(select, { target: { value: allOption.value } })
+    expect(screen.getByText('Charlie')).toBeInTheDocument()
+    expect(screen.getByText('Alice')).toBeInTheDocument()
+  })
 })
 
 describe('@bloomskill/table-shadcn — review-changes sheet (batch mode)', () => {

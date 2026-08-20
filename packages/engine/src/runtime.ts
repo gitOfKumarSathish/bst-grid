@@ -1322,9 +1322,10 @@ export function createRuntime<TData extends RowData>(
 
   /* --------------------------------------------------------------- export */
 
-  /** Columns to export — visible leaf columns minus pure-UI action columns. */
+  /** Columns to export — visible leaf columns minus pure-UI + row-number columns. */
   const exportColumnIds = (): string[] =>
     ctx.visibleColumnIds.filter((id) => {
+      if (id.startsWith('__bst')) return false // row-number column (AG9)
       const t = metaOf(id).type
       return t !== 'action' && t !== 'actionMenu'
     })

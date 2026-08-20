@@ -9,6 +9,65 @@ this project uses [Semantic Versioning](https://semver.org).
 > affected package README(s) **and** bump the version, in the same change.
 
 ## [Unreleased]
+
+## [0.40.0] — 2026-08-20
+### Added — Row numbers (AG9) · loading/error overlays (AG23) · auto-generate columns (AG27)
+- **Row-number column (`AG9`) — `enableRowNumbers`** (+ **`rowNumberHeader`**). A leading,
+  non-interactive `#` column numbering the **current view** — continuous across pages, reflecting the
+  active sort + filter (not the raw data order). It's injected as a real leaf column under the reserved
+  `__bst` id prefix, so it stays out of sorting, the filter row, the columns menu and export **by
+  construction**; the number is read from the live painted row model (cached per model, O(n)). It is
+  **pinned to the start** by default (sticky-left), so it stays the leftmost data column — ahead of any
+  user-pinned column — and stays visible during horizontal scroll (the pin is seeded even when a
+  consumer `initialState` / `gridState` sets its own column pinning). In the runtime settings sheet
+  under **Columns → "Row numbers"** (always shown). Both skins inherit it.
+- **Loading / error overlays (`AG23`) — `enableOverlays`** (default **on**) + **`loading`** / **`error`**
+  (+ **`overlayText`** / **`renderLoadingOverlay`** / **`renderErrorOverlay`**). A formal overlay paints
+  over the grid while `loading` is true or when `error` is set (error wins), instead of a blank / stale
+  body. `useBstDataSource` **and** `useBstInfiniteDataSource` now surface `loading` + `error` on their
+  `tableProps`, so a server-wired grid shows the overlays with no extra code. Default content is a
+  spinner + "Loading…" / the error message; fully replaceable via the render props. Settings sheet:
+  **Display → "Loading / error overlays"**.
+- **Auto-generate columns (`AG27`) — `enableAutoColumns`** (+ **`autoColumns`**). When **no `columns`**
+  are supplied (empty array), the grid infers one column per key found across a sample of rows
+  (first-seen order), guessing the cell type (number / boolean / date, else text) and humanizing the
+  header (`unitPrice` → "Unit Price"). Ignored the moment `columns` is non-empty — explicit columns
+  always win. New engine export **`autoGenerateColumns(data, opts)`** (+ `humanizeKey`, `inferCellType`,
+  `ROW_NUMBER_COLUMN_ID`, `RESERVED_COLUMN_PREFIX`). Settings sheet: **Columns → "Auto-generate columns"**.
+- New engine module `columns.ts`; overlay + row-number CSS in `bst-table.css` (`.bst-table-viewport` /
+  `.bst-overlay*` / `.bst-rownum-cell`). Settings-sheet parity + MCP flag-rules entries added for all
+  three flags; §12 registry rows added. Tested in `columns.test.tsx` (17 cases: auto-column inference,
+  row-number ordering/pagination continuity, overlay states). Demo: `enableRowNumbers` on the main grid
+  + dedicated **AG27** and **AG23** sections.
+
+### Marked optional (kept, out of scope) — AG18 / AG19 / AG24
+- **Cell notes / comments (`AG18`)**, **i18n / localeText (`AG19`)** and **RTL (`AG24`)** are moved to a
+  new **"Optional — kept but out of scope"** section in [`COVERAGE.md`](COVERAGE.md) (and flagged in
+  `Plan.md`). They stay documented but are **not scheduled** and no longer counted as missing work.
+
+### Added — Sticky-header viewport (`enableStickyHeader`) + an "All" rows-per-page choice
+- **`enableStickyHeader`** (engine, G3/G4) caps the scrollable body to a bounded height so the rows
+  scroll **inside** the grid under a header (and per-column filter row) that stays pinned — instead
+  of the whole table growing taller as the page size grows. Fixes the "increase rows per page → no
+  scroll, header scrolls away, height just grows" behaviour. `true` uses a default height (440px);
+  pass an object to size it by pixels (`{ maxHeight: 500 }` / `{ maxHeight: '60vh' }`) or by a row
+  count (`{ maxRows: 10 }`). Opt-in (default off), and **always listed in the runtime settings sheet**
+  under **Rows → "Sticky header"**, so an end-user can switch it on per table without developer wiring.
+- Row virtualization (`enableVirtualization`) already caps the body + sticks the header, so the engine
+  adds the standalone `bst-sticky-header` class only when windowing is **off** — the two never stack.
+  Height comes from the `--bst-max-height` CSS var (set inline), overridable via `styles.root`.
+- New engine exports: pure **`resolveStickyHeader`** helper + `BstStickyHeaderOptions` /
+  `ResolvedStickyHeader` types + the `STICKY_*` constants.
+- **"Rows per page" now accepts an `'all'` choice.** `pageSizeOptions` may include the string `'all'`
+  (e.g. `[10, 25, 50, 'all']`) to offer an **All** entry that shows every (filtered) row — the natural
+  companion to the sticky-header viewport (show everything, scroll inside a fixed box). Resolved by the
+  new pure engine helpers **`resolvePageSizeChoices`** / **`pageSizeForChoice`** (+ `BstPageSizeOption`
+  type), so MUI and shadcn behave identically. `pageSizeOptions` is now typed `(number | 'all')[]`
+  (backward compatible with `number[]`).
+- Settings-sheet parity (`enableStickyHeader`) + MCP flag-rules entry added; new tests in
+  `stickyHeader.test.tsx` (pure resolvers + render: class/height applied, yields to virtualization),
+  `mui.test.tsx` / `shadcn.test.tsx` (settings toggle wires through; the "All" option shows every row).
+
 ### Added — Per-column hide/show (eye) toggle in the Columns menu
 - The **Columns menu** now gives every column a one-click **eye / eye-off** visibility toggle
   (aria `Hide <col>` / `Show <col>`) beside the existing pin / reorder / copy / edit controls, in

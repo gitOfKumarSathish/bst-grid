@@ -9,7 +9,7 @@ engine + adapter source. Re-run when a version ships._
 > 2026-08-13 AG Grid audit ([`docs/ag-grid-gap-analysis.md`](docs/ag-grid-gap-analysis.md)), phased in
 > `Plan.md` PART 3 "Phases 5–8".
 
-**Legend:** ✅ built · 🟡 partial · ❌ missing (needs the Phase-4 foundation / a new dep)
+**Legend:** ✅ built · 🟡 partial · ❌ missing (needs the Phase-4 foundation / a new dep) · ⏭️ deliberately skipped · ⚪ optional / out of scope (kept, not scheduled)
 **Tally:** ✅ 55 built · 🟡 2 partial · ❌ 1 missing (of 58). _(**B5 now ✅** — in-cell **PDF thumbnail** (`cellMeta.pdfThumbnail`, rendered by **pdf.js** via an injected renderer — engine stays dep-free), the last B5 gap; I3 file ops ✅ — formal `DataSource.uploadFile`/`deleteFile`/`getFileUrl` verbs + `createFileHandlers` bridge on top of the cell-level upload/delete; D1 row/column virtualization + A2 infinite scroll shipped on `@tanstack/react-virtual` → both ✅, leaving I5 the only ❌; v0.30.0 — batch editing + `getChangeSet` + single-call `onSave` → I4 now partial; v0.28.0 server DataSource foundation → A3 server pagination done; v0.25.0 G2 row resize; v0.23.0 B1 QR/barcode + J2 rich-text)_
 
 | ID | Requirement | Status | Where / why |
@@ -113,7 +113,7 @@ Everything below ships **free** (MIT/Apache)._
 | AG6 | Right-click context menu | 💷 | ✅ | P6 — `enableContextMenu` + `getContextMenuItems` (dep-free popup: Copy / Export / Autosize + custom) |
 | AG7 | Tool-panel sidebar (Columns + Filters) | 💷 | ⏭️ skip | **Deliberately not built** (2026-08-17) — redundant with the toolbar's **Columns** menu (show/hide · pin · reorder · group) + **Filters** button. Was prototyped (`showSidebar` + `BstColumnPanel`) and reverted. |
 | AG8 | Find (highlight + jump between matches) | 💷 | ❌ | P6 |
-| AG9 | Row-number column | 💷 | ❌ | P6 |
+| AG9 | Row-number column | 💷 | ✅ | **`enableRowNumbers`** (+ `rowNumberHeader`) — leading non-interactive `#` column numbering the current view (continuous across pages; reflects sort + filter). **Pinned to the start (sticky-left) by default**, so it stays leftmost even when other columns are pinned. Settings-toggle ("Columns"). Both skins |
 | AG10 | Managed row dragging (reorder) | 🆓 | ❌ | P6 |
 | AG11 | Multi-filter (stack filter types per column) | 💷 | ✅ | P6 — `enableMultiFilter` + array `meta.filter` (e.g. `['condition','set']`); stacked in the filter row, AND-combined via `combineFilterConditions` / `FilterConditionGroup` |
 | AG12 | Fill handle (drag-to-fill range) | 💷 | ❌ | P6 |
@@ -122,23 +122,37 @@ Everything below ships **free** (MIT/Apache)._
 | AG15 | Integrated charts (range → chart) | 💷 | ❌ | P7 |
 | AG16 | Advanced server-side row model (server group/pivot/tree, lazy expand) | 💷 | 🟡 | P7 |
 | AG17 | Calculated / formula columns | 💷 | 🟡 | P7 |
-| AG18 | Cell notes / comments | 💷 | ❌ | P7 |
-| AG19 | Localization / i18n (localeText) | 🆓 | ❌ | P4 |
+| AG18 | Cell notes / comments | 💷 | ⚪ | **Optional — out of scope** (see below) |
+| AG19 | Localization / i18n (localeText) | 🆓 | ⚪ | **Optional — out of scope** (see below) |
 | AG20 | Accessibility / ARIA grid audit | 🆓 | 🟡 | P4 |
 | AG21 | Grid-state save/restore API | 🆓 | ✅ | P4 — `getGridState`/`applyGridState`/`loadGridState`/`useBstGridState` (+ adapters' one-line `gridState={{ key }}`); full view snapshot, stale-column-safe |
 | AG22 | Live / streaming updates (I5, WebSocket merge) | — | ❌ | P4 |
-| AG23 | Formal loading / error overlays | 🆓 | 🟡 | P4/P5 |
-| AG24 | RTL support | 🆓 | ❌ | P8 |
+| AG23 | Formal loading / error overlays | 🆓 | ✅ | **`enableOverlays`** (default on) + `loading` / `error` (+ `overlayText` / `renderLoadingOverlay` / `renderErrorOverlay`); `useBstDataSource` / `useBstInfiniteDataSource` `tableProps` feed both, so server grids get it free |
+| AG24 | RTL support | 🆓 | ⚪ | **Optional — out of scope** (see below) |
 | AG25 | Row / column animations | 🆓 | ❌ | P8 |
 | AG26 | Auto row height (content-measured) | 🆓 | ✅ | P8 — `enableAutoRowHeight` + `meta.wrapText` (CSS wrap, browser-measured, dep-free) |
-| AG27 | Auto-generate columns from data | 🆓 | ❌ | P8 |
+| AG27 | Auto-generate columns from data | 🆓 | ✅ | **`enableAutoColumns`** (+ `autoColumns`) — infer columns from data when none supplied; helper `autoGenerateColumns(data, opts)`; settings-toggle ("Columns") |
 | AG28 | Cell flashing on data change | 🆓 | ❌ | P8 |
 | AG29 | Aligned grids (shared column state) | 🆓 | ❌ | P8 |
 
-**Tally:** 29 parity items — ✅ 9 built (P5 export · P6 Set Filter / status bar / context menu /
-**multi-filter AG11** · P8 auto row height · P4 grid-state save/restore AG21) · ❌ 15 missing · 🟡 4 partial ·
-⏭️ 1 skipped (AG7 sidebar). **12 of them are AG Grid Enterprise-paid** — they ship free here.
+**Tally:** 29 parity items — ✅ 12 built · 🟡 3 partial (AG16 SSRM · AG17 formula cols · AG20 a11y) ·
+❌ 10 missing · ⏭️ 1 skipped (AG7 sidebar) · ⚪ 3 optional/out-of-scope (AG18 · AG19 · AG24). **12 of the
+29 are AG Grid Enterprise-paid** — they ship free here. _(v0.40.0 added **AG9** row-number column,
+**AG23** loading/error overlays, **AG27** auto-generate columns; and moved **AG18/AG19/AG24** to
+Optional below.)_
 
 **Already matched (AG Grid Enterprise-paid, shipped free):** cell/range selection · clipboard
 copy/paste · batch editing · row grouping + aggregation · master-detail · sparklines · advanced-filter
 builder · server row model. See "Built beyond the original spec" above and `CLAUDE.md` §12.
+
+### Optional — kept but out of scope (not scheduled)
+
+These parity items are **intentionally not on the roadmap** (decision 2026-08-20). They remain
+documented here for completeness and can be picked up later, but no phase owns them and they are
+**not** counted toward the missing tally as work-to-do.
+
+| ID | Feature | AG tier | Why deferred |
+|---|---|---|---|
+| AG18 | Cell notes / comments | 💷 | Collaboration/annotation feature outside the current grid scope; no consuming app needs it yet. |
+| AG19 | Localization / i18n (`localeText`) | 🆓 | The grid's few built-in strings are overridable at the call site (e.g. `overlayText`, headers, labels); a full `localeText` catalog isn't required for the target apps. |
+| AG24 | RTL support | 🆓 | No RTL-locale app currently consumes the grid; revisit if/when one does. |

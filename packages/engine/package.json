@@ -1,6 +1,6 @@
 {
   "name": "@bloomskill/table-engine",
-  "version": "0.39.0",
+  "version": "0.40.0",
   "description": "Bst-Table headless engine — TanStack Table v9 wiring + neutral renderer + CSS-var theme tokens. UI-library agnostic.",
   "keywords": [
     "react",

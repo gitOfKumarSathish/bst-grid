@@ -273,6 +273,7 @@ describe('useBstSettings — newer features (added after the sheet shipped)', ()
       'enableColumnFilterRow',
       'fitColumns',
       'enableResponsive',
+      'enableStickyHeader',
       'enableExpanding',
       'enableRowPinning',
       'enableRowResize',

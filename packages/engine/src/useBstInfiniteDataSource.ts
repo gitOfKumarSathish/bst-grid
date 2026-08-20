@@ -63,6 +63,10 @@ export interface BstInfiniteTableProps<TData> {
   onColumnFiltersChange: (u: Updater<DsColumnFilter[]>) => void
   onGlobalFilterChange: (u: Updater<string>) => void
   onPaginationChange: (u: Updater<unknown>) => void
+  /** Initial fetch in flight (AG23) — drives the loading overlay (not appends). */
+  loading: boolean
+  /** Last fetch error, or null (AG23) — drives the error overlay. */
+  error: Error | null
 }
 
 export interface BstInfiniteDataSourceResult<TData> {
@@ -254,6 +258,9 @@ export function useBstInfiniteDataSource<TData>(
     onColumnFiltersChange,
     onGlobalFilterChange,
     onPaginationChange,
+    // Only the initial load covers the grid; appends use `isFetchingNextPage`.
+    loading: loading && rows.length === 0,
+    error,
   }
 
   return {

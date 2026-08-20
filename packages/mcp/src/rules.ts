@@ -73,6 +73,15 @@ export const RULES: Record<string, FlagRule> = {
     ],
     conflictsWith: [{ flag: 'fitColumns', why: 'responsive hiding is a no-op under `fitColumns`' }],
   },
+  enableStickyHeader: {
+    note: 'Caps the scroll box to a bounded height (default 440px; size it with `{ maxHeight }` or `{ maxRows }`) so the body scrolls under a pinned header + filter row, instead of the table growing taller with the page size. Row virtualization already does this, so the engine skips the standalone class when `enableVirtualization` is on — the two never stack.',
+  },
+  enableRowNumbers: {
+    note: 'Prepends a leading, non-interactive `#` column (AG9) numbering the current view — continuous across pages, reflecting sort + filter. It stays out of sorting, filtering, the columns menu, the filter row and export. Override the header via `rowNumberHeader`.',
+  },
+  enableAutoColumns: {
+    note: 'Generates columns from the data (AG27) ONLY when `columns` is empty — one column per key found in a sample of rows, with a guessed cell type + humanized header. Ignored the moment `columns` is non-empty. Tune via `autoColumns` (sampleRows / include / exclude / header / inferType).',
+  },
 
   // ---- Rows ----
   enableExpanding: {
@@ -160,6 +169,9 @@ export const RULES: Record<string, FlagRule> = {
   },
   enableAutoRowHeight: {
     note: 'Body cells wrap and each row grows to fit its content (AG26) — browser-measured, no JS. Opt individual columns in/out with `meta.wrapText`. A manually-resized row (`enableRowResize`) keeps its set height and clips the wrapped content.',
+  },
+  enableOverlays: {
+    note: 'Loading / error overlays (AG23), on by default. Feed state via `loading` / `error` (or wire `useBstDataSource`, whose `tableProps` already carry both). Customize via `overlayText`, `renderLoadingOverlay`, `renderErrorOverlay`. Set false to manage those states yourself.',
   },
 
   // ---- Performance (D1 — row/column virtualization) ----

@@ -109,11 +109,14 @@ const SETTINGS_META: Record<BstSettingKey, SettingMeta> = {
   enableColumnFilterRow: { group: 'Columns', default: false, alwaysShow: true, label: 'Per-column filter row', hint: 'Filter inputs under each header · needs Column filters', requires: ['enableColumnFilters'] },
   fitColumns: { group: 'Columns', default: false, label: 'Fit columns to width', hint: 'No horizontal scroll (G3)' },
   enableResponsive: { group: 'Columns', default: false, label: 'Responsive columns', hint: 'Hide low-priority columns when narrow (G4)' },
+  enableRowNumbers: { group: 'Columns', default: false, alwaysShow: true, label: 'Row numbers', hint: 'Leading # column numbering the current view (AG9)' },
+  enableAutoColumns: { group: 'Columns', default: false, label: 'Auto-generate columns', hint: 'Infer columns from the data when none are defined (AG27)' },
   // Rows
   enableExpanding: { group: 'Rows', default: false, label: 'Master-detail rows', hint: 'Expandable detail panel (A4)' },
   enableRowPinning: { group: 'Rows', default: false, label: 'Pin rows', hint: 'Freeze rows top / bottom (G1)' },
   enableRowResize: { group: 'Rows', default: false, alwaysShow: true, label: 'Resize rows', hint: 'Drag a row edge to set its height (G2)' },
   enableAutoRowHeight: { group: 'Rows', default: false, alwaysShow: true, label: 'Auto row height', hint: 'Rows grow to fit wrapped content (AG26)' },
+  enableStickyHeader: { group: 'Rows', default: false, alwaysShow: true, label: 'Sticky header', hint: 'Cap the body height so rows scroll under a pinned header (G3/G4)' },
   // Editing
   enableEditing: { group: 'Editing', default: false, label: 'Inline editing' },
   enableBatchEditing: {
@@ -162,6 +165,7 @@ const SETTINGS_META: Record<BstSettingKey, SettingMeta> = {
   },
   showDensityToggle: { group: 'Display', default: false, label: 'Density toggle' },
   showStatusBar: { group: 'Display', default: false, label: 'Status bar', hint: 'Row counts + sum / avg / min / max of the selection (AG5)' },
+  enableOverlays: { group: 'Display', default: true, alwaysShow: true, label: 'Loading / error overlays', hint: 'Show an overlay while fetching or on error (AG23)' },
   // Export (AG1–AG3) — an opt-in capability plus per-format sub-toggles, mirroring
   // the clipboard pattern (master off; formats default-on, always shown with a
   // "needs Export" hint) so an end-user can switch export on and pick formats.

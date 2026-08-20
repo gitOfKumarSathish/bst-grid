@@ -21,6 +21,9 @@ import type { CellTypeRegistry } from './registry/registry.js'
 import type { BstColumnMeta } from './registry/types.js'
 import { resolveVirtualization } from './virtualization.js'
 import type { ResolvedVirtualization } from './virtualization.js'
+import { resolveStickyHeader } from './stickyHeader.js'
+import type { ResolvedStickyHeader } from './stickyHeader.js'
+import { autoGenerateColumns, makeRowNumberColumn, ROW_NUMBER_COLUMN_ID } from './columns.js'
 
 const DEFAULT_PAGE_SIZE = 10
 
@@ -99,6 +102,8 @@ export interface BstRuntimeHandle<TData extends RowData> {
   enableResponsive: boolean
   /** Row virtualization (D1) — render only the viewport's rows. Resolved config. */
   virtualization: ResolvedVirtualization
+  /** Sticky-header viewport (G3/G4) — bounded body height + pinned header. Resolved config. */
+  stickyHeader: ResolvedStickyHeader
   /** A2 infinite scroll — fired once when the virtualized body nears its end. */
   onReachEnd?: () => void
   /** Rows-from-end that trigger `onReachEnd`. Default 8. */
@@ -107,6 +112,22 @@ export interface BstRuntimeHandle<TData extends RowData> {
   enableExport: boolean
   /** Which export formats are on (CSV / Excel / Print) — filters the menu items. */
   exportFormats: { csv: boolean; excel: boolean; print: boolean }
+  /** Row-number column (AG9) is active — a leading `#` column was injected. */
+  enableRowNumbers: boolean
+  /** Auto-generated columns (AG27) were used because no columns were supplied. */
+  enableAutoColumns: boolean
+  /** Loading / error overlays (AG23) may render (default true). */
+  enableOverlays: boolean
+  /** Loading state (AG23) — drives the loading overlay. */
+  loading?: boolean
+  /** Error state (AG23) — drives the error overlay. */
+  error?: React.ReactNode | Error | null
+  /** Overlay label overrides (AG23). */
+  overlayText?: { loading?: string; error?: string }
+  /** Custom loading overlay (AG23). */
+  renderLoadingOverlay?: () => React.ReactNode
+  /** Custom error overlay (AG23). */
+  renderErrorOverlay?: (error: unknown) => React.ReactNode
 }
 
 /** Column ids whose column def carries a user-authored `cell` renderer. */
@@ -339,10 +360,59 @@ export function useBstTable<TData extends RowData>(opts: UseBstTableOptions<TDat
     }
   }
 
+  // Effective columns: AG27 auto-generate when none are supplied, then AG9
+  // prepend the row-number column. Memoized on the inputs that determine them so
+  // a stable `columns`/`data` ref does not churn the table's column state.
+  const columns = React.useMemo(() => {
+    const base =
+      opts.enableAutoColumns && (!opts.columns || opts.columns.length === 0)
+        ? autoGenerateColumns(opts.data, opts.autoColumns)
+        : opts.columns
+    return opts.enableRowNumbers
+      ? [makeRowNumberColumn(opts.rowNumberHeader), ...base]
+      : base
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    opts.columns,
+    opts.data,
+    opts.enableAutoColumns,
+    opts.enableRowNumbers,
+    opts.rowNumberHeader,
+    opts.autoColumns,
+  ])
+
+  // Seed state. The row-number column (AG9) is pinned to the **start** so it stays
+  // the leftmost data column — ahead of any user-pinned column — and sticks during
+  // horizontal scroll. Injected here (not just in the column def) so it survives a
+  // consumer-supplied `initialState`/`gridState` that sets its own column pinning.
+  const initialState: Record<string, unknown> = {
+    pagination: {
+      pageIndex: 0,
+      pageSize: paginationEnabled ? pageSize : Number.MAX_SAFE_INTEGER,
+    },
+    // v9 pinning state is { start, end } (renamed from v8 left/right) and its
+    // logic reads these arrays directly, so they must exist even when the
+    // feature is off (otherwise `.start.length` / `.includes` throws).
+    columnPinning: { start: [], end: [] },
+    columnOrder: [],
+    expanded: {},
+    rowPinning: { top: [], bottom: [] },
+    grouping: [],
+    ...opts.initialState,
+  }
+  if (opts.enableRowNumbers) {
+    const cp = (initialState.columnPinning ?? { start: [], end: [] }) as {
+      start?: string[]
+      end?: string[]
+    }
+    const start = (cp.start ?? []).filter((id) => id !== ROW_NUMBER_COLUMN_ID)
+    initialState.columnPinning = { start: [ROW_NUMBER_COLUMN_ID, ...start], end: cp.end ?? [] }
+  }
+
   const table = useTable({
     features: bstTableFeatures,
     data: opts.data,
-    columns: opts.columns,
+    columns,
     getRowId: opts.getRowId,
     globalFilterFn: 'includesString',
     enableSorting: opts.enableSorting ?? true,
@@ -367,21 +437,7 @@ export function useBstTable<TData extends RowData>(opts: UseBstTableOptions<TDat
     // A column may still override `filterFn` in its def.
     defaultColumn: { filterFn: 'bstCondition' },
     ...(serverOpts as any),
-    initialState: {
-      pagination: {
-        pageIndex: 0,
-        pageSize: paginationEnabled ? pageSize : Number.MAX_SAFE_INTEGER,
-      },
-      // v9 pinning state is { start, end } (renamed from v8 left/right) and its
-      // logic reads these arrays directly, so they must exist even when the
-      // feature is off (otherwise `.start.length` / `.includes` throws).
-      columnPinning: { start: [], end: [] },
-      columnOrder: [],
-      expanded: {},
-      rowPinning: { top: [], bottom: [] },
-      grouping: [],
-      ...opts.initialState,
-    },
+    initialState,
   })
 
   // Registry: adapter preset if supplied, else the neutral engine defaults (stable).
@@ -417,7 +473,7 @@ export function useBstTable<TData extends RowData>(opts: UseBstTableOptions<TDat
     enableCopyColumn: !!ctx.enableClipboard && ctx.enableCopyColumn !== false,
     enableCopyRow: !!ctx.enableClipboard && ctx.enableCopyRow !== false,
     userCellColumns: collectUserCellColumns(
-      opts.columns as unknown as ReadonlyArray<Record<string, unknown>>,
+      columns as unknown as ReadonlyArray<Record<string, unknown>>,
     ),
     classNames: opts.classNames,
     styles: opts.styles,
@@ -436,6 +492,7 @@ export function useBstTable<TData extends RowData>(opts: UseBstTableOptions<TDat
     fitColumns: !!opts.fitColumns,
     enableResponsive: !!opts.enableResponsive,
     virtualization: resolveVirtualization(opts.enableVirtualization, opts.enableColumnVirtualization),
+    stickyHeader: resolveStickyHeader(opts.enableStickyHeader),
     onReachEnd: opts.onReachEnd,
     endReachedThreshold: opts.endReachedThreshold,
     enableExport: !!ctx.enableExport,
@@ -444,6 +501,15 @@ export function useBstTable<TData extends RowData>(opts: UseBstTableOptions<TDat
       excel: ctx.enableExcelExport !== false,
       print: ctx.enablePrint !== false,
     },
+    enableRowNumbers: !!opts.enableRowNumbers,
+    enableAutoColumns:
+      !!opts.enableAutoColumns && (!opts.columns || opts.columns.length === 0),
+    enableOverlays: opts.enableOverlays !== false,
+    loading: opts.loading,
+    error: opts.error,
+    overlayText: opts.overlayText,
+    renderLoadingOverlay: opts.renderLoadingOverlay,
+    renderErrorOverlay: opts.renderErrorOverlay,
   }
   ;(table as unknown as Record<symbol, unknown>)[BST_RUNTIME] = handle
 

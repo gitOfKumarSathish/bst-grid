@@ -1,3 +1,4 @@
+/// <reference types="@testing-library/jest-dom/vitest" />
 import { describe, test, expect, afterEach } from 'vitest'
 import { render, cleanup, fireEvent, within, waitFor } from '@testing-library/react'
 import * as React from 'react'

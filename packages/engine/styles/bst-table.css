@@ -1304,6 +1304,22 @@
   top: 0;
   z-index: 4;
 }
+
+/* ── Sticky-header viewport (G3/G4, opt-in) ──────────────────────────────────
+   `enableStickyHeader` caps the scroll box to a bounded height so the body scrolls
+   under a header (+ filter row) that stays pinned, instead of the table growing
+   taller as the page size grows. The engine adds `.bst-sticky-header` only when row
+   virtualization is OFF (the `.bst-virtualized` rules above already do this), so the
+   two never stack. Height comes from `--bst-max-height` (set inline from
+   `maxHeight` / `maxRows`), overridable via `styles.root`. */
+.bst-table-scroll.bst-sticky-header {
+  max-height: var(--bst-max-height, 440px);
+}
+.bst-table-scroll.bst-sticky-header thead {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+}
 .bst-virtual-spacer,
 .bst-virtual-spacer > td,
 .bst-virtual-colspacer {
@@ -1475,4 +1491,63 @@
   height: 1px;
   margin: 4px 2px;
   background: var(--bst-table-border);
+}
+
+/* ---- Loading / error overlays (AG23) ---------------------------------------
+   `.bst-table-viewport` is the positioned ancestor wrapping the scroll box, so
+   the overlay covers the visible grid and stays put while the body scrolls
+   (the wrapper does not scroll — the inner `.bst-table-scroll` does). */
+.bst-table-viewport {
+  position: relative;
+}
+.bst-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px;
+  text-align: center;
+  color: var(--bst-table-fg);
+  font-size: 14px;
+  background: color-mix(in srgb, var(--bst-table-bg) 72%, transparent);
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+}
+.bst-overlay-text {
+  color: var(--bst-table-muted);
+}
+.bst-overlay-errtext {
+  color: #ef4444;
+  font-weight: 600;
+  max-width: 42ch;
+}
+.bst-overlay-spinner {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 3px solid color-mix(in srgb, var(--bst-table-accent) 35%, transparent);
+  border-top-color: var(--bst-table-accent);
+  animation: bst-overlay-spin 0.7s linear infinite;
+}
+@keyframes bst-overlay-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bst-overlay-spinner {
+    animation-duration: 2.4s;
+  }
+}
+
+/* Row-number column (AG9) — muted, non-selectable digits. */
+.bst-rownum-cell {
+  color: var(--bst-table-muted);
+  font-variant-numeric: tabular-nums;
+  -webkit-user-select: none;
+  user-select: none;
 }
