@@ -535,17 +535,17 @@ CSV export (`X1`) · Excel `.xlsx` export (`X2`) · print / print-friendly view 
 Export menu in both adapters (`showExport`).
 → *Deliverable:* every grid can download CSV / Excel and print.
 
-**Phase 6 — Enterprise-grade chrome & filtering**  *(in progress)*
+**Phase 6 — Enterprise-grade chrome & filtering**  *(✅ complete)*
 **Set Filter** — distinct-values checklist (`X4` ✅) · **status bar** — row count + sum/avg/count of
 selection (`X5` ✅) · right-click context menu (`X6` ✅) · tool-panel sidebar — Columns + Filters
-(`X7`) · Find — highlight + jump (`X8`) · row-number column (`X9`) · managed row dragging (`X10`) ·
-multi-filter per column (`X11`) · fill handle (`X12`).
+(`X7` ⏭️ skipped) · Find — highlight + jump (`X8` ✅) · row-number column (`X9` ✅) · managed row
+dragging (`X10` ⚪ optional) · multi-filter per column (`X11` ✅) · fill handle (`X12` ⚪ optional).
 → *Deliverable:* the chrome + filtering an enterprise-grid user expects on day one.
 **Shipped:** `X4` (`enableSetFilter` + `BstSetFilter`, an `{op:'set'}` condition) and `X5`
 (`showStatusBar` + `runtime.getSelectionStats`) and `X6` (`enableContextMenu` + `getContextMenuItems`)
 and `X9` (`enableRowNumbers` + `rowNumberHeader`, **v0.40.0** — leading `#` column, settings-toggle)
-and `X11` (`enableMultiFilter`).
-**Remaining:** X7 (⏭️ skipped) · X8 · X10 · X12.
+and `X11` (`enableMultiFilter`) and `X8` (`enableFind` + `showFind` — find bar: highlight + jump, no rows hidden).
+**Remaining:** none — `X7` ⏭️ skipped; `X10` managed row dragging + `X12` fill handle ⚪ optional/out-of-scope (see COVERAGE.md "Optional").
 
 **Phase 7 — Hierarchy, analytics & scale**
 Tree data — self-referencing hierarchy (`X13` — ⚪ **now optional 2026-08-24**, see COVERAGE.md
@@ -749,8 +749,8 @@ nobody. **Result: 44/58 clean, 14 findings, all closed or converted to an open q
 - [x] **Phase 5 — Export (X1–X3) shipped** (v0.34.0) — CSV / Excel (`.xlsx`, dependency-free) / print
       via `enableExport` + `runtime.exportCsv`/`exportExcel`/`printTable`; both adapters render the
       Export menu (`showExport`). `export.test.ts` green.
-- [ ] **Phase 6 in progress** — ✅ Set Filter (`X4`) + status bar (`X5`) shipped; **remaining:**
-      context menu (`X6`), tool-panel sidebar (`X7`), Find (`X8`), row-number column (`X9`), row
-      drag (`X10`), multi-filter (`X11`), fill handle (`X12`).
+- [x] **Phase 6 complete** — ✅ Set Filter (`X4`), status bar (`X5`), context menu (`X6`), Find
+      (`X8`), row-number column (`X9`), multi-filter (`X11`) shipped; `X7` ⏭️ skipped; `X10` row
+      drag + `X12` fill handle ⚪ optional/out-of-scope.
 - [ ] **Phases 7–8 — extended capability roadmap** — hierarchy/analytics P7 · polish P8. See PART 3
       "Phases 5–8", the `X1–X29` matrix in `COVERAGE.md`, and `docs/capability-roadmap.md`.

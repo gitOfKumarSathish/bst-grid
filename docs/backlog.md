@@ -1,7 +1,7 @@
 # Bst-Table — Working backlog
 
 _Actionable "what's next" list, derived from [`COVERAGE.md`](../COVERAGE.md) (status source of
-truth) and phased per [`Plan.md`](../Plan.md) PART 3. Snapshot: **v0.41.1, 2026-08-24**._
+truth) and phased per [`Plan.md`](../Plan.md) PART 3. Snapshot: **v0.42.0, 2026-08-24**._
 
 > **How to use this doc.** [`COVERAGE.md`](../COVERAGE.md) is the **source of truth for status**;
 > this file is the **working list you tick off**. When an item ships: follow the
@@ -12,27 +12,22 @@ truth) and phased per [`Plan.md`](../Plan.md) PART 3. Snapshot: **v0.41.1, 2026-
 **Effort:** **S** small · **M** medium · **L** large.
 **Status:** 🟡 partial (started) · ❌ pending (not started).
 
-**Snapshot tally (v0.41.1):** original spec 58 → ✅ 55 · 🟡 2 · ❌ 1 · extended X1–X29 → ✅ 13 ·
-🟡 3 · ❌ 7 · ⏭️ 1 skipped · ⚪ 5 optional _(X8 Find shipped, unreleased)_. This backlog lists the
-**12 open items** (5 partial + 7 pending); the ⚪ optional / ⏭️ skipped items are parked at the
-bottom and are **not** work-to-do.
+**Snapshot tally (v0.42.0):** original spec 58 → ✅ 55 · 🟡 2 · ❌ 1 · extended X1–X29 → ✅ 13 ·
+🟡 3 · ❌ 5 · ⏭️ 1 skipped · ⚪ 7 optional _(X8 Find shipped; X10 + X12 out of scope)_. This backlog
+lists the **10 open items** (5 partial + 5 pending); the ⚪ optional / ⏭️ skipped items are parked at
+the bottom and are **not** work-to-do.
 
 ---
 
-## Phase 6 — Chrome & filtering  _(in progress — closest to done)_
+## Phase 6 — Chrome & filtering  _(✅ complete — no open work)_
 
-Self-contained **M**-effort features that build on foundations already shipped. Finish this phase first.
+All shipped or resolved: **X8 Find** ✅; **X10 managed row dragging** + **X12 fill handle** are ⚪ optional (see parked); **X7 tool-panel sidebar** ⏭️ skipped.
 
-- [x] **X8 · Find** — ✅ done (unreleased) — **M**
+- [x] **X8 · Find** — ✅ done (v0.42.0) — **M**
   Search box that **highlights matches and jumps between them** (Next/Prev), hiding nothing —
   distinct from the global filter (which removes non-matches). Shipped: `enableFind` (+ `BstFindOptions`),
   adapters' `showFind`, ⌘/Ctrl+F · Enter/F3 · Esc, "n / m" counter, in-place `<mark>` + cell tint.
   _Done:_ the Find control cycles matches with a visible highlight + "n of m", no rows removed.
-- [ ] **X10 · Managed row dragging** — ❌ pending — **M**
-  Drag to **reorder rows**. Builds on the existing column drag-drop mechanism.
-  _Done when:_ rows reorder via a drag handle, with an `onRowOrderChange`-style callback.
-
-_(X7 tool-panel sidebar is ⏭️ deliberately skipped — see parked list.)_
 
 ---
 
@@ -91,12 +86,12 @@ Heavier features; schedule after Phase 6 closes.
 
 ## Recommended pick-up order
 
-1. **X8 · Find** — high value, no dependency on unfinished work, cleanly scoped → best single next ask.
-2. **X10 · Managed row dragging** — closes out Phase 6.
-3. **I4 · Backend reconcile** → unblocks **X22 / I5** live updates.
-4. **X20 · a11y audit** — production-hardening, do before broad adoption.
-5. Then the Phase 7 analytics block (**X17 → X16 → X15**), with **A6** proven alongside **X16**.
-6. Phase 8 polish (**X28 → X25 → X29**) as the tail.
+_(Phase 6 closed — X8 Find shipped; X10 + X12 out of scope.)_
+
+1. **I4 · Backend reconcile** → unblocks **X22 / I5** live updates.
+2. **X20 · a11y audit** — production-hardening, do before broad adoption.
+3. Then the Phase 7 analytics block (**X17 → X16 → X15**), with **A6** proven alongside **X16**.
+4. Phase 8 polish (**X28 → X25 → X29**) as the tail.
 
 ---
 
@@ -109,6 +104,7 @@ Heavier features; schedule after Phase 6 closes.
 
 **⚪ Optional / out of scope** (rationale in [`COVERAGE.md`](../COVERAGE.md) "Optional — kept but out of scope")
 
+- **X10 · Managed row dragging** (drag to reorder rows) — manual order only matters for user-curated, persisted "ordered list" data; a no-op / footgun under sort, filter, pagination and grouping, and the target apps are reporting / data grids where order is *derived*. Revisit if a list-management UI needs it.
 - **X12 · Fill handle** (drag corner to fill / increment) — range selection + clipboard copy/paste cover bulk-fill needs; no consuming app needs the drag gesture yet.
 - **X13 · Tree data** (self-referencing hierarchy) — master-detail + grouping cover current needs.
 - **X14 · Pivoting** — grouping + aggregation cover current reporting needs.

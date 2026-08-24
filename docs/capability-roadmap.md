@@ -21,7 +21,7 @@ cluster in **four areas**:
 
 1. ~~**Export** (CSV / Excel / print) — the single biggest hole.~~ ✅ **shipped v0.34.0** (dependency-free).
 2. ~~**Set Filter**, **status bar**, **context menu**, **multi-filter**, **row numbers**, **overlays**.~~ ✅ **shipped (Phases 6 / 8)**.
-3. **Interaction tail** — Find (highlight + jump), managed row dragging.
+3. ~~**Interaction tail** — Find (highlight + jump), managed row dragging.~~ Find ✅ **shipped**; managed row dragging ⚪ **out of scope 2026-08-24**.
 4. **Analytics + scale tail** — integrated range charts, lazy server-side grouping, formula columns.
 
 Plus production hardening: an **ARIA / a11y audit** and **live-update merge (I5)**.
@@ -102,9 +102,9 @@ Deliberately **out of scope**: fill handle, tree data, pivoting, cell notes, i18
 | 10 | **Right-click context menu** | X6 | ✅ P6 | M | `enableContextMenu` + `getContextMenuItems` — dep-free popup with Copy / Export / Autosize defaults + custom items. |
 | 11 | **Tool-panel sidebar** (docked Columns + Filters) | X7 | ⏭️ skip | M/L | **Deliberately not built** — redundant with the toolbar's Columns menu (show/hide · pin · reorder · group) + Filters button. Prototyped and reverted 2026-08-17. |
 | 12 | **Fill handle** (drag corner to fill / increment a range) | X12 | ⚪ | M | Out of scope 2026-08-24 — range selection + clipboard copy/paste cover bulk-fill needs; no consuming app requires the drag-to-fill gesture yet. |
-| 13 | **Find** (highlight + jump between matches, not filter) | X8 | ❌ | M | Distinct from the global filter, which hides non-matches. |
+| 13 | **Find** (highlight + jump between matches, not filter) | X8 | ✅ | M | Shipped — `enableFind` (+ `showFind`): find bar highlights matches + jumps (Next / Prev · "n / m"), never hides rows. Distinct from the global filter. |
 | 14 | **Tree data** (self-referencing hierarchy) | X13 | ⚪ | L | Out of scope 2026-08-24 — master-detail + grouping cover current hierarchical needs. |
-| 15 | **Managed row dragging** (reorder rows) | X10 | ❌ | M | We drag columns, not rows. |
+| 15 | **Managed row dragging** (reorder rows) | X10 | ⚪ | M | Out of scope 2026-08-24 — manual row order only matters for user-curated, persisted "ordered list" data; a no-op / footgun under sort / filter / pagination / grouping, and the target apps are reporting / data grids where order is derived. |
 | 16 | **Row-number / index column** | X9 | ✅ v0.40.0 | S | `enableRowNumbers` + `rowNumberHeader` — leading `#` column, pinned to the start. |
 | 17 | **Pivoting** | X14 | ⚪ | L | Out of scope 2026-08-24 — grouping + aggregation cover current reporting needs. |
 
@@ -141,8 +141,8 @@ Deliberately **out of scope**: fill handle, tree data, pivoting, cell notes, i18
 overlays ✅ · **a11y audit — remaining**. *(i18n moved to Optional.)*
 
 **Milestone B — "Complete grid chrome" (P1):** context menu ✅ · row-number column ✅ ·
-multi-filter ✅ · **remaining: Find · row drag**. *(Sidebar skipped; fill handle + tree data +
-pivoting out of scope.)*
+multi-filter ✅ · **Find ✅** — *milestone complete*. *(Sidebar skipped; row drag + fill handle +
+tree data + pivoting out of scope.)*
 
 **Milestone C — "Heavyweight analytics" (P2):** integrated charts · advanced SSRM · calculated
 columns · live updates (I5).
