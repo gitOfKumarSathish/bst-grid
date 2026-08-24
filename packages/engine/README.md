@@ -51,6 +51,7 @@ component-library styling**, so you pair it with a skin:
 &nbsp;· [Body icons](#body-icons)
 &nbsp;· [Runtime settings sheet](#runtime-settings-sheet)
 &nbsp;· [Grid state (save / restore views)](#grid-state--save--restore-views-x21)
+&nbsp;· [Backend integration — wire your API](#backend-integration-at-a-glance)
 &nbsp;· [Server mode (DataSource)](#server-mode-datasource)
 
 **Reference** &nbsp;· [Exports](#exports) &nbsp;· [Requirements](#requirements) &nbsp;· [License](#license)
@@ -1383,6 +1384,75 @@ model in the DOM.
   grouped headers or cell spanning.
 - `resolveVirtualization` and `virtualizationBypassReason` are exported (pure, unit-tested) if you need
   the resolved config or the bypass reason yourself.
+
+## Backend integration at a glance
+
+Every place the grid touches your backend is a **function you supply** — wire it against local/in-memory
+data today and swap in real endpoints later, in one place. The table just calls the hook; it never cares
+what's inside. (Details live in the linked sections; this is the map.)
+
+| Need | The hook you write | Guide |
+| --- | --- | --- |
+| **Load** big data (server sort/filter/paginate) | `DataSource.fetch(query)` → `{ rows, totalCount }` | [Server mode](#server-mode-datasource) |
+| **Infinite scroll** | `useBstInfiniteDataSource` + `onReachEnd` | [Server mode](#server-mode-datasource) |
+| **Save** one cell edit | `onCellCommit(change)` | [Editing](#editing-and-validation) |
+| **Save** a batch in one call | `onSave(event)` with `enableEditing:{ mode:'batch' }` | [Batch editing](#batch-editing-and-single-call-save) |
+| **Save** anything (whole array) | `onDataChange(next)` | [Editing](#editing-and-validation) |
+| **Validate** against the server | `meta.validate` → `Promise<FieldError[]>` | [Editing & validation](#editing-and-validation) |
+| **Files** upload / view / delete | `DataSource.uploadFile` / `getFileUrl` / `deleteFile` | [Files columns](#files-columns--images--pdfs) |
+| **Remember** each user's view | `gridState.storage` | [Grid state](#grid-state--save--restore-views-x21) |
+| **Remember** each user's toggles | `showSettings.storage` | [Per-user persistence](#per-user-server-side-persistence) |
+
+```tsx
+import { useBstTable, useBstDataSource, createServerDataSource } from '@bloomskill/table-engine'
+
+// A · load from your API (large tables)
+const source = createServerDataSource(async (q, signal) => {
+  const res = await fetch('/api/rows?' + toParams(q), { signal, credentials: 'include' })
+  const { rows, total } = await res.json()
+  return { rows, totalCount: total } // totalCount drives the page count
+})
+
+const table = useBstTable({
+  columns,
+  getRowId: (r) => r.id,
+  onDataChange: setData,
+  ...useBstDataSource(source).tableProps,
+
+  // B · save each edit as it commits (or use onSave with enableEditing:{ mode:'batch' } for ONE call)
+  enableEditing: true,
+  onCellCommit: (c) =>
+    fetch(`/api/rows/${c.rowId}`, {
+      method: 'PATCH',
+      credentials: 'include',
+      body: JSON.stringify({ [c.field]: c.newValue }),
+    }),
+})
+
+// C · validate a column against the server
+const sku = {
+  id: 'sku', accessorKey: 'sku', header: 'SKU',
+  meta: {
+    type: 'text', editable: true,
+    validate: async (v) => ((await isSkuFree(v)) ? [] : [{ message: 'SKU already exists' }]),
+  },
+}
+
+// D · files — fill the DataSource verbs
+Object.assign(source, {
+  uploadFile: async (file) => await api.upload(file), // → BstFileRef { id, name }
+  getFileUrl: async (ref) => await api.signedUrl(ref.id), // short-lived view URL
+  deleteFile: async (ref) => { await api.remove(ref.id) },
+})
+
+// E · remember each user's setup — ONE storage adapter feeds both:
+// <BstTableMui {...} gridState={{ key: 'invoices', storage: store }}
+//                    showSettings={{ persistKey: 'invoices', storage: store }} />
+```
+
+> `toParams` · `api` · `store` · `isSkuFree` are **yours** — the grid only calls the hooks. `store` is
+> `window.localStorage` today, or an API-backed `BstGridStateStorage` later (see
+> [Per-user, server-side persistence](#per-user-server-side-persistence)).
 
 ## Server mode (DataSource)
 
