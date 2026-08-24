@@ -10,6 +10,8 @@ this project uses [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+## [0.42.0] — 2026-08-24
+
 ### Added — Per-cell commit hook (`onCellCommit`) + edit log (`enableEditLog`)
 - **`onCellCommit(change)`** (engine) — the **inline counterpart to `onSave`**. Fires **once per
   committed cell** the moment an edit writes through: an inline edit saved on **Enter / blur** (edit a

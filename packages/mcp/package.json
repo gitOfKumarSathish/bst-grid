@@ -1,7 +1,7 @@
 {
   "name": "@bloomskill/table-mcp",
-  "version": "0.41.1",
-  "description": "Bst-Table MCP server \u2014 gives AI coding agents accurate, version-pinned knowledge of @bloomskill/table-* : docs search, the feature-toggle registry, cell types, config validation and grid scaffolding.",
+  "version": "0.42.0",
+  "description": "Bst-Table MCP server — gives AI coding agents accurate, version-pinned knowledge of @bloomskill/table-* : docs search, the feature-toggle registry, cell types, config validation and grid scaffolding.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gitOfKumarSathish/bst-grid.git",
