@@ -20,7 +20,7 @@ sparklines, and a server row model are all shipped and free. The real gaps clust
 3. ~~**Status bar** (row count + sum/avg/count of the selected range)~~ ✅ **shipped (Phase 6)**.
 4. **Right-click context menu** (general cell/grid, not just the row kebab).
 5. **Tool-panel sidebar** (docked Columns + Filters panels).
-6. **Pivoting** and **Tree Data** (self-referencing hierarchy).
+6. ~~**Pivoting** and **Tree Data** (self-referencing hierarchy).~~ ⚪ **Out of scope (2026-08-24)** — see COVERAGE.md "Optional".
 
 Plus production-hardening: **i18n/localeText** and an **ARIA a11y audit** (grid-state save/restore ✅ shipped).
 
@@ -89,10 +89,10 @@ Legend — **AG tier:** 🆓 Community · 💷 Enterprise (paid). **Status:** �
 | 11 | **Tool-panel sidebar** (docked Columns panel + Filters panel) | 💷 | ⏭️ skip | M/L | **Deliberately not built** — redundant with the toolbar's Columns menu (show/hide · pin · reorder · group) + Filters button. Prototyped and reverted 2026-08-17. |
 | 12 | **Fill handle** (drag corner to fill/increment a range) | 💷 | ❌ | M | Excel muscle-memory; builds on existing range selection. |
 | 13 | **Find** (search box that highlights + jumps between matches, not filter) | 💷 | ❌ | M | Distinct from global filter (which hides non-matches). |
-| 14 | **Tree Data** (self-referencing parent/child hierarchy, one column) | 💷 | ❌ | L | We have master-detail + grouping, not recursive tree data. Common for BOM/org/folder data. |
+| 14 | **Tree Data** (self-referencing parent/child hierarchy, one column) | 💷 | ⚪ | L | **Out of scope (2026-08-24)** — master-detail + grouping cover current hierarchical needs; no consuming app needs recursive tree data (BOM/org/folder) yet. |
 | 15 | **Managed row dragging** (drag to reorder rows / across grids) | 🆓 | ❌ | M | We drag columns, not rows. |
 | 16 | **Row-number / index column** (pinned, auto) | 💷 | ❌ | S | Trivial but frequently requested. |
-| 17 | **Pivoting** (turn row values into columns + aggregate) | 💷 | ❌ | L | The heavyweight reporting feature; grouping is the foundation. |
+| 17 | **Pivoting** (turn row values into columns + aggregate) | 💷 | ⚪ | L | **Out of scope (2026-08-24)** — the heavyweight reporting feature; grouping + aggregation cover current reporting needs, no consuming app requires pivot yet. |
 
 ### P2 — Advanced / enterprise-heavy
 
@@ -129,8 +129,8 @@ Grid-state API ✅ · i18n · a11y audit · overlays. *These are the items whose
 adoption and the ones AG Grid users notice missing on day one — **i18n + a11y + overlays remain**.*
 
 **Milestone B — "Feels like AG Grid" (P1):** Context menu · Tool-panel sidebar · Fill handle · Find ·
-Row drag · Row-number column. *(Tree Data + Pivoting are P1 in value but L in effort — schedule as
-their own slices.)*
+Row drag · Row-number column. *(Tree Data + Pivoting were P1-value but L-effort — **moved out of scope
+2026-08-24**; see COVERAGE.md "Optional".)*
 
 **Milestone C — "Enterprise heavyweight" (P2):** Integrated charts · advanced SSRM · calculated
 columns · cell notes · live updates (I5).

@@ -117,8 +117,8 @@ Everything below ships **free** (MIT/Apache)._
 | AG10 | Managed row dragging (reorder) | 🆓 | ❌ | P6 |
 | AG11 | Multi-filter (stack filter types per column) | 💷 | ✅ | P6 — `enableMultiFilter` + array `meta.filter` (e.g. `['condition','set']`); stacked in the filter row, AND-combined via `combineFilterConditions` / `FilterConditionGroup` |
 | AG12 | Fill handle (drag-to-fill range) | 💷 | ❌ | P6 |
-| AG13 | Tree data (self-referencing hierarchy) | 💷 | ❌ | P7 |
-| AG14 | Pivoting | 💷 | ❌ | P7 |
+| AG13 | Tree data (self-referencing hierarchy) | 💷 | ⚪ | **Optional — out of scope** (see below) |
+| AG14 | Pivoting | 💷 | ⚪ | **Optional — out of scope** (see below) |
 | AG15 | Integrated charts (range → chart) | 💷 | ❌ | P7 |
 | AG16 | Advanced server-side row model (server group/pivot/tree, lazy expand) | 💷 | 🟡 | P7 |
 | AG17 | Calculated / formula columns | 💷 | 🟡 | P7 |
@@ -136,10 +136,10 @@ Everything below ships **free** (MIT/Apache)._
 | AG29 | Aligned grids (shared column state) | 🆓 | ❌ | P8 |
 
 **Tally:** 29 parity items — ✅ 12 built · 🟡 3 partial (AG16 SSRM · AG17 formula cols · AG20 a11y) ·
-❌ 10 missing · ⏭️ 1 skipped (AG7 sidebar) · ⚪ 3 optional/out-of-scope (AG18 · AG19 · AG24). **12 of the
-29 are AG Grid Enterprise-paid** — they ship free here. _(v0.40.0 added **AG9** row-number column,
-**AG23** loading/error overlays, **AG27** auto-generate columns; and moved **AG18/AG19/AG24** to
-Optional below.)_
+❌ 8 missing · ⏭️ 1 skipped (AG7 sidebar) · ⚪ 5 optional/out-of-scope (AG13 · AG14 · AG18 · AG19 · AG24).
+**12 of the 29 are AG Grid Enterprise-paid** — they ship free here. _(v0.40.0 added **AG9** row-number
+column, **AG23** loading/error overlays, **AG27** auto-generate columns; and moved **AG18/AG19/AG24** to
+Optional below. **2026-08-24:** moved **AG13** tree data + **AG14** pivoting to Optional too.)_
 
 **Already matched (AG Grid Enterprise-paid, shipped free):** cell/range selection · clipboard
 copy/paste · batch editing · row grouping + aggregation · master-detail · sparklines · advanced-filter
@@ -147,12 +147,14 @@ builder · server row model. See "Built beyond the original spec" above and `CLA
 
 ### Optional — kept but out of scope (not scheduled)
 
-These parity items are **intentionally not on the roadmap** (decision 2026-08-20). They remain
-documented here for completeness and can be picked up later, but no phase owns them and they are
+These parity items are **intentionally not on the roadmap** (decisions 2026-08-20 and 2026-08-24). They
+remain documented here for completeness and can be picked up later, but no phase owns them and they are
 **not** counted toward the missing tally as work-to-do.
 
 | ID | Feature | AG tier | Why deferred |
 |---|---|---|---|
+| AG13 | Tree data (self-referencing hierarchy) | 💷 | Master-detail (A4) + multi-column grouping (E4) cover the hierarchical needs of the target apps; recursive self-referencing tree data (BOM/org/folder) is L-effort and no consuming app requires it yet. Revisit if one does. |
+| AG14 | Pivoting | 💷 | The heavyweight cross-tab reporting feature (L-effort); grouping + aggregation cover current reporting needs and no target app requires pivot/reshape. Revisit if one does. |
 | AG18 | Cell notes / comments | 💷 | Collaboration/annotation feature outside the current grid scope; no consuming app needs it yet. |
 | AG19 | Localization / i18n (`localeText`) | 🆓 | The grid's few built-in strings are overridable at the call site (e.g. `overlayText`, headers, labels); a full `localeText` catalog isn't required for the target apps. |
 | AG24 | RTL support | 🆓 | No RTL-locale app currently consumes the grid; revisit if/when one does. |

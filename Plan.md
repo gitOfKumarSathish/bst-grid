@@ -547,10 +547,13 @@ and `AG11` (`enableMultiFilter`).
 **Remaining:** AG7 (⏭️ skipped) · AG8 · AG10 · AG12.
 
 **Phase 7 — Hierarchy, analytics & scale**
-Tree data — self-referencing hierarchy (`AG13`) · pivoting (`AG14`) · integrated charts, range → chart
-(`AG15`) · advanced server-side row model — server group/pivot/tree + lazy expand (`AG16`) ·
-calculated / formula columns (`AG17`) · cell notes / comments (`AG18`).
-→ *Deliverable:* enterprise-heavyweight analytics + true server-side scale.
+Tree data — self-referencing hierarchy (`AG13` — ⚪ **now optional 2026-08-24**, see COVERAGE.md
+"Optional") · pivoting (`AG14` — ⚪ **now optional 2026-08-24**, see COVERAGE.md "Optional") · integrated
+charts, range → chart (`AG15`) · advanced server-side row model — server group/pivot/tree + lazy expand
+(`AG16`) · calculated / formula columns (`AG17`) · cell notes / comments (`AG18` — ⚪ optional).
+→ *Deliverable:* enterprise-heavyweight analytics + true server-side scale. _(With AG13/AG14/AG18 now
+optional, the scheduled remainder here is AG15 integrated charts + the partial AG16 SSRM / AG17 formula
+columns.)_
 
 **Phase 8 — Polish & parity tail**  *(in progress)*
 RTL (`AG24` — ⚪ **now optional**, see above) · row/column move+sort animations (`AG25`) · **auto row
@@ -561,9 +564,10 @@ grids (`AG29`).
 `AG27` — `enableAutoColumns` + `autoColumns` + `autoGenerateColumns(data, opts)` (**v0.40.0**).
 
 Each item ships behind a §12 toggle (`enable*` / `show*`) with the full Definition of Done (demo +
-README + CHANGELOG + version bump). Every **AG Grid Enterprise-paid** capability above (Set Filter,
-status bar, context menu, tool panels, fill handle, tree data, pivoting, integrated charts, advanced
-SSRM, cell notes, multi-filter) ships **free** — MIT/Apache only, per the licensing constraint.
+README + CHANGELOG + version bump). Every **AG Grid Enterprise-paid** capability above that we build
+(Set Filter, status bar, context menu, fill handle, integrated charts, advanced SSRM, multi-filter)
+ships **free** — MIT/Apache only, per the licensing constraint. _(Tree data, pivoting and cell notes are
+⚪ optional/out-of-scope; the tool-panel sidebar is ⏭️ skipped.)_
 
 ---
 
