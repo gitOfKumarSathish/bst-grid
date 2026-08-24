@@ -10,6 +10,7 @@ import {
   BST_SETTINGS_REGISTRY,
 } from '../settings'
 import type { BstSettingsGroup } from '../settings'
+import type { BstGridStateStorage } from '../gridState'
 
 type Row = { id: string; name: string }
 const data: Row[] = [{ id: '1', name: 'A' }]
@@ -43,9 +44,17 @@ describe('applySettingsOverrides (pure)', () => {
 
 // ---- hook harness -------------------------------------------------------------
 
-function Settings({ persistKey, persist = false }: { persistKey?: string; persist?: boolean }) {
+function Settings({
+  persistKey,
+  persist = false,
+  storage,
+}: {
+  persistKey?: string
+  persist?: boolean
+  storage?: BstGridStateStorage
+}) {
   const baseProps: any = { data, columns, enableClipboard: true }
-  const { props: eff, model } = useBstSettings(baseProps, { persist, persistKey })
+  const { props: eff, model } = useBstSettings(baseProps, { persist, persistKey, storage })
   return (
     <div>
       <span data-testid="clip">{String(eff.enableClipboard !== false)}</span>
@@ -166,6 +175,53 @@ describe('useBstSettings (hook)', () => {
     render(<Settings persist persistKey="unit-test" />)
     expect(txt('clip')).toBe('false')
     expect(txt('count')).toBe('1')
+  })
+
+  test('persists to a custom storage backend (server-adapter shape) — not localStorage', () => {
+    const store = new Map<string, string>()
+    const calls: string[] = []
+    const custom: BstGridStateStorage = {
+      getItem: (k) => {
+        calls.push('get:' + k)
+        return store.get(k) ?? null
+      },
+      setItem: (k, v) => {
+        calls.push('set:' + k)
+        store.set(k, v)
+      },
+      removeItem: (k) => {
+        calls.push('del:' + k)
+        store.delete(k)
+      },
+    }
+    const { unmount } = render(<Settings persist persistKey="srv" storage={custom} />)
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Copy & paste' }))
+    expect(txt('clip')).toBe('false')
+    // written to the CUSTOM store under the namespaced key — and NOT to localStorage
+    expect(store.get('bst-table:settings:srv')).toBe(JSON.stringify({ enableClipboard: false }))
+    expect(window.localStorage.getItem('bst-table:settings:srv')).toBeNull()
+    unmount()
+    // a fresh mount hydrates from the custom store (getItem hit), restoring the choice
+    render(<Settings persist persistKey="srv" storage={custom} />)
+    expect(txt('clip')).toBe('false')
+    expect(txt('count')).toBe('1')
+    expect(calls).toContain('get:bst-table:settings:srv')
+  })
+
+  test('persist:false writes nothing to the custom storage', () => {
+    const store = new Map<string, string>()
+    const custom: BstGridStateStorage = {
+      getItem: (k) => store.get(k) ?? null,
+      setItem: (k, v) => {
+        store.set(k, v)
+      },
+      removeItem: (k) => {
+        store.delete(k)
+      },
+    }
+    render(<Settings persist={false} persistKey="srv2" storage={custom} />)
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Copy & paste' }))
+    expect(store.size).toBe(0)
   })
 
   test('registry is internally consistent (unique keys, valid layers)', () => {

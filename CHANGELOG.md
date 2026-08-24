@@ -10,6 +10,21 @@ this project uses [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+### Added — Pluggable `storage` for the settings sheet (per-user / server-side persistence)
+- **`showSettings={{ storage }}`** (engine `BstSettingsOptions.storage`) — the settings sheet's feature
+  toggles can now persist to **any** `BstGridStateStorage` backend, not just `localStorage`. Pass the
+  **same** storage object you give `gridState.storage` and the view *and* the toggles ride **one socket**
+  (e.g. a server-backed, per-user store). Default unchanged: `window.localStorage`.
+- Mirrors `gridState`'s existing `storage`; `readStored`/`writeStored` + `useBstSettings` now take the
+  backend (default via a `defaultStorage()` fallback that also handles SSR / no-`window`). No behaviour
+  change for existing grids, and adapters forward `showSettings.storage` unchanged (no adapter edit).
+- New engine README recipe **"Per-user, server-side persistence"** — the key names the *table*, your auth
+  scopes the *user*; a sync-over-async hydrate-once cache backs an API; one `<ErpTable>` wrapper. The demo
+  now feeds one custom storage into a grid's `showSettings` **and** `gridState` so toggles + view log
+  through the same socket.
+- Tested in `settings.test.tsx` (persists to a custom store, not localStorage · hydrates on remount ·
+  `persist:false` writes nothing). No API break — purely additive.
+
 ## [0.42.0] — 2026-08-24
 
 ### Added — Per-cell commit hook (`onCellCommit`) + edit log (`enableEditLog`)

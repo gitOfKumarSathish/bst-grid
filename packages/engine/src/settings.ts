@@ -1,5 +1,6 @@
 import * as React from 'react'
 import type { BstTableEngineToggles, UseBstTableOptions } from './types.js'
+import type { BstGridStateStorage } from './gridState.js'
 
 /**
  * Runtime settings (§12 chrome). The adapters render a gear → a side "sheet"
@@ -370,8 +371,16 @@ export interface BstSettingsOptions {
    * per grid shape). Set this to disambiguate two grids with identical columns.
    */
   persistKey?: string
-  /** Persist the user's choices to `localStorage`. Default `true`. */
+  /** Persist the user's choices. Default `true`. */
   persist?: boolean
+  /**
+   * Storage backend for the persisted toggles. Default `window.localStorage`.
+   * Pass the SAME `BstGridStateStorage` (`{ getItem, setItem, removeItem }`) you
+   * give `gridState.storage` to route BOTH the view and the feature toggles
+   * through one backend — e.g. a per-user, server-backed store. Keep the object
+   * stable (memoize it) so it doesn't re-persist on every render.
+   */
+  storage?: BstGridStateStorage
   /**
    * Show a search box in the sheet to filter the toggle list — the sheet can list
    * 30+ features, so it's on by default but appears **only once the sheet has more
@@ -428,10 +437,25 @@ function deriveKey(columns: ReadonlyArray<Record<string, unknown>> | undefined):
   return 'c' + (h >>> 0).toString(36)
 }
 
-function readStored(storageKey: string | null): BstSettingsOverrides {
-  if (!storageKey || typeof window === 'undefined') return {}
+/** Default backend — `window.localStorage` when available, else `null` (SSR /
+ *  private mode). Mirrors `gridState.ts`'s fallback so a custom `storage` can
+ *  serve both persistence layers. */
+function defaultStorage(): BstGridStateStorage | null {
   try {
-    const raw = window.localStorage.getItem(storageKey)
+    return typeof window !== 'undefined' && window.localStorage ? window.localStorage : null
+  } catch {
+    return null
+  }
+}
+
+function readStored(
+  storageKey: string | null,
+  storage?: BstGridStateStorage,
+): BstSettingsOverrides {
+  const s = storage ?? defaultStorage()
+  if (!storageKey || !s) return {}
+  try {
+    const raw = s.getItem(storageKey)
     if (!raw) return {}
     const parsed = JSON.parse(raw) as Record<string, unknown>
     const out: BstSettingsOverrides = {}
@@ -445,11 +469,16 @@ function readStored(storageKey: string | null): BstSettingsOverrides {
   }
 }
 
-function writeStored(storageKey: string | null, overrides: BstSettingsOverrides): void {
-  if (!storageKey || typeof window === 'undefined') return
+function writeStored(
+  storageKey: string | null,
+  overrides: BstSettingsOverrides,
+  storage?: BstGridStateStorage,
+): void {
+  const s = storage ?? defaultStorage()
+  if (!storageKey || !s) return
   try {
-    if (Object.keys(overrides).length === 0) window.localStorage.removeItem(storageKey)
-    else window.localStorage.setItem(storageKey, JSON.stringify(overrides))
+    if (Object.keys(overrides).length === 0) s.removeItem(storageKey)
+    else s.setItem(storageKey, JSON.stringify(overrides))
   } catch {
     /* storage unavailable (private mode / quota) — stay in-memory */
   }
@@ -470,17 +499,19 @@ export function useBstSettings<P extends object>(
 ): { props: P; model: BstSettingsModel } {
   const rec = props as Record<string, unknown>
   const persist = options?.persist ?? true
+  const storage = options?.storage
   const columns = rec.columns as ReadonlyArray<Record<string, unknown>> | undefined
   const derived = React.useMemo(() => deriveKey(columns), [columns])
   const storageKey = persist ? STORAGE_PREFIX + (options?.persistKey ?? derived) : null
 
+  // Seed from the (custom or default) storage using the same key — no duplicate calc.
   const [overrides, setOverrides] = React.useState<BstSettingsOverrides>(() =>
-    readStored(persist ? STORAGE_PREFIX + (options?.persistKey ?? deriveKey(columns)) : null),
+    readStored(storageKey, storage),
   )
 
   React.useEffect(() => {
-    writeStored(storageKey, overrides)
-  }, [storageKey, overrides])
+    writeStored(storageKey, overrides, storage)
+  }, [storageKey, overrides, storage])
 
   const setOverride = React.useCallback(
     (key: BstSettingKey, next: boolean) => {

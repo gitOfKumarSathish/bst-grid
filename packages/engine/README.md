@@ -1219,7 +1219,10 @@ const table = useBstTable(effective)   // enable*/show* now reflect the user's c
   style) from parent to child — `parentKey` / `lastChild` on each item carry the tree. Sections are
   separated by a divider with prominent uppercase headings.
 - **Persistence** — on by default under a key derived from your columns; set `persistKey` to disambiguate,
-  or `persist: false` for in-memory only.
+  or `persist: false` for in-memory only. Pass **`storage`** (any `BstGridStateStorage`) to swap the
+  backend — the **same** object you give `gridState.storage`, so the view *and* the toggles ride one socket
+  (localStorage by default; a server-backed store for per-user, cross-device prefs — see
+  [Per-user, server-side persistence](#per-user-server-side-persistence)).
 - Exports: `applySettingsOverrides(props, overrides)`, `filterSettingsGroups` / `shouldShowSettingsSearch`
   (the search helpers), and `BST_SETTINGS_REGISTRY` (ordered metadata). The list is derived from the
   engine's own toggle interface, so new features show up automatically.
@@ -1263,8 +1266,10 @@ than on every change — the adapters call `saveGridState` / `resetGridState` + 
 > `bst-table:settings:<key>`) holds which **features** are on, and saves **automatically** on every
 > change. They are independent: **Save view** does not capture feature toggles, and each has its own
 > Reset. The adapters label both halves in the sheet so the difference is visible to end-users.
-> Both are **per browser** — swap `gridState.storage` (any `BstGridStateStorage`) or drive
-> `getGridState` / `initialState` yourself to put the view behind a user account instead.
+> Both default to **per browser** (localStorage), but **both take a `storage` option** — `gridState.storage`
+> for the view and `showSettings.storage` for the toggles. Pass the **same** `BstGridStateStorage` to both to
+> route everything through one backend (e.g. a server-backed, per-user store) — see
+> [Per-user, server-side persistence](#per-user-server-side-persistence) below.
 
 | Export | Kind | Purpose |
 | --- | --- | --- |
@@ -1279,6 +1284,62 @@ than on every change — the adapters call `saveGridState` / `resetGridState` + 
 `select` = `{ include?, exclude? }` (a subset of `BstGridStateKey`); hook `opts` =
 `{ key, storage?, persist?, debounceMs?, include?, exclude? }`. Snapshots are namespaced under
 `bst-table:state:<key>` in `localStorage` by default (pass any `storage` — e.g. `sessionStorage`).
+
+### Per-user, server-side persistence
+
+Both the toggles (`showSettings.storage`) and the view (`gridState.storage`) accept the **same**
+`BstGridStateStorage` — a three-method, `localStorage`-shaped socket:
+
+```ts
+interface BstGridStateStorage {
+  getItem(key: string): string | null
+  setItem(key: string, value: string): void
+  removeItem(key: string): void
+}
+```
+
+**The key names the _table_; the _user_ comes from the adapter.** Give every grid a stable per-table key
+(`persistKey="invoices"`, `gridState.key="invoices"`) — the **same for all users is fine**. Identity lives in
+your storage adapter (it sends the auth cookie/token; the server scopes by the logged-in user), so you never
+bake a user id into the key.
+
+**Start on `localStorage` today, swap to your API later — in one place.** The interface is **synchronous**, so
+back an async API with a _hydrate-once, write-through cache_: fetch this user's prefs once at login into a
+`Map`, read from it synchronously, and debounce writes to the server in the background.
+
+```ts
+// one call at login gets ALL of this user's prefs, keyed by their full storage key
+function createServerPrefStore(boot: Record<string, string>): BstGridStateStorage {
+  const cache = new Map(Object.entries(boot))
+  const flush = debounce((k: string, v: string) =>
+    fetch(`/api/prefs/${encodeURIComponent(k)}`, { method: 'PUT', credentials: 'include', body: v })
+      .catch(retryLater), 500)
+  return {
+    getItem: (k) => cache.get(k) ?? null,                 // sync — from the hydrated cache (flash-free restore)
+    setItem: (k, v) => { cache.set(k, v); flush(k, v) },  // sync cache + async write-through
+    removeItem: (k) => { cache.delete(k); fetch(`/api/prefs/${k}`, { method: 'DELETE', credentials: 'include' }) },
+  }
+}
+```
+
+**Wire it once** so every grid is consistent — and swapping storage later is one line, not a per-table edit:
+
+```tsx
+function ErpTable<T>({ tableId, ...props }: { tableId: string } & BstTableMuiProps<T>) {
+  const store = usePrefStore() // provided at app boot, after the login prefs fetch
+  return (
+    <BstTableMui
+      {...props}
+      gridState={{ key: tableId, storage: store }}
+      showSettings={{ persistKey: tableId, storage: store }}
+    />
+  )
+}
+// <ErpTable tableId="invoices" columns={…} data={…} />
+```
+
+Today `store` can be `window.localStorage`; the day you have an API, swap `createServerPrefStore` in behind
+`usePrefStore` and **every table** starts syncing per-user, cross-device — you touch none of them.
 
 ## Virtualization (D1)
 

@@ -937,7 +937,7 @@ export default function App() {
             conditionalFormats={cfRules}
             onConditionalFormatsChange={setCfRules}
             enableExport={{ fileName: 'people' }} // Phase 5 (X1–X3): CSV / Excel / Print toolbar menu
-            showSettings={{ persistKey: 'demo-mui' }}
+            showSettings={{ persistKey: 'demo-mui', storage: muiViewStorage }} // toggles persist through the SAME custom storage socket as the view (open the console + flip a switch)
             gridState={{ key: 'demo-mui-view', persist: false, storage: muiViewStorage }} // X21: ⚙ sheet footer → Save view / Reset view
             showShortcuts // ⌨ keyboard-shortcuts overlay (also opens on ?)
           />
