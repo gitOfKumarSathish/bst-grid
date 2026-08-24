@@ -7,6 +7,10 @@ import {
   useToolbarOverflow,
   useBstGridState,
   loadGridState,
+  getGridState,
+  saveGridState,
+  resetGridState,
+  clearGridState,
   BstTable,
   BstFilterBuilder,
   BstConditionalFormatBuilder,
@@ -270,6 +274,32 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
   } as UseBstTableOptions<TData>
   const { table, runtime, handle } = useBstGrid<TData>(gridOpts)
   const theme = useTheme()
+  // Grid-state save/restore (AG21) — the manual "Save view" / "Reset view" controls
+  // rendered in the settings-sheet footer below. These persist the *arrangement*
+  // (sort · filter · column layout · grouping · …), distinct from the settings Reset,
+  // which clears feature toggles. In manual mode (`gridState.persist === false`) the
+  // view is written only on click; auto mode keeps the debounced <GridStatePersist>.
+  const [viewJustSaved, setViewJustSaved] = React.useState(false)
+  const viewSavedTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+  React.useEffect(
+    () => () => {
+      if (viewSavedTimer.current) clearTimeout(viewSavedTimer.current)
+    },
+    [],
+  )
+  const saveView = () => {
+    if (!gridState) return
+    saveGridState(gridState.key, getGridState(table, gridState), gridState.storage)
+    setViewJustSaved(true)
+    if (viewSavedTimer.current) clearTimeout(viewSavedTimer.current)
+    viewSavedTimer.current = setTimeout(() => setViewJustSaved(false), 1800)
+  }
+  const resetView = () => {
+    if (!gridState) return
+    resetGridState(table)
+    clearGridState(gridState.key, gridState.storage)
+    setViewJustSaved(false)
+  }
   // Forward MUI icons into the engine body so the whole grid is Material-consistent.
   const bodyIcons = React.useMemo<BstIconOverrides>(
     () => ({
@@ -509,7 +539,9 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
         boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
       }}
     >
-      {gridState ? <GridStatePersist table={table} options={gridState} /> : null}
+      {gridState && gridState.persist !== false ? (
+        <GridStatePersist table={table} options={gridState} />
+      ) : null}
       {toolbarOn && (
         <Stack
           ref={toolbarRef}
@@ -1098,6 +1130,38 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
                 Reset
               </Button>
             </Stack>
+            {gridState && (
+              <>
+                <Divider />
+                <Stack direction="row" sx={{ p: 1.5, gap: 1, alignItems: 'center' }}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ flex: 1, alignSelf: 'center' }}
+                  >
+                    {viewJustSaved
+                      ? 'View saved to this browser ✓'
+                      : gridState.persist === false
+                        ? 'Save this arrangement to restore it next time'
+                        : 'This view is saved automatically'}
+                  </Typography>
+                  {gridState.persist === false && (
+                    <Button
+                      size="small"
+                      variant="contained"
+                      disableElevation
+                      startIcon={<SaveIcon fontSize="small" />}
+                      onClick={saveView}
+                    >
+                      Save view
+                    </Button>
+                  )}
+                  <Button size="small" onClick={resetView}>
+                    Reset view
+                  </Button>
+                </Stack>
+              </>
+            )}
           </Box>
         </Drawer>
       )}

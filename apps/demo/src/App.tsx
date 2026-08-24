@@ -551,12 +551,13 @@ function GridStateSection() {
     <section>
       <h3 style={{ margin: '0 0 8px' }}>Grid state — save / restore view (AG21)</h3>
       <div style={{ ...box, marginBottom: 8 }}>
-        <b>Sort, resize, reorder, hide or pin</b> a column below — then <b>reload the page</b>. The
-        grid restores your exact view. It's one prop:{' '}
-        <code>gridState={'{{'} key: '{GRID_STATE_KEY}' {'}}'}</code> — it seeds{' '}
-        <code>initialState</code> from <code>localStorage</code> and writes changes back (debounced).
-        Distinct from the settings gear (which toggles <i>features</i>). The live snapshot on the
-        right is what's persisted.
+        <b>Sort, resize, reorder, hide or pin</b> a column below, then open the <b>⚙ settings gear</b>{' '}
+        and click <b>Save view</b> at the bottom of the sheet — now <b>reload the page</b> and your
+        arrangement comes back. This grid uses{' '}
+        <code>gridState={'{{'} key: '{GRID_STATE_KEY}', persist: false {'}}'}</code> (manual save) with{' '}
+        <code>showSettings</code>, so nothing is written until you click <b>Save view</b>. The live
+        snapshot on the right is exactly what gets persisted — separate from the gear's{' '}
+        <i>feature</i> toggles above it, and from the settings <b>Reset</b>.
       </div>
       <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', flexWrap: 'wrap' }}>
         <div style={{ flex: '1 1 420px', minWidth: 0 }}>
@@ -576,7 +577,8 @@ function GridStateSection() {
             data={people}
             columns={gsColumns}
             getRowId={(r) => r.id}
-            gridState={{ key: GRID_STATE_KEY }}
+            gridState={{ key: GRID_STATE_KEY, persist: false }}
+            showSettings={{ persistKey: 'demo-gridstate' }}
             enableColumnPinning
             enableColumnOrdering
             showDensityToggle

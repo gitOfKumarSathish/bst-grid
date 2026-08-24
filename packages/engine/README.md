@@ -1219,7 +1219,10 @@ function Grid() {
 ```
 
 **Adapters** wrap both steps in one prop — `gridState={{ key: 'orders' }}` on `<BstTableMui>` /
-`<BstTableShadcn>` seeds `initialState` from storage and persists changes for you.
+`<BstTableShadcn>` seeds `initialState` from storage and persists changes for you. Pass
+`persist: false` (with `showSettings` on) for **manual save**: the settings-sheet footer gains a
+**Save view** button (plus **Reset view**), so the user persists the arrangement on click rather
+than on every change — the adapters call `saveGridState` / `resetGridState` + `clearGridState` for you.
 
 | Export | Kind | Purpose |
 | --- | --- | --- |

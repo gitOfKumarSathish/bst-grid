@@ -9,6 +9,19 @@ this project uses [Semantic Versioning](https://semver.org).
 > affected package README(s) **and** bump the version, in the same change.
 
 ## [Unreleased]
+### Added — Save view / Reset view controls in the settings sheet (AG21)
+- The **settings-sheet footer** now shows grid-state **view** controls in **both** adapters when
+  `gridState` is configured: a **Reset view** button always, and a **Save view** button in
+  **manual mode** (`gridState={{ key, persist: false }}`). Manual mode still restores the saved view
+  on mount but writes **only when the user clicks Save view** (auto mode keeps the debounced
+  `<GridStatePersist>`). Save calls `saveGridState(getGridState(table))`; Reset calls
+  `resetGridState(table)` + `clearGridState(key)` — clearing the live arrangement **and** forgetting
+  the snapshot. These sit below, and visually separate from, the settings **Reset** (which clears
+  *feature* toggles).
+- **No new flag** — pure adapter chrome over the existing `gridState` API, so no settings-sheet or
+  MCP-rules change. The demo's **Grid state** section now uses `persist: false` + `showSettings` to
+  show it live. Tested in `mui.test.tsx` + `shadcn.test.tsx` (Save writes the snapshot, Reset clears
+  it; auto mode shows Reset view but not Save view).
 
 ## [0.40.0] — 2026-08-20
 ### Added — Row numbers (AG9) · loading/error overlays (AG23) · auto-generate columns (AG27)

@@ -297,6 +297,59 @@ describe('@bloomskill/table-mui — "Rows per page" All option', () => {
   })
 })
 
+describe('@bloomskill/table-mui — Save view / Reset view controls (AG21)', () => {
+  beforeEach(() => window.localStorage.clear())
+
+  test('manual mode: the settings footer Save view writes the snapshot, Reset view clears it', () => {
+    render(
+      <BstTableMui
+        data={seed}
+        columns={columns}
+        getRowId={(r) => r.id}
+        gridState={{ key: 'unit-view', persist: false }}
+        showSettings={{ persist: false }}
+      />,
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Table settings' }))
+    // manual mode: nothing persisted until the user clicks Save view
+    expect(window.localStorage.getItem('bst-table:state:unit-view')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'Save view' }))
+    expect(window.localStorage.getItem('bst-table:state:unit-view')).toContain('"version"')
+    // Reset view forgets the persisted snapshot
+    fireEvent.click(screen.getByRole('button', { name: 'Reset view' }))
+    expect(window.localStorage.getItem('bst-table:state:unit-view')).toBeNull()
+  })
+
+  test('auto mode shows Reset view but not Save view (saving is automatic)', () => {
+    render(
+      <BstTableMui
+        data={seed}
+        columns={columns}
+        getRowId={(r) => r.id}
+        gridState={{ key: 'unit-view-auto' }}
+        showSettings={{ persist: false }}
+      />,
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Table settings' }))
+    expect(screen.queryByRole('button', { name: 'Save view' })).toBeNull()
+    expect(screen.getByRole('button', { name: 'Reset view' })).toBeInTheDocument()
+  })
+
+  test('no gridState → no view controls in the settings footer', () => {
+    render(
+      <BstTableMui
+        data={seed}
+        columns={columns}
+        getRowId={(r) => r.id}
+        showSettings={{ persist: false }}
+      />,
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Table settings' }))
+    expect(screen.queryByRole('button', { name: 'Save view' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Reset view' })).toBeNull()
+  })
+})
+
 describe('@bloomskill/table-mui — select editors are overlay editors', () => {
   // MUI's Select/menu portals to <body>. Without `overlayEditor`, opening it
   // blurs the cell and the engine commits + tears the editor down before you can

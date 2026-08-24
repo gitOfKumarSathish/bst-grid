@@ -7,6 +7,10 @@ import {
   useToolbarOverflow,
   useBstGridState,
   loadGridState,
+  getGridState,
+  saveGridState,
+  resetGridState,
+  clearGridState,
   BstTable,
   BstFilterBuilder,
   BstConditionalFormatBuilder,
@@ -290,6 +294,32 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
     conditionalFormats: effectiveFormats,
   } as UseBstTableOptions<TData>
   const { table, runtime, handle } = useBstGrid<TData>(gridOpts)
+  // Grid-state save/restore (AG21) — the manual "Save view" / "Reset view" controls
+  // rendered in the settings-sheet footer below. These persist the *arrangement*
+  // (sort · filter · column layout · grouping · …), distinct from the settings Reset,
+  // which clears feature toggles. In manual mode (`gridState.persist === false`) the
+  // view is written only on click; auto mode keeps the debounced <GridStatePersist>.
+  const [viewJustSaved, setViewJustSaved] = React.useState(false)
+  const viewSavedTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+  React.useEffect(
+    () => () => {
+      if (viewSavedTimer.current) clearTimeout(viewSavedTimer.current)
+    },
+    [],
+  )
+  const saveView = () => {
+    if (!gridState) return
+    saveGridState(gridState.key, getGridState(table, gridState), gridState.storage)
+    setViewJustSaved(true)
+    if (viewSavedTimer.current) clearTimeout(viewSavedTimer.current)
+    viewSavedTimer.current = setTimeout(() => setViewJustSaved(false), 1800)
+  }
+  const resetView = () => {
+    if (!gridState) return
+    resetGridState(table)
+    clearGridState(gridState.key, gridState.storage)
+    setViewJustSaved(false)
+  }
   const I = React.useMemo(() => resolveIcons(icons), [icons])
   // Forward the resolved chrome icons into the engine body for the overlapping
   // slots, so the whole grid uses one icon set. Sort arrows + file-type icons
@@ -546,7 +576,9 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
 
   return (
     <div className={'sc-card' + themeClass + (className ? ' ' + className : '')} style={style}>
-      {gridState ? <GridStatePersist table={table} options={gridState} /> : null}
+      {gridState && gridState.persist !== false ? (
+        <GridStatePersist table={table} options={gridState} />
+      ) : null}
       {toolbarOn && (
         <div className="sc-toolbar" ref={toolbarRef}>
           {title && <span className="sc-title">{title}</span>}
@@ -1032,6 +1064,25 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
                 Reset
               </button>
             </div>
+            {gridState && (
+              <div className="sc-sheet-footer">
+                <span className="sc-muted" style={{ flex: 1 }}>
+                  {viewJustSaved
+                    ? 'View saved to this browser ✓'
+                    : gridState.persist === false
+                      ? 'Save this arrangement to restore it next time'
+                      : 'This view is saved automatically'}
+                </span>
+                {gridState.persist === false && (
+                  <button className="sc-btn sc-btn-primary" onClick={saveView}>
+                    Save view
+                  </button>
+                )}
+                <button className="sc-btn" onClick={resetView}>
+                  Reset view
+                </button>
+              </div>
+            )}
           </aside>
         </div>
       )}
