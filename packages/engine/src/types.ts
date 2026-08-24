@@ -8,7 +8,7 @@ import type { BstFormatRule } from './formatting.js'
 import type { VirtualizationOptions } from './virtualization.js'
 import type { BstStickyHeaderOptions } from './stickyHeader.js'
 import type { BstExportOptions } from './export.js'
-import type { BstSaveEvent, CommitPolicy, SaveTrigger } from './runtime.js'
+import type { BstCellEdit, BstSaveEvent, CommitPolicy, SaveTrigger } from './runtime.js'
 
 /** A Bst-Table column definition, pre-bound to the engine's feature set. */
 export type BstTableColumn<TData extends RowData> = ColumnDef<BstTableFeatures, TData, any>
@@ -233,6 +233,15 @@ export interface BstTableEngineToggles {
    */
   enableBatchEditing?: boolean
   /**
+   * Log committed cell edits — a debug aid (the "Both"-mode companion to
+   * `onCellCommit`). When `true`, every cell commit that writes through — an
+   * inline edit saved on Enter/blur, or each cell of a paste — is `console.log`ged
+   * as a `BstCellEdit` (old → new, formatted text, the row). If an `onCellCommit`
+   * handler is supplied it takes precedence and this stays quiet, so you never get
+   * a double signal. Needs `enableEditing`. Default: false (opt-in).
+   */
+  enableEditLog?: boolean
+  /**
    * Row virtualization (D1) — render only the rows inside the scroll viewport
    * (plus overscan), so a 10k / 1M-row grid stays fast with a bounded DOM. Pass
    * `true`, or an object to tune it (`{ overscan, estimateRowSize, estimateColumnSize }`
@@ -425,6 +434,17 @@ export interface UseBstTableOptions<TData extends RowData> extends BstTableEngin
    * explicit save.
    */
   onSave?: (event: BstSaveEvent<TData>) => void | Promise<void>
+  /**
+   * Per-cell commit hook — the inline counterpart to `onSave`. Fires **once per
+   * committed cell** the moment an edit writes through: an inline edit saved on
+   * Enter / blur (edit a cell, click out), or each cell of a paste, in the default
+   * `'cell'` editing mode. The payload is the single `BstCellEdit` (`rowId`,
+   * `columnId`, `field`, `oldValue` → `newValue`, formatted `oldText`/`newText`,
+   * and the `row`). Deferred modes (`'row'` / `'batch'`) batch their writes through
+   * `onSave`, so this does not fire there. Opt-in by presence, like `onSave`; for a
+   * zero-wiring debug log instead, flip `enableEditLog`.
+   */
+  onCellCommit?: (change: BstCellEdit<TData>) => void
   /** Factory for a blank row (row add). A temp id is assigned if none is set. */
   createRow?: () => Partial<TData>
   /** Prefix for generated temp ids on created/duplicated rows. Default `'tmp_'`. */

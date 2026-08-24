@@ -1,4 +1,4 @@
-import { describe, test, expect } from 'vitest'
+import { describe, test, expect, vi } from 'vitest'
 import { render, screen, fireEvent, within, waitFor } from '@testing-library/react'
 import * as React from 'react'
 import {
@@ -7,7 +7,7 @@ import {
   createCellTypeRegistry,
   defineCellType,
 } from '../index'
-import type { BstTableColumn } from '../index'
+import type { BstTableColumn, BstCellEdit } from '../index'
 
 type Person = {
   id: string
@@ -118,6 +118,80 @@ describe('inline editing round-trip', () => {
     const checkbox = screen.getByRole('checkbox') as HTMLInputElement
     fireEvent.click(checkbox)
     expect(dataJson()[1].active).toBe(true)
+  })
+})
+
+describe('per-cell commit hook (onCellCommit / enableEditLog)', () => {
+  function CommitGrid(props: {
+    onCellCommit?: (c: BstCellEdit<Person>) => void
+    enableEditLog?: boolean
+  }) {
+    const [data, setData] = React.useState<Person[]>(seed)
+    const table = useBstTable<Person>({
+      data,
+      columns,
+      getRowId: (r) => r.id,
+      enableEditing: true,
+      onDataChange: setData,
+      onCellCommit: props.onCellCommit,
+      enableEditLog: props.enableEditLog,
+    })
+    return (
+      <div className="bst-table-root">
+        <BstTable table={table} />
+      </div>
+    )
+  }
+
+  const editName = (to: string) => {
+    const nameCell = within(screen.getAllByRole('row')[1]).getByText('Charlie')
+    fireEvent.doubleClick(nameCell)
+    const input = screen.getByDisplayValue('Charlie') as HTMLInputElement
+    fireEvent.change(input, { target: { value: to } })
+    fireEvent.keyDown(input, { key: 'Enter' })
+  }
+
+  test('onCellCommit fires once with the old → new delta on commit', () => {
+    const calls: BstCellEdit<Person>[] = []
+    render(<CommitGrid onCellCommit={(c) => calls.push(c)} />)
+    editName('Charlotte')
+    expect(calls).toHaveLength(1)
+    expect(calls[0]).toMatchObject({
+      rowId: '1',
+      columnId: 'name',
+      field: 'name',
+      oldValue: 'Charlie',
+      newValue: 'Charlotte',
+      oldText: 'Charlie',
+      newText: 'Charlotte',
+    })
+  })
+
+  test('enableEditLog console.logs the commit when no handler is set', () => {
+    const spy = vi.spyOn(console, 'log').mockImplementation(() => {})
+    try {
+      render(<CommitGrid enableEditLog />)
+      editName('Chuck')
+      expect(spy).toHaveBeenCalledWith(
+        '[bst-table] cell commit',
+        expect.objectContaining({ rowId: '1', columnId: 'name', newValue: 'Chuck' }),
+      )
+    } finally {
+      spy.mockRestore()
+    }
+  })
+
+  test('handler wins: enableEditLog stays quiet when onCellCommit is set', () => {
+    const spy = vi.spyOn(console, 'log').mockImplementation(() => {})
+    const calls: BstCellEdit<Person>[] = []
+    try {
+      render(<CommitGrid enableEditLog onCellCommit={(c) => calls.push(c)} />)
+      editName('Chaz')
+      expect(calls).toHaveLength(1)
+      expect(spy).not.toHaveBeenCalledWith('[bst-table] cell commit', expect.anything())
+    } finally {
+      spy.mockRestore()
+    }
   })
 })
 

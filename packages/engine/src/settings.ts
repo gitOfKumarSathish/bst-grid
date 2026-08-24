@@ -140,6 +140,7 @@ const SETTINGS_META: Record<BstSettingKey, SettingMeta> = {
   enableRowActions: { group: 'Editing', default: false, label: 'Add / delete rows' },
   enableUndoRedo: { group: 'Editing', default: false, label: 'Undo / redo' },
   enableTypeToEdit: { group: 'Editing', default: false, label: 'Type to edit', hint: 'Type on a selected cell to overwrite · Enter/Tab commit & move', requires: ['enableEditing', 'enableCellSelection'] },
+  enableEditLog: { group: 'Editing', default: false, alwaysShow: true, label: 'Log cell edits', hint: 'console.log each committed cell edit (old → new) · needs Inline editing', requires: ['enableEditing'] },
   // Selection & clipboard
   enableRowSelection: { group: 'Selection & clipboard', default: false, label: 'Row selection' },
   enableCellSelection: { group: 'Selection & clipboard', default: false, label: 'Cell selection' },

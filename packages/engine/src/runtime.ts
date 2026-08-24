@@ -192,6 +192,11 @@ export interface RuntimeCtx<TData extends RowData> {
   /** Batched save hook — ONE call per save action with the full change set.
    *  A rejection aborts the save and keeps every draft (nothing is lost). */
   onSave?: (event: BstSaveEvent<TData>) => void | Promise<void>
+  /** Per-cell commit hook — fires once per cell as an immediate edit/paste writes
+   *  through (the inline counterpart to `onSave`). */
+  onCellCommit?: (change: BstCellEdit<TData>) => void
+  /** Debug: `console.log` each committed cell edit when no `onCellCommit` is set. */
+  enableEditLog?: boolean
   createRow?: () => Partial<TData>
   tempIdPrefix: string
 }
@@ -688,6 +693,27 @@ export function createRuntime<TData extends RowData>(
 
   const persist = (changes: Array<{ rowId: string; columnId: string; value: unknown }>) => {
     if (!changes.length || !ctx.onDataChange) return
+    // Announce each cell as it writes through — the inline counterpart to onSave,
+    // firing on immediate 'cell'-mode commits (edit + click out) and paste. Build
+    // the delta from the CURRENT upstream, BEFORE commitData applies it, so the
+    // old → new pair is accurate. Handler wins; enableEditLog is the fallback log.
+    if (ctx.onCellCommit || ctx.enableEditLog) {
+      for (const ch of changes) {
+        const oldValue = sourceValue(ch.rowId, ch.columnId)
+        const edit: BstCellEdit<TData> = {
+          rowId: ch.rowId,
+          columnId: ch.columnId,
+          field: fieldOf(ch.columnId),
+          oldValue,
+          newValue: ch.value,
+          oldText: formatValue(ch.columnId, oldValue),
+          newText: formatValue(ch.columnId, ch.value),
+          row: rowOf(ch.rowId),
+        }
+        if (ctx.onCellCommit) ctx.onCellCommit(edit)
+        else console.log('[bst-table] cell commit', edit)
+      }
+    }
     commitData(applyChanges(changes))
   }
 

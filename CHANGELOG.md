@@ -10,6 +10,18 @@ this project uses [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+### Added — Per-cell commit hook (`onCellCommit`) + edit log (`enableEditLog`)
+- **`onCellCommit(change)`** (engine) — the **inline counterpart to `onSave`**. Fires **once per
+  committed cell** the moment an edit writes through: an inline edit saved on **Enter / blur** (edit a
+  cell, click out), or **each cell of a paste**, in the default `'cell'` editing mode. The payload is
+  the single **`BstCellEdit`** — `rowId` · `columnId` · `field` · `oldValue` → `newValue` · formatted
+  `oldText` / `newText` · the `row`. Emitted from `persist()` (downstream of `commitCell`), so it also
+  covers Enter/Tab commit-and-move and paste. Deferred `'row'` / `'batch'` modes still batch through
+  `onSave`. Opt-in by presence, like `onSave`; forwarded through both adapters (`...rest`).
+- **`enableEditLog`** (engine, default `false`) — a zero-wiring **debug companion** that
+  `console.log`s each committed cell edit. If an `onCellCommit` handler is supplied it takes precedence
+  and this stays quiet (no double signal). Needs `enableEditing`; a settings-sheet toggle ("Editing").
+
 ### Added — Find (X8): highlight + jump between matches, without hiding rows
 - **`enableFind`** (engine) adds an in-grid **find bar** that **highlights every match and jumps
   between them** (Next / Prev with an "n / m" counter) — the browser-`Ctrl+F` experience *inside*

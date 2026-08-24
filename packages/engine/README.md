@@ -614,6 +614,8 @@ means *passing the object implies enabled*.
 | `enableUndoRedo` | `boolean` | `false` | [Undo/redo](#undo-and-redo) of committed changes. Needs `onDataChange`. |
 | `cellTypes` | `CellTypeRegistry` | neutral defaults | Cell-type registry (adapters pass a preset). |
 | `onDataChange` | `(next: TData[]) => void` | — | Controlled write-back on edit/add/delete/duplicate. |
+| `onCellCommit` | `(change: BstCellEdit<TData>) => void` | — | Per-cell commit hook — the inline counterpart to `onSave`. Fires once per committed cell (Enter/blur in `cell` mode, or per pasted cell) with the single old → new edit. |
+| `enableEditLog` | `boolean` | `false` | Debug: `console.log` each committed cell edit when no `onCellCommit`. Needs `enableEditing`. |
 | `onSave` | `(event: BstSaveEvent) => void \| Promise<void>` | — | Batched save hook — **one call per save action**. Rejecting keeps every draft. |
 
 **Selection & access control**
@@ -716,6 +718,7 @@ const table = useBstTable<Task>({
   `parse`, so text and number cells work), then **Enter** commits and moves down (⇧ up) and **Tab**
   commits and moves right (⇧ left). Non-text editors (dropdowns, date pickers) and keys the cell type
   can't represent are left to double-click / F2.
+- **Per-cell change hook** — pass `onCellCommit(change)` to be notified the moment each cell commits (edit + click out, or paste) with the single old → new `BstCellEdit` — the inline counterpart to the batch `onSave`. For a zero-wiring debug trace, set `enableEditLog` to `console.log` every commit.
 - **Invalid-commit policy** — `policy: 'blockCommitOnError'` (keep the value a dirty draft, default) or `'commitButFlag'` (write it, but flag it).
 - **Validation** runs in order: the cell-type validator → the `required` check (`cellMeta.required`)
   → your `meta.validate(value, ctx)`. Cross-column rules read siblings via `ctx.getSiblingValue(id)`;

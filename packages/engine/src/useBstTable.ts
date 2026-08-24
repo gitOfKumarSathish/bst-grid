@@ -328,6 +328,8 @@ function buildCtx<TData extends RowData>(
     cellDisabled: opts.cellDisabled,
     onDataChange: opts.onDataChange,
     onSave: opts.onSave,
+    onCellCommit: opts.onCellCommit,
+    enableEditLog: !!opts.enableEditLog,
     createRow: opts.createRow,
     tempIdPrefix: opts.tempIdPrefix ?? 'tmp_',
   }

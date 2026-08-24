@@ -125,6 +125,10 @@ export const RULES: Record<string, FlagRule> = {
     requires: ['enableEditing', 'enableCellSelection'],
     note: 'Type on a selected cell to overwrite (seeded via the cell type `parse`); Enter commits & moves down, Tab commits & moves right (Shift reverses). No-op without both prerequisites.',
   },
+  enableEditLog: {
+    requires: ['enableEditing'],
+    note: 'Debug aid: console.logs each committed cell edit (old → new). If you pass an `onCellCommit` handler it takes precedence and this flag stays quiet — no double signal.',
+  },
   enableConditionalFormatting: {
     needsOptions: [{ name: 'conditionalFormats', why: 'the flag gates rules; with no rules it has nothing to apply' }],
     note: 'Defaults to ON — it is the runtime off-switch for rules already passed, not the opt-in.',

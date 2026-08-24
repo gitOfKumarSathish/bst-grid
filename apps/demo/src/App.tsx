@@ -340,6 +340,13 @@ function ErpFormatsSection() {
         enableEditing
         enableValidation
         onDataChange={setRows}
+        onCellCommit={(change) =>
+          // Inline per-cell save hook — the console.log made concrete.
+          console.log(
+            `[demo] ${change.columnId} on row ${change.rowId}: ${String(change.oldText)} → ${String(change.newText)}`,
+            change,
+          )
+        }
         pagination={false}
         showSearch={false}
       />
