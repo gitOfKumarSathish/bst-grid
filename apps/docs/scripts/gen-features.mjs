@@ -17,6 +17,18 @@ const REQS = JSON.parse(readFileSync('requirements.json', 'utf8'))
 const RULES = JSON.parse(readFileSync('rules.json', 'utf8'))
 const reqById = Object.fromEntries(REQS.map((r) => [r.id, r]))
 
+// ---- human quality layer (Phase 2) -----------------------------------------
+// Hand-written prose partials injected into the generated pages. They live
+// OUTSIDE the generated tree (apps/docs/guides/) so regeneration never clobbers
+// them; a missing partial is simply skipped. Per-flag: guides/<group>/<flag>.mdx.
+// Per-group intro:  guides/<group>/_overview.mdx.
+const GUIDES = join(OUT, '..', 'guides')
+function readGuide(rel) {
+  try {
+    return readFileSync(join(GUIDES, rel), 'utf8').replace(/^---\n[\s\S]*?\n---\n/, '').trim()
+  } catch { return '' }
+}
+
 // ---- docs taxonomy: 8 settings-sheet groups + a chrome bucket -------------
 const GROUPS = [
   ['Data operations', 'data-operations', 'Sorting, filtering, search, pagination and grouping.'],
@@ -102,6 +114,11 @@ function renderPage(f) {
   if (f.group) L.push(`| Settings sheet | ${f.group} |`)
   L.push('')
   if (f.doc) { L.push(mdxSafe(f.doc)); L.push('') }
+
+  // Human quality layer — injected verbatim from apps/docs/guides/<group>/<flag>.mdx
+  const gslug = SLUG[groupOf(f)]
+  const guide = gslug ? readGuide(join(gslug, `${f.flag}.mdx`)) : ''
+  if (guide) { L.push(guide); L.push('') }
 
   // Enable it
   L.push('## Enable it')
@@ -193,9 +210,12 @@ for (const [name, slug, blurb] of GROUPS) {
   mkdirSync(dir, { recursive: true })
   writeFileSync(join(dir, '_category_.json'), JSON.stringify({ label: name, position: POS[name], link: { type: 'doc', id: `features/${slug}/index` } }, null, 2))
   // group index
+  const groupOverview = readGuide(join(slug, '_overview.mdx'))
   const idx = [
     '---', `id: index`, `title: ${name}`, `sidebar_label: Overview`, '---', '',
-    `# ${name}`, '', blurb, '', '| Feature | Flag | Default |', '| --- | --- | --- |',
+    `# ${name}`, '', blurb, '',
+    ...(groupOverview ? [groupOverview, ''] : []),
+    '| Feature | Flag | Default |', '| --- | --- | --- |',
     ...items.map((f) => `| [${mdxSafe(f.feature, { inTableCell: true })}](./${f.flag}) | ${code(f.flag)} | ${code(f.default)} |`),
     '',
   ].join('\n')

@@ -17,6 +17,11 @@ master-detail, range selection or clipboard.
 Full per-package docs live in each package README. Start with the
 **[engine README](packages/engine/README.md)** — it documents every option, cell type and feature.
 
+**📚 Documentation site:** [bst-grid.pages.dev](https://bst-grid.pages.dev) — generated feature
+guides, cell types, API reference and a coverage matrix, plus hand-written guides, built from this
+repo's corpus (source in [`apps/docs`](apps/docs)). Run it locally with
+`cd apps/docs && npm install --no-workspaces && npm run start`.
+
 ## What it does
 
 Every capability is a **per-instance toggle** in one of two layers: `enable*` = engine

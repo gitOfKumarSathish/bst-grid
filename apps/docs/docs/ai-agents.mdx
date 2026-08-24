@@ -1,0 +1,70 @@
+---
+id: ai-agents
+title: AI Agents & MCP
+sidebar_label: AI Agents & MCP
+sidebar_position: 7
+slug: /ai-agents
+---
+
+# AI Agents & MCP
+
+No language model was trained on Bst-Table. Ask a coding agent to "build a Bst-Table grid with
+batch editing" and it will confidently write **some other grid library's** code — the very
+libraries this project exists to replace. The **`@bloomskill/table-mcp`** server fixes that: point
+your agent at it and it gets the real API — searchable docs, the full feature-toggle registry,
+every cell type, exact type signatures, and the ability to scaffold and validate working grids.
+
+Works with anything that speaks MCP — Claude Code, Cursor, VS Code (Copilot), Claude Desktop.
+
+## Register the server
+
+Nothing to install first — `npx` fetches the package on first run.
+
+**Claude Code**
+
+```bash
+claude mcp add bst-table -s user -- npx -y @bloomskill/table-mcp
+```
+
+`-s user` makes it available in every project on your machine; drop it for the current directory
+only, or use `-s project` to write a `.mcp.json` your team gets on clone.
+
+**Cursor · Claude Desktop** (`mcpServers` key)
+
+```json
+{
+  "mcpServers": {
+    "bst-table": {
+      "command": "npx",
+      "args": ["-y", "@bloomskill/table-mcp"]
+    }
+  }
+}
+```
+
+## What the agent gets
+
+The server exposes eight tools:
+
+| Tool | What it does |
+| --- | --- |
+| `bst_search_docs` | full-text search across the corpus |
+| `bst_get_feature` | a flag's layer, type, default, dependencies and status |
+| `bst_get_cell_type` | a `meta.type` cell's value shape, `cellMeta` and editability |
+| `bst_get_api` | exact type signatures from the built `.d.ts` |
+| `bst_get_example` | runnable usage examples |
+| `bst_scaffold_grid` | generate a working grid from a feature list |
+| `bst_validate_config` | check a grid config against the dependency rules |
+| `bst_detect_version` | resolve which release an API belongs to |
+
+## Why it stays correct
+
+The corpus is **generated from source** at build time — the same feature registry, cell types,
+`.d.ts` signatures and coverage matrix that produce this documentation site. When a feature ships,
+it flows into the MCP server automatically, so the agent's knowledge tracks the code release for
+release. It's the same guarantee these docs give: what you read is what the compiler accepts.
+
+:::tip
+These docs and the MCP server are two faces of one corpus. Humans read the [Feature
+Guides](./features/index.mdx); agents query `bst_get_feature`. Neither can drift from the code.
+:::

@@ -1,20 +1,5 @@
----
-id: index
-title: Performance
-sidebar_label: Overview
----
-
-# Performance
-
-Virtualization and infinite scroll for large datasets.
-
 Performance features keep large grids fast by **rendering only what's visible**. Row
 virtualization (`enableVirtualization`) is the big lever; `enableColumnVirtualization` adds
 horizontal windowing for very wide grids. Both default off — turn them on for thousands of rows or
 hundreds of columns. Virtualization yields to master-detail, grouping, spanning and row pinning,
 which need the full DOM.
-
-| Feature | Flag | Default |
-| --- | --- | --- |
-| [Column virtualization (D1)](./enableColumnVirtualization) | `enableColumnVirtualization` | `false` |
-| [Row virtualization (D1)](./enableVirtualization) | `enableVirtualization` | `false` |

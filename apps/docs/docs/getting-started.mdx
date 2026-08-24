@@ -1,0 +1,99 @@
+---
+id: getting-started
+title: Getting Started
+sidebar_label: Getting Started
+sidebar_position: 1
+slug: /getting-started
+---
+
+# Getting Started
+
+**Bst-Table** is a React data grid: a headless engine (`@bloomskill/table-engine`, built on
+TanStack Table v9) with swappable style **skins**. Pick a skin, pass `data` + `columns`, and you
+get sorting, search, pagination and column controls out of the box — then opt into editing,
+selection, clipboard, export and more with per-instance flags. Everything is **MIT / Apache**: no
+per-seat licensing, no paid tiers.
+
+## Install
+
+Choose a skin — the engine comes with it. Both render the same `data` and `columns`, so you can
+switch later without touching your data code.
+
+**Material UI skin**
+
+```bash
+npm install @bloomskill/table-mui @bloomskill/table-engine \
+  @mui/material @mui/icons-material @emotion/react @emotion/styled \
+  react react-dom
+```
+
+**shadcn / Radix skin**
+
+```bash
+npm install @bloomskill/table-shadcn @bloomskill/table-engine \
+  @radix-ui/react-dropdown-menu react react-dom
+```
+
+## Quick start
+
+Define your columns once, then render the skin. The engine stylesheet is always required.
+
+```tsx
+import { BstTableMui } from '@bloomskill/table-mui'
+import type { BstTableColumn } from '@bloomskill/table-engine'
+import '@bloomskill/table-engine/styles.css'
+
+type Person = { id: string; name: string; role: string; age: number }
+
+const columns: BstTableColumn<Person>[] = [
+  { id: 'name', accessorKey: 'name', header: 'Name', sortFn: 'alphanumeric' },
+  { id: 'role', accessorKey: 'role', header: 'Role' },
+  { id: 'age',  accessorKey: 'age',  header: 'Age',  sortFn: 'basic' },
+]
+
+export function People({ rows }: { rows: Person[] }) {
+  return (
+    <BstTableMui
+      title="People"
+      data={rows}
+      columns={columns}
+      getRowId={(r) => r.id}
+      pagination={{ pageSize: 10 }}
+    />
+  )
+}
+```
+
+The shadcn skin is identical, with one extra stylesheet:
+
+```tsx
+import { BstTableShadcn } from '@bloomskill/table-shadcn'
+import '@bloomskill/table-engine/styles.css'
+import '@bloomskill/table-shadcn/styles.css'   // shadcn skin needs both
+
+<BstTableShadcn data={rows} columns={columns} getRowId={(r) => r.id} dark />
+```
+
+:::tip Always pass `getRowId`
+Selection, editing and clipboard target rows **by id**. Passing `getRowId` keeps them correct
+across sorting and filtering.
+:::
+
+## Choosing a skin
+
+| | `@bloomskill/table-mui` | `@bloomskill/table-shadcn` |
+| --- | --- | --- |
+| Best when | your app is on **Material UI** | your app is on **shadcn / Tailwind / Radix** |
+| Theming | reads your MUI `ThemeProvider` (light/dark) | `theme="inherit"` adopts your shadcn tokens; or a self-contained **zinc** palette |
+| Icons | `@mui/icons-material` | lucide / Tabler / Phosphor / … or built-in SVGs |
+| Extra dep | `@mui/material` + Emotion | `@radix-ui/react-dropdown-menu` (ships its own CSS — no Tailwind build needed) |
+
+Not on either? The engine is headless — `useBstTable` renders with your own markup.
+
+## Next steps
+
+- [Feature Guides](./features/index.mdx) — every `enable*` / `show*` flag, with when-and-why prose.
+- [Cell Types](./cell-types/index.mdx) — the 17 built-in `meta.type` renderers/editors.
+- [API Reference](./api/index.mdx) — every engine export with real signatures.
+- [Styling & Theming](./theming.mdx) — themes, dark mode and CSS slots.
+- [AI Agents & MCP](./ai-agents.mdx) — let your coding agent write correct Bst-Table code.

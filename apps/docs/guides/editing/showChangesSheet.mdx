@@ -1,0 +1,17 @@
+## When to use it
+
+In batch editing, give users a **review-before-save** panel: every pending edit listed, revertable,
+with the final Save confirmation.
+
+## How it works
+
+`showChangesSheet` adds an `{n} unsaved` chip and a **Review & save** button that opens a side sheet
+listing each change (row · column · old → new) with per-change and per-row revert. Confirming runs
+`commitAll()` → one `onSave`. It follows `enableEditing` with `mode: 'batch'` and replaces the plain
+save bar while on.
+
+## Gotchas
+
+- Meant for `batch` mode; in `row` / `cell` mode use `showSaveBar` instead.
+- A failed save keeps the drafts and shows the error in the sheet — users don't lose work.
+- `changesRowLabel` sets how each row is named in the list (e.g. by a human key, not the row id).

@@ -1,0 +1,85 @@
+---
+id: migration
+title: Migrating to Bst-Table
+sidebar_label: Migration
+sidebar_position: 8
+slug: /migration
+---
+
+# Migrating to Bst-Table
+
+Coming from another React data grid? The concepts map closely — Bst-Table just splits them into a
+headless **engine** (`enable*` behaviour) and a **skin** (`show*` chrome). This page maps the ideas
+you already know onto Bst-Table's API.
+
+## Concept map
+
+| You're used to… | In Bst-Table |
+| --- | --- |
+| `columns` with `field` / `accessor` | `columns: BstTableColumn[]` with `accessorKey` + `id` |
+| A custom cell renderer per column | `meta.type` (built-in cell types) or `columnDef.cell` |
+| `getRowId` / row keys | `getRowId={(r) => r.id}` — required for selection & editing |
+| A `<DataGrid>` mega-component with dozens of props | one skin component + per-instance `enable*` / `show*` flags |
+| Pro / Premium / Enterprise tiers | everything is MIT / Apache — no gated features |
+
+## Columns & cells
+
+Instead of a bespoke renderer per column, pick a built-in **cell type** by `meta.type` (17 of them
+— text, number, date, select, files, sparkline, KPI, …) and configure it with `cellMeta`. Drop to
+`columnDef.cell` only when you need something custom.
+
+```tsx
+const columns: BstTableColumn<Row>[] = [
+  { id: 'name',   accessorKey: 'name',   header: 'Name' },
+  { id: 'status', accessorKey: 'status', header: 'Status',
+    meta: { type: 'singleSelect', options: STATUSES } },
+  { id: 'trend',  accessorKey: 'history', header: 'Trend',
+    meta: { type: 'sparkline' } },
+]
+```
+
+See [Cell Types](./cell-types/index.mdx) for the full set.
+
+## Data operations
+
+Sorting, filtering, global search, grouping and pagination are engine features and mostly default
+**on**. Turn them off with `enableSorting={false}` etc., or reach for the advanced pieces
+(`enableSetFilter`, `enableMultiFilter`) when you need them. See [Data
+operations](./features/data-operations/index.mdx).
+
+## Selection, editing & clipboard
+
+These default **off** — opt in per grid:
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  getRowId={(r) => r.id}
+  enableRowSelection
+  enableCellSelection
+  enableClipboard
+  enableEditing={{ mode: 'batch' }}
+  onSave={async ({ rows }) => api.bulkUpdate(rows.map((r) => r.patch))}
+/>
+```
+
+The whole [Editing](./features/editing/index.mdx) and [Selection &
+clipboard](./features/selection-clipboard/index.mdx) sections cover the details.
+
+## Server-side data (large datasets)
+
+For big tables, run sort/filter/paginate on the server with a **DataSource** and manual mode, and
+turn on virtualization — the grid API stays the same, only the data source changes. See
+[Performance](./features/performance/index.mdx).
+
+## Styling
+
+Map your existing theme with [Styling & Theming](./theming.mdx): the MUI skin follows your MUI
+theme, the shadcn skin adopts your design tokens with `theme="inherit"`, and CSS slots
+(`classNames` / `styles`) cover the rest.
+
+:::tip Let your agent do it
+If you use an AI coding assistant, connect the [MCP server](./ai-agents.mdx) first — it can
+scaffold the equivalent Bst-Table grid and validate the config for you.
+:::

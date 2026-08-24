@@ -8,6 +8,11 @@ sidebar_label: Overview
 
 General adapter chrome — toolbar, settings sheet, shortcuts.
 
+These are the general adapter controls that host everything else — the toolbar itself
+(`showToolbar`), the runtime **settings sheet** (`showSettings`) where end-users flip features
+without developer wiring, and the keyboard-shortcuts overlay (`showShortcuts`). They're chrome, so
+they live in the adapters (`@bloomskill/table-mui`, `@bloomskill/table-shadcn`), not the engine.
+
 | Feature | Flag | Default |
 | --- | --- | --- |
 | [Runtime settings sheet](./showSettings) | `showSettings` | `false` |

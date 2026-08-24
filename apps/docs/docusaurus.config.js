@@ -5,7 +5,7 @@ const { themes } = require('prism-react-renderer')
 module.exports = {
   title: 'Bst-Table Docs',
   tagline: 'Feature Guides',
-  url: 'http://localhost',
+  url: 'https://bst-grid.pages.dev',
   baseUrl: '/',
   onBrokenLinks: 'warn',
   markdown: { hooks: { onBrokenMarkdownLinks: 'warn' } },

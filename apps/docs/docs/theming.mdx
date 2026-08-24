@@ -1,0 +1,88 @@
+---
+id: theming
+title: Styling & Theming
+sidebar_label: Styling & Theming
+sidebar_position: 6
+slug: /theming
+---
+
+# Styling & Theming
+
+Bst-Table renders its body from CSS variables (`--bst-table-*`), so each skin can map your app's
+theme onto the grid — and you can override any part with plain CSS.
+
+## Material UI skin
+
+`@bloomskill/table-mui` reads your MUI theme automatically. Wrap the grid in a `ThemeProvider` and
+the toolbar, controls and grid body follow it — dark mode included.
+
+```tsx
+import { ThemeProvider, createTheme } from '@mui/material/styles'
+
+<ThemeProvider theme={createTheme({ palette: { mode: 'dark' } })}>
+  <BstTableMui data={rows} columns={columns} getRowId={(r) => r.id} />
+</ThemeProvider>
+```
+
+With no `ThemeProvider`, MUI's default theme is used.
+
+## shadcn / Radix skin
+
+`@bloomskill/table-shadcn` ships a self-contained **zinc** palette by default — no Tailwind build
+required, just import the stylesheet. To adopt your app's design tokens instead, set
+`theme="inherit"`: the grid re-points every variable at your host shadcn tokens (`--background`,
+`--primary`, `--border`, `--ring`, `--radius`, font).
+
+```tsx
+// self-contained zinc palette (default)
+<BstTableShadcn data={rows} columns={columns} getRowId={(r) => r.id} />
+
+// adopt the host app's shadcn tokens + OKLCH colors
+<BstTableShadcn
+  data={rows}
+  columns={columns}
+  getRowId={(r) => r.id}
+  theme="inherit"
+  tokenFormat="oklch"   // 'hsl' (default) | 'oklch'
+/>
+```
+
+**Dark mode** follows your ambient `.dark` class automatically (next-themes / shadcn). Force it
+with `dark={true}` or `dark={false}`.
+
+## Custom CSS (any skin)
+
+The engine exposes styling slots that layer **on top of** the built-in `bst-*` classes — they
+never replace them, so your CSS builds on the theme rather than forking the renderer.
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  getRowId={(r) => r.id}
+  className="my-card"                       // outer card
+  classNames={{ row: 'my-row', cell: 'my-cell' }}
+  styles={{ headerCell: { fontWeight: 700 } }}
+/>
+```
+
+| Where | Prop | Applies to |
+| --- | --- | --- |
+| Outer card | `className` / `style` | the adapter's card wrapper |
+| Grid parts | `classNames` / `styles` | `root`, `table`, `header`, `headerRow`, `headerCell`, `filterRow`, `body`, `row`, `cell`, `empty` |
+| Per column | `meta.cellClassName` / `meta.headerClassName` | that column's cells / header |
+
+`headerCell`, `row` and `cell` slots also accept a function for per-row / per-cell logic, and
+per-column `meta` styles win over the global slot (more specific).
+
+## Conditional formatting
+
+For data-driven styling (thresholds, status colors), use declarative rules instead of hand-written
+CSS — see [`enableConditionalFormatting`](./features/display/index.mdx) and the runtime
+**Formats** builder (`showFormatBuilder`). Rules compose with the CSS slots above.
+
+## Density & row height
+
+`showDensityToggle` cycles compact / standard / comfortable row heights at runtime;
+`enableRowResize` and `enableAutoRowHeight` (see [Rows](./features/rows/index.mdx)) let users or
+content drive per-row height.

@@ -8,6 +8,11 @@ sidebar_label: Overview
 
 Cell/range selection and Excel-like copy/paste.
 
+Cell / range selection is the foundation the clipboard builds on: `enableCellSelection` first, then
+`enableClipboard` for spreadsheet-style copy / paste, with `enableCopyColumn` / `enableCopyRow` as
+sub-toggles. Copy spans **all pages** (pre-pagination), and paste writes through the edit session —
+so it respects validation and the change-set. All opt-in.
+
 | Feature | Flag | Default |
 | --- | --- | --- |
 | [Cell/range selection + keyboard nav](./enableCellSelection) | `enableCellSelection` | `false` |

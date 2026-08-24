@@ -153,7 +153,7 @@ function genCoverage() {
   for (const r of REQS) (byCat[cat(r.id)] = byCat[cat(r.id)] || []).push(r)
   const counts = REQS.reduce((a, r) => ((a[r.status] = (a[r.status] || 0) + 1), a), {})
 
-  const L = ['---', 'id: coverage', 'title: Feature Coverage & Roadmap', 'sidebar_label: Coverage & Roadmap', 'sidebar_position: 6', '---', '',
+  const L = ['---', 'id: coverage', 'title: Feature Coverage & Roadmap', 'sidebar_label: Coverage & Roadmap', 'sidebar_position: 9', '---', '',
     '# Feature Coverage & Roadmap', '',
     `Requirement-by-requirement status across ${REQS.length} spec leaves: `
     + `**${counts.built || 0} built**, **${counts.partial || 0} partial**, **${counts.missing || 0} not built**. `

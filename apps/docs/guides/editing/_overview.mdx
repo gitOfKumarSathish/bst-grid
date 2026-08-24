@@ -1,0 +1,14 @@
+Bst-Table's editing is **opt-in and layered**: turn on `enableEditing` for the core edit
+session, then add `enableValidation`, `enableUndoRedo` or `enableRowActions` as you need them.
+Every edit routes through **one** callback — `onDataChange` (inline) or `onSave` (batch) — so your
+backend sees a clean change-set, never a firehose of per-keystroke events.
+
+**Pick an edit mode** with `enableEditing={{ mode }}`:
+
+- **`cell`** _(default)_ — edit one cell, commit on Enter / blur. Snappy for quick corrections.
+- **`row`** — edit a whole row, commit it as a unit (a Save / Discard bar appears).
+- **`batch`** — every edit is an unsaved **draft**; the user reviews and saves them together in
+  **one** backend call. Best for bulk data entry and spreadsheet-style workflows.
+
+All three need `getRowId` (so edits target rows by id, never by index) and a place to send the
+result. Start with `enableEditing`, then layer the rest.
