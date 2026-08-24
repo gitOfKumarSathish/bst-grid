@@ -699,6 +699,9 @@ needs a version bump.)
    verify:naming`** (manual / release flow), a **pre-push hook** (`.githooks/pre-push`, installed by
    `npm install` via the root `prepare` script — `--no-verify` bypasses in an emergency), and **CI**
    (`.github/workflows/verify.yml`, which runs it *after* the build so `dist/` is in scope).
+   A fourth, **manual** check covers what is already on npm: **`npm run verify:published`** downloads
+   every published version of all four packages and scans the tarballs with the same rules. It needs
+   network, so it is deliberately not in CI — run it before a naming-related release decision.
 
 ### Which README to update
 | Change is in… | Update this README |
