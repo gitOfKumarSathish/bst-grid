@@ -49,6 +49,10 @@ export interface BstRuntimeHandle<TData extends RowData> {
   enableMultiFilter: boolean
   /** Cell/range selection + keyboard nav is active (Phase 3). */
   enableCellSelection: boolean
+  /** Type-to-edit — spreadsheet-style entry (type to overwrite; Enter/Tab
+   *  commit-and-move). True only when editing + cell selection are also on.
+   *  Read by the keydown handler and the shortcuts overlay (`<BstShortcuts>`). */
+  enableTypeToEdit: boolean
   /** Clipboard copy/paste is active (Phase 3). */
   enableClipboard: boolean
   /** Undo/redo is active (Phase 3, C5). */
@@ -477,6 +481,8 @@ export function useBstTable<TData extends RowData>(opts: UseBstTableOptions<TDat
       (opts.enableColumnFilters ?? true) &&
       !!opts.enableColumnFilterRow,
     enableCellSelection: ctx.enableCellSelection,
+    // Type-to-edit is effective only with editing + cell selection both on.
+    enableTypeToEdit: !!opts.enableTypeToEdit && !!ctx.enableEditing && ctx.enableCellSelection,
     enableClipboard: ctx.enableClipboard,
     enableUndoRedo: ctx.enableUndoRedo,
     enableEditing: !!ctx.enableEditing,

@@ -45,6 +45,10 @@ export const BST_SHORTCUTS_REGISTRY: readonly BstShortcut[] = [
   { keys: ['Enter'], label: 'Edit cell (or move down)', category: 'Edit', requires: ['enableCellSelection', 'enableEditing'] },
   { keys: ['F2'], label: 'Edit cell in place', category: 'Edit', requires: ['enableEditing'] },
   { keys: ['Esc'], label: 'Cancel edit / clear selection', category: 'Edit', requires: ['enableCellSelection'] },
+  // Type-to-edit — spreadsheet-style entry (needs editing + cell selection)
+  { keys: ['A–Z', '0–9'], label: 'Type to overwrite the cell', category: 'Edit', requires: ['enableTypeToEdit'] },
+  { keys: ['Enter'], label: 'Commit & move down (⇧ up)', category: 'Edit', requires: ['enableTypeToEdit'] },
+  { keys: ['Tab'], label: 'Commit & move right (⇧ left)', category: 'Edit', requires: ['enableTypeToEdit'] },
   // Clipboard
   { keys: ['Mod', 'C'], label: 'Copy selection', category: 'Clipboard', requires: ['enableClipboard'] },
   { keys: ['Mod', 'V'], label: 'Paste', category: 'Clipboard', requires: ['enableClipboard', 'enableEditing'] },

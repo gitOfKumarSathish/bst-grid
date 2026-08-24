@@ -301,6 +301,33 @@ export function BstTable({
     if (!handle.enableCellSelection) return
     if (st.editingCell) return // an inline editor owns the keys
     const active = st.activeCell
+    // Type-to-edit — a printable keystroke on an active editable cell opens the
+    // editor seeded with that character, overwriting the value (spreadsheet-style).
+    // Sits BEFORE the nav switch but yields modifier chords to it (Ctrl+A select
+    // all, Ctrl/Shift+Space column/row select). Seeds via the cell type's `parse`
+    // (so text + number cells work); overlay editors (select / date pickers) and
+    // cell types without `parse` are left to double-click / F2.
+    if (
+      handle.enableTypeToEdit &&
+      active &&
+      !mod &&
+      !e.altKey &&
+      e.key.length === 1 &&
+      !(e.key === ' ' && shift) &&
+      runtime.isCellEditable(active.rowId, active.columnId)
+    ) {
+      const ct = registry.get(runtime.metaOf(active.columnId).type)
+      if (ct?.renderEdit && ct.parse && !ct.overlayEditor) {
+        const seed = ct.parse(e.key, runtime.metaOf(active.columnId))
+        // Decline keys the cell type can't represent (e.g. a letter typed into a
+        // number cell → NaN) so we never open an editor on a garbage value.
+        if (!(typeof seed === 'number' && Number.isNaN(seed))) {
+          e.preventDefault()
+          runtime.startEditing(active.rowId, active.columnId, seed)
+          return
+        }
+      }
+    }
     switch (e.key) {
       case 'ArrowUp':
         e.preventDefault()
@@ -1856,6 +1883,7 @@ const GridCell = React.memo(function GridCell({
       cellType={cellType}
       renderProps={renderProps}
       isRowSession={slice.inRowSession && !slice.isEditing}
+      moveOnCommit={handle.enableTypeToEdit}
     />
   ) : handle.userCellColumns.has(columnId) ? (
     flexRender(cell.column.columnDef.cell, cell.getContext())
@@ -1942,14 +1970,26 @@ function CellEditorHost({
   cellType,
   renderProps,
   isRowSession,
+  moveOnCommit,
 }: {
   runtime: BstRuntime<any>
   cellType: CellType<any, any, any>
   renderProps: CellRenderProps
   isRowSession: boolean
+  /** Type-to-edit: commit-and-move on Enter/Tab (single-cell edits only). */
+  moveOnCommit: boolean
 }) {
   const { rowId, columnId } = renderProps
-  const [draft, setDraft] = React.useState<unknown>(renderProps.value)
+  const [draft, setDraft] = React.useState<unknown>(() => {
+    // Type-to-edit seeds the opening draft so the first keystroke overwrites the
+    // value. Only for a single-cell edit on the matching cell — a row/batch
+    // session opens every editor on its existing value.
+    if (!isRowSession) {
+      const seed = runtime.store.getState().editSeed
+      if (seed && seed.rowId === rowId && seed.columnId === columnId) return seed.value
+    }
+    return renderProps.value
+  })
   const doneRef = React.useRef(false)
 
   const doCommit = (override?: unknown) => {
@@ -1994,6 +2034,15 @@ function CellEditorHost({
       if (!commitsOn('enter')) return
       e.preventDefault()
       doCommit()
+      // Commit-and-move (type-to-edit): Enter steps the active cell down,
+      // Shift+Enter up — like a spreadsheet. Single-cell edits only; a row
+      // session keeps its native field-to-field flow.
+      if (moveOnCommit && !isRowSession) runtime.moveActive(e.shiftKey ? -1 : 1, 0)
+    } else if (e.key === 'Tab' && moveOnCommit && !isRowSession) {
+      // Tab commits and steps right (Shift+Tab left), wrapping across rows.
+      e.preventDefault()
+      doCommit()
+      runtime.moveActive(0, e.shiftKey ? -1 : 1, { wrap: true })
     } else if (e.key === 'Escape') {
       e.preventDefault()
       doCancel()

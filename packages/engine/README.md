@@ -186,6 +186,7 @@ settings (e.g. `pagination={{ pageSize: 25 }}`). Follow a link for the full guid
 | [Batch editing + one `onSave`](#batch-editing-and-single-call-save) | `enableEditing: { mode: 'batch' }` | `false` |
 | [Validation (sync / async / cross-column)](#editing-and-validation) | `enableValidation` | `false` |
 | [Undo / redo](#undo-and-redo) | `enableUndoRedo` | `false` |
+| [Type-to-edit (spreadsheet entry)](#editing-and-validation) | `enableTypeToEdit` | `false` |
 
 #### ⌨️ Selection & clipboard
 
@@ -620,6 +621,7 @@ means *passing the object implies enabled*.
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
 | `enableCellSelection` | `boolean` | `false` | [Cell/range selection](#selection-keyboard-and-clipboard) + keyboard nav. |
+| `enableTypeToEdit` | `boolean` | `false` | [Type-to-edit](#editing-and-validation): type on a selected cell to overwrite; **Enter/Tab commit & move**. Needs `enableEditing` + `enableCellSelection`. |
 | `enableClipboard` | `boolean` | `false` | Copy/paste. Implies `enableCellSelection`; paste needs `enableEditing`. |
 | `enableCopyColumn` / `enableCopyRow` | `boolean` | `true` | Sub-toggles of clipboard for whole-column / whole-row copy. |
 | `enableContextMenu` | `boolean` | `false` | [Right-click menu](#selection-keyboard-and-clipboard) (X6) — Copy / Export / Autosize defaults; customize via `getContextMenuItems`. |
@@ -709,6 +711,11 @@ const table = useBstTable<Task>({
   - `'row'` — the action column's **Edit → Save** defers every cell edit until the row is saved (C2 ≡ I2).
   - `'batch'` — every edit stays a draft until an explicit save → see [Batch editing](#batch-editing-and-single-call-save).
 - **Save timing** — `saveOn: 'enter' | 'blur' | 'explicit'` (array allowed). Default `['enter','blur']`.
+- **Type-to-edit** — `enableTypeToEdit` (needs `enableCellSelection`) turns on spreadsheet-style entry:
+  **type on a selected cell to overwrite** it (the first keystroke seeds the editor via the cell type's
+  `parse`, so text and number cells work), then **Enter** commits and moves down (⇧ up) and **Tab**
+  commits and moves right (⇧ left). Non-text editors (dropdowns, date pickers) and keys the cell type
+  can't represent are left to double-click / F2.
 - **Invalid-commit policy** — `policy: 'blockCommitOnError'` (keep the value a dirty draft, default) or `'commitButFlag'` (write it, but flag it).
 - **Validation** runs in order: the cell-type validator → the `required` check (`cellMeta.required`)
   → your `meta.validate(value, ctx)`. Cross-column rules read siblings via `ctx.getSiblingValue(id)`;

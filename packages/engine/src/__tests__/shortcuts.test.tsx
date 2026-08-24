@@ -20,6 +20,7 @@ const KNOWN_FLAGS = [
   'enableCopyColumn',
   'enableCopyRow',
   'enableFind',
+  'enableTypeToEdit',
 ]
 
 const ALL_ON = Object.fromEntries(KNOWN_FLAGS.map((f) => [f, true]))

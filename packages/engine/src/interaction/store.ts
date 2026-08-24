@@ -42,6 +42,13 @@ export interface FindState {
 export interface InteractionState {
   /** The cell currently in inline edit mode, or `null`. */
   editingCell: { rowId: string; columnId: string } | null
+  /**
+   * Initial draft for a *type-to-edit* session (`enableTypeToEdit`) — set when a
+   * printable keystroke opens the editor so the first character overwrites the
+   * old value (Excel-style). The editor host reads it once at mount, only for the
+   * matching cell (single-cell edits, never a row session). `null` = no seed.
+   */
+  editSeed: { rowId: string; columnId: string; value: unknown } | null
   /** The row currently in a deferred row-edit session, or `null` (C2 ≡ I2). */
   rowSession: string | null
   /**
@@ -92,6 +99,7 @@ export interface InteractionState {
 
 export const initialInteractionState: InteractionState = {
   editingCell: null,
+  editSeed: null,
   rowSession: null,
   activeCell: null,
   anchorCell: null,

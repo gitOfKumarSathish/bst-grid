@@ -51,6 +51,27 @@ this project uses [Semantic Versioning](https://semver.org).
   control's value always matches an option. Engine-level fix — benefits both adapters, any consumer
   `pageSize`. Covered in `stickyHeader.test.tsx`.
 
+### Added — Type-to-edit (C5/C6): spreadsheet-style data entry
+- **`enableTypeToEdit`** (engine) — with cell selection + editing on, **start typing on a selected
+  cell to overwrite it**: a printable keystroke opens the inline editor **seeded with that character**
+  (via the cell type's `parse`, so text *and* number cells work). Off by default; a no-op unless both
+  `enableEditing` and `enableCellSelection` are on (resolved together on the runtime handle).
+- **Commit-and-move** — while editing, **Enter commits and moves down** (⇧ up) and **Tab commits and
+  moves right** (⇧ left, wrapping rows) — like a spreadsheet. Single-cell edits only; a row session
+  keeps its native field-to-field flow. Both route through the existing `commitCell`, so there is **no
+  new write path** (validation, dirty-tracking, batch/undo and any `onDataChange`/save hooks all fire
+  exactly as before).
+- **Safe seeding** — only **non-overlay** editors that expose `parse` (text / number) seed; keys the
+  cell type can't represent (e.g. a letter typed into a number cell → `NaN`) are **declined** rather
+  than opening an editor on a garbage value. Modifier chords (Ctrl+A select-all, Ctrl/Shift+Space
+  column/row select) still reach the nav handler unchanged.
+- **Discoverability** — three new **Edit** entries in the `showShortcuts` overlay (gated on
+  `enableTypeToEdit`); a **Type to edit** toggle in the settings sheet under **Editing** (disabled
+  until its prerequisites are on). Registered in the MCP rules corpus.
+- Tested in `typeToEdit.test.tsx` (seed text + number · decline NaN · Enter / Shift+Enter / Tab
+  commit-and-move · off when the flag or editing is absent · modifier chords unaffected). No API
+  break — purely additive.
+
 ## [0.41.1] — 2026-08-24
 ### Changed — neutral naming (docs, comments and shipped strings)
 - Bst-Table now describes its **own** capabilities in its **own** words. Every reference to a

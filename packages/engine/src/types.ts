@@ -181,6 +181,16 @@ export interface BstTableEngineToggles {
    */
   enableCellSelection?: boolean
   /**
+   * Type-to-edit — spreadsheet-style data entry layered on cell selection +
+   * editing. On a selected (not-yet-editing) cell: start typing a printable
+   * character to open the editor seeded with that character, overwriting the old
+   * value (via the cell type's `parse`, so text and number cells both work).
+   * Enter then commits and moves the active cell **down**; Tab commits and moves
+   * **right** (Shift reverses each). Needs both `enableEditing` and
+   * `enableCellSelection` — a no-op without them. Default: false (opt-in).
+   */
+  enableTypeToEdit?: boolean
+  /**
    * Clipboard copy / paste (Phase 3, H1–H4). Copy the selection as TSV
    * (Ctrl/Cmd+C); paste TSV from the active cell (Ctrl/Cmd+V) honouring
    * editability + validation. Implies `enableCellSelection`; paste additionally

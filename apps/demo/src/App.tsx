@@ -743,6 +743,7 @@ export default function App() {
     enableRowActions: true,
     // Phase 3
     enableCellSelection: true, // click / Shift-click + Arrow / Tab / Home / End / Ctrl+A
+    enableTypeToEdit: true, // type on a selected cell to overwrite · Enter/Tab commit & move
     enableClipboard: true, // Ctrl+C copies TSV · Ctrl+V pastes into editable cells
     enableRowSelection: true, // checkbox column + "n selected" chip
     enableUndoRedo: true, // Ctrl+Z / Ctrl+Y + toolbar buttons

@@ -228,7 +228,9 @@ export interface BstRuntime<TData extends RowData> {
   /** Resolved save triggers (`enter`/`blur`/`explicit`). The inline editor
    *  consults these before auto-committing on Enter or blur. */
   saveOn: SaveTrigger[]
-  startEditing: (rowId: string, columnId: string) => void
+  /** Open the inline editor. `seed` (type-to-edit) is the opening draft so the
+   *  first keystroke overwrites the value; omit for a plain edit on the value. */
+  startEditing: (rowId: string, columnId: string, seed?: unknown) => void
   cancelEditing: () => void
   setDraft: (rowId: string, columnId: string, value: unknown) => void
   commitCell: (rowId: string, columnId: string, value: unknown) => void
@@ -584,9 +586,16 @@ export function createRuntime<TData extends RowData>(
 
   /* ---------------------------------------------------------------- editing */
 
-  const startEditing = (rowId: string, columnId: string) => {
+  const startEditing = (rowId: string, columnId: string, seed?: unknown) => {
     if (!isCellEditable(rowId, columnId)) return
-    set((s) => ({ ...s, editingCell: { rowId, columnId } }))
+    // `seed` (type-to-edit) becomes the editor's opening draft so the first
+    // keystroke overwrites the value; absent, clear any stale seed so a plain
+    // Enter/F2/double-click edit opens on the existing value.
+    set((s) => ({
+      ...s,
+      editingCell: { rowId, columnId },
+      editSeed: seed === undefined ? null : { rowId, columnId, value: seed },
+    }))
   }
 
   const cancelEditing = () => {
