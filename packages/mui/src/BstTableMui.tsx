@@ -1119,8 +1119,8 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
             <Stack direction="row" sx={{ p: 1.5, gap: 1 }}>
               <Typography variant="caption" color="text.secondary" sx={{ flex: 1, alignSelf: 'center' }}>
                 {settings.overrideCount > 0
-                  ? `${settings.overrideCount} changed`
-                  : 'Saved to this browser'}
+                  ? `${settings.overrideCount} changed · saved automatically`
+                  : 'Feature toggles save automatically'}
               </Typography>
               <Button
                 size="small"
@@ -1133,32 +1133,44 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
             {gridState && (
               <>
                 <Divider />
-                <Stack direction="row" sx={{ p: 1.5, gap: 1, alignItems: 'center' }}>
+                {/* Stacked, not inline: the sheet is ~320px, so a caption sharing the
+                    row with two buttons wraps to four lines and squeezes both. */}
+                <Stack sx={{ p: 1.5, gap: 1 }}>
                   <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ flex: 1, alignSelf: 'center' }}
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: '0.75rem',
+                      letterSpacing: '0.07em',
+                      textTransform: 'uppercase',
+                      color: 'text.primary',
+                    }}
                   >
+                    Saved view
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
                     {viewJustSaved
                       ? 'View saved to this browser ✓'
                       : gridState.persist === false
-                        ? 'Save this arrangement to restore it next time'
-                        : 'This view is saved automatically'}
+                        ? 'Sort, filters and column layout — saved on click'
+                        : 'Sort, filters and column layout — saved automatically'}
                   </Typography>
-                  {gridState.persist === false && (
-                    <Button
-                      size="small"
-                      variant="contained"
-                      disableElevation
-                      startIcon={<SaveIcon fontSize="small" />}
-                      onClick={saveView}
-                    >
-                      Save view
+                  <Stack direction="row" sx={{ gap: 1, justifyContent: 'flex-end' }}>
+                    {gridState.persist === false && (
+                      <Button
+                        size="small"
+                        variant="contained"
+                        disableElevation
+                        startIcon={<SaveIcon fontSize="small" />}
+                        onClick={saveView}
+                        sx={{ whiteSpace: 'nowrap' }}
+                      >
+                        Save view
+                      </Button>
+                    )}
+                    <Button size="small" onClick={resetView} sx={{ whiteSpace: 'nowrap' }}>
+                      Reset view
                     </Button>
-                  )}
-                  <Button size="small" onClick={resetView}>
-                    Reset view
-                  </Button>
+                  </Stack>
                 </Stack>
               </>
             )}

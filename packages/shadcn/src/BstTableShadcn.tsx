@@ -1053,8 +1053,8 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
             <div className="sc-sheet-footer">
               <span className="sc-muted" style={{ flex: 1 }}>
                 {settings.overrideCount > 0
-                  ? `${settings.overrideCount} changed`
-                  : 'Saved to this browser'}
+                  ? `${settings.overrideCount} changed · saved automatically`
+                  : 'Feature toggles save automatically'}
               </span>
               <button
                 className="sc-btn"
@@ -1065,22 +1065,27 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
               </button>
             </div>
             {gridState && (
-              <div className="sc-sheet-footer">
-                <span className="sc-muted" style={{ flex: 1 }}>
+              /* Stacked, not inline: the sheet is ~320px, so a caption sharing the
+                 row with two buttons wraps to four lines and squeezes both. */
+              <div className="sc-sheet-footer sc-view-footer">
+                <div className="sc-view-heading">Saved view</div>
+                <span className="sc-muted">
                   {viewJustSaved
                     ? 'View saved to this browser ✓'
                     : gridState.persist === false
-                      ? 'Save this arrangement to restore it next time'
-                      : 'This view is saved automatically'}
+                      ? 'Sort, filters and column layout — saved on click'
+                      : 'Sort, filters and column layout — saved automatically'}
                 </span>
-                {gridState.persist === false && (
-                  <button className="sc-btn sc-btn-primary" onClick={saveView}>
-                    Save view
+                <div className="sc-view-actions">
+                  {gridState.persist === false && (
+                    <button className="sc-btn sc-btn-primary" onClick={saveView}>
+                      Save view
+                    </button>
+                  )}
+                  <button className="sc-btn" onClick={resetView}>
+                    Reset view
                   </button>
-                )}
-                <button className="sc-btn" onClick={resetView}>
-                  Reset view
-                </button>
+                </div>
               </div>
             )}
           </aside>

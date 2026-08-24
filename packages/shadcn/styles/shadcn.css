@@ -585,6 +585,28 @@
   border-top: 1px solid var(--sc-border);
 }
 
+/* Grid-state view controls (AG21) — caption on its own line, buttons right-aligned
+   below it, so the narrow sheet never squeezes "Save view" / "Reset view". */
+.sc-view-footer {
+  flex-direction: column;
+  align-items: stretch;
+}
+.sc-view-heading {
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--sc-fg);
+}
+.sc-view-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.sc-view-actions .sc-btn {
+  white-space: nowrap;
+}
+
 /* ------------------------- review-changes sheet (unsaved edits, old → new) */
 .sc-change-rowlabel {
   display: flex;

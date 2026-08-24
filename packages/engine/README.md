@@ -1224,6 +1224,14 @@ function Grid() {
 **Save view** button (plus **Reset view**), so the user persists the arrangement on click rather
 than on every change — the adapters call `saveGridState` / `resetGridState` + `clearGridState` for you.
 
+> **Two stores, not one.** Grid state (this API, `bst-table:state:<key>`) holds the **view** — sort ·
+> filters · column layout · grouping. The settings sheet (`showSettings`,
+> `bst-table:settings:<key>`) holds which **features** are on, and saves **automatically** on every
+> change. They are independent: **Save view** does not capture feature toggles, and each has its own
+> Reset. The adapters label both halves in the sheet so the difference is visible to end-users.
+> Both are **per browser** — swap `gridState.storage` (any `BstGridStateStorage`) or drive
+> `getGridState` / `initialState` yourself to put the view behind a user account instead.
+
 | Export | Kind | Purpose |
 | --- | --- | --- |
 | `getGridState(table, select?)` | fn | Snapshot the current view as `BstGridState`. |

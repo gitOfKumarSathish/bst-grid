@@ -14,7 +14,7 @@ import {
   BstPdfThumbnailerProvider,
   createPdfjsThumbnailer,
 } from '@bloomskill/table-engine';
-import type { BstTableColumn, BstFormatRule } from '@bloomskill/table-engine';
+import type { BstTableColumn, BstFormatRule, BstGridStateStorage } from '@bloomskill/table-engine';
 // pdf.js powers the in-cell PDF thumbnails (B5). The engine never imports pdf.js —
 // the app owns it (and its worker), then injects a renderer via the provider.
 import * as pdfjsLib from 'pdfjs-dist';
@@ -532,6 +532,34 @@ function OverlaysSection() {
 
 const GRID_STATE_KEY = 'demo-people-view';
 
+/**
+ * A `localStorage` wrapper that logs every grid-state write/clear to the console.
+ * `gridState.storage` is a public option (`BstGridStateStorage`), so this needs no
+ * library change — click **Save view** and the exact persisted snapshot is logged.
+ */
+function loggingStorage(label: string): BstGridStateStorage {
+  return {
+    getItem: (k) => {
+      const raw = window.localStorage.getItem(k);
+      console.log(`[AG21] ${label} · restore ←`, k, raw ? JSON.parse(raw) : null);
+      return raw;
+    },
+    setItem: (k, v) => {
+      console.log(`[AG21] ${label} · Save view →`, k, JSON.parse(v));
+      window.localStorage.setItem(k, v);
+    },
+    removeItem: (k) => {
+      console.log(`[AG21] ${label} · Reset view → cleared`, k);
+      window.localStorage.removeItem(k);
+    },
+  };
+}
+
+// Module-level so the object identity is stable across renders.
+const muiViewStorage = loggingStorage('MUI');
+const scViewStorage = loggingStorage('shadcn');
+const sectionViewStorage = loggingStorage('AG21 section');
+
 function GridStateSection() {
   const [nonce, setNonce] = React.useState(0);
   const [stored, setStored] = React.useState('');
@@ -577,7 +605,7 @@ function GridStateSection() {
             data={people}
             columns={gsColumns}
             getRowId={(r) => r.id}
-            gridState={{ key: GRID_STATE_KEY, persist: false }}
+            gridState={{ key: GRID_STATE_KEY, persist: false, storage: sectionViewStorage }}
             showSettings={{ persistKey: 'demo-gridstate' }}
             enableColumnPinning
             enableColumnOrdering
@@ -901,6 +929,7 @@ export default function App() {
             onConditionalFormatsChange={setCfRules}
             enableExport={{ fileName: 'people' }} // Phase 5 (AG1–AG3): CSV / Excel / Print toolbar menu
             showSettings={{ persistKey: 'demo-mui' }}
+            gridState={{ key: 'demo-mui-view', persist: false, storage: muiViewStorage }} // AG21: ⚙ sheet footer → Save view / Reset view
             showShortcuts // ⌨ keyboard-shortcuts overlay (also opens on ?)
           />
         </section>
@@ -921,6 +950,7 @@ export default function App() {
             onConditionalFormatsChange={setCfRules}
             enableExport={{ fileName: 'people' }} // Phase 5 (AG1–AG3): CSV / Excel / Print toolbar menu
             showSettings={{ persistKey: 'demo-sc' }}
+            gridState={{ key: 'demo-sc-view', persist: false, storage: scViewStorage }} // AG21: ⚙ sheet footer → Save view / Reset view
             showShortcuts // ⌨ keyboard-shortcuts overlay (also opens on ?)
           />
         </section>

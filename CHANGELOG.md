@@ -9,6 +9,8 @@ this project uses [Semantic Versioning](https://semver.org).
 > affected package README(s) **and** bump the version, in the same change.
 
 ## [Unreleased]
+
+## [0.41.0] — 2026-08-24
 ### Added — Save view / Reset view controls in the settings sheet (AG21)
 - The **settings-sheet footer** now shows grid-state **view** controls in **both** adapters when
   `gridState` is configured: a **Reset view** button always, and a **Save view** button in
@@ -22,6 +24,19 @@ this project uses [Semantic Versioning](https://semver.org).
   MCP-rules change. The demo's **Grid state** section now uses `persist: false` + `showSettings` to
   show it live. Tested in `mui.test.tsx` + `shadcn.test.tsx` (Save writes the snapshot, Reset clears
   it; auto mode shows Reset view but not Save view).
+- **Sheet footer is now stacked, and says which half saves how.** The view controls previously shared
+  one flex row with their caption, so in the ~320px sheet the caption wrapped to four lines and
+  squeezed both buttons. Caption now sits on its own line above a right-aligned button row
+  (`white-space: nowrap`), under a **"Saved view"** heading matching the sheet's other section
+  headings. Captions name what each half covers and how it saves — feature toggles read
+  *"saved automatically"*, the view reads *"Sort, filters and column layout — saved on click"* (or
+  *"saved automatically"* in auto mode) — because the two persist to **separate** keys
+  (`bst-table:settings:*` auto, `bst-table:state:*` manual) with separate Resets, which read as a bug
+  when unlabelled. shadcn adds `.sc-view-footer` / `.sc-view-heading` / `.sc-view-actions`.
+- **Demo:** the primary **MUI** and **shadcn** grids now pass `gridState` too, so the view controls
+  are demonstrable on the main tables (own keys, `persist: false`). Both — and the AG21 section —
+  wrap `localStorage` in a small logging `gridState.storage`, so clicking **Save view** logs the exact
+  persisted snapshot to the console. Uses the public `BstGridStateStorage` contract; no library change.
 
 ## [0.40.0] — 2026-08-20
 ### Added — Row numbers (AG9) · loading/error overlays (AG23) · auto-generate columns (AG27)
