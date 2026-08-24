@@ -516,6 +516,7 @@ range selection, clipboard, batch editing, grouping + aggregation, master-detail
 advanced-filter builder, server row model — all shipped **free**. The remaining gaps schedule as four
 new phases (easy → hard). Full analysis: [`docs/capability-roadmap.md`](docs/capability-roadmap.md);
 status IDs **`X1–X29`** in [`COVERAGE.md`](COVERAGE.md). These map to Milestones A–D in the roadmap doc.
+The open items as a tick-off checklist (pick-up order): [`docs/backlog.md`](docs/backlog.md).
 
 **Phase 4 remainder (parity-relevant, already in Phase 4 scope):** i18n / localeText (`X19` — ⚪ **now optional**, see below) ·
 a11y / ARIA grid audit (`X20`) · grid-state save/restore API (`X21` ✅) · live / WebSocket updates —

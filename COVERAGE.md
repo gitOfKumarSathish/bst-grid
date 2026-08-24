@@ -8,6 +8,9 @@ engine + adapter source. Re-run when a version ships._
 > **extended capability matrix** (`X1–X29`, at the bottom) — capabilities beyond the original spec,
 > from the 2026-08-13 market review ([`docs/capability-roadmap.md`](docs/capability-roadmap.md)),
 > phased in `Plan.md` PART 3 "Phases 5–8".
+>
+> **Working backlog** — the open items (5 partial + 8 pending) as a tick-off checklist, in
+> pick-up order: [`docs/backlog.md`](docs/backlog.md). This matrix stays the status source of truth.
 
 **Legend:** ✅ built · 🟡 partial · ❌ missing (needs the Phase-4 foundation / a new dep) · ⏭️ deliberately skipped · ⚪ optional / out of scope (kept, not scheduled)
 **Tally:** ✅ 55 built · 🟡 2 partial · ❌ 1 missing (of 58). _(**B5 now ✅** — in-cell **PDF thumbnail** (`cellMeta.pdfThumbnail`, rendered by **pdf.js** via an injected renderer — engine stays dep-free), the last B5 gap; I3 file ops ✅ — formal `DataSource.uploadFile`/`deleteFile`/`getFileUrl` verbs + `createFileHandlers` bridge on top of the cell-level upload/delete; D1 row/column virtualization + A2 infinite scroll shipped on `@tanstack/react-virtual` → both ✅, leaving I5 the only ❌; v0.30.0 — batch editing + `getChangeSet` + single-call `onSave` → I4 now partial; v0.28.0 server DataSource foundation → A3 server pagination done; v0.25.0 G2 row resize; v0.23.0 B1 QR/barcode + J2 rich-text)_
