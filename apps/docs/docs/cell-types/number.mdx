@@ -1,0 +1,35 @@
+---
+id: number
+title: number
+sidebar_label: number
+---
+
+# `number`
+
+locale number / currency / percent.
+
+## At a glance
+
+| | |
+| --- | --- |
+| Renders | locale number / currency / percent |
+| Value shape | `number \| null` |
+| Editable | ✅ number input |
+| Key `cellMeta` | precision, currency, useGrouping, required, pattern |
+
+## Use it
+
+```tsx
+const columns: BstTableColumn<Row>[] = [
+  { id: 'x', accessorKey: 'x', header: 'X', meta: { type: 'number', /* cellMeta below */ } },
+]
+```
+
+## `cellMeta` options
+
+**`number`** — also honours `meta.format` (`'currency'` / `'percent'` / `Intl.NumberFormatOptions`) and `meta.locale`.
+| `cellMeta` | Type | Effect |
+| --- | --- | --- |
+| `precision` | `number` | Fixed min+max fraction digits. |
+| `currency` | `string` (ISO 4217) | Currency format, e.g. `'USD'`, `'INR'`. |
+| `useGrouping` | `boolean` | Thousands separators on/off. |

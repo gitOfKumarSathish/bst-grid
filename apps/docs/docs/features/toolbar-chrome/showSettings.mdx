@@ -1,0 +1,35 @@
+---
+id: showSettings
+title: Runtime settings sheet
+sidebar_label: showSettings
+---
+
+# Runtime settings sheet
+
+Prop `showSettings` — adapter chrome, default `false`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `show*` (chrome, resolved in the adapter) |
+| Type | `boolean \| BstSettingsOptions` |
+| Default | `false` |
+| Status | ✅ done |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  showSettings
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- Renders a gear → a sheet where END-USERS flip this grid's features on/off at runtime, persisted to localStorage.
+- Chrome flag: it only renders its control when the matching `enable*` behaviour is on.

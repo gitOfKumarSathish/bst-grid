@@ -1,0 +1,31 @@
+---
+id: enableGlobalFilter
+title: Global filter
+sidebar_label: enableGlobalFilter
+---
+
+# Global filter
+
+Prop `enableGlobalFilter` — engine behaviour, default `true`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean` |
+| Default | `true` |
+| Status | ✅ done |
+| Settings sheet | Data operations |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableGlobalFilter
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.

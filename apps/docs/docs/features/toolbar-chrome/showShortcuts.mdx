@@ -1,0 +1,35 @@
+---
+id: showShortcuts
+title: Keyboard-shortcuts overlay
+sidebar_label: showShortcuts
+---
+
+# Keyboard-shortcuts overlay
+
+Prop `showShortcuts` — adapter chrome, default `false`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `show*` (chrome, resolved in the adapter) |
+| Type | `boolean` |
+| Default | `false` |
+| Status | ✅ done |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  showShortcuts
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- A "?" button + dep-free overlay listing the keyboard shortcuts ACTIVE on this grid — filtered by enableCellSelection / enableClipboard / enableEditing / enableUndoRedo / copy toggles. Also opens on the ? key. Backed by BST_SHORTCUTS_REGISTRY + resolveActiveShortcuts.
+- Chrome flag: it only renders its control when the matching `enable*` behaviour is on.

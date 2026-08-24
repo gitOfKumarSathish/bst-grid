@@ -1,0 +1,35 @@
+---
+id: showSearch
+title: Global search box
+sidebar_label: showSearch
+---
+
+# Global search box
+
+Prop `showSearch` — adapter chrome, default `true`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `show*` (chrome, resolved in the adapter) |
+| Type | `boolean` |
+| Default | `true` |
+| Status | ✅ done |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableGlobalFilter          // chrome is a no-op without its behaviour flag
+  showSearch
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- **Requires** `enableGlobalFilter` to be on — this flag is a no-op otherwise.

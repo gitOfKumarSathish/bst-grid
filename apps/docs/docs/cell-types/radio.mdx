@@ -1,0 +1,33 @@
+---
+id: radio
+title: radio
+sidebar_label: radio
+---
+
+# `radio`
+
+badge.
+
+## At a glance
+
+| | |
+| --- | --- |
+| Renders | badge |
+| Value shape | `string \| null` |
+| Editable | ✅ radio group |
+| Key `cellMeta` | layout |
+
+## Use it
+
+```tsx
+const columns: BstTableColumn<Row>[] = [
+  { id: 'x', accessorKey: 'x', header: 'X', meta: { type: 'radio', /* cellMeta below */ } },
+]
+```
+
+## `cellMeta` options
+
+**`radio`**
+| `cellMeta` | Type | Effect |
+| --- | --- | --- |
+| `layout` | `'vertical' \| 'horizontal'` | Radio arrangement. Default `'vertical'`. |

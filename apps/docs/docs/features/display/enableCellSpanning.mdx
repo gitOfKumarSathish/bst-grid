@@ -1,0 +1,37 @@
+---
+id: enableCellSpanning
+title: Cell spanning (A5)
+sidebar_label: enableCellSpanning
+---
+
+# Cell spanning (A5)
+
+Prop `enableCellSpanning` — engine behaviour, default `false`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean` |
+| Default | `false` |
+| Status | ✅ done |
+| Settings sheet | Display |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableCellSpanning
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Options
+
+| Option | Notes |
+| --- | --- |
+| `getCellSpan or meta.rowSpan` | spanning is opt-in per cell; without either nothing merges |

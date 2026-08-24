@@ -1,0 +1,35 @@
+---
+id: enableColumnFilterRow
+title: Per-column filter row ("dual filter")
+sidebar_label: enableColumnFilterRow
+---
+
+# Per-column filter row ("dual filter")
+
+Prop `enableColumnFilterRow` — engine behaviour, default `false`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean` |
+| Default | `false` |
+| Status | ✅ done (Phase 3; always-in-settings v0.29.0) |
+| Settings sheet | Columns |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableColumnFilterRow
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- **Requires** `enableColumnFilters` to be on — this flag is a no-op otherwise.

@@ -1,0 +1,8 @@
+{
+  "label": "Performance",
+  "position": 7,
+  "link": {
+    "type": "doc",
+    "id": "features/performance/index"
+  }
+}

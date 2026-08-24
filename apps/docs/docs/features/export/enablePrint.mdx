@@ -1,0 +1,36 @@
+---
+id: enablePrint
+title: Print (X3)
+sidebar_label: enablePrint
+---
+
+# Print (X3)
+
+Prop `enablePrint` — engine behaviour, default `true`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean` |
+| Default | `true` |
+| Status | ✅ done |
+| Settings sheet | Export |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enablePrint
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- **Requires** `enableExport` to be on — this flag is a no-op otherwise.
+- Defaults to ON — set false to hide the Print item / no-op `runtime.printTable`.

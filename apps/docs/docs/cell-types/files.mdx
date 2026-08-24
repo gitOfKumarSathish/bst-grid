@@ -1,0 +1,39 @@
+---
+id: files
+title: files
+sidebar_label: files
+---
+
+# `files`
+
+image thumbnail / PDF thumbnail (pdfThumbnail) / icon + name · click to preview (image inline, PDF native viewer).
+
+## At a glance
+
+| | |
+| --- | --- |
+| Renders | image thumbnail / PDF thumbnail (pdfThumbnail) / icon + name · click to preview (image inline, PDF native viewer) |
+| Value shape | `FileRef[] ({ name, url, thumbnailUrl?, contentType? })` |
+| Editable | popup: add/remove (adapters) |
+| Key `cellMeta` | preview, pdfThumbnail, onUpload, onDelete, accept |
+
+## Use it
+
+```tsx
+const columns: BstTableColumn<Row>[] = [
+  { id: 'x', accessorKey: 'x', header: 'X', meta: { type: 'files', /* cellMeta below */ } },
+]
+```
+
+## `cellMeta` options
+
+**`files`** — an attachments cell (images, PDFs, any file). The full how-to is
+[**Files columns — images & PDFs**](#files-columns--images--pdfs) below; in short, the value is a
+`FileRef[]`, image files thumbnail automatically, and PDFs thumbnail once you wire pdf.js.
+| `cellMeta` | Type | Effect |
+| --- | --- | --- |
+| `preview` | `boolean` | Click-to-preview. Default `true` (a file needs a `url` to preview). |
+| `pdfThumbnail` | `boolean \| PdfThumbnailRenderer` | Render PDFs as an in-cell page-1 thumbnail via **pdf.js**. `true` uses the renderer from `<BstPdfThumbnailerProvider>`; a function is a per-column renderer. Default `false`. Falls back to the icon with no renderer; `thumbnailUrl` wins when present. |
+| `onUpload` | `(file: File) => FileRef \| Promise<FileRef>` | Called for each picked file — upload it and return the stored ref (busy state shown). Without it, the editor keeps a local object URL so preview still works offline. |
+| `onDelete` | `(file: FileRef) => void \| Promise<void>` | Called before a file is removed (e.g. delete it on the server). |
+| `accept` / `multiple` | `string` / `boolean` | Passed to the file `<input>`. |

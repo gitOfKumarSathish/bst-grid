@@ -1,0 +1,8 @@
+{
+  "label": "Selection & clipboard",
+  "position": 5,
+  "link": {
+    "type": "doc",
+    "id": "features/selection-clipboard/index"
+  }
+}

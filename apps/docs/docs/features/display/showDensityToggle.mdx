@@ -1,0 +1,35 @@
+---
+id: showDensityToggle
+title: Density toggle
+sidebar_label: showDensityToggle
+---
+
+# Density toggle
+
+Prop `showDensityToggle` — adapter chrome, default `false`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `show*` (chrome, resolved in the adapter) |
+| Type | `boolean` |
+| Default | `false` |
+| Status | ✅ done (Phase 3) |
+| Settings sheet | Display |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  showDensityToggle
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- Chrome flag: it only renders its control when the matching `enable*` behaviour is on.

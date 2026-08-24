@@ -1,0 +1,26 @@
+---
+id: longText
+title: longText
+sidebar_label: longText
+---
+
+# `longText`
+
+clamped multi-line text.
+
+## At a glance
+
+| | |
+| --- | --- |
+| Renders | clamped multi-line text |
+| Value shape | `string` |
+| Editable | ✅ textarea → popup (adapters) |
+| Key `cellMeta` | required |
+
+## Use it
+
+```tsx
+const columns: BstTableColumn<Row>[] = [
+  { id: 'x', accessorKey: 'x', header: 'X', meta: { type: 'longText', /* cellMeta below */ } },
+]
+```

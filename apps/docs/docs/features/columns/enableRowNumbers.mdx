@@ -1,0 +1,35 @@
+---
+id: enableRowNumbers
+title: Row-number column (X9)
+sidebar_label: enableRowNumbers
+---
+
+# Row-number column (X9)
+
+Prop `enableRowNumbers` — engine behaviour, default `false`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean` |
+| Default | `false` |
+| Status | ✅ done |
+| Settings sheet | Columns |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableRowNumbers
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- Prepends a leading, non-interactive `#` column numbering the current view — continuous across pages, reflecting sort + filter. It stays out of sorting, filtering, the columns menu, the filter row and export. Override the header via `rowNumberHeader`.

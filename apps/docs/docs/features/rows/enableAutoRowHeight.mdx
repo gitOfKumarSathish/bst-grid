@@ -1,0 +1,35 @@
+---
+id: enableAutoRowHeight
+title: Auto row height (X26)
+sidebar_label: enableAutoRowHeight
+---
+
+# Auto row height (X26)
+
+Prop `enableAutoRowHeight` — engine behaviour, default `false`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean` |
+| Default | `false` |
+| Status | ✅ done |
+| Settings sheet | Rows |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableAutoRowHeight
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- Body cells wrap and each row grows to fit its content — browser-measured, no JS. Opt individual columns in/out with `meta.wrapText`. A manually-resized row (`enableRowResize`) keeps its set height and clips the wrapped content.

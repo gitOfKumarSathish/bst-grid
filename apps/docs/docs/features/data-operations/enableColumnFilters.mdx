@@ -1,0 +1,31 @@
+---
+id: enableColumnFilters
+title: Column filters
+sidebar_label: enableColumnFilters
+---
+
+# Column filters
+
+Prop `enableColumnFilters` — engine behaviour, default `true`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean` |
+| Default | `true` |
+| Status | ✅ done (Phase 3) |
+| Settings sheet | Data operations |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableColumnFilters
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.

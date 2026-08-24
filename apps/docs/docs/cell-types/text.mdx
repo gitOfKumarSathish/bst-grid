@@ -1,0 +1,26 @@
+---
+id: text
+title: text
+sidebar_label: text
+---
+
+# `text`
+
+single-line text, ellipsis + title tooltip.
+
+## At a glance
+
+| | |
+| --- | --- |
+| Renders | single-line text, ellipsis + title tooltip |
+| Value shape | `string` |
+| Editable | ✅ input |
+| Key `cellMeta` | required, pattern |
+
+## Use it
+
+```tsx
+const columns: BstTableColumn<Row>[] = [
+  { id: 'x', accessorKey: 'x', header: 'X', meta: { type: 'text', /* cellMeta below */ } },
+]
+```

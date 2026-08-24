@@ -1,0 +1,37 @@
+---
+id: enableUndoRedo
+title: Undo/redo (C5)
+sidebar_label: enableUndoRedo
+---
+
+# Undo/redo (C5)
+
+Prop `enableUndoRedo` — engine behaviour, default `false`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean` |
+| Default | `false` |
+| Status | ✅ done (Phase 3) |
+| Settings sheet | Editing |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableUndoRedo
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Options
+
+| Option | Notes |
+| --- | --- |
+| `onDataChange` | undo/redo is snapshot-based and replays through your data setter |

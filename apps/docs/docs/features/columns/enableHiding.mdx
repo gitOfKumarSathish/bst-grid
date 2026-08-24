@@ -1,0 +1,31 @@
+---
+id: enableHiding
+title: Column visibility
+sidebar_label: enableHiding
+---
+
+# Column visibility
+
+Prop `enableHiding` — engine behaviour, default `true`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean` |
+| Default | `true` |
+| Status | ✅ done |
+| Settings sheet | Columns |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableHiding
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.

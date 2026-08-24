@@ -1,0 +1,31 @@
+---
+id: pagination
+title: Pagination (logic)
+sidebar_label: pagination
+---
+
+# Pagination (logic)
+
+Prop `pagination` — engine behaviour, default `true`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean \| {pageSize}` |
+| Default | `true` |
+| Status | ✅ done |
+| Settings sheet | Data operations |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  pagination={/* boolean | {pageSize} */}
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.

@@ -1,0 +1,34 @@
+---
+id: multiSelect
+title: multiSelect
+sidebar_label: multiSelect
+---
+
+# `multiSelect`
+
+chips + +N more overflow.
+
+## At a glance
+
+| | |
+| --- | --- |
+| Renders | chips + +N more overflow |
+| Value shape | `string[]` |
+| Editable | ✅ checkbox dropdown |
+| Key `cellMeta` | maxChips, fitChips |
+
+## Use it
+
+```tsx
+const columns: BstTableColumn<Row>[] = [
+  { id: 'x', accessorKey: 'x', header: 'X', meta: { type: 'multiSelect', /* cellMeta below */ } },
+]
+```
+
+## `cellMeta` options
+
+**`multiSelect`**
+| `cellMeta` | Type | Effect |
+| --- | --- | --- |
+| `maxChips` | `number` | Max chips before `+N more`. Default `3`. |
+| `fitChips` | `boolean` | Width-aware: show as many chips as the column width fits, fold the rest into `+N more` (widen → more chips). `maxChips` then acts as an upper cap. |

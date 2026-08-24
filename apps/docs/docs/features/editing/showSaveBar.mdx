@@ -1,0 +1,35 @@
+---
+id: showSaveBar
+title: Save/Discard bar
+sidebar_label: showSaveBar
+---
+
+# Save/Discard bar
+
+Prop `showSaveBar` — adapter chrome, default `follows enableEditing`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `show*` (chrome, resolved in the adapter) |
+| Type | `boolean` |
+| Default | `follows enableEditing` |
+| Status | ✅ done (Phase 2) |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableEditing          // chrome is a no-op without its behaviour flag
+  showSaveBar
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- **Requires** `enableEditing` to be on — this flag is a no-op otherwise.

@@ -1,0 +1,157 @@
+---
+id: types
+title: Types
+sidebar_label: Types
+sidebar_position: 4
+---
+
+# Types
+
+Type aliases and unions.
+
+## BstExportFormat
+
+Which export formats a grid offers (X1–X3).
+
+```ts
+type BstExportFormat = 'csv' | 'excel' | 'print';
+```
+
+## BstExportScope
+
+Row scope for an export — every filtered+sorted row (all pages) or just the current page.
+
+```ts
+type BstExportScope = 'all' | 'page';
+```
+
+## BstFormatScope
+
+Conditional formatting (K3) — a declarative rule engine that maps a condition to a cell/row class + style (and, for F5, optionally blanks the cell). Rules reuse the E3 operator machinery (`{ op, value }` conditions via `evalCondition`) or a free predicate. Evaluated at render time and merged into the same class/style path as the `classNames` / `styles` slots — so it composes with a theme rather than replacing it. Feed rules via `conditionalFormats`; build them with `<BstConditionalFormatBuilder>`.
+
+```ts
+type BstFormatScope = 'cell' | 'row';
+```
+
+## BstGridStateKey
+
+The view-state slices a snapshot can carry.
+
+```ts
+type BstGridStateKey = 'sorting' | 'columnFilters' | 'globalFilter' | 'columnOrder' | 'columnSizing' | 'columnVisibility' | 'columnPinning' | 'grouping' | 'expanded' | 'rowPinning' | 'rowSelection' | 'pagination';
+```
+
+## BstIconOverrides
+
+```ts
+type BstIconOverrides = Partial<BstIcons>;
+```
+
+## BstPageSizeOption
+
+Pagination chrome helpers — shared, pure logic for the adapters' "Rows per page" dropdown so MUI and shadcn stay identical. Lets `pageSizeOptions` carry an `'all'` entry that shows every row (the "total number of rows" choice), on top of the plain numeric sizes.
+
+```ts
+type BstPageSizeOption = number | 'all';
+```
+
+## BstSettingKey
+
+Runtime settings (§12 chrome). The adapters render a gear → a side "sheet" where the end-user flips this grid's features on/off at runtime, **per table**, persisted to `localStorage`. The logic is pure/headless and lives here so both adapters share one model; each renders it in its own idiom (MUI Drawer, shadcn slide-over). Nothing here imports a UI library.
+
+```ts
+type BstSettingKey = keyof BstTableEngineToggles | ExtraEngineSettingKey | ChromeSettingKey;
+```
+
+## BstSettingsOverrides
+
+Overrides map — a subset of keys the user has explicitly set.
+
+```ts
+type BstSettingsOverrides = Partial<Record<BstSettingKey, boolean>>;
+```
+
+## BstTableColumn
+
+A Bst-Table column definition, pre-bound to the engine's feature set.
+
+```ts
+type BstTableColumn<TData extends RowData> = ColumnDef<BstTableFeatures, TData, any>;
+```
+
+## BstTableFeatures
+
+```ts
+type BstTableFeatures = typeof bstTableFeatures;
+```
+
+## BstTableInstance
+
+```ts
+type BstTableInstance<TData extends RowData> = ReturnType<typeof useBstTable<TData>>;
+```
+
+## CommitPolicy
+
+```ts
+type CommitPolicy = 'blockCommitOnError' | 'commitButFlag';
+```
+
+## FieldErrorLevel
+
+Cell-type registry contract (Plan.md §2.3). A `CellType` bundles the read renderer (hot path, plain DOM — NO MUI), an optional edit renderer (adapters own this), parse/format (clipboard + text I/O) and a validator. Types are selected per column via `columnDef.meta.type` and resolved once per column. Everything here is framework-owned and UI-agnostic so it stays tsc-clean and lets MUI / shadcn adapters implement the same contract (§2.6).
+
+```ts
+type FieldErrorLevel = 'error' | 'warning';
+```
+
+## FieldPattern
+
+What `cellMeta.pattern` accepts.
+
+```ts
+type FieldPattern = string | RegExp | FieldFormat;
+```
+
+## IconComponent
+
+```ts
+type IconComponent = React.ComponentType<IconProps>;
+```
+
+## InteractionStore
+
+```ts
+type InteractionStore = Store<InteractionState>;
+```
+
+## PdfThumbnailRenderer
+
+In-cell PDF thumbnails (B5) via **pdf.js**. Rendering a PDF's first page as a small raster can't be done reliably with the browser's native viewer (Chrome won't paint a PDF in a tiny `<iframe>`), so the crisp path is pdf.js — the tool `CLAUDE.md` §6 always named for this. The engine stays **dependency-free**: it never imports `pdfjs-dist`. Instead the consumer creates a renderer with `createPdfjsThumbnailer` (passing their own pdf.js, so *they* own the worker setup their bundler needs) and supplies it through `BstPdfThumbnailerProvider` — or per column via `cellMeta.pdfThumbnail`. The `files` cell then renders page 1 to an `<img>`.
+
+```ts
+type PdfThumbnailRenderer = (url: string, size: {
+    width: number;
+    height: number;
+}) => Promise<string | null>;
+```
+
+## QrEcLevel
+
+Dependency-free QR Code encoder (byte mode, versions 1–10, EC levels L/M/Q/H). Produces the module matrix; the `qr` cell type renders it to inline SVG so a QR cell needs no runtime dependency. Verified bit-for-bit against the `qrcode` reference library in tests (a dev-only dependency). Follows ISO/IEC 18004.
+
+```ts
+type QrEcLevel = 'L' | 'M' | 'Q' | 'H';
+```
+
+## SaveTrigger
+
+```ts
+type SaveTrigger = 'enter' | 'blur' | 'explicit';
+```
+
+## ShortcutCategory
+
+```ts
+type ShortcutCategory = 'Navigate' | 'Edit' | 'Clipboard' | 'History';
+```

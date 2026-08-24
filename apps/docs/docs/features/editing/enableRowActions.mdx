@@ -1,0 +1,41 @@
+---
+id: enableRowActions
+title: Row add/delete/duplicate
+sidebar_label: enableRowActions
+---
+
+# Row add/delete/duplicate
+
+Prop `enableRowActions` — engine behaviour, default `false`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean` |
+| Default | `false` |
+| Status | ✅ done (Phase 2) |
+| Settings sheet | Editing |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableRowActions
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Options
+
+| Option | Notes |
+| --- | --- |
+| `onDataChange` | add/delete/duplicate must write back to your data |
+
+## Behavior & interactions
+
+- Supply `createRow` to control the shape of a newly added row.

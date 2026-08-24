@@ -1,0 +1,42 @@
+---
+id: enableBatchEditing
+title: Batch-editing runtime switch
+sidebar_label: enableBatchEditing
+---
+
+# Batch-editing runtime switch
+
+Prop `enableBatchEditing` — engine behaviour, default `— (follows enableEditing.mode)`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean` |
+| Default | `— (follows enableEditing.mode)` |
+| Status | ✅ done |
+| Settings sheet | Editing |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableBatchEditing
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Options
+
+| Option | Notes |
+| --- | --- |
+| `onSave` | batch mode defers every edit to one explicit save; without `onSave` nothing is persisted |
+
+## Behavior & interactions
+
+- **Requires** `enableEditing` to be on — this flag is a no-op otherwise.
+- Overrides `enableEditing.mode` at runtime. `onSave` fires ONCE per save action with the whole change set — make one backend request from it, never one per cell.

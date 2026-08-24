@@ -1,0 +1,35 @@
+---
+id: showExport
+title: Export menu
+sidebar_label: showExport
+---
+
+# Export menu
+
+Prop `showExport` — adapter chrome, default `follows enableExport`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `show*` (chrome, resolved in the adapter) |
+| Type | `boolean` |
+| Default | `follows enableExport` |
+| Status | ✅ done |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableExport          // chrome is a no-op without its behaviour flag
+  showExport
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- **Requires** `enableExport` to be on — this flag is a no-op otherwise.

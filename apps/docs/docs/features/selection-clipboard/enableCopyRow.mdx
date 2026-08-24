@@ -1,0 +1,36 @@
+---
+id: enableCopyRow
+title: Copy row (H2)
+sidebar_label: enableCopyRow
+---
+
+# Copy row (H2)
+
+Prop `enableCopyRow` — engine behaviour, default `true`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean` |
+| Default | `true` |
+| Status | ✅ done |
+| Settings sheet | Selection & clipboard |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableCopyRow
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- **Requires** `enableClipboard` to be on — this flag is a no-op otherwise.
+- Defaults to ON — set false to disable Shift+Space row copy while keeping the rest of the clipboard.

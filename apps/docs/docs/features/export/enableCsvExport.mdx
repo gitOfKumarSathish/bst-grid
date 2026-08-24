@@ -1,0 +1,36 @@
+---
+id: enableCsvExport
+title: CSV export (X1)
+sidebar_label: enableCsvExport
+---
+
+# CSV export (X1)
+
+Prop `enableCsvExport` — engine behaviour, default `true`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean` |
+| Default | `true` |
+| Status | ✅ done |
+| Settings sheet | Export |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableCsvExport
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- **Requires** `enableExport` to be on — this flag is a no-op otherwise.
+- Defaults to ON — set false to hide the CSV item / no-op `runtime.exportCsv` while keeping Excel + Print.

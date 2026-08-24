@@ -1,0 +1,22 @@
+---
+id: index
+title: Editing
+sidebar_label: Overview
+---
+
+# Editing
+
+Inline, row and batch editing, validation and undo/redo.
+
+| Feature | Flag | Default |
+| --- | --- | --- |
+| [Batch-editing runtime switch](./enableBatchEditing) | `enableBatchEditing` | `— (follows enableEditing.mode)` |
+| [Inline editing](./enableEditing) | `enableEditing` | `false` |
+| [Batch editing + single-call save (C2/I2/I4)](./enableEditing) | `enableEditing` | `— (opt-in)` |
+| [Row add/delete/duplicate](./enableRowActions) | `enableRowActions` | `false` |
+| [Undo/redo (C5)](./enableUndoRedo) | `enableUndoRedo` | `false` |
+| [Validation](./enableValidation) | `enableValidation` | `false` |
+| [Add-row button](./showAddRow) | `showAddRow` | `follows enableRowActions` |
+| [Review-changes sheet](./showChangesSheet) | `showChangesSheet` | `follows mode: 'batch'` |
+| [Save/Discard bar](./showSaveBar) | `showSaveBar` | `follows enableEditing` |
+| [Undo/Redo buttons](./showUndoRedo) | `showUndoRedo` | `follows enableUndoRedo` |

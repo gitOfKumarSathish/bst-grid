@@ -1,0 +1,35 @@
+---
+id: qr
+title: qr
+sidebar_label: qr
+---
+
+# `qr`
+
+inline-SVG QR code (byte mode, v1–10).
+
+## At a glance
+
+| | |
+| --- | --- |
+| Renders | inline-SVG QR code (byte mode, v1–10) |
+| Value shape | `string` |
+| Editable | ✅ input |
+| Key `cellMeta` | ecLevel, size, margin |
+
+## Use it
+
+```tsx
+const columns: BstTableColumn<Row>[] = [
+  { id: 'x', accessorKey: 'x', header: 'X', meta: { type: 'qr', /* cellMeta below */ } },
+]
+```
+
+## `cellMeta` options
+
+**`qr`**
+| `cellMeta` | Type | Effect |
+| --- | --- | --- |
+| `ecLevel` | `'L' \| 'M' \| 'Q' \| 'H'` | Error-correction level. Default `'M'`. |
+| `size` | `number` | Rendered px. Default `88`. |
+| `margin` | `number` | Quiet-zone modules. Default `2`. |

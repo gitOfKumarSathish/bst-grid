@@ -1,0 +1,35 @@
+---
+id: showUndoRedo
+title: Undo/Redo buttons
+sidebar_label: showUndoRedo
+---
+
+# Undo/Redo buttons
+
+Prop `showUndoRedo` — adapter chrome, default `follows enableUndoRedo`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `show*` (chrome, resolved in the adapter) |
+| Type | `boolean` |
+| Default | `follows enableUndoRedo` |
+| Status | ✅ done (Phase 3) |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableUndoRedo          // chrome is a no-op without its behaviour flag
+  showUndoRedo
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- **Requires** `enableUndoRedo` to be on — this flag is a no-op otherwise.

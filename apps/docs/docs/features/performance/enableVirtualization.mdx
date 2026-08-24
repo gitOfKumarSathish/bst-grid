@@ -1,0 +1,39 @@
+---
+id: enableVirtualization
+title: Row virtualization (D1)
+sidebar_label: enableVirtualization
+---
+
+# Row virtualization (D1)
+
+Prop `enableVirtualization` — engine behaviour, default `false`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean \| {overscan,estimateRowSize,estimateColumnSize}` |
+| Default | `false` |
+| Status | ✅ done |
+| Settings sheet | Performance |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableVirtualization={/* boolean | {overscan,estimateRowSize,estimateColumnSize} */}
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- **Conflicts with** `enableExpanding` — the grid renders un-windowed (yields) while master-detail is on.
+- **Conflicts with** `enableGrouping` — the grid renders un-windowed (yields) while grouping is on.
+- **Conflicts with** `enableCellSpanning` — the grid renders un-windowed (yields) while cell spanning is on.
+- **Conflicts with** `enableRowPinning` — the grid renders un-windowed (yields) while row pinning is on.
+- Paints only the visible rows for large datasets. Object form tunes `overscan` / `estimateRowSize` / `estimateColumnSize`. Needs a bounded scroll-box height (applied by default; override via `styles.root`).

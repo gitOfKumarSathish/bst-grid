@@ -1,0 +1,33 @@
+---
+id: richText
+title: richText
+sidebar_label: richText
+---
+
+# `richText`
+
+sanitized-HTML preview or formatted.
+
+## At a glance
+
+| | |
+| --- | --- |
+| Renders | sanitized-HTML preview or formatted |
+| Value shape | `HTML string` |
+| Editable | ✅ toolbar → popup (adapters) |
+| Key `cellMeta` | render |
+
+## Use it
+
+```tsx
+const columns: BstTableColumn<Row>[] = [
+  { id: 'x', accessorKey: 'x', header: 'X', meta: { type: 'richText', /* cellMeta below */ } },
+]
+```
+
+## `cellMeta` options
+
+**`richText`**
+| `cellMeta` | Type | Effect |
+| --- | --- | --- |
+| `render` | `'text' \| 'html'` | `'text'` (default) = safe one-line plain preview; `'html'` = show the *sanitized* HTML **formatted** (bold / lists / …). |

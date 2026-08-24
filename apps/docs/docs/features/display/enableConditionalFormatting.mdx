@@ -1,0 +1,41 @@
+---
+id: enableConditionalFormatting
+title: Conditional formatting runtime toggle (K3)
+sidebar_label: enableConditionalFormatting
+---
+
+# Conditional formatting runtime toggle (K3)
+
+Prop `enableConditionalFormatting` — engine behaviour, default `true`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean` |
+| Default | `true` |
+| Status | ✅ done |
+| Settings sheet | Display |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableConditionalFormatting
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Options
+
+| Option | Notes |
+| --- | --- |
+| `conditionalFormats` | the flag gates rules; with no rules it has nothing to apply |
+
+## Behavior & interactions
+
+- Defaults to ON — it is the runtime off-switch for rules already passed, not the opt-in.

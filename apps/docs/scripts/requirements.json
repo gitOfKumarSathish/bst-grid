@@ -1,0 +1,350 @@
+[
+  {
+    "id": "A1",
+    "title": "Inline editing",
+    "status": "built",
+    "notes": "P2 — enableEditing"
+  },
+  {
+    "id": "A2",
+    "title": "Infinite / virtual scroll",
+    "status": "built",
+    "notes": "virtual scroll = D1 (enableVirtualization); infinite = useBstInfiniteDataSource (fetch-on-scroll append + onReachEnd) over the server DataSource"
+  },
+  {
+    "id": "A3",
+    "title": "Pagination (client/server)",
+    "status": "built",
+    "notes": "client + server (manual mode) v0.28.0 — useBstDataSource / DataSource (manual sort/filter/paginate passthrough)"
+  },
+  {
+    "id": "A4",
+    "title": "Nested / master-detail",
+    "status": "built",
+    "notes": "v0.13.0 — enableExpanding + renderDetail"
+  },
+  {
+    "id": "A5",
+    "title": "Inline charts / cell spanning",
+    "status": "built",
+    "notes": "v0.12.0 spanning (enableCellSpanning, col+row) · charts = M1"
+  },
+  {
+    "id": "A6",
+    "title": "High-perf at 3 scales",
+    "status": "partial",
+    "notes": "workflow tier ✅; 10k client-virtual now ✅ (D1); server tier reachable v0.28.0 + infinite scroll (A2); 1M migration tier still to prove end-to-end"
+  },
+  {
+    "id": "B1",
+    "title": "Text / long text",
+    "status": "built",
+    "notes": "P2 · QR + barcode v0.23.0 (dep-free inline-SVG; QR verified bit-for-bit vs qrcode) · ERP field formats (cellMeta.pattern: PAN/GSTIN/IFSC/IBAN/SWIFT/email/…)"
+  },
+  {
+    "id": "B10",
+    "title": "Action column",
+    "status": "built",
+    "notes": "P2; \"floating\" variant open (Q5)"
+  },
+  {
+    "id": "B2",
+    "title": "Number (currency/precision/formats)",
+    "status": "built",
+    "notes": "P2 — Intl formats · ERP field formats (cellMeta.pattern: Aadhaar/Verhoeff, PIN, card/Luhn)"
+  },
+  {
+    "id": "B3",
+    "title": "Date / time",
+    "status": "built",
+    "notes": "P2"
+  },
+  {
+    "id": "B4",
+    "title": "Boolean",
+    "status": "built",
+    "notes": "P2 (now an injectable check icon)"
+  },
+  {
+    "id": "B5",
+    "title": "Files & attachments",
+    "status": "built",
+    "notes": "file cell + image thumbnails + file-type icons + in-cell PDF thumbnail (cellMeta.pdfThumbnail — page 1 rendered by pdf.js to an <img>; engine stays dep-free, app injects createPdfjsThumbnailer(pdfjs) via <BstPdfThumbnailerProvider>) + click-to-preview (BstFilePreview: image inline · PDF native iframe, data:→blob:) + configurable upload/delete (cellMeta.onUpload/onDelete); a server raster (thumbnailUrl) wins when present"
+  },
+  {
+    "id": "B6",
+    "title": "Single select",
+    "status": "built",
+    "notes": "P2 (inline overlay editor)"
+  },
+  {
+    "id": "B7",
+    "title": "Multi select (chips/overflow)",
+    "status": "built",
+    "notes": "P2 · width-aware chips (cellMeta.fitChips — fit to column width)"
+  },
+  {
+    "id": "B8",
+    "title": "Radio group",
+    "status": "built",
+    "notes": "P2"
+  },
+  {
+    "id": "B9",
+    "title": "Hyperlink",
+    "status": "built",
+    "notes": "P2"
+  },
+  {
+    "id": "C1",
+    "title": "Editing modes",
+    "status": "built",
+    "notes": "P2 — cell + row-session"
+  },
+  {
+    "id": "C2",
+    "title": "Save on Enter/Blur/Explicit",
+    "status": "built",
+    "notes": "P2"
+  },
+  {
+    "id": "C3",
+    "title": "Cell/row/cross-col/async validation",
+    "status": "built",
+    "notes": "P2 — enableValidation"
+  },
+  {
+    "id": "C4",
+    "title": "Inline validation feedback",
+    "status": "built",
+    "notes": "P2"
+  },
+  {
+    "id": "C5",
+    "title": "Shortcuts (arrows/undo-redo)",
+    "status": "built",
+    "notes": "P3 — nav + enableUndoRedo"
+  },
+  {
+    "id": "C6",
+    "title": "Tab nav (skip/wrap)",
+    "status": "built",
+    "notes": "P3"
+  },
+  {
+    "id": "D1",
+    "title": "Row & column virtualization",
+    "status": "built",
+    "notes": "enableVirtualization (+ enableColumnVirtualization) on @tanstack/react-virtual — windowed rows (dynamic measure) + columns, sticky header, bounded DOM; yields to master-detail / grouping / cell spanning / row pinning. Tested (virtualization.test.tsx)"
+  },
+  {
+    "id": "D2",
+    "title": "Lightweight cell renderers",
+    "status": "built",
+    "notes": "P2 — memoized hot-path"
+  },
+  {
+    "id": "D3",
+    "title": "Smart column auto-size",
+    "status": "built",
+    "notes": "v0.22.0 — double-click resizer → sampled canvas.measureText fit"
+  },
+  {
+    "id": "D4",
+    "title": "Partial / dirty-cell render",
+    "status": "built",
+    "notes": "P2–3 — draft overlay, paint-time"
+  },
+  {
+    "id": "E1",
+    "title": "Sorting",
+    "status": "built",
+    "notes": "P1"
+  },
+  {
+    "id": "E2",
+    "title": "Column & global search",
+    "status": "built",
+    "notes": "P1 global + P3 per-column filter row"
+  },
+  {
+    "id": "E3",
+    "title": "Advanced filtering",
+    "status": "built",
+    "notes": "P3 — filter builder + bstCondition"
+  },
+  {
+    "id": "E4",
+    "title": "Multi-column grouping",
+    "status": "built",
+    "notes": "v0.15.0 — enableGrouping + aggregates + group toggle"
+  },
+  {
+    "id": "F1",
+    "title": "Disable grid",
+    "status": "built",
+    "notes": "P2 — disabled"
+  },
+  {
+    "id": "F2",
+    "title": "Disable row",
+    "status": "built",
+    "notes": "P2 — rowDisabled"
+  },
+  {
+    "id": "F3",
+    "title": "Disable column",
+    "status": "built",
+    "notes": "P3 — meta.disabled"
+  },
+  {
+    "id": "F4",
+    "title": "Disable cell",
+    "status": "built",
+    "notes": "P3 — meta.disabled fn + cellDisabled"
+  },
+  {
+    "id": "F5",
+    "title": "Conditional visibility/render",
+    "status": "built",
+    "notes": "v0.18.0 — conditionalFormats (hideContent + rule styling)"
+  },
+  {
+    "id": "G1",
+    "title": "Freeze / pin rows & columns",
+    "status": "built",
+    "notes": "column pin P3 + row pin v0.14.0 (enableRowPinning)"
+  },
+  {
+    "id": "G2",
+    "title": "Row & column resizing",
+    "status": "built",
+    "notes": "column resize (P3) + row resize v0.25.0 (enableRowResize — drag a row edge to set its height, double-click to reset)"
+  },
+  {
+    "id": "G3",
+    "title": "Auto layout",
+    "status": "built",
+    "notes": "fixed layout + total-size + fitColumns fit-to-viewport"
+  },
+  {
+    "id": "G4",
+    "title": "Responsive",
+    "status": "built",
+    "notes": "v0.22.0 — enableResponsive + meta.responsivePriority (hide low-priority when narrow)"
+  },
+  {
+    "id": "H1",
+    "title": "Copy cell",
+    "status": "built",
+    "notes": "P3"
+  },
+  {
+    "id": "H2",
+    "title": "Copy row",
+    "status": "built",
+    "notes": "P3"
+  },
+  {
+    "id": "H3",
+    "title": "Copy column",
+    "status": "built",
+    "notes": "fixed — runtime.copyColumn / Ctrl+Space selects the whole column and copies all pages (pre-pagination, filter+sort order); copyRow/Shift+Space too. Server-tier export rides the Phase-4 foundation"
+  },
+  {
+    "id": "H4",
+    "title": "Paste",
+    "status": "built",
+    "notes": "P3 — needs enableEditing"
+  },
+  {
+    "id": "I1",
+    "title": "Row lifecycle events",
+    "status": "built",
+    "notes": "P2 — enableRowActions + onDataChange"
+  },
+  {
+    "id": "I2",
+    "title": "Cell events + deferred save",
+    "status": "built",
+    "notes": "P2 (C2≡I2)"
+  },
+  {
+    "id": "I3",
+    "title": "File ops (upload/view/delete)",
+    "status": "built",
+    "notes": "view + preview (BstFilePreview) + upload/delete via cellMeta.onUpload/onDelete (busy state; local object-URL fallback), now also formal DataSource verbs uploadFile/deleteFile/getFileUrl + createFileHandlers(source) bridge (Plan.md §2.2)"
+  },
+  {
+    "id": "I4",
+    "title": "Backend updates → cells/rows/grid",
+    "status": "partial",
+    "notes": "change-set half done v0.30.0 — batch mode's runtime.getChangeSet() + one onSave({ changes, rows[].patch, next }) per save action, with a rejected save keeping every draft; reconciling the backend's response back into cells/rows (server-authoritative values, partial failures) not built"
+  },
+  {
+    "id": "I5",
+    "title": "External updates (parent/WS)",
+    "status": "missing",
+    "notes": "WebSocket / live merge not built"
+  },
+  {
+    "id": "J1",
+    "title": "Popup form editors",
+    "status": "built",
+    "notes": "P2 — Dialog / modal popups"
+  },
+  {
+    "id": "J2",
+    "title": "Rich / custom React editors",
+    "status": "built",
+    "notes": "custom React ✅ · rich-text v0.23.0 (dep-free sanitized-HTML cell + popup editor; not Lexical)"
+  },
+  {
+    "id": "K1",
+    "title": "Dynamic cell styling",
+    "status": "built",
+    "notes": "v0.10.0 slots + v0.18.0 conditionalFormats"
+  },
+  {
+    "id": "K2",
+    "title": "Dynamic row styling",
+    "status": "built",
+    "notes": "slots (classNames.row/styles.row) + row-scope rules"
+  },
+  {
+    "id": "K3",
+    "title": "Conditional formatting",
+    "status": "built",
+    "notes": "v0.18.0 — rule engine + <BstConditionalFormatBuilder>"
+  },
+  {
+    "id": "L1",
+    "title": "Multi-row highlighting",
+    "status": "built",
+    "notes": "row-scope conditionalFormats (v0.18.0) + validation"
+  },
+  {
+    "id": "L2",
+    "title": "Cell highlighting",
+    "status": "built",
+    "notes": "P2 — error ring + rule styling"
+  },
+  {
+    "id": "L3",
+    "title": "Inline error presentation",
+    "status": "built",
+    "notes": "P2"
+  },
+  {
+    "id": "M1",
+    "title": "In-cell charts",
+    "status": "built",
+    "notes": "v0.19.0 — sparkline cell type (line/area/bar)"
+  },
+  {
+    "id": "M2",
+    "title": "KPI cells",
+    "status": "built",
+    "notes": "v0.19.0 — kpi cell type (value + delta + mini-spark)"
+  }
+]

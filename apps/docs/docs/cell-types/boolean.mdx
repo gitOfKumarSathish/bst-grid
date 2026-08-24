@@ -1,0 +1,26 @@
+---
+id: boolean
+title: boolean
+sidebar_label: boolean
+---
+
+# `boolean`
+
+check ✓ / muted dash.
+
+## At a glance
+
+| | |
+| --- | --- |
+| Renders | check ✓ / muted dash |
+| Value shape | `boolean` |
+| Editable | ✅ checkbox |
+| Key `cellMeta` | — |
+
+## Use it
+
+```tsx
+const columns: BstTableColumn<Row>[] = [
+  { id: 'x', accessorKey: 'x', header: 'X', meta: { type: 'boolean' } },
+]
+```

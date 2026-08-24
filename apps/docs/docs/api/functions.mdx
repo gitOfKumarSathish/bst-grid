@@ -1,0 +1,752 @@
+---
+id: functions
+title: Functions
+sidebar_label: Functions
+sidebar_position: 2
+---
+
+# Functions
+
+Standalone helpers and factories.
+
+## applyGridState
+
+Restore a (partial) view-state snapshot onto the grid (X21). Entries that reference a column which no longer exists are dropped, so a snapshot survives a column-set change without wedging the grid. Pass `include` / `exclude` to restore a subset. Silently ignores an absent snapshot.
+
+```ts
+function applyGridState<TData extends RowData>(table: BstTableInstance<TData>, state: Partial<BstGridState> | null | undefined, select?: BstGridStateSelect): void;
+```
+
+## applySettingsOverrides
+
+Apply user overrides onto a table-options object. Only the registry keys are touched; everything else passes through untouched. Object-valued flags (`pagination`, `enableEditing`, …) keep their options when toggled back on and become `false` when toggled off.
+
+```ts
+function applySettingsOverrides<P extends object>(props: P, overrides: BstSettingsOverrides | undefined): P;
+```
+
+## arrayEqual
+
+Shallow array equality — handy for selecting `FieldError[]` / id lists.
+
+```ts
+function arrayEqual<T>(a: readonly T[], b: readonly T[]): boolean;
+```
+
+## autoGenerateColumns
+
+Infer columns from row data (X27) — one column per key found across a sample of rows (first-seen order), with a humanized header and a guessed cell type. Returns `[]` for empty / non-object data (the grid then renders no columns).
+
+```ts
+function autoGenerateColumns<TData extends RowData>(data: readonly TData[], opts?: AutoColumnsOptions): BstTableColumn<TData>[];
+```
+
+## BstConditionalFormatBuilder
+
+Neutral, theme-agnostic **conditional-format builder** (K3) — the styling cousin of `<BstFilterBuilder>`. Controlled: it reads `rules` and calls `onChange` with the next array. Each row is `scope · column · operator · value · style`. Feed the result to `useBstTable({ conditionalFormats })`. Styled purely with `bst-*` classes, so both skins share it.
+
+```ts
+function BstConditionalFormatBuilder<TData = any>({ rules, onChange, columns, presets, className, icons, }: {
+    rules: BstFormatRule<TData>[];
+    onChange: (rules: BstFormatRule<TData>[]) => void;
+    columns: BstFormatBuilderColumn[];
+    presets?: BstFormatPreset[];
+    className?: string;
+    /** Body-icon overrides (uses the `remove` slot). */
+    icons?: BstIconOverrides;
+}): React.JSX.Element;
+```
+
+## BstFilePreview
+
+Dependency-free file preview overlay (B5/I3). Renders the clicked document full-screen: **images** inline, **PDFs** in the browser's native viewer (`<iframe>` — no pdf.js), anything else as an open/download fallback. Closes on Escape or a backdrop click. Exported so adapters can reuse it from their file editors. A file needs a `url` to preview.
+
+```ts
+function BstFilePreview({ file, onClose, }: {
+    file: {
+        name?: string;
+        url?: string;
+        thumbnailUrl?: string;
+        contentType?: string;
+    };
+    onClose: () => void;
+}): React.JSX.Element;
+```
+
+## BstFilterBuilder
+
+Neutral, theme-agnostic filter-builder UI (E3). Reads/writes v9's `columnFilters` state (one condition per column) using the operator-aware `bstCondition` filterFn. Rendered by adapters inside their own popover/panel; styled purely with `bst-*` classes + CSS vars, so both skins share it.
+
+```ts
+function BstFilterBuilder({ table, className, icons, }: {
+    table: any;
+    className?: string;
+    /** Body-icon overrides (uses the `remove` slot). */
+    icons?: BstIconOverrides;
+}): React.JSX.Element;
+```
+
+## BstPdfThumbnailerProvider
+
+Provide a grid-wide PDF thumbnail renderer. Wrap your tables (any adapter) in it; columns with `cellMeta.pdfThumbnail: true` then render page-1 thumbnails.
+
+```ts
+function BstPdfThumbnailerProvider({ renderer, children, }: {
+    renderer: PdfThumbnailRenderer | null;
+    children: React.ReactNode;
+}): React.FunctionComponentElement<React.ProviderProps<PdfThumbnailRenderer | null>>;
+```
+
+## BstSetFilter
+
+```ts
+function BstSetFilter({ column, table, label, value, onChange }: BstSetFilterProps): React.JSX.Element;
+```
+
+## BstShortcuts
+
+In-UI keyboard-shortcuts help: a trigger button + a dependency-free overlay that lists **only the shortcuts active on this grid** (grouped, searchable, platform-aware). Also opens on `?`. Self-contained so an adapter just drops in `<BstShortcuts table={table} />`.
+
+```ts
+function BstShortcuts<TData extends RowData>({ table, className, platform, }: BstShortcutsProps<TData>): React.JSX.Element;
+```
+
+## BstTable
+
+Neutral, theme-agnostic table body renderer (Plan.md §2.6). Uses only semantic HTML + CSS classes driven by CSS custom properties. In Phase 2 each cell is a memoized `GridCell` that consults the cell-type registry (read path), the interaction store (edit/dirty/error state) and the runtime (edit lifecycle). MUI / shadcn skins theme it purely via `--bst-table-*` vars.
+
+```ts
+function BstTable({ table, className, icons, }: {
+    table: any;
+    className?: string;
+    /** Body-icon overrides (sort / expander / pin / boolean / file). Adapters
+     * forward their own icon set; unspecified slots use the built-in SVGs. */
+    icons?: BstIconOverrides;
+}): React.JSX.Element;
+```
+
+## buildPrintHtml
+
+Build a standalone, print-friendly HTML document for the matrix.
+
+```ts
+function buildPrintHtml(matrix: BstExportMatrix, opts?: PrintOptions): string;
+```
+
+## cellKey
+
+Composite key for a cell (`rowId` first so a row's cells sort together).
+
+```ts
+function cellKey(rowId: string, columnId: string): string;
+```
+
+## clearGridState
+
+Remove a persisted snapshot (leaves the live grid untouched).
+
+```ts
+function clearGridState(key: string, storage?: BstGridStateStorage): void;
+```
+
+## code128
+
+Encode `text` as Code 128B. Throws on non-printable-ASCII input.
+
+```ts
+function code128(text: string): BarcodeResult;
+```
+
+## combineFilterConditions
+
+Combine several conditions into the value a **multi-filter** column stores. Keeps every slot (positional, `undefined` allowed) so the stacked widgets stay aligned; returns `undefined` when no slot is active (so the column reads as unfiltered). `op` defaults to `and` (every part must match).
+
+```ts
+function combineFilterConditions(conditions: (FilterCondition | undefined)[], op?: 'and' | 'or'): FilterConditionGroup | undefined;
+```
+
+## computeAutoWidth
+
+The fitted width for a column: the widest of `texts` measured in the given font, plus padding, clamped to `[min, max]`. Feed it the header label + the current page's formatted cell values (sampling, not the whole dataset).
+
+```ts
+function computeAutoWidth(texts: ReadonlyArray<string>, opts?: AutoSizeOptions): number;
+```
+
+## computeCellSpans
+
+Build the span plan for the visible rows × columns. O(rows × cols) — fine for the workflow/reporting tiers (a page of rows), which is the only tier without server-side windowing. `getCellSpan` (explicit) wins over `meta.rowSpan` groups for a given origin.
+
+```ts
+function computeCellSpans(rows: SpanRow[], cols: SpanCol[], getCellSpan?: (ctx: BstSpanContext) => BstCellSpan | undefined): SpanPlan;
+```
+
+## createCellTypeRegistry
+
+```ts
+function createCellTypeRegistry(seed?: Array<CellType<any, any, any>>): CellTypeRegistry;
+```
+
+## createClientDataSource
+
+In-memory DataSource — applies **filter → quick-filter → sort → page** over `rows` using the SAME operator semantics (`evalCondition`) as the client grid. Sort is a best-effort natural comparison (numeric when both values parse as numbers, else locale string) — a real server defines its own ordering. Async (resolves a Promise, honours `AbortSignal`); `delayMs` simulates latency.
+
+```ts
+function createClientDataSource<TData>(rows: readonly TData[], opts?: {
+    /** Read a column's value from a row. Default `(row, id) => row[id]`. */
+    getValue?: (row: TData, columnId: string) => unknown;
+    /** Column ids the **quick filter** searches. Default: all own fields of the row. */
+    columns?: string[];
+    /** Simulated latency (ms). Default 0. */
+    delayMs?: number;
+}): DataSource<TData>;
+```
+
+## createDefaultRegistry
+
+A registry seeded with the neutral defaults (used when no preset is supplied).
+
+```ts
+function createDefaultRegistry(): CellTypeRegistry;
+```
+
+## createFileHandlers
+
+Bridge a `DataSource`'s file verbs (I3) to the `files` cell's `cellMeta.onUpload` / `cellMeta.onDelete` hooks, so ONE server contract drives both the grid query and file storage. Drop the result into a column:
+
+```ts
+meta: { type: 'files', editable: true, cellMeta: createFileHandlers(source) }
+```
+
+Only the verbs the source actually implements are wired (a source with no `uploadFile` leaves the cell on its local object-URL preview fallback).
+
+```ts
+function createFileHandlers<TData>(source: DataSource<TData>, ctx?: DataSourceFileContext): BstFileCellHandlers;
+```
+
+## createInteractionStore
+
+```ts
+function createInteractionStore(): InteractionStore;
+```
+
+## createPdfjsThumbnailer
+
+Build a `PdfThumbnailRenderer` backed by pdf.js. Pass your imported `pdfjs-dist` **module** (worker already configured) or a **loader** `() => import('pdfjs-dist')` for lazy loading — pdf.js is fetched only when the first thumbnail renders, so it stays out of your initial bundle.
+
+```ts
+import * as pdfjs from 'pdfjs-dist' import Worker from 'pdfjs-dist/build/pdf.worker.min.mjs?worker' // Vite pdfjs.GlobalWorkerOptions.workerPort = new Worker() const thumbs = createPdfjsThumbnailer(pdfjs) // <BstPdfThumbnailerProvider renderer={thumbs}> … </BstPdfThumbnailerProvider>
+```
+
+```ts
+function createPdfjsThumbnailer(pdfjs: PdfjsLike | (() => Promise<PdfjsLike | {
+    default: PdfjsLike;
+}>), opts?: PdfThumbnailerOptions): PdfThumbnailRenderer;
+```
+
+## createRuntime
+
+```ts
+function createRuntime<TData extends RowData>(initialCtx: RuntimeCtx<TData>): BstRuntime<TData>;
+```
+
+## createServerDataSource
+
+Wrap a fetch function as a DataSource (the server tier). Thin by design — your function *is* the source; this just names + types it.
+
+```ts
+const source = createServerDataSource(async (q, signal) => { const res = await fetch('/api/rows?' + toParams(q), { signal }) const { rows, total } = await res.json() return { rows, totalCount: total } })
+```
+
+```ts
+function createServerDataSource<TData>(fetcher: (query: DataSourceQuery, signal?: AbortSignal) => Promise<DataSourcePage<TData>>): DataSource<TData>;
+```
+
+## createStore
+
+A minimal immutable external store. Every `setState` produces a new object.
+
+```ts
+function createStore<S>(initial: S): Store<S>;
+```
+
+## defineCellType
+
+Identity helper for authoring a CellType with full inference.
+
+```ts
+function defineCellType<TValue, TMeta = unknown, TData extends RowData = any>(ct: CellType<TValue, TMeta, TData>): CellType<TValue, TMeta, TData>;
+```
+
+## defineFieldFormat
+
+Identity helper for authoring a custom format with inference + a stable ref.
+
+```ts
+function defineFieldFormat(fmt: FieldFormat): FieldFormat;
+```
+
+## downloadBlob
+
+Trigger a browser download of `data` as `fileName`. No-ops under SSR / jsdom (no `document` / `URL.createObjectURL`), so callers never need to guard.
+
+```ts
+function downloadBlob(fileName: string, mime: string, data: string | Uint8Array): void;
+```
+
+## emptyGridState
+
+An "empty" snapshot — the cleared view (no sort / filter, default column layout). By default omits `pagination` and `rowSelection` (clearing those is rarely what "reset view" means); request them via `include` if you want them.
+
+```ts
+function emptyGridState(select?: BstGridStateSelect): BstGridState;
+```
+
+## ensureExtension
+
+Ensure `name` ends with `.ext` (case-insensitive), appending if missing.
+
+```ts
+function ensureExtension(name: string, ext: string): string;
+```
+
+## escapeHtml
+
+Dependency-free rich-text helpers for the `richText` cell type. Stored value is **sanitized HTML**; read mode shows a **plain-text preview** (`htmlToText`), edit mode is a `contentEditable` surface whose output is run through `sanitizeHtml` (an allow-list, so no script/style/handlers survive) on commit — no DOMPurify.
+
+```ts
+function escapeHtml(s: string): string;
+```
+
+## evalCellFormat
+
+Merge all matching **cell-scope** rules for one cell.
+
+```ts
+function evalCellFormat<TData = any>(rules: ReadonlyArray<BstFormatRule<TData>>, ctx: BstFormatContext<TData>, getValue: (columnId: string) => unknown): FormatResult;
+```
+
+## evalCondition
+
+Evaluate a `{ op, value }` condition (or a bare value → contains) on a cell.
+
+```ts
+function evalCondition(cell: unknown, raw: unknown): boolean;
+```
+
+## evalRowFormat
+
+Merge all matching **row-scope** rules for one row.
+
+```ts
+function evalRowFormat<TData = any>(rules: ReadonlyArray<BstFormatRule<TData>>, row: TData, rowId: string, getValue: (columnId: string) => unknown): FormatResult;
+```
+
+## filterFn_bstCondition
+
+TanStack v9 `filterFn` that interprets a `{ op, value }` condition.
+
+```ts
+function filterFn_bstCondition(row: any, columnId: string, filterValue: unknown): boolean;
+```
+
+## filterSettingsGroups
+
+Filter the sheet's groups by a free-text query (case-insensitive), for the search box. A setting matches on its **label** or **hint**; a group whose **name** matches keeps all its items (so "export" surfaces the whole Export section). An empty / whitespace query returns the groups unchanged. Pure — both adapters share it, like the rest of this model. Returns fresh group objects (item references reused) so callers never mutate the source model.
+
+```ts
+function filterSettingsGroups(groups: readonly BstSettingsGroup[], query: string): BstSettingsGroup[];
+```
+
+## formatShortcutToken
+
+Render one key token for display, platform-aware.
+
+```ts
+function formatShortcutToken(token: string, isMac: boolean): string;
+```
+
+## getBstRuntime
+
+Read the runtime handle a `useBstTable` render attached to the table.
+
+```ts
+function getBstRuntime<TData extends RowData>(table: unknown): BstRuntimeHandle<TData>;
+```
+
+## getGridState
+
+Snapshot the grid's current view state as plain JSON (X21). Pass `include` / `exclude` to capture only some slices (e.g. skip `rowSelection` / `pagination`).
+
+```ts
+function getGridState<TData extends RowData>(table: BstTableInstance<TData>, select?: BstGridStateSelect): BstGridState;
+```
+
+## gstinCheckDigit
+
+The GSTIN 15th character (checksum) for a 14-char prefix.
+
+```ts
+function gstinCheckDigit(first14: string): string;
+```
+
+## hasBlockingError
+
+True when any finding is an `error` (as opposed to a `warning`).
+
+```ts
+function hasBlockingError(errors: FieldError[] | undefined): boolean;
+```
+
+## htmlToText
+
+Strip tags → readable one-line text (SSR-safe; used for the read preview + copy).
+
+```ts
+function htmlToText(html: unknown): string;
+```
+
+## humanizeKey
+
+`fooBar` / `foo_bar` / `foo-bar` → "Foo Bar".
+
+```ts
+function humanizeKey(key: string): string;
+```
+
+## inferCellType
+
+Built-in cell-type guess from a sample value (X27). Text → undefined (untyped).
+
+```ts
+function inferCellType(_key: string, value: unknown): string | undefined;
+```
+
+## isConditionActive
+
+Whether a `{ op, value }` condition (or bare value) would actually filter anything — i.e. `evalCondition` wouldn't treat it as inactive. A half-built builder row (operator chosen, no value) is **inactive**; unary ops (`empty` / `isTrue` / …) are always active. Used to strip no-op conditions before sending them to a server (client mode ignores them anyway).
+
+```ts
+function isConditionActive(raw: unknown): boolean;
+```
+
+## isRichTextEmpty
+
+True when the rich text has no visible content.
+
+```ts
+function isRichTextEmpty(html: unknown): boolean;
+```
+
+## isSettingActive
+
+Is a setting **effectively active** — on itself AND every prerequisite (`requires`) transitively active? Drives the sheet's dependency cascade: turning a parent off disables its dependents, and re-enabling it brings them back. Pure; exported for testing. `props` should be the override-applied (effective) props.
+
+```ts
+function isSettingActive(key: BstSettingKey, props: Record<string, unknown>, seen?: Set<BstSettingKey>): boolean;
+```
+
+## isValidAadhaar
+
+Aadhaar (India, UIDAI): 12 digits, first 2–9, valid Verhoeff checksum.
+
+```ts
+function isValidAadhaar(v: string): boolean;
+```
+
+## isValidEsic
+
+ESIC number (India Employees' State Insurance): 17 digits.
+
+```ts
+function isValidEsic(v: string): boolean;
+```
+
+## isValidGstin
+
+GSTIN (India GST): 2-digit state + 10-char PAN + entity + 'Z' + checksum.
+
+```ts
+function isValidGstin(v: string): boolean;
+```
+
+## isValidIban
+
+IBAN: 2-letter country + 2 check digits + BBAN, validated by the mod-97 rule.
+
+```ts
+function isValidIban(v: string): boolean;
+```
+
+## isValidIec
+
+IEC (India Import-Export Code): a PAN since 2017, or a legacy 10-digit code.
+
+```ts
+function isValidIec(v: string): boolean;
+```
+
+## isValidIfsc
+
+IFSC (India bank branch): 4 letters, a '0', 6 alphanumerics.
+
+```ts
+function isValidIfsc(v: string): boolean;
+```
+
+## isValidPan
+
+PAN (India Income Tax): 5 letters, 4 digits, 1 letter.
+
+```ts
+function isValidPan(v: string): boolean;
+```
+
+## isValidPassport
+
+Indian passport: a letter followed by 7 digits (e.g. `A1234567`).
+
+```ts
+function isValidPassport(v: string): boolean;
+```
+
+## isValidSwift
+
+SWIFT / BIC: 6 letters (bank + country) + 2 alphanumerics, optional 3-char branch.
+
+```ts
+function isValidSwift(v: string): boolean;
+```
+
+## isValidUan
+
+PF UAN (India Universal Account Number): 12 digits.
+
+```ts
+function isValidUan(v: string): boolean;
+```
+
+## loadGridState
+
+Load a persisted snapshot. Returns `undefined` when absent, unparseable, or from an incompatible schema version — feed the result straight into `useBstTable({ initialState })` for a flash-free restore.
+
+```ts
+function loadGridState(key: string, storage?: BstGridStateStorage): BstGridState | undefined;
+```
+
+## luhnValid
+
+Luhn (mod-10) — the checksum credit/debit card numbers (13–19 digits) carry.
+
+```ts
+function luhnValid(num: string): boolean;
+```
+
+## measureTextWidth
+
+Smart column auto-size (D3) — a dep-free content-measurement helper. Measures text with an **offscreen `canvas.measureText`** (no layout thrash, no DOM insertion) so a column can be sized to fit its widest sampled value. Sampling (header + the current page's cells) and the trigger (double-click the resize handle) live in the renderer; this module is the pure measurement core, also exported so consumers can auto-size programmatically.
+
+```ts
+function measureTextWidth(text: string, font: string): number;
+```
+
+## operatorArity
+
+Look up an operator's arity (value-input count). Default 1.
+
+```ts
+function operatorArity(typeId: string | undefined, op: string): 0 | 1 | 2;
+```
+
+## operatorsForType
+
+The operators offered for a given `meta.type`.
+
+```ts
+function operatorsForType(typeId?: string): FilterOperator[];
+```
+
+## pageSizeForChoice
+
+Turn a chosen dropdown value into the page size to apply (`setPageSize`).
+
+```ts
+function pageSizeForChoice(value: number): number;
+```
+
+## partitionToolbar
+
+Decide which collapsible items stay inline vs move to overflow, given the width `available` to them and the width the "⋯" button costs once anything overflows. Keeps the highest-priority contiguous run that fits. Pure.
+
+```ts
+function partitionToolbar(items: readonly ToolbarItemWidth[], available: number, moreWidth: number): {
+    inline: string[];
+    overflow: string[];
+};
+```
+
+## printHtml
+
+Open `html` in a print view and invoke the browser print dialog. Prefers a new window (self-contained, doesn't touch the host DOM); falls back to a hidden iframe when a popup is blocked. No-ops under SSR / jsdom.
+
+```ts
+function printHtml(html: string): void;
+```
+
+## qrMatrix
+
+Encode `text` to a QR module matrix. Throws if it doesn't fit in versions 1–10.
+
+```ts
+function qrMatrix(text: string, level?: QrEcLevel, forceMask?: number): QrMatrix;
+```
+
+## resetGridState
+
+Clear the grid's view back to defaults — sort · filter · column layout · grouping · expansion · row pinning. `pagination` and `rowSelection` are left as-is unless you pass them via `include`.
+
+```ts
+function resetGridState<TData extends RowData>(table: BstTableInstance<TData>, select?: BstGridStateSelect): void;
+```
+
+## resolveActiveShortcuts
+
+Filter the registry to the shortcuts whose required flags are **all** active, grouped by category and optionally narrowed by a free-text `query` (label or keys). Pass `isMac` to drop platform-specific entries (e.g. `⌘Y` redo on Mac); omit it to keep everything. Pure — the overlay renders exactly this.
+
+```ts
+function resolveActiveShortcuts(flags: Record<string, boolean | undefined>, query?: string, isMac?: boolean): ResolvedShortcutGroup[];
+```
+
+## resolveBstIcons
+
+Merge overrides onto the defaults, skipping `undefined`/`null` so a partial map (e.g. an adapter forwarding only the slots its icon set covers) keeps the built-in SVG for every unspecified slot.
+
+```ts
+function resolveBstIcons(overrides?: BstIconOverrides): BstIcons;
+```
+
+## resolveFieldFormat
+
+Resolve a `cellMeta.pattern` value to a `FieldFormat`: a built-in name, a `RegExp` (+ optional message), or a format object. Unknown names → `null`.
+
+```ts
+function resolveFieldFormat(pattern: unknown, patternMessage?: string): FieldFormat | null;
+```
+
+## resolvePageSizeChoices
+
+Resolve the dropdown's choices plus the value that should read as selected. "All" is shown as selected whenever the current page size is **not** one of the offered numeric sizes (i.e. it was set to the "All" sentinel, or otherwise exceeds every option) — so picking a normal size like `20` still shows `20` even when there are fewer than 20 rows. Pure — unit-tested.
+
+```ts
+function resolvePageSizeChoices(options: ReadonlyArray<BstPageSizeOption>, currentPageSize: number): {
+    choices: BstPageSizeChoice[];
+    value: number;
+};
+```
+
+## resolveStickyHeader
+
+Fold `enableStickyHeader` (`boolean | BstStickyHeaderOptions`, §12 value shape — an object implies enabled) into one resolved config. `maxHeight` wins over `maxRows`; a number is treated as pixels, a string is passed through verbatim. Pure — unit-tested.
+
+```ts
+function resolveStickyHeader(enable: boolean | BstStickyHeaderOptions | undefined): ResolvedStickyHeader;
+```
+
+## resolveVirtualization
+
+Fold `enableVirtualization` (`boolean | VirtualizationOptions`, §12 value shape — an object implies enabled) plus the `enableColumnVirtualization` sub-toggle into one resolved config. Pure — unit-tested.
+
+```ts
+function resolveVirtualization(enable: boolean | VirtualizationOptions | undefined, enableColumns: boolean | undefined): ResolvedVirtualization;
+```
+
+## RichTextEditor
+
+Neutral inline rich-text editor: a `contentEditable` surface + a small toolbar (bold / italic / underline / lists). Self-commits on blur with the value run through `sanitizeHtml` (allow-list), so no unsafe markup is stored. Adapters override this with a popup (dialog) version.
+
+```ts
+function RichTextEditor({ draft, commit, cancel, autoFocus }: CellEditProps<any, string>): React.JSX.Element;
+```
+
+## runValidators
+
+Compose the validators for a cell (C3): a `required` check, then the CellType's built-in validator, then the column-level `meta.validate`. Returns a synchronous `FieldError[]` when every validator is sync, otherwise a Promise — the runtime handles async with last-write-wins + AbortSignal.
+
+```ts
+function runValidators<TData extends RowData>(value: unknown, cellType: CellType<any, any, TData>, ctx: CellValidateContext<TData>): FieldError[] | Promise<FieldError[]>;
+```
+
+## sanitizeHtml
+
+Allow-list HTML sanitizer: keeps only formatting tags (no attributes except a safe `href`), escaping everything else. Uses `DOMParser`; on the server (no DOM) it degrades to escaped plain text.
+
+```ts
+function sanitizeHtml(html: unknown): string;
+```
+
+## saveGridState
+
+Persist a snapshot under `bst-table:state:<key>`. No-op when storage is unavailable.
+
+```ts
+function saveGridState(key: string, state: BstGridState, storage?: BstGridStateStorage): void;
+```
+
+## shouldShowSettingsSearch
+
+Resolve whether the sheet shows its search box. `false` → never; `true` → always; omitted → auto (only for lists longer than a handful, so a short sheet stays clutter-free). Keeps both adapters' behaviour identical.
+
+```ts
+function shouldShowSettingsSearch(search: boolean | undefined, itemCount: number): boolean;
+```
+
+## splitCellKey
+
+Split a composite key back into its `rowId` / `columnId` parts.
+
+```ts
+function splitCellKey(key: string): {
+    rowId: string;
+    columnId: string;
+};
+```
+
+## toCsv
+
+Serialize a matrix to CSV (RFC 4180: `""`-escaped quotes, CRLF, optional BOM).
+
+```ts
+function toCsv(matrix: BstExportMatrix, opts?: CsvOptions): string;
+```
+
+## toXlsx
+
+Serialize a matrix to a real OOXML `.xlsx` (store-only ZIP, no dependency).
+
+```ts
+function toXlsx(matrix: BstExportMatrix, opts?: XlsxOptions): Uint8Array;
+```
+
+## verhoeffChecksum
+
+The Verhoeff check digit for a numeric payload (append it to make it valid).
+
+```ts
+function verhoeffChecksum(payload: string): string;
+```
+
+## verhoeffValid
+
+True when a numeric string carries a valid Verhoeff check digit (last digit).
+
+```ts
+function verhoeffValid(num: string): boolean;
+```
+
+## virtualizationBypassReason
+
+The first active incompatible feature's label, or `null` when virtualization can run. Pure — unit-tested; the renderer uses it to decide the windowed vs un-windowed path and to emit a one-time dev-console warning.
+
+```ts
+function virtualizationBypassReason(compat: VirtualizationCompat): string | null;
+```

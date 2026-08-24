@@ -1,0 +1,36 @@
+---
+id: enableExcelExport
+title: Excel export (X2)
+sidebar_label: enableExcelExport
+---
+
+# Excel export (X2)
+
+Prop `enableExcelExport` — engine behaviour, default `true`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean` |
+| Default | `true` |
+| Status | ✅ done |
+| Settings sheet | Export |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableExcelExport
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- **Requires** `enableExport` to be on — this flag is a no-op otherwise.
+- Defaults to ON — set false to hide the Excel item / no-op `runtime.exportExcel`. Emits a real `.xlsx` (numeric cells typed).

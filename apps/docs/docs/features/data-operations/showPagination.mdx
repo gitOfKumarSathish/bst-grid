@@ -1,0 +1,35 @@
+---
+id: showPagination
+title: Pagination bar
+sidebar_label: showPagination
+---
+
+# Pagination bar
+
+Prop `showPagination` — adapter chrome, default `true`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `show*` (chrome, resolved in the adapter) |
+| Type | `boolean` |
+| Default | `true` |
+| Status | ✅ done |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  pagination          // chrome is a no-op without its behaviour flag
+  showPagination
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- **Requires** `pagination` to be on — this flag is a no-op otherwise.

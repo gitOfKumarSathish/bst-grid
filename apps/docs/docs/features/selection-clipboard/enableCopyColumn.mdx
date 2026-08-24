@@ -1,0 +1,36 @@
+---
+id: enableCopyColumn
+title: Copy column (H3)
+sidebar_label: enableCopyColumn
+---
+
+# Copy column (H3)
+
+Prop `enableCopyColumn` — engine behaviour, default `true`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean` |
+| Default | `true` |
+| Status | ✅ done |
+| Settings sheet | Selection & clipboard |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableCopyColumn
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- **Requires** `enableClipboard` to be on — this flag is a no-op otherwise.
+- Defaults to ON — set false to disable Ctrl/⌘+Space column copy while keeping the rest of the clipboard.

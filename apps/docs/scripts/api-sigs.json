@@ -1,0 +1,1568 @@
+[
+  {
+    "symbol": "actionCellType",
+    "kind": "const",
+    "signature": "const actionCellType: CellType<unknown>",
+    "doc": ""
+  },
+  {
+    "symbol": "actionMenuCellType",
+    "kind": "const",
+    "signature": "const actionMenuCellType: CellType<unknown>",
+    "doc": ""
+  },
+  {
+    "symbol": "advancedCellTypes",
+    "kind": "const",
+    "signature": "const advancedCellTypes: CellType<string, unknown, any>[]",
+    "doc": ""
+  },
+  {
+    "symbol": "applyGridState",
+    "kind": "function",
+    "signature": "export declare function applyGridState<TData extends RowData>(table: BstTableInstance<TData>, state: Partial<BstGridState> | null | undefined, select?: BstGridStateSelect): void;",
+    "doc": "Restore a (partial) view-state snapshot onto the grid (X21). Entries that reference a column which no longer exists are dropped, so a snapshot survives a column-set change without wedging the grid. Pass `include` / `exclude` to restore a subset. Silently ignores an absent snapshot."
+  },
+  {
+    "symbol": "applySettingsOverrides",
+    "kind": "function",
+    "signature": "export declare function applySettingsOverrides<P extends object>(props: P, overrides: BstSettingsOverrides | undefined): P;",
+    "doc": "Apply user overrides onto a table-options object. Only the registry keys are touched; everything else passes through untouched. Object-valued flags (`pagination`, `enableEditing`, …) keep their options when toggled back on and become `false` when toggled off."
+  },
+  {
+    "symbol": "arrayEqual",
+    "kind": "function",
+    "signature": "export declare function arrayEqual<T>(a: readonly T[], b: readonly T[]): boolean;",
+    "doc": "Shallow array equality — handy for selecting `FieldError[]` / id lists."
+  },
+  {
+    "symbol": "AutoColumnsOptions",
+    "kind": "interface",
+    "signature": "export interface AutoColumnsOptions {\n    /** How many rows to sample when collecting keys. Default 50. */\n    sampleRows?: number;\n    /** Only generate these keys (in this order). Omit → every key found. */\n    include?: string[];\n    /** Never generate columns for these keys (e.g. an internal id). */\n    exclude?: string[];\n    /** Turn a data key into a column header. Default: humanize (`unitPrice` → \"Unit Price\"). */\n    header?: (key: string) => string;\n    /**\n     * Infer a Bst cell type (`meta.type`) from a key + a sample value. Return\n     * `undefined` to leave the column untyped (plain text). Omit → the built-in\n     * guesser (number / boolean / date, else text).\n     */\n    inferType?: (key: string, sampleValue: unknown) => string | undefined;\n}",
+    "doc": "Tuning for auto-generated columns (X27). All optional."
+  },
+  {
+    "symbol": "autoGenerateColumns",
+    "kind": "function",
+    "signature": "export declare function autoGenerateColumns<TData extends RowData>(data: readonly TData[], opts?: AutoColumnsOptions): BstTableColumn<TData>[];",
+    "doc": "Infer columns from row data (X27) — one column per key found across a sample of rows (first-seen order), with a humanized header and a guessed cell type. Returns `[]` for empty / non-object data (the grid then renders no columns)."
+  },
+  {
+    "symbol": "AutoSizeOptions",
+    "kind": "interface",
+    "signature": "export interface AutoSizeOptions {\n    /** CSS `font` shorthand used for measurement. Default a 14px system UI stack. */\n    font?: string;\n    /** Horizontal padding to add (cell padding + sort/resizer affordance). Default 28. */\n    padding?: number;\n    /** Lower clamp. Default 56. */\n    min?: number;\n    /** Upper clamp. Default 480. */\n    max?: number;\n}",
+    "doc": "Options for {@link computeAutoWidth}."
+  },
+  {
+    "symbol": "barcodeCellType",
+    "kind": "const",
+    "signature": "const barcodeCellType: CellType<string>",
+    "doc": ""
+  },
+  {
+    "symbol": "BarcodeResult",
+    "kind": "interface",
+    "signature": "export interface BarcodeResult {\n    /** Concatenated bar/space run widths (digits 1–4), starting with a bar. */\n    pattern: string;\n    /** The encoded text (echoed for an optional human-readable line). */\n    text: string;\n}",
+    "doc": "Dependency-free Code 128 (subset B) barcode encoder → bar-width pattern. The `barcode` cell type renders it to inline SVG, so a barcode cell needs no runtime dependency. Code 128B covers all printable ASCII (space–`~`), which is what SKUs / IDs / short codes use. Verified by an encode→decode round-trip in tests."
+  },
+  {
+    "symbol": "BOOLEAN_OPERATORS",
+    "kind": "const",
+    "signature": "const BOOLEAN_OPERATORS: FilterOperator[]",
+    "doc": ""
+  },
+  {
+    "symbol": "booleanCellType",
+    "kind": "const",
+    "signature": "const booleanCellType: CellType<boolean>",
+    "doc": ""
+  },
+  {
+    "symbol": "BST_GRID_STATE_KEYS",
+    "kind": "const",
+    "signature": "const BST_GRID_STATE_KEYS: readonly BstGridStateKey[]",
+    "doc": ""
+  },
+  {
+    "symbol": "BST_GRID_STATE_VERSION",
+    "kind": "const",
+    "signature": "const BST_GRID_STATE_VERSION = 1",
+    "doc": ""
+  },
+  {
+    "symbol": "BST_ICON_SLOTS",
+    "kind": "const",
+    "signature": "const BST_ICON_SLOTS: (keyof BstIcons)[]",
+    "doc": ""
+  },
+  {
+    "symbol": "BST_RUNTIME",
+    "kind": "const",
+    "signature": "const BST_RUNTIME: unique symbol",
+    "doc": ""
+  },
+  {
+    "symbol": "BST_SETTINGS_REGISTRY",
+    "kind": "const",
+    "signature": "const BST_SETTINGS_REGISTRY: readonly RegistryEntry[]",
+    "doc": ""
+  },
+  {
+    "symbol": "BST_SHORTCUTS_REGISTRY",
+    "kind": "const",
+    "signature": "const BST_SHORTCUTS_REGISTRY: readonly BstShortcut[]",
+    "doc": ""
+  },
+  {
+    "symbol": "BstCellApi",
+    "kind": "interface",
+    "signature": "export interface BstCellApi<TData extends RowData = any> {\n    /** Whether this cell is currently in edit mode. */\n    isEditing: boolean;\n    /** Whether editing is blocked for this cell (access control / not editable). */\n    isDisabled: boolean;\n    /** Whether this cell (or its row session) holds an unsaved draft. */\n    isDirty: boolean;\n    /** Enter edit mode for this cell (no-op when not editable). */\n    startEditing: () => void;\n    /** Abandon the active edit, restoring the source value. */\n    cancelEditing: () => void;\n    /** Persist a value for this cell per the save policy. */\n    commitCell: (value: unknown) => void;\n    /** Begin a deferred row-edit session for this row (C2 ≡ I2). */\n    editRow: () => void;\n    /** Commit the row session for this row. */\n    saveRow: () => void;\n    /** Delete this row (I1 / row lifecycle). */\n    deleteRow: () => void;\n    /** Duplicate this row with a fresh temp id. */\n    duplicateRow: () => void;\n    /** Current validation findings for this cell. */\n    errors: FieldError[];\n}",
+    "doc": "Bound per-cell API handed to renderers so action / file cells can drive the grid."
+  },
+  {
+    "symbol": "BstCellEdit",
+    "kind": "interface",
+    "signature": "export interface BstCellEdit<TData> {\n    rowId: string;\n    columnId: string;\n    /** The data field written (`cellMeta.field` ?? `accessorKey` ?? column id). */\n    field: string;\n    /** The value currently upstream (before the save). */\n    oldValue: unknown;\n    /** The pending draft value. */\n    newValue: unknown;\n    /** `oldValue` formatted for display (cell-type `format`, else `String`). */\n    oldText: string;\n    /** `newValue` formatted for display. */\n    newText: string;\n    /** The row as it is upstream, when still present. */\n    row: TData | undefined;\n}",
+    "doc": "One unsaved cell edit — previous → new value, plus display strings formatted via the column's cell type. What the review-changes sheet lists per cell."
+  },
+  {
+    "symbol": "BstCellSpan",
+    "kind": "interface",
+    "signature": "export interface BstCellSpan {\n    colSpan?: number;\n    rowSpan?: number;\n}",
+    "doc": "Cell spanning (A5) — a **render-layer** feature (Plan.md §2.7a). v9 9.1.2 ships no spanning feature, and there is no virtualizer yet, so spanning is a pure paint concern: compute which body cell is the top-left **origin** of a merged block and which cells it **covers**; the renderer draws origins with `colSpan`/`rowSpan` and skips covered cells entirely. Two ways to declare a span (both need `enableCellSpanning`): - `meta.rowSpan: 'group'` on a column → auto-merge vertically-consecutive cells with an equal value (the classic \"merge same values\" case); - a grid-level `getCellSpan(ctx)` returning `{ colSpan?, rowSpan? }` for the origin cell — full control over both axes."
+  },
+  {
+    "symbol": "BstClassNames",
+    "kind": "interface",
+    "signature": "export interface BstClassNames<TData extends RowData = any> {\n    root?: string;\n    table?: string;\n    header?: string;\n    headerRow?: string;\n    headerCell?: string | ((ctx: BstHeaderSlotContext) => string | undefined);\n    filterRow?: string;\n    body?: string;\n    row?: string | ((ctx: BstRowContext<TData>) => string | undefined);\n    cell?: string | ((ctx: CellRenderProps<TData>) => string | undefined);\n    empty?: string;\n}",
+    "doc": "Consumer-owned class names for the grid's structural slots — the custom-CSS hook (K1/K2). Static strings for fixed parts; `headerCell` / `row` / `cell` also accept a function for per-item classes. Every slot **composes with** (never replaces) the built-in `bst-*` classes, so themes keep working. `root` targets the same element as the `<BstTable className>` prop (the scroll wrapper). Slots map to: `root`→`.bst-table-scroll`, `table`→`<table>`, `header`→`<thead>`, `headerRow`→header `<tr>`, `headerCell`→`<th>`, `filterRow`→the per-column filter `<tr>`, `body`→`<tbody>`, `row`→body `<tr>`, `cell`→body `<td>`, `empty`→the \"No rows\" `<td>`."
+  },
+  {
+    "symbol": "BstColumnMeta",
+    "kind": "interface",
+    "signature": "export interface BstColumnMeta<TData extends RowData = any, TValue = any> {\n    /** Selects the CellType from the registry. Default: `'text'`. */\n    type?: string;\n    /** Free-form settings passed through to the CellType (precision, variant, …). */\n    cellMeta?: Record<string, unknown>;\n    /** Force inline vs popup editing for this column (overrides the CellType default). */\n    editMode?: 'inline' | 'popup';\n    /** Whether this column is editable — static or per-row. Default: `false`. */\n    editable?: boolean | ((row: TData) => boolean);\n    /**\n     * Access control (F3 column / F4 cell). Disable interaction for this column —\n     * `true` disables the whole column; a predicate disables per row/cell. A\n     * disabled cell is never editable and renders in a muted style; it cascades\n     * under the grid `disabled` + `rowDisabled` options and overrides `editable`.\n     * Selection + copy still work on a disabled cell.\n     */\n    disabled?: boolean | ((row: TData) => boolean);\n    /** Options for option-based cells (singleSelect / multiSelect / radio). */\n    options?: BstOption[];\n    /**\n     * Per-column filter UI in the filter row (X4 / X11). With `enableSetFilter` on,\n     * `'set'` forces the **Set Filter** (a checklist of distinct values) for this\n     * column, and `'condition'` opts back into the default operator input. When\n     * unset, categorical columns (`singleSelect` / `multiSelect` / `radio` /\n     * `boolean`) use the Set Filter and the rest use the condition input.\n     *\n     * **Multi-filter (X11):** an **array** (e.g. `['condition', 'set']`) \n  // …truncated",
+    "doc": "Per-column meta the registry + features read. Authored on `columnDef.meta` and typed via the `columnMeta` slot on `tableFeatures` (no global declaration merging — Plan.md §2.1). All fields optional; `type` defaults to `'text'`."
+  },
+  {
+    "symbol": "BstConditionalFormatBuilder",
+    "kind": "function",
+    "signature": "export declare function BstConditionalFormatBuilder<TData = any>({ rules, onChange, columns, presets, className, icons, }: {\n    rules: BstFormatRule<TData>[];\n    onChange: (rules: BstFormatRule<TData>[]) => void;\n    columns: BstFormatBuilderColumn[];\n    presets?: BstFormatPreset[];\n    className?: string;\n    /** Body-icon overrides (uses the `remove` slot). */\n    icons?: BstIconOverrides;\n}): React.JSX.Element;",
+    "doc": "Neutral, theme-agnostic **conditional-format builder** (K3) — the styling cousin of `<BstFilterBuilder>`. Controlled: it reads `rules` and calls `onChange` with the next array. Each row is `scope · column · operator · value · style`. Feed the result to `useBstTable({ conditionalFormats })`. Styled purely with `bst-*` classes, so both skins share it."
+  },
+  {
+    "symbol": "BstContextMenuContext",
+    "kind": "interface",
+    "signature": "export interface BstContextMenuContext<TData extends RowData = any> {\n    rowId: string;\n    columnId: string;\n    value: unknown;\n    row: TData | undefined;\n    /** The items Bst-Table would show by default — spread and extend them. */\n    defaultItems: BstContextMenuItem[];\n}",
+    "doc": "Context handed to `getContextMenuItems` — the right-clicked cell + the defaults."
+  },
+  {
+    "symbol": "BstContextMenuItem",
+    "kind": "interface",
+    "signature": "export interface BstContextMenuItem {\n    /** Stable key (React list key). */\n    key?: string;\n    /** Menu label. */\n    label?: React.ReactNode;\n    /** Invoked when the item is chosen; the menu closes afterwards. */\n    onSelect?: () => void;\n    /** Greyed out + non-interactive. */\n    disabled?: boolean;\n    /** Render a divider instead of an item (`label` / `onSelect` ignored). */\n    separator?: boolean;\n    /** Optional leading icon. */\n    icon?: React.ReactNode;\n}",
+    "doc": "One entry in the right-click context menu (X6)."
+  },
+  {
+    "symbol": "BstDataSourceResult",
+    "kind": "interface",
+    "signature": "export interface BstDataSourceResult<TData> {\n    /** The current page's rows (also in `tableProps.data`). */\n    rows: TData[];\n    /** Total matching rows across all pages. */\n    totalCount: number;\n    /** A fetch is in flight. */\n    loading: boolean;\n    /** The last fetch's error, or null. */\n    error: Error | null;\n    /** Re-run the current query (e.g. after a mutation). */\n    refetch: () => void;\n    /** Spread into the grid to put it in server mode. */\n    tableProps: BstServerTableProps<TData>;\n}",
+    "doc": "The current page's rows (also in `tableProps.data`)."
+  },
+  {
+    "symbol": "BstExportColumn",
+    "kind": "interface",
+    "signature": "export interface BstExportColumn {\n    /** Column id. */\n    id: string;\n    /** Header text written to the first row (when headers are included). */\n    header: string;\n    /** `true` (a `number` cell) → emit typed numeric Excel cells from the raw value. */\n    numeric?: boolean;\n}",
+    "doc": "Export (Phase 5, X1–X3) — **dependency-free** CSV / Excel (`.xlsx`) / print builders. The core is pure and DOM-free (so it unit-tests in node): the runtime gathers a {@link BstExportMatrix} from the grid — values formatted per cell type, exactly like the clipboard — and these functions serialize it. Two DOM helpers (`downloadBlob`, `printHtml`) trigger the browser download / print and are guarded so SSR / jsdom simply no-op. Excel is a real OOXML `.xlsx`: a **store-only** (uncompressed) ZIP of minimal SpreadsheetML, assembled here with a hand-rolled CRC-32 + ZIP writer, so **no `exceljs` / `sheetjs` dependency** is pulled into the engine (matching the repo's dep-free ethos — QR, barcode, charts and PDF preview are all dep-free too). Numbers are emitted as typed numeric cells; everything else is an inline string. Opens in Excel, LibreOffice and Google Sheets."
+  },
+  {
+    "symbol": "BstExportFormat",
+    "kind": "type",
+    "signature": "export type BstExportFormat = 'csv' | 'excel' | 'print';",
+    "doc": "Which export formats a grid offers (X1–X3)."
+  },
+  {
+    "symbol": "BstExportMatrix",
+    "kind": "interface",
+    "signature": "export interface BstExportMatrix {\n    columns: BstExportColumn[];\n    /** Display strings, row-major — `rows[r][c]` aligns with `columns[c]`. */\n    rows: string[][];\n    /** Raw values parallel to `rows` — used only for Excel numeric typing. */\n    values?: unknown[][];\n}",
+    "doc": "The tabular payload every exporter serializes. `rows` holds display strings (already formatted per cell type, so they match what the grid shows and what copy/paste produces); `values` carries the parallel raw values, used only to type numeric Excel cells."
+  },
+  {
+    "symbol": "BstExportOptions",
+    "kind": "interface",
+    "signature": "export interface BstExportOptions {\n    /** Offer CSV. Default `true`. */\n    csv?: boolean;\n    /** Offer Excel (`.xlsx`). Default `true`. */\n    excel?: boolean;\n    /** Offer Print. Default `true`. */\n    print?: boolean;\n    /** Base download file name (the extension is added per format). Default `\"export\"`. */\n    fileName?: string;\n    /** Rows to export — `'all'` pages (default) or the current `'page'`. */\n    scope?: BstExportScope;\n    /** Include the header row. Default `true`. */\n    includeHeaders?: boolean;\n}",
+    "doc": "Customization for the `enableExport` toggle (passing an object implies enabled, §12). The per-format fields (`csv`/`excel`/`print`) are ALSO exposed as the top-level `enableCsvExport` / `enableExcelExport` / `enablePrint` settings-sheet switches, which win over the matching field here."
+  },
+  {
+    "symbol": "BstExportRunOptions",
+    "kind": "interface",
+    "signature": "export interface BstExportRunOptions {\n    /** Row scope for this call — overrides the configured default. */\n    scope?: BstExportScope;\n    /** Base file name for this call — overrides the configured default. */\n    fileName?: string;\n    /** Header inclusion for this call — overrides the configured default. */\n    includeHeaders?: boolean;\n    /** CSV only — field delimiter. Default `\",\"`. */\n    delimiter?: string;\n}",
+    "doc": "Per-call overrides for the `runtime.export*` methods (all optional)."
+  },
+  {
+    "symbol": "BstExportScope",
+    "kind": "type",
+    "signature": "export type BstExportScope = 'all' | 'page';",
+    "doc": "Row scope for an export — every filtered+sorted row (all pages) or just the current page."
+  },
+  {
+    "symbol": "BstFileCellHandlers",
+    "kind": "interface",
+    "signature": "export interface BstFileCellHandlers {\n    onUpload?: (file: File) => Promise<BstFileRef>;\n    onDelete?: (ref: BstFileRef) => Promise<void>;\n}",
+    "doc": "The `files` cell hooks a {@link createFileHandlers} bridge produces."
+  },
+  {
+    "symbol": "BstFilePreview",
+    "kind": "function",
+    "signature": "export declare function BstFilePreview({ file, onClose, }: {\n    file: {\n        name?: string;\n        url?: string;\n        thumbnailUrl?: string;\n        contentType?: string;\n    };\n    onClose: () => void;\n}): React.JSX.Element;",
+    "doc": "Dependency-free file preview overlay (B5/I3). Renders the clicked document full-screen: **images** inline, **PDFs** in the browser's native viewer (`<iframe>` — no pdf.js), anything else as an open/download fallback. Closes on Escape or a backdrop click. Exported so adapters can reuse it from their file editors. A file needs a `url` to preview."
+  },
+  {
+    "symbol": "BstFileRef",
+    "kind": "interface",
+    "signature": "export interface BstFileRef {\n    /** Display name. */\n    name: string;\n    /** Stable storage id/key — what `uploadFile` returns and `deleteFile`/`getFileUrl` take. */\n    id?: string;\n    /** A (possibly short-lived) URL to view / download the file. */\n    url?: string;\n    /** MIME type, when known. */\n    contentType?: string;\n    /** Size in bytes, when known. */\n    size?: number;\n}",
+    "doc": "A stored file reference the grid keeps in row data (I3, Plan.md §2.2). `url` should be a **short-lived / signed** view URL, not a permanent link — resolve it on demand with `getFileUrl` so B5 thumbnails never bake a permanent URL into the row. Structurally a superset of the adapters' file-cell shape, so a ref returned by `uploadFile` drops straight into a `files` cell."
+  },
+  {
+    "symbol": "BstFilterBuilder",
+    "kind": "function",
+    "signature": "export declare function BstFilterBuilder({ table, className, icons, }: {\n    table: any;\n    className?: string;\n    /** Body-icon overrides (uses the `remove` slot). */\n    icons?: BstIconOverrides;\n}): React.JSX.Element;",
+    "doc": "Neutral, theme-agnostic filter-builder UI (E3). Reads/writes v9's `columnFilters` state (one condition per column) using the operator-aware `bstCondition` filterFn. Rendered by adapters inside their own popover/panel; styled purely with `bst-*` classes + CSS vars, so both skins share it."
+  },
+  {
+    "symbol": "BstFormatBuilderColumn",
+    "kind": "interface",
+    "signature": "export interface BstFormatBuilderColumn {\n    id: string;\n    header?: string;\n    type?: string;\n}",
+    "doc": "Minimal column descriptor the builder needs (id + label + cell type)."
+  },
+  {
+    "symbol": "BstFormatContext",
+    "kind": "interface",
+    "signature": "export interface BstFormatContext<TData = any> {\n    value: unknown;\n    row: TData;\n    rowId: string;\n    /** The column being evaluated (cell scope) or the rule's trigger column (row scope). */\n    columnId?: string;\n}",
+    "doc": "Context passed to a predicate `when`."
+  },
+  {
+    "symbol": "BstFormatPreset",
+    "kind": "interface",
+    "signature": "export interface BstFormatPreset {\n    id: string;\n    label: string;\n    className?: string;\n    style?: React.CSSProperties;\n}",
+    "doc": "A named style preset for the conditional-format builder."
+  },
+  {
+    "symbol": "BstFormatRule",
+    "kind": "interface",
+    "signature": "export interface BstFormatRule<TData = any> {\n    /** Stable id (useful for a builder UI). */\n    id?: string;\n    /**\n     * The column whose value the rule tests. For `scope: 'cell'`, also the column\n     * whose cells get styled (omit to style **every** cell against its own value).\n     * For `scope: 'row'`, the trigger column whose value decides the whole row.\n     */\n    columnId?: string;\n    /** `'cell'` (default) styles the matched cell; `'row'` styles the whole row. */\n    scope?: BstFormatScope;\n    /** A `{ op, value }` condition (E3 operators) or a predicate over the row/cell. */\n    when: FilterCondition | ((ctx: BstFormatContext<TData>) => boolean);\n    /** Class name(s) applied on match. */\n    className?: string;\n    /** Inline style / CSS vars applied on match. */\n    style?: React.CSSProperties;\n    /** F5 — blank the matched cell's content (cell scope only). */\n    hideContent?: boolean;\n}",
+    "doc": "A single conditional-format rule."
+  },
+  {
+    "symbol": "BstFormatScope",
+    "kind": "type",
+    "signature": "export type BstFormatScope = 'cell' | 'row';",
+    "doc": "Conditional formatting (K3) — a declarative rule engine that maps a condition to a cell/row class + style (and, for F5, optionally blanks the cell). Rules reuse the E3 operator machinery (`{ op, value }` conditions via `evalCondition`) or a free predicate. Evaluated at render time and merged into the same class/style path as the `classNames` / `styles` slots — so it composes with a theme rather than replacing it. Feed rules via `conditionalFormats`; build them with `<BstConditionalFormatBuilder>`."
+  },
+  {
+    "symbol": "BstGridState",
+    "kind": "interface",
+    "signature": "export interface BstGridState {\n    /** Schema version — {@link BST_GRID_STATE_VERSION}. */\n    version: number;\n    sorting?: Array<{\n        id: string;\n        desc: boolean;\n    }>;\n    columnFilters?: Array<{\n        id: string;\n        value: unknown;\n    }>;\n    globalFilter?: unknown;\n    columnOrder?: string[];\n    columnSizing?: Record<string, number>;\n    columnVisibility?: Record<string, boolean>;\n    /** v9 pinning is `{ start, end }` (renamed from v8 left/right). */\n    columnPinning?: {\n        start?: string[];\n        end?: string[];\n    };\n    grouping?: string[];\n    expanded?: true | Record<string, boolean>;\n    rowPinning?: {\n        top?: string[];\n        bottom?: string[];\n    };\n    rowSelection?: Record<string, boolean>;\n    pagination?: {\n        pageIndex: number;\n        pageSize: number;\n    };\n}",
+    "doc": "A serializable grid view-state snapshot (plain JSON — safe to persist per user)."
+  },
+  {
+    "symbol": "BstGridStateController",
+    "kind": "interface",
+    "signature": "export interface BstGridStateController {\n    /** The full `bst-table:state:<key>` storage key, or `null` when persistence is off. */\n    storageKey: string | null;\n    /** Current snapshot of the grid. */\n    getState: () => BstGridState;\n    /** Restore a snapshot onto the grid. */\n    applyState: (state: Partial<BstGridState> | null | undefined) => void;\n    /** Force-write the current snapshot now (bypasses the debounce). */\n    save: () => void;\n    /** Delete the persisted snapshot (the live view is untouched). */\n    clear: () => void;\n    /**\n     * Reset the grid's view (sort / filter / column layout / grouping) to defaults.\n     * With auto-persist on, the default view is then written back; call `clear()`\n     * too if you want to forget the persisted snapshot entirely.\n     */\n    reset: () => void;\n}",
+    "doc": "Imperative handle returned by {@link useBstGridState}."
+  },
+  {
+    "symbol": "BstGridStateKey",
+    "kind": "type",
+    "signature": "export type BstGridStateKey = 'sorting' | 'columnFilters' | 'globalFilter' | 'columnOrder' | 'columnSizing' | 'columnVisibility' | 'columnPinning' | 'grouping' | 'expanded' | 'rowPinning' | 'rowSelection' | 'pagination';",
+    "doc": "The view-state slices a snapshot can carry."
+  },
+  {
+    "symbol": "BstGridStateOptions",
+    "kind": "interface",
+    "signature": "export interface BstGridStateOptions extends BstGridStateSelect {\n    /** Key suffix, namespaced under `bst-table:state:`. */\n    key: string;\n    /** Storage backend (default `window.localStorage`). */\n    storage?: BstGridStateStorage;\n    /** Persist changes automatically. Default `true`. */\n    persist?: boolean;\n    /** Debounce writes, in ms (rapid column-resize etc.). Default `300`; `0` = synchronous. */\n    debounceMs?: number;\n}",
+    "doc": "Key suffix, namespaced under `bst-table:state:`."
+  },
+  {
+    "symbol": "BstGridStateSelect",
+    "kind": "interface",
+    "signature": "export interface BstGridStateSelect {\n    /** Only these slices (default: all). */\n    include?: BstGridStateKey[];\n    /** Drop these slices (applied after `include`). */\n    exclude?: BstGridStateKey[];\n}",
+    "doc": "Narrow which slices a snapshot / restore touches."
+  },
+  {
+    "symbol": "BstGridStateStorage",
+    "kind": "interface",
+    "signature": "export interface BstGridStateStorage {\n    getItem(key: string): string | null;\n    setItem(key: string, value: string): void;\n    removeItem(key: string): void;\n}",
+    "doc": "Minimal `localStorage`-shaped contract, so `sessionStorage` / a mock also work."
+  },
+  {
+    "symbol": "BstHeaderSlotContext",
+    "kind": "interface",
+    "signature": "export interface BstHeaderSlotContext {\n    columnId: string;\n}",
+    "doc": "Column context handed to the `headerCell` class/style slot."
+  },
+  {
+    "symbol": "BstIconOverrides",
+    "kind": "type",
+    "signature": "export type BstIconOverrides = Partial<BstIcons>;",
+    "doc": ""
+  },
+  {
+    "symbol": "BstIcons",
+    "kind": "interface",
+    "signature": "export interface BstIcons {\n    /** Header: column sorted ascending. */\n    sortAsc: IconComponent;\n    /** Header: column sorted descending. */\n    sortDesc: IconComponent;\n    /** Header: sortable but unsorted. */\n    sortNone: IconComponent;\n    /** Expander / group row: expanded (points down). */\n    expandExpanded: IconComponent;\n    /** Expander / group row: collapsed (points right). */\n    expandCollapsed: IconComponent;\n    /** Row-pinning control. */\n    pin: IconComponent;\n    /** Boolean cell — true. */\n    booleanTrue: IconComponent;\n    /** Builder remove-rule button (filter / conditional-format). */\n    remove: IconComponent;\n    /** KPI cell — positive delta (trend up). */\n    trendUp: IconComponent;\n    /** KPI cell — negative delta (trend down). */\n    trendDown: IconComponent;\n    /** File cell — generic / unknown type. */\n    fileGeneric: IconComponent;\n    /** File cell — PDF. */\n    filePdf: IconComponent;\n    /** File cell — Word / rich text. */\n    fileDoc: IconComponent;\n    /** File cell — spreadsheet. */\n    fileSheet: IconComponent;\n    /** File cell — presentation. */\n    fileSlides: IconComponent;\n    /** File cell — archive. */\n    fileArchive: IconComponent;\n    /** File cell — audio. */\n    fileAudio: IconComponent;\n    /** File cell — video. */\n    fileVideo: IconComponent;\n}",
+    "doc": "The body-icon slots the engine renders (distinct from an adapter's chrome icons)."
+  },
+  {
+    "symbol": "BstIconsContext",
+    "kind": "const",
+    "signature": "const BstIconsContext: React.Context<BstIcons>",
+    "doc": ""
+  },
+  {
+    "symbol": "BstInfiniteDataSourceResult",
+    "kind": "interface",
+    "signature": "export interface BstInfiniteDataSourceResult<TData> {\n    /** All rows accumulated so far (across every loaded window). */\n    rows: TData[];\n    /** Total rows matching the current query across all windows. */\n    totalCount: number;\n    /** The first-window (reset) fetch is in flight. */\n    loading: boolean;\n    /** A follow-on window (append) fetch is in flight. */\n    isFetchingNextPage: boolean;\n    /** More rows remain to load (accumulated < total). */\n    hasNextPage: boolean;\n    /** The last fetch's error, or null. */\n    error: Error | null;\n    /** Load the next window and append it. No-op while fetching or at the end. */\n    fetchNextPage: () => void;\n    /** Alias of `fetchNextPage`, named for `<BstTable onReachEnd>`. */\n    onReachEnd: () => void;\n    /** Reset and re-fetch the first window (e.g. after a mutation). */\n    refetch: () => void;\n    /** Spread into the grid to run it in infinite server mode. */\n    tableProps: BstInfiniteTableProps<TData>;\n}",
+    "doc": "All rows accumulated so far (across every loaded window)."
+  },
+  {
+    "symbol": "BstInfiniteTableProps",
+    "kind": "interface",
+    "signature": "export interface BstInfiniteTableProps<TData> {\n    data: TData[];\n    manualSorting: true;\n    manualFiltering: true;\n    manualPagination: true;\n    autoResetPageIndex: false;\n    rowCount: number;\n    state: {\n        sorting: DsSort[];\n        columnFilters: DsColumnFilter[];\n        globalFilter: string;\n        pagination: {\n            pageIndex: number;\n            pageSize: number;\n        };\n    };\n    onSortingChange: (u: Updater<DsSort[]>) => void;\n    onColumnFiltersChange: (u: Updater<DsColumnFilter[]>) => void;\n    onGlobalFilterChange: (u: Updater<string>) => void;\n    onPaginationChange: (u: Updater<unknown>) => void;\n    /** Initial fetch in flight (X23) — drives the loading overlay (not appends). */\n    loading: boolean;\n    /** Last fetch error, or null (X23) — drives the error overlay. */\n    error: Error | null;\n}",
+    "doc": "Props to spread into the grid to run it in infinite (append) server mode."
+  },
+  {
+    "symbol": "BstOption",
+    "kind": "interface",
+    "signature": "export interface BstOption {\n    value: string;\n    label?: string;\n    /** Swatch / badge color (any CSS color). */\n    color?: string;\n    /** Leading icon node (adapter-provided). */\n    icon?: React.ReactNode;\n    /** Avatar / image URL rendered as a small circle. */\n    avatar?: string;\n    /** Free-form image URL. */\n    image?: string;\n    description?: string;\n    disabled?: boolean;\n}",
+    "doc": "Option for option-based cells — singleSelect / multiSelect / radio (overlap #12)."
+  },
+  {
+    "symbol": "BstPageSizeChoice",
+    "kind": "interface",
+    "signature": "export interface BstPageSizeChoice {\n    value: number;\n    label: string;\n}",
+    "doc": "A resolved dropdown choice: the option `value` to render and its `label`."
+  },
+  {
+    "symbol": "BstPageSizeOption",
+    "kind": "type",
+    "signature": "export type BstPageSizeOption = number | 'all';",
+    "doc": "Pagination chrome helpers — shared, pure logic for the adapters' \"Rows per page\" dropdown so MUI and shadcn stay identical. Lets `pageSizeOptions` carry an `'all'` entry that shows every row (the \"total number of rows\" choice), on top of the plain numeric sizes."
+  },
+  {
+    "symbol": "BstPdfThumbnailerProvider",
+    "kind": "function",
+    "signature": "export declare function BstPdfThumbnailerProvider({ renderer, children, }: {\n    renderer: PdfThumbnailRenderer | null;\n    children: React.ReactNode;\n}): React.FunctionComponentElement<React.ProviderProps<PdfThumbnailRenderer | null>>;",
+    "doc": "Provide a grid-wide PDF thumbnail renderer. Wrap your tables (any adapter) in it; columns with `cellMeta.pdfThumbnail: true` then render page-1 thumbnails."
+  },
+  {
+    "symbol": "BstRowChange",
+    "kind": "interface",
+    "signature": "export interface BstRowChange<TData> {\n    rowId: string;\n    /** The row as it is upstream (before the save). */\n    original: TData | undefined;\n    /** The row with every pending edit applied (what it becomes after the save). */\n    updated: TData | undefined;\n    /** `field → new value` for just the changed fields. */\n    patch: Record<string, unknown>;\n    changes: BstCellEdit<TData>[];\n}",
+    "doc": "A row's unsaved edits, grouped — `patch` is a ready-made PATCH body."
+  },
+  {
+    "symbol": "BstRowContext",
+    "kind": "interface",
+    "signature": "export interface BstRowContext<TData extends RowData = any> {\n    row: TData;\n    rowId: string;\n    /** Visual (post sort/filter/paginate) row index. */\n    index: number;\n}",
+    "doc": "Row context handed to the `row` class/style slot (K2 dynamic row styling)."
+  },
+  {
+    "symbol": "BstRuntime",
+    "kind": "interface",
+    "signature": "export interface BstRuntime<TData extends RowData> {\n    store: InteractionStore;\n    updateCtx: (ctx: RuntimeCtx<TData>) => void;\n    reset: () => void;\n    /** Resolved save triggers (`enter`/`blur`/`explicit`). The inline editor\n     *  consults these before auto-committing on Enter or blur. */\n    saveOn: SaveTrigger[];\n    startEditing: (rowId: string, columnId: string) => void;\n    cancelEditing: () => void;\n    setDraft: (rowId: string, columnId: string, value: unknown) => void;\n    commitCell: (rowId: string, columnId: string, value: unknown) => void;\n    beginRowSession: (rowId: string) => void;\n    commitRowSession: (rowId: string) => Promise<boolean>;\n    cancelRowSession: () => void;\n    /** Persist every outstanding draft across all rows in one write (bulk save). */\n    commitAll: () => Promise<boolean>;\n    /** Discard every outstanding draft across all rows. */\n    cancelAll: () => void;\n    getDirtyChanges: () => Array<CellChange<TData>>;\n    /** Every unsaved edit as old → new (+ formatted display strings) — what the\n     *  review-changes sheet lists. Ordered by first-edit time. */\n    getChangeSet: () => Array<BstCellEdit<TData>>;\n    /** Discard ONE unsaved edit — the cell reverts to its upstream value. */\n    revertCell: (rowId: string, columnId: string) => void;\n    /** Discard every unsaved edit in a row. */\n    revertRow: (rowId: string) => void;\n    /** Format a value for display using the column's cell type (`format`). */\n    formatValue: (columnId: string, value: unknown) => string;\n    /** Revert the last committed data change (`onDataChange`). *\n  // …truncated",
+    "doc": "Resolved save triggers (`enter`/`blur`/`explicit`). The inline editor consults these before auto-committing on Enter or blur."
+  },
+  {
+    "symbol": "BstRuntimeHandle",
+    "kind": "interface",
+    "signature": "export interface BstRuntimeHandle<TData extends RowData> {\n    runtime: BstRuntime<TData>;\n    registry: CellTypeRegistry;\n    editingMode: 'cell' | 'row' | 'batch';\n    enableRowActions: boolean;\n    /** Row selection checkbox column is active (Phase 3). */\n    enableRowSelection: boolean;\n    /** Column pinning (sticky) is active (Phase 3) — affects the select column too. */\n    enableColumnPinning: boolean;\n    /** Column drag-to-reorder is active (Phase 3). */\n    enableColumnOrdering: boolean;\n    /** Per-column header filter row is rendered (Phase 3, \"dual filter\"). */\n    enableColumnFilterRow: boolean;\n    /** Set Filter (X4) — eligible columns show a distinct-values checklist in the filter row. */\n    enableSetFilter: boolean;\n    /** Multi-filter (X11) — columns with an array `meta.filter` stack those filters. */\n    enableMultiFilter: boolean;\n    /** Cell/range selection + keyboard nav is active (Phase 3). */\n    enableCellSelection: boolean;\n    /** Clipboard copy/paste is active (Phase 3). */\n    enableClipboard: boolean;\n    /** Undo/redo is active (Phase 3, C5). */\n    enableUndoRedo: boolean;\n    /** Inline editing is active — read by the shortcuts overlay (`<BstShortcuts>`). */\n    enableEditing: boolean;\n    /** Whole-column copy gesture is active (clipboard on + not opted out). */\n    enableCopyColumn: boolean;\n    /** Whole-row copy gesture is active (clipboard on + not opted out). */\n    enableCopyRow: boolean;\n    /**\n     * Column ids the caller supplied an explicit `columnDef.cell` for. v9 always\n     * populates a *default* `cell`, so this is how\n  // …truncated",
+    "doc": "Row selection checkbox column is active (Phase 3)."
+  },
+  {
+    "symbol": "BstSaveEvent",
+    "kind": "interface",
+    "signature": "export interface BstSaveEvent<TData> {\n    /** Every pending cell edit, flat. */\n    changes: BstCellEdit<TData>[];\n    /** The same edits grouped per row. */\n    rows: BstRowChange<TData>[];\n    /** The full next data array (what `onDataChange` receives after the save). */\n    next: TData[];\n}",
+    "doc": "The payload of ONE save action (I2/I4). Handed to `onSave` exactly once per confirm — never per cell/row/column — so the backend call stays a single batched request whichever granularity the API wants: `changes` (cell-wise), `rows[].patch` (row-wise), or `next` (whole grid)."
+  },
+  {
+    "symbol": "BstSelectionStats",
+    "kind": "interface",
+    "signature": "export interface BstSelectionStats {\n    /** Total selected cells (real data rows only). */\n    count: number;\n    /** How many of the selected cells hold a numeric value. */\n    numericCount: number;\n    /** Sum of the numeric cells. */\n    sum: number;\n    /** Mean of the numeric cells (0 when none). */\n    avg: number;\n    /** Min of the numeric cells (0 when none). */\n    min: number;\n    /** Max of the numeric cells (0 when none). */\n    max: number;\n}",
+    "doc": "Aggregate of the current cell selection — shown in the status bar (X5)."
+  },
+  {
+    "symbol": "BstServerTableProps",
+    "kind": "interface",
+    "signature": "export interface BstServerTableProps<TData> {\n    data: TData[];\n    manualSorting: true;\n    manualFiltering: true;\n    manualPagination: true;\n    autoResetPageIndex: false;\n    rowCount: number;\n    state: {\n        sorting: DsSort[];\n        columnFilters: DsColumnFilter[];\n        globalFilter: string;\n        pagination: DsPagination;\n    };\n    onSortingChange: (u: Updater<DsSort[]>) => void;\n    onColumnFiltersChange: (u: Updater<DsColumnFilter[]>) => void;\n    onGlobalFilterChange: (u: Updater<string>) => void;\n    onPaginationChange: (u: Updater<DsPagination>) => void;\n    /** Fetch in flight (X23) — drives the loading overlay. */\n    loading: boolean;\n    /** Last fetch error, or null (X23) — drives the error overlay. */\n    error: Error | null;\n}",
+    "doc": "Props to spread into `useBstTable` / an adapter to run the grid in server mode."
+  },
+  {
+    "symbol": "BstSetFilter",
+    "kind": "function",
+    "signature": "export declare function BstSetFilter({ column, table, label, value, onChange }: BstSetFilterProps): React.JSX.Element;",
+    "doc": ""
+  },
+  {
+    "symbol": "BstSetFilterOption",
+    "kind": "interface",
+    "signature": "export interface BstSetFilterOption {\n    /** The stored value (stringified) — what the filter matches on. */\n    value: string;\n    /** Human label (from `meta.options`, else the value itself). */\n    label: string;\n    /** How many rows carry this value (when derivable). */\n    count?: number;\n}",
+    "doc": "Set Filter (X4) — an Excel-style **checklist of distinct values** for one column. A dependency-free popover (search · select-all / clear · per-value counts · a \"(Blanks)\" entry) that drives the column's own `columnFilters` entry via `setFilterValue({ op: 'set', value })` — interpreted by the `bstCondition` filterFn, so it composes with the filter builder and the rest of the filter row. When every value is checked the filter clears (inactive); an empty selection matches nothing. Distinct values come from `meta.options` when present, else from the grid's rows (client mode — under a server `DataSource` it lists the loaded page). Rendered inside the per-column filter row for eligible columns; also exported for bespoke filter UIs."
+  },
+  {
+    "symbol": "BstSetFilterProps",
+    "kind": "interface",
+    "signature": "export interface BstSetFilterProps {\n    /** The TanStack column this filter targets. */\n    column: any;\n    /** The TanStack table instance (source of distinct values). */\n    table: any;\n    /** Accessible label; defaults to the column header / id. */\n    label?: string;\n    /**\n     * Controlled slot (multi-filter, X11). When `onChange` is given, the checklist\n     * reads/writes this `{ op:'set', value }` condition instead of the column's whole\n     * filter value — so it can be one part of a stacked filter. Omit both for the\n     * default standalone mode (drives `column.setFilterValue` directly).\n     */\n    value?: {\n        op?: string;\n        value?: string[];\n    };\n    onChange?: (condition: {\n        op: 'set';\n        value: string[];\n    } | undefined) => void;\n}",
+    "doc": "The TanStack column this filter targets."
+  },
+  {
+    "symbol": "BstSettingKey",
+    "kind": "type",
+    "signature": "export type BstSettingKey = keyof BstTableEngineToggles | ExtraEngineSettingKey | ChromeSettingKey;",
+    "doc": "Runtime settings (§12 chrome). The adapters render a gear → a side \"sheet\" where the end-user flips this grid's features on/off at runtime, **per table**, persisted to `localStorage`. The logic is pure/headless and lives here so both adapters share one model; each renders it in its own idiom (MUI Drawer, shadcn slide-over). Nothing here imports a UI library."
+  },
+  {
+    "symbol": "BstSettingsGroup",
+    "kind": "interface",
+    "signature": "export interface BstSettingsGroup {\n    name: string;\n    items: BstSettingsItem[];\n}",
+    "doc": "Items grouped for sheet rendering (a labelled section per group)."
+  },
+  {
+    "symbol": "BstSettingsItem",
+    "kind": "interface",
+    "signature": "export interface BstSettingsItem {\n    key: BstSettingKey;\n    label: string;\n    group: string;\n    layer: 'engine' | 'chrome';\n    hint?: string;\n    /** Current effective value — the user override if present, else the developer prop / default. */\n    value: boolean;\n    /** True when the user has changed this away from the developer-provided value. */\n    overridden: boolean;\n    /**\n     * A prerequisite (`requires`) is off, so this toggle can't take effect — the\n     * sheet renders it disabled and non-interactive until the parent is back on.\n     */\n    disabled: boolean;\n    /** Label of the prerequisite blocking it (for a tooltip), when `disabled`. */\n    disabledBy?: string;\n    /**\n     * The prerequisite this item hangs off **within the same group** — set when the\n     * required parent is also rendered in this section, so the sheet can draw a\n     * tree/branch connector from parent to child. Cross-group prerequisites (parent\n     * in another section) stay unlinked; the \"Needs …\" hint still names them.\n     */\n    parentKey?: BstSettingKey;\n    /** This is the last child of its `parentKey` in the group — the connector's\n     *  vertical branch line stops at this row. */\n    lastChild?: boolean;\n    set: (next: boolean) => void;\n    toggle: () => void;\n    reset: () => void;\n}",
+    "doc": "One toggle in the settings sheet — its live value plus mutators."
+  },
+  {
+    "symbol": "BstSettingsModel",
+    "kind": "interface",
+    "signature": "export interface BstSettingsModel {\n    /** Flat, in registry order. */\n    items: BstSettingsItem[];\n    /** Grouped for sheet rendering. */\n    groups: BstSettingsGroup[];\n    /** How many settings the user has changed from the developer configuration. */\n    overrideCount: number;\n    /** Clear every override — back to the developer-provided configuration. */\n    reset: () => void;\n    /** The `localStorage` key in use, or `null` when persistence is off. */\n    storageKey: string | null;\n}",
+    "doc": "The headless model an adapter renders as the settings sheet."
+  },
+  {
+    "symbol": "BstSettingsOptions",
+    "kind": "interface",
+    "signature": "export interface BstSettingsOptions {\n    /**\n     * Restrict the sheet to these keys (rendered in registry order). Omit → auto:\n     * the default-on data/display features plus any opt-in feature the developer\n     * has enabled.\n     */\n    features?: BstSettingKey[];\n    /** Sheet heading. Default `\"Table settings\"`. */\n    title?: string;\n    /**\n     * Explicit `localStorage` key. Omit → a key derived from the column ids (stable\n     * per grid shape). Set this to disambiguate two grids with identical columns.\n     */\n    persistKey?: string;\n    /** Persist the user's choices to `localStorage`. Default `true`. */\n    persist?: boolean;\n    /**\n     * Show a search box in the sheet to filter the toggle list — the sheet can list\n     * 30+ features, so it's on by default but appears **only once the sheet has more\n     * than a handful of items** (`{@link shouldShowSettingsSearch}`). `true` always\n     * shows it; `false` never. Filters by label / hint / group name.\n     */\n    search?: boolean;\n}",
+    "doc": "Options for the settings sheet (`showSettings={{ … }}`). Passing an object implies enabled (§12)."
+  },
+  {
+    "symbol": "BstSettingsOverrides",
+    "kind": "type",
+    "signature": "export type BstSettingsOverrides = Partial<Record<BstSettingKey, boolean>>;",
+    "doc": "Overrides map — a subset of keys the user has explicitly set."
+  },
+  {
+    "symbol": "BstShortcut",
+    "kind": "interface",
+    "signature": "export interface BstShortcut {\n    /** Key tokens for one chord. `'Mod'` → ⌘ on Mac / Ctrl elsewhere; `'Shift'` →\n     *  ⇧ / Shift; `'Arrows'` → the arrow cluster; others render literally. */\n    keys: string[];\n    /** Short human label. */\n    label: string;\n    category: ShortcutCategory;\n    /** Engine flags that must ALL be active for this shortcut to fire. */\n    requires: string[];\n    /** Show this entry only on the given platform (e.g. `⌘Y` redo is a PC-only\n     *  convention). Omit → shown on both. Filtered by `resolveActiveShortcuts`. */\n    platform?: 'mac' | 'pc';\n}",
+    "doc": "Key tokens for one chord. `'Mod'` → ⌘ on Mac / Ctrl elsewhere; `'Shift'` → ⇧ / Shift; `'Arrows'` → the arrow cluster; others render literally."
+  },
+  {
+    "symbol": "BstShortcuts",
+    "kind": "function",
+    "signature": "export declare function BstShortcuts<TData extends RowData>({ table, className, platform, }: BstShortcutsProps<TData>): React.JSX.Element;",
+    "doc": "In-UI keyboard-shortcuts help: a trigger button + a dependency-free overlay that lists **only the shortcuts active on this grid** (grouped, searchable, platform-aware). Also opens on `?`. Self-contained so an adapter just drops in `<BstShortcuts table={table} />`."
+  },
+  {
+    "symbol": "BstShortcutsProps",
+    "kind": "interface",
+    "signature": "export interface BstShortcutsProps<TData extends RowData> {\n    /** The table from `useBstTable` / `useBstGrid` — its resolved flags decide which\n     *  shortcuts are shown. */\n    table: unknown;\n    /** Extra class on the trigger button (adapters can blend it into their toolbar). */\n    className?: string;\n    /** Key rendering: `'mac'` forces ⌘/⇧, `'pc'` forces Ctrl, `'auto'` (default)\n     *  detects from `navigator`. Use it when detection is unreliable (remote/proxied). */\n    platform?: 'mac' | 'pc' | 'auto';\n}",
+    "doc": "The table from `useBstTable` / `useBstGrid` — its resolved flags decide which shortcuts are shown."
+  },
+  {
+    "symbol": "BstSpanContext",
+    "kind": "interface",
+    "signature": "export interface BstSpanContext<TData = any> {\n    row: TData;\n    rowId: string;\n    columnId: string;\n    value: unknown;\n    /** Visual (post sort/filter/paginate) row index. */\n    rowIndex: number;\n    /** Visible-leaf column index. */\n    colIndex: number;\n}",
+    "doc": "Context handed to `getCellSpan` for one visible body cell."
+  },
+  {
+    "symbol": "BstStickyHeaderOptions",
+    "kind": "interface",
+    "signature": "export interface BstStickyHeaderOptions {\n    /**\n     * Max body height as a CSS pixel number (e.g. `440`) or any CSS length string\n     * (e.g. `'60vh'`). Wins over `maxRows`. Default: 440px.\n     */\n    maxHeight?: number | string;\n    /**\n     * Cap the viewport to roughly this many body rows. Converted to a pixel height\n     * with a fixed row-height estimate (see {@link STICKY_ROW_PX}), so it is\n     * **approximate** across densities — use `maxHeight` when you need an exact box.\n     */\n    maxRows?: number;\n}",
+    "doc": "Sticky-header viewport (G3/G4) — the small render-layer companion that caps the scroll box to a bounded height so the body scrolls **inside** the grid under a header (and per-column filter row) that stays pinned, instead of the whole table growing taller as the page size grows. Opt-in per §12 (`enableStickyHeader`), off by default. Row virtualization already does exactly this (its `.bst-virtualized` rules cap the body + stick the header); this is the same viewport **without** row windowing, for the small / medium grids where windowing isn't warranted. So `BstTable` adds the `.bst-sticky-header` class only when virtualization is off — see `BstTable.tsx`. This module holds only the **pure** resolve helper; the class + inline `--bst-max-height` var are applied in `BstTable.tsx`."
+  },
+  {
+    "symbol": "BstStyles",
+    "kind": "interface",
+    "signature": "export interface BstStyles<TData extends RowData = any> {\n    root?: React.CSSProperties;\n    table?: React.CSSProperties;\n    header?: React.CSSProperties;\n    headerRow?: React.CSSProperties;\n    headerCell?: React.CSSProperties | ((ctx: BstHeaderSlotContext) => React.CSSProperties | undefined);\n    filterRow?: React.CSSProperties;\n    body?: React.CSSProperties;\n    row?: React.CSSProperties | ((ctx: BstRowContext<TData>) => React.CSSProperties | undefined);\n    cell?: React.CSSProperties | ((ctx: CellRenderProps<TData>) => React.CSSProperties | undefined);\n    empty?: React.CSSProperties;\n}",
+    "doc": "Inline styles / CSS variables per structural slot — parallels {@link BstClassNames}."
+  },
+  {
+    "symbol": "BstTable",
+    "kind": "function",
+    "signature": "export declare function BstTable({ table, className, icons, }: {\n    table: any;\n    className?: string;\n    /** Body-icon overrides (sort / expander / pin / boolean / file). Adapters\n     * forward their own icon set; unspecified slots use the built-in SVGs. */\n    icons?: BstIconOverrides;\n}): React.JSX.Element;",
+    "doc": "Neutral, theme-agnostic table body renderer (Plan.md §2.6). Uses only semantic HTML + CSS classes driven by CSS custom properties. In Phase 2 each cell is a memoized `GridCell` that consults the cell-type registry (read path), the interaction store (edit/dirty/error state) and the runtime (edit lifecycle). MUI / shadcn skins theme it purely via `--bst-table-*` vars."
+  },
+  {
+    "symbol": "BstTableColumn",
+    "kind": "type",
+    "signature": "export type BstTableColumn<TData extends RowData> = ColumnDef<BstTableFeatures, TData, any>;",
+    "doc": "A Bst-Table column definition, pre-bound to the engine's feature set."
+  },
+  {
+    "symbol": "BstTableEngineToggles",
+    "kind": "interface",
+    "signature": "export interface BstTableEngineToggles {\n    /** Column sorting. Maps to v9 `enableSorting`. Default: true. */\n    enableSorting?: boolean;\n    /** Global search filtering behaviour. Maps to v9 `enableGlobalFilter`. Default: true. */\n    enableGlobalFilter?: boolean;\n    /** Per-column filtering behaviour (drives the E3 filter builder). Maps to v9 `enableColumnFilters`. Default: true. */\n    enableColumnFilters?: boolean;\n    /**\n     * Set Filter (X4) — an Excel-style **checklist of distinct values** per column,\n     * rendered in the per-column filter row. When on, categorical columns\n     * (`singleSelect` / `multiSelect` / `radio` / `boolean`) use the checklist; any\n     * column can force it via `meta.filter: 'set'` or opt out via\n     * `meta.filter: 'condition'`. Needs `enableColumnFilters` + the filter row\n     * (`enableColumnFilterRow`) to be visible. Default: false.\n     */\n    enableSetFilter?: boolean;\n    /**\n     * Multi-filter (X11) — **stack several filter types on one column**. A column\n     * opts in with `meta.filter` as an array (e.g. `['condition', 'set']`), which\n     * renders the listed filters **stacked** in its filter row; a row must satisfy\n     * **all** of them (AND). Needs `enableColumnFilters` + `enableColumnFilterRow`\n     * (and `enableSetFilter` for a `'set'` part). Default: false.\n     */\n    enableMultiFilter?: boolean;\n    /** Column show/hide behaviour. Maps to v9 `enableHiding`. Default: true. */\n    enableHiding?: boolean;\n    /** Column resizing. Maps to v9 `enableColumnResizing`. Default: true. */\n    enableColumnResizing?: boole\n  // …truncated",
+    "doc": "Engine-behaviour toggles (§12 `enable*` layer). OOTB data features default ON (opt-out); heavy features (editing, validation) default OFF (opt-in)."
+  },
+  {
+    "symbol": "bstTableFeatures",
+    "kind": "const",
+    "signature": "const bstTableFeatures: {\n    rowSortingFeature: import(\"@tanstack/table-core\").TableFeature;\n    columnFilteringFeature: import(\"@tanstack/table-core\").TableFeature;\n    globalFilteringFeature: import(\"@tanstack/table-core\").TableFeature;\n    rowPaginationFeature: import(\"@tanstack/table-core\").TableFeature;\n    rowSelectionFeature: import(\"@tanstack/table-core\").TableFeature;\n    rowExpandingFeature: import(\"@tanstack/table-core\").TableFeature;\n    rowPinningFeature: import(\"@tanstack/table-core\").TableFeature;\n    columnGroupingFeature: import(\"@tanstack/table-core\").TableFeature;\n    rowAggregationFeature: import(\"@tanstack/table-core\").TableFeature;\n    columnVisibilityFeature: import(\"@tanstack/table-core\").TableFeature;\n    columnOrderingFeature: import(\"@tanstack/table-core\").TableFeature;\n    columnPinningFeature: import(\"@tanstack/table-core\").TableFeature;\n    columnSizingFeature: import(\"@tanstack/table-core\").TableFeature;\n    columnResizingFeature: import(\"@tanstack/table-core\").TableFeature;\n    coreRowModel: (table: import(\"@tanstack/table-core\").Table<any, any>) => () => import(\"@tanstack/table-core\").RowModel<any, any>;\n    sortedRowModel: (table: import(\"@tanstack/table-core\").Table<any, any>) => () => import(\"@tanstack/table-core\").RowModel<any, any>;\n    filteredRowModel: (table: import(\"@tanstack/table-core\").Table<any, any>) => () => import(\"@tanstack/table-core\").RowModel<any, any>;\n    paginatedRowModel: (table: import(\"@tanstack/table-core\").Table<any, any>) => () => import(\"@tanstack/table-core\").RowModel<any, any>;\n    expandedRowModel: (table: i\n  // …truncated",
+    "doc": ""
+  },
+  {
+    "symbol": "BstTableFeatures",
+    "kind": "type",
+    "signature": "export type BstTableFeatures = typeof bstTableFeatures;",
+    "doc": ""
+  },
+  {
+    "symbol": "BstTableInstance",
+    "kind": "type",
+    "signature": "export type BstTableInstance<TData extends RowData> = ReturnType<typeof useBstTable<TData>>;",
+    "doc": ""
+  },
+  {
+    "symbol": "buildPrintHtml",
+    "kind": "function",
+    "signature": "export declare function buildPrintHtml(matrix: BstExportMatrix, opts?: PrintOptions): string;",
+    "doc": "Build a standalone, print-friendly HTML document for the matrix."
+  },
+  {
+    "symbol": "CellAccess",
+    "kind": "interface",
+    "signature": "export interface CellAccess {\n    /** Interaction is turned off (grid / row / column / cell disable). */\n    disabled: boolean;\n    /** The cell can be edited (editing on, not disabled, `meta.editable` true). */\n    editable: boolean;\n}",
+    "doc": "Resolved access for a cell (F1–F4 cascade)."
+  },
+  {
+    "symbol": "CellChange",
+    "kind": "interface",
+    "signature": "export interface CellChange<TData> {\n    rowId: string;\n    columnId: string;\n    value: unknown;\n    row: TData | undefined;\n}",
+    "doc": ""
+  },
+  {
+    "symbol": "CellEditProps",
+    "kind": "interface",
+    "signature": "export interface CellEditProps<TData extends RowData = any, TValue = unknown> extends CellRenderProps<TData, TValue> {\n    /** Current draft value (seeded from the source value or an existing draft). */\n    draft: TValue;\n    /** Update the local draft — does NOT persist until `commit`. */\n    setDraft: (v: TValue) => void;\n    /** Persist per the save policy (Enter / explicit / blur). */\n    commit: (override?: TValue) => void;\n    /** Abandon the edit, restoring the source value. */\n    cancel: () => void;\n    /** Whether the editor should grab focus on mount. */\n    autoFocus: boolean;\n}",
+    "doc": "Props passed to `renderEdit`. Adds the draft + commit/cancel lifecycle."
+  },
+  {
+    "symbol": "cellKey",
+    "kind": "function",
+    "signature": "export declare function cellKey(rowId: string, columnId: string): string;",
+    "doc": "Composite key for a cell (`rowId` first so a row's cells sort together)."
+  },
+  {
+    "symbol": "CellRef",
+    "kind": "interface",
+    "signature": "export interface CellRef {\n    rowId: string;\n    columnId: string;\n}",
+    "doc": "A cell address by stable ids (never indices — Plan.md §2.4/§2.5)."
+  },
+  {
+    "symbol": "CellRenderProps",
+    "kind": "interface",
+    "signature": "export interface CellRenderProps<TData extends RowData = any, TValue = unknown> {\n    value: TValue;\n    row: TData;\n    rowId: string;\n    columnId: string;\n    meta: BstColumnMeta<TData, TValue>;\n    /** True when a dirty draft is being shown (deferred / row-session edits). */\n    isDirty: boolean;\n    api: BstCellApi<TData>;\n}",
+    "doc": "Props passed to `renderRead`. Cheap + scalar-friendly (hot path)."
+  },
+  {
+    "symbol": "CellType",
+    "kind": "interface",
+    "signature": "export interface CellType<TValue = unknown, TMeta = unknown, TData extends RowData = any> {\n    /** Registry key — matched against `columnDef.meta.type`. */\n    id: string;\n    /** Hot-path read renderer — plain DOM, no component library. */\n    renderRead: (p: CellRenderProps<TData, TValue>) => React.ReactNode;\n    /** Edit renderer — adapters provide the rich version (MUI / shadcn). */\n    renderEdit?: (p: CellEditProps<TData, TValue>) => React.ReactNode;\n    /** Inline (in-cell) vs popup (dialog) editing. Default: `'inline'`. */\n    editMode?: 'inline' | 'popup';\n    /** Parse typed / pasted text into a value (clipboard + text I/O). */\n    parse?: (raw: string, meta: BstColumnMeta<TData, TValue>) => TValue;\n    /** Format a value for display + copy. */\n    format?: (v: TValue, meta: BstColumnMeta<TData, TValue>) => string;\n    /** Built-in validator, composed before the column-level validator (C3). */\n    validate?: (v: TValue, ctx: CellValidateContext<TData>) => FieldError[] | Promise<FieldError[]>;\n    /** When true the editor consumes arrow keys (keyboard-nav yields to it). */\n    capturesArrowKeys?: boolean;\n    /**\n     * When true the editor opens its own portalled overlay (e.g. a MUI `Select`\n     * menu, a date-picker popper) that renders OUTSIDE this cell in the DOM.\n     * The host then skips its default commit-on-blur — opening the overlay moves\n     * focus out of the cell, which would otherwise commit and tear the editor down\n     * before the user can pick a value. Such editors MUST commit/cancel themselves\n     * (e.g. `commit(v)` on change, `cancel()`/`co\n  // …truncated",
+    "doc": "A registered cell type (Plan.md §2.3)."
+  },
+  {
+    "symbol": "CellTypeRegistry",
+    "kind": "interface",
+    "signature": "export interface CellTypeRegistry {\n    register: (ct: CellType<any, any, any>) => void;\n    /** Resolve a type id, falling back to `'text'` when unknown / undefined. */\n    get: (id: string | undefined) => CellType<any, any, any>;\n    has: (id: string) => boolean;\n    list: () => string[];\n    /** A shallow copy so adapters can extend without mutating a shared instance. */\n    clone: () => CellTypeRegistry;\n}",
+    "doc": "A cell-type registry (Plan.md §2.3, concern #2). Keyed by `CellType.id`, which is matched against `columnDef.meta.type`. Adapters seed one via their preset (`createMuiPreset` / `createShadcnPreset`) and may override individual types."
+  },
+  {
+    "symbol": "CellValidateContext",
+    "kind": "interface",
+    "signature": "export interface CellValidateContext<TData extends RowData = any> {\n    row: TData;\n    rowId: string;\n    columnId: string;\n    meta: BstColumnMeta<TData>;\n    /** Read a sibling cell's current (draft-aware) value for cross-column rules. */\n    getSiblingValue: (columnId: string) => unknown;\n    /** Aborts when a newer edit supersedes this async validation. */\n    signal?: AbortSignal;\n}",
+    "doc": "Context handed to validators (supports cross-column + async — C3)."
+  },
+  {
+    "symbol": "clearGridState",
+    "kind": "function",
+    "signature": "export declare function clearGridState(key: string, storage?: BstGridStateStorage): void;",
+    "doc": "Remove a persisted snapshot (leaves the live grid untouched)."
+  },
+  {
+    "symbol": "code128",
+    "kind": "function",
+    "signature": "export declare function code128(text: string): BarcodeResult;",
+    "doc": "Encode `text` as Code 128B. Throws on non-printable-ASCII input."
+  },
+  {
+    "symbol": "combineFilterConditions",
+    "kind": "function",
+    "signature": "export declare function combineFilterConditions(conditions: (FilterCondition | undefined)[], op?: 'and' | 'or'): FilterConditionGroup | undefined;",
+    "doc": "Combine several conditions into the value a **multi-filter** column stores. Keeps every slot (positional, `undefined` allowed) so the stacked widgets stay aligned; returns `undefined` when no slot is active (so the column reads as unfiltered). `op` defaults to `and` (every part must match)."
+  },
+  {
+    "symbol": "CommitPolicy",
+    "kind": "type",
+    "signature": "export type CommitPolicy = 'blockCommitOnError' | 'commitButFlag';",
+    "doc": ""
+  },
+  {
+    "symbol": "computeAutoWidth",
+    "kind": "function",
+    "signature": "export declare function computeAutoWidth(texts: ReadonlyArray<string>, opts?: AutoSizeOptions): number;",
+    "doc": "The fitted width for a column: the widest of `texts` measured in the given font, plus padding, clamped to `[min, max]`. Feed it the header label + the current page's formatted cell values (sampling, not the whole dataset)."
+  },
+  {
+    "symbol": "computeCellSpans",
+    "kind": "function",
+    "signature": "export declare function computeCellSpans(rows: SpanRow[], cols: SpanCol[], getCellSpan?: (ctx: BstSpanContext) => BstCellSpan | undefined): SpanPlan;",
+    "doc": "Build the span plan for the visible rows × columns. O(rows × cols) — fine for the workflow/reporting tiers (a page of rows), which is the only tier without server-side windowing. `getCellSpan` (explicit) wins over `meta.rowSpan` groups for a given origin."
+  },
+  {
+    "symbol": "createCellTypeRegistry",
+    "kind": "function",
+    "signature": "export declare function createCellTypeRegistry(seed?: Array<CellType<any, any, any>>): CellTypeRegistry;",
+    "doc": ""
+  },
+  {
+    "symbol": "createClientDataSource",
+    "kind": "function",
+    "signature": "export declare function createClientDataSource<TData>(rows: readonly TData[], opts?: {\n    /** Read a column's value from a row. Default `(row, id) => row[id]`. */\n    getValue?: (row: TData, columnId: string) => unknown;\n    /** Column ids the **quick filter** searches. Default: all own fields of the row. */\n    columns?: string[];\n    /** Simulated latency (ms). Default 0. */\n    delayMs?: number;\n}): DataSource<TData>;",
+    "doc": "In-memory DataSource — applies **filter → quick-filter → sort → page** over `rows` using the SAME operator semantics (`evalCondition`) as the client grid. Sort is a best-effort natural comparison (numeric when both values parse as numbers, else locale string) — a real server defines its own ordering. Async (resolves a Promise, honours `AbortSignal`); `delayMs` simulates latency."
+  },
+  {
+    "symbol": "createColumnHelper",
+    "kind": "unknown",
+    "signature": "createColumnHelper",
+    "doc": ""
+  },
+  {
+    "symbol": "createDefaultRegistry",
+    "kind": "function",
+    "signature": "export declare function createDefaultRegistry(): CellTypeRegistry;",
+    "doc": "A registry seeded with the neutral defaults (used when no preset is supplied)."
+  },
+  {
+    "symbol": "createFileHandlers",
+    "kind": "function",
+    "signature": "export declare function createFileHandlers<TData>(source: DataSource<TData>, ctx?: DataSourceFileContext): BstFileCellHandlers;",
+    "doc": "Bridge a {@link DataSource}'s file verbs (I3) to the `files` cell's `cellMeta.onUpload` / `cellMeta.onDelete` hooks, so ONE server contract drives both the grid query and file storage. Drop the result into a column: ```ts meta: { type: 'files', editable: true, cellMeta: createFileHandlers(source) } ``` Only the verbs the source actually implements are wired (a source with no `uploadFile` leaves the cell on its local object-URL preview fallback)."
+  },
+  {
+    "symbol": "createInteractionStore",
+    "kind": "function",
+    "signature": "export declare function createInteractionStore(): InteractionStore;",
+    "doc": ""
+  },
+  {
+    "symbol": "createPdfjsThumbnailer",
+    "kind": "function",
+    "signature": "export declare function createPdfjsThumbnailer(pdfjs: PdfjsLike | (() => Promise<PdfjsLike | {\n    default: PdfjsLike;\n}>), opts?: PdfThumbnailerOptions): PdfThumbnailRenderer;",
+    "doc": "Build a {@link PdfThumbnailRenderer} backed by pdf.js. Pass your imported `pdfjs-dist` **module** (worker already configured) or a **loader** `() => import('pdfjs-dist')` for lazy loading — pdf.js is fetched only when the first thumbnail renders, so it stays out of your initial bundle. ```ts import * as pdfjs from 'pdfjs-dist' import Worker from 'pdfjs-dist/build/pdf.worker.min.mjs?worker' // Vite pdfjs.GlobalWorkerOptions.workerPort = new Worker() const thumbs = createPdfjsThumbnailer(pdfjs) // <BstPdfThumbnailerProvider renderer={thumbs}> … </BstPdfThumbnailerProvider> ```"
+  },
+  {
+    "symbol": "createRuntime",
+    "kind": "function",
+    "signature": "export declare function createRuntime<TData extends RowData>(initialCtx: RuntimeCtx<TData>): BstRuntime<TData>;",
+    "doc": ""
+  },
+  {
+    "symbol": "createServerDataSource",
+    "kind": "function",
+    "signature": "export declare function createServerDataSource<TData>(fetcher: (query: DataSourceQuery, signal?: AbortSignal) => Promise<DataSourcePage<TData>>): DataSource<TData>;",
+    "doc": "Wrap a fetch function as a DataSource (the server tier). Thin by design — your function *is* the source; this just names + types it. ```ts const source = createServerDataSource(async (q, signal) => { const res = await fetch('/api/rows?' + toParams(q), { signal }) const { rows, total } = await res.json() return { rows, totalCount: total } }) ```"
+  },
+  {
+    "symbol": "createStore",
+    "kind": "function",
+    "signature": "export declare function createStore<S>(initial: S): Store<S>;",
+    "doc": "A minimal immutable external store. Every `setState` produces a new object."
+  },
+  {
+    "symbol": "CsvOptions",
+    "kind": "interface",
+    "signature": "export interface CsvOptions {\n    /** Field separator. Default `\",\"`. */\n    delimiter?: string;\n    /** Include the header row. Default `true`. */\n    includeHeaders?: boolean;\n    /** Prepend a UTF-8 BOM so Excel opens non-ASCII correctly. Default `true`. */\n    bom?: boolean;\n    /** Line terminator. Default `\"\\r\\n\"` (RFC 4180). */\n    newline?: string;\n}",
+    "doc": "Options for {@link toCsv}."
+  },
+  {
+    "symbol": "DataSource",
+    "kind": "interface",
+    "signature": "export interface DataSource<TData> {\n    fetch(query: DataSourceQuery, signal?: AbortSignal): Promise<DataSourcePage<TData>>;\n    /**\n     * I3 — upload one picked file and return the stored {@link BstFileRef} to put in\n     * the row. Throw/reject to surface the failure (the cell keeps its busy state off).\n     */\n    uploadFile?(file: File, ctx?: DataSourceFileContext, signal?: AbortSignal): Promise<BstFileRef>;\n    /** I3 — delete a stored file (runs before the cell removes it). */\n    deleteFile?(ref: BstFileRef, ctx?: DataSourceFileContext, signal?: AbortSignal): Promise<void>;\n    /** I3 — resolve a fresh (short-lived) view URL for a stored file — B5 thumbnails / preview. */\n    getFileUrl?(ref: BstFileRef, ctx?: DataSourceFileContext, signal?: AbortSignal): Promise<string>;\n}",
+    "doc": "A pluggable data source. `signal` aborts a request the grid has superseded. Sort/filter `id`s are the **column ids** (map them to your DB fields server-side). Grouping and expansion are NOT part of the query — server-side grouping/aggregation is a separate concern, so enable `enableGrouping` only in client mode. The three **file verbs** (I3, Plan.md §2.2) are optional — implement them to move file storage server-side; bridge them to a `files` cell with {@link createFileHandlers}."
+  },
+  {
+    "symbol": "DataSourceFileContext",
+    "kind": "interface",
+    "signature": "export interface DataSourceFileContext {\n    /** Row the file belongs to (if any). */\n    rowId?: string;\n    /** Column the file belongs to (if any). */\n    columnId?: string;\n}",
+    "doc": "Where a file verb is acting — lets the server scope the upload/delete to a cell."
+  },
+  {
+    "symbol": "DataSourceFilter",
+    "kind": "interface",
+    "signature": "export interface DataSourceFilter {\n    /** Column id. */\n    id: string;\n    /** The column-filter value (operator-aware condition, or a plain value → `contains`). */\n    value: unknown;\n}",
+    "doc": "One per-column filter. `value` is a `{ op, value, value2? }` condition or a bare value."
+  },
+  {
+    "symbol": "DataSourcePage",
+    "kind": "interface",
+    "signature": "export interface DataSourcePage<TData> {\n    /** The rows for this page. */\n    rows: TData[];\n    /** Total rows matching the query across ALL pages — drives the page count. */\n    totalCount: number;\n    /** Optional grand total BEFORE filtering (for an \"X of Y — filtered from Z\" UI). */\n    unfilteredCount?: number;\n}",
+    "doc": "One page of results."
+  },
+  {
+    "symbol": "DataSourceQuery",
+    "kind": "interface",
+    "signature": "export interface DataSourceQuery {\n    /** Multi-column sort. */\n    sort: DataSourceSort[];\n    /** Per-column filters (E3 conditions). */\n    filters: DataSourceFilter[];\n    /** Global quick-filter text (the toolbar search box). */\n    quickFilter?: string;\n    /** Zero-based row offset of the requested page (`pageIndex * pageSize`). */\n    offset: number;\n    /** Page size (rows requested). */\n    limit: number;\n}",
+    "doc": "The query a page request carries — everything the server needs to return one page."
+  },
+  {
+    "symbol": "DataSourceSort",
+    "kind": "interface",
+    "signature": "export interface DataSourceSort {\n    /** Column id. */\n    id: string;\n    /** Descending? */\n    desc: boolean;\n}",
+    "doc": "DataSource — the client/server seam (Plan.md §2.2, §5). A grid runs identically over an in-memory array (tiers 1–2) or a server query (tier 3) by swapping the source; `useBstDataSource` drives it and puts the grid into TanStack **manual** mode (server does sort/filter/paginate). This is the foundation the artifact flagged as missing — the engine was client-only."
+  },
+  {
+    "symbol": "DATE_OPERATORS",
+    "kind": "const",
+    "signature": "const DATE_OPERATORS: FilterOperator[]",
+    "doc": ""
+  },
+  {
+    "symbol": "dateTimeCellType",
+    "kind": "const",
+    "signature": "const dateTimeCellType: CellType<string | Date | null>",
+    "doc": ""
+  },
+  {
+    "symbol": "DEFAULT_FORMAT_PRESETS",
+    "kind": "const",
+    "signature": "const DEFAULT_FORMAT_PRESETS: BstFormatPreset[]",
+    "doc": ""
+  },
+  {
+    "symbol": "defaultBstIcons",
+    "kind": "const",
+    "signature": "const defaultBstIcons: BstIcons",
+    "doc": ""
+  },
+  {
+    "symbol": "defaultCellTypes",
+    "kind": "const",
+    "signature": "const defaultCellTypes: Array<CellType<any, any, any>>",
+    "doc": ""
+  },
+  {
+    "symbol": "defineCellType",
+    "kind": "function",
+    "signature": "export declare function defineCellType<TValue, TMeta = unknown, TData extends RowData = any>(ct: CellType<TValue, TMeta, TData>): CellType<TValue, TMeta, TData>;",
+    "doc": "Identity helper for authoring a CellType with full inference."
+  },
+  {
+    "symbol": "defineFieldFormat",
+    "kind": "function",
+    "signature": "export declare function defineFieldFormat(fmt: FieldFormat): FieldFormat;",
+    "doc": "Identity helper for authoring a custom format with inference + a stable ref."
+  },
+  {
+    "symbol": "downloadBlob",
+    "kind": "function",
+    "signature": "export declare function downloadBlob(fileName: string, mime: string, data: string | Uint8Array): void;",
+    "doc": "Trigger a browser download of `data` as `fileName`. No-ops under SSR / jsdom (no `document` / `URL.createObjectURL`), so callers never need to guard."
+  },
+  {
+    "symbol": "DsColumnFilter",
+    "kind": "interface",
+    "signature": "export interface DsColumnFilter {\n    id: string;\n    value: unknown;\n}",
+    "doc": ""
+  },
+  {
+    "symbol": "DsPagination",
+    "kind": "interface",
+    "signature": "export interface DsPagination {\n    pageIndex: number;\n    pageSize: number;\n}",
+    "doc": ""
+  },
+  {
+    "symbol": "DsSort",
+    "kind": "interface",
+    "signature": "export interface DsSort {\n    id: string;\n    desc: boolean;\n}",
+    "doc": "Minimal TanStack-compatible state shapes the grid controls."
+  },
+  {
+    "symbol": "EditingOptions",
+    "kind": "interface",
+    "signature": "export interface EditingOptions {\n    /**\n     * `'cell'` = commit each cell; `'row'` = deferred row session (C2 ≡ I2);\n     * `'batch'` = EVERY edit (typed or pasted) stays an unsaved draft until an\n     * explicit save — the mode behind the review-changes sheet + single `onSave`\n     * API call. Default `'cell'`.\n     */\n    mode?: 'cell' | 'row' | 'batch';\n    /** When a committed value is saved. Default `['enter', 'blur']`. */\n    saveOn?: SaveTrigger | SaveTrigger[];\n    /** What happens when a commit is invalid. Default `'blockCommitOnError'`. */\n    policy?: CommitPolicy;\n}",
+    "doc": "Options for the Editing feature (Phase 2). Passing an object implies enabled (§12)."
+  },
+  {
+    "symbol": "emptyGridState",
+    "kind": "function",
+    "signature": "export declare function emptyGridState(select?: BstGridStateSelect): BstGridState;",
+    "doc": "An \"empty\" snapshot — the cleared view (no sort / filter, default column layout). By default omits `pagination` and `rowSelection` (clearing those is rarely what \"reset view\" means); request them via `include` if you want them."
+  },
+  {
+    "symbol": "ensureExtension",
+    "kind": "function",
+    "signature": "export declare function ensureExtension(name: string, ext: string): string;",
+    "doc": "Ensure `name` ends with `.ext` (case-insensitive), appending if missing."
+  },
+  {
+    "symbol": "escapeHtml",
+    "kind": "function",
+    "signature": "export declare function escapeHtml(s: string): string;",
+    "doc": "Dependency-free rich-text helpers for the `richText` cell type. Stored value is **sanitized HTML**; read mode shows a **plain-text preview** (`htmlToText`), edit mode is a `contentEditable` surface whose output is run through `sanitizeHtml` (an allow-list, so no script/style/handlers survive) on commit — no DOMPurify."
+  },
+  {
+    "symbol": "evalCellFormat",
+    "kind": "function",
+    "signature": "export declare function evalCellFormat<TData = any>(rules: ReadonlyArray<BstFormatRule<TData>>, ctx: BstFormatContext<TData>, getValue: (columnId: string) => unknown): FormatResult;",
+    "doc": "Merge all matching **cell-scope** rules for one cell."
+  },
+  {
+    "symbol": "evalCondition",
+    "kind": "function",
+    "signature": "export declare function evalCondition(cell: unknown, raw: unknown): boolean;",
+    "doc": "Evaluate a `{ op, value }` condition (or a bare value → contains) on a cell."
+  },
+  {
+    "symbol": "evalRowFormat",
+    "kind": "function",
+    "signature": "export declare function evalRowFormat<TData = any>(rules: ReadonlyArray<BstFormatRule<TData>>, row: TData, rowId: string, getValue: (columnId: string) => unknown): FormatResult;",
+    "doc": "Merge all matching **row-scope** rules for one row."
+  },
+  {
+    "symbol": "EXPORT_MIME",
+    "kind": "const",
+    "signature": "const EXPORT_MIME: {\n    readonly csv: 'text/csv;charset=utf-8';\n    readonly xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';\n    readonly html: 'text/html;charset=utf-8';\n}",
+    "doc": ""
+  },
+  {
+    "symbol": "FIELD_FORMATS",
+    "kind": "const",
+    "signature": "const FIELD_FORMATS: Record<string, FieldFormat>",
+    "doc": ""
+  },
+  {
+    "symbol": "FieldError",
+    "kind": "interface",
+    "signature": "export interface FieldError {\n    level: FieldErrorLevel;\n    message: string;\n    code?: string;\n}",
+    "doc": "A single validation finding for a cell or row (feeds L1–L3 error UI)."
+  },
+  {
+    "symbol": "FieldErrorLevel",
+    "kind": "type",
+    "signature": "export type FieldErrorLevel = 'error' | 'warning';",
+    "doc": "Cell-type registry contract (Plan.md §2.3). A `CellType` bundles the read renderer (hot path, plain DOM — NO MUI), an optional edit renderer (adapters own this), parse/format (clipboard + text I/O) and a validator. Types are selected per column via `columnDef.meta.type` and resolved once per column. Everything here is framework-owned and UI-agnostic so it stays tsc-clean and lets MUI / shadcn adapters implement the same contract (§2.6)."
+  },
+  {
+    "symbol": "FieldFormat",
+    "kind": "interface",
+    "signature": "export interface FieldFormat {\n    /** Stable id. */\n    name: string;\n    /** Human label (docs / builder UIs). */\n    label: string;\n    /**\n     * Validate a **non-empty** value → an error message, or `null` when valid.\n     * Emptiness is the `required` check's job — return `null` for `''` here.\n     */\n    validate?: (value: string) => string | null;\n    /** Format the stored value for display (the mask). Default: shown as-is. */\n    mask?: (value: string) => string;\n    /** Normalize raw editor input as the user types (uppercase / strip separators). */\n    normalize?: (raw: string) => string;\n    /** Placeholder for an empty editor. */\n    placeholder?: string;\n    /** `inputMode` hint for the editor (mobile keyboards). */\n    inputMode?: 'text' | 'decimal' | 'numeric' | 'tel' | 'email' | 'url' | 'search';\n    /** Max input length after normalization. */\n    maxLength?: number;\n}",
+    "doc": "Field-format presets (ERP / Frappe-style, B2/B1). A named **validation + input-mask** applied to a `text` or `number` cell through `cellMeta.pattern`, so the common identity / finance fields an ERP form needs — Aadhaar, PAN, GSTIN, IFSC, email, phone, PIN code, … — validate, mask and normalize consistently without hand-writing a `meta.validate` for each column. ```ts { id: 'aadhaar', meta: { type: 'number', editable: true, cellMeta: { pattern: 'aadhaar' } } } { id: 'pan',     meta: { type: 'text',   editable: true, cellMeta: { pattern: 'pan' } } } ``` `cellMeta.pattern` accepts a **built-in name** (`'aadhaar'`), a **`RegExp`** (with an optional `cellMeta.patternMessage`), or a **custom `FieldFormat`** object. Register your own reusable formats with {@link defineFieldFormat} or by adding to {@link FIELD_FORMATS}. Checksum validators (Aadhaar/Verhoeff, GSTIN) are exported for use outside the grid too."
+  },
+  {
+    "symbol": "FieldPattern",
+    "kind": "type",
+    "signature": "export type FieldPattern = string | RegExp | FieldFormat;",
+    "doc": "What `cellMeta.pattern` accepts."
+  },
+  {
+    "symbol": "filesCellType",
+    "kind": "const",
+    "signature": "const filesCellType: CellType<unknown>",
+    "doc": ""
+  },
+  {
+    "symbol": "FilterCondition",
+    "kind": "interface",
+    "signature": "export interface FilterCondition {\n    op: string;\n    value?: unknown;\n    value2?: unknown;\n}",
+    "doc": "A single column condition stored as the column filter value."
+  },
+  {
+    "symbol": "FilterConditionGroup",
+    "kind": "interface",
+    "signature": "export interface FilterConditionGroup {\n    op: 'and' | 'or';\n    conditions: (FilterCondition | undefined)[];\n}",
+    "doc": "A compound of column conditions combined with `and` / `or` — the value a **multi-filter** column stores (X11), so several filter types (e.g. a text condition **+** a Set Filter) stack on ONE column. `evalCondition` / `isConditionActive` understand it, so it flows through the same `bstCondition` filterFn as a single condition. Slots are positional (one per filter part) and may be `undefined` (an empty part), so the stacked widgets keep a stable index."
+  },
+  {
+    "symbol": "filterFn_bstCondition",
+    "kind": "function",
+    "signature": "export declare function filterFn_bstCondition(row: any, columnId: string, filterValue: unknown): boolean;",
+    "doc": "TanStack v9 `filterFn` that interprets a `{ op, value }` condition."
+  },
+  {
+    "symbol": "FilterOperator",
+    "kind": "interface",
+    "signature": "export interface FilterOperator {\n    op: string;\n    label: string;\n    /** Number of value inputs: 0 = unary (is empty), 1 = default, 2 = between. */\n    arity?: 0 | 1 | 2;\n}",
+    "doc": "One selectable operator in the filter builder."
+  },
+  {
+    "symbol": "filterSettingsGroups",
+    "kind": "function",
+    "signature": "export declare function filterSettingsGroups(groups: readonly BstSettingsGroup[], query: string): BstSettingsGroup[];",
+    "doc": "Filter the sheet's groups by a free-text query (case-insensitive), for the search box. A setting matches on its **label** or **hint**; a group whose **name** matches keeps all its items (so \"export\" surfaces the whole Export section). An empty / whitespace query returns the groups unchanged. Pure — both adapters share it, like the rest of this model. Returns fresh group objects (item references reused) so callers never mutate the source model."
+  },
+  {
+    "symbol": "flexRender",
+    "kind": "unknown",
+    "signature": "flexRender",
+    "doc": ""
+  },
+  {
+    "symbol": "FormatResult",
+    "kind": "interface",
+    "signature": "export interface FormatResult {\n    className?: string;\n    style?: React.CSSProperties;\n    hideContent?: boolean;\n}",
+    "doc": "The merged formatting for one cell or row."
+  },
+  {
+    "symbol": "formatShortcutToken",
+    "kind": "function",
+    "signature": "export declare function formatShortcutToken(token: string, isMac: boolean): string;",
+    "doc": "Render one key token for display, platform-aware."
+  },
+  {
+    "symbol": "getBstRuntime",
+    "kind": "function",
+    "signature": "export declare function getBstRuntime<TData extends RowData>(table: unknown): BstRuntimeHandle<TData>;",
+    "doc": "Read the runtime handle a `useBstTable` render attached to the table."
+  },
+  {
+    "symbol": "getGridState",
+    "kind": "function",
+    "signature": "export declare function getGridState<TData extends RowData>(table: BstTableInstance<TData>, select?: BstGridStateSelect): BstGridState;",
+    "doc": "Snapshot the grid's current view state as plain JSON (X21). Pass `include` / `exclude` to capture only some slices (e.g. skip `rowSelection` / `pagination`)."
+  },
+  {
+    "symbol": "gstinCheckDigit",
+    "kind": "function",
+    "signature": "export declare function gstinCheckDigit(first14: string): string;",
+    "doc": "The GSTIN 15th character (checksum) for a 14-char prefix."
+  },
+  {
+    "symbol": "hasBlockingError",
+    "kind": "function",
+    "signature": "export declare function hasBlockingError(errors: FieldError[] | undefined): boolean;",
+    "doc": "True when any finding is an `error` (as opposed to a `warning`)."
+  },
+  {
+    "symbol": "htmlToText",
+    "kind": "function",
+    "signature": "export declare function htmlToText(html: unknown): string;",
+    "doc": "Strip tags → readable one-line text (SSR-safe; used for the read preview + copy)."
+  },
+  {
+    "symbol": "humanizeKey",
+    "kind": "function",
+    "signature": "export declare function humanizeKey(key: string): string;",
+    "doc": "`fooBar` / `foo_bar` / `foo-bar` → \"Foo Bar\"."
+  },
+  {
+    "symbol": "hyperlinkCellType",
+    "kind": "const",
+    "signature": "const hyperlinkCellType: CellType<unknown>",
+    "doc": ""
+  },
+  {
+    "symbol": "IconComponent",
+    "kind": "type",
+    "signature": "export type IconComponent = React.ComponentType<IconProps>;",
+    "doc": ""
+  },
+  {
+    "symbol": "IconProps",
+    "kind": "interface",
+    "signature": "export interface IconProps {\n    /** Icon size (width = height): px number or a CSS length. Body call-sites pass a number. */\n    size?: number | string;\n    /** Extra class on the rendered `<svg>`. */\n    className?: string;\n}",
+    "doc": "Engine-body icon system. The neutral `<BstTable>` body, the filter / format builders and the file & boolean cells render **injectable** icons instead of emoji/Unicode glyphs. Defaults are dependency-free inline SVGs drawn in the lucide idiom (24×24 viewBox, `currentColor`, 2px round strokes), skin-neutral so both the MUI and shadcn adapters can override any slot with their own set."
+  },
+  {
+    "symbol": "inferCellType",
+    "kind": "function",
+    "signature": "export declare function inferCellType(_key: string, value: unknown): string | undefined;",
+    "doc": "Built-in cell-type guess from a sample value (X27). Text → undefined (untyped)."
+  },
+  {
+    "symbol": "InteractionState",
+    "kind": "interface",
+    "signature": "export interface InteractionState {\n    /** The cell currently in inline edit mode, or `null`. */\n    editingCell: {\n        rowId: string;\n        columnId: string;\n    } | null;\n    /** The row currently in a deferred row-edit session, or `null` (C2 ≡ I2). */\n    rowSession: string | null;\n    /**\n     * The focused (\"active\") cell — the moving end of a range + keyboard-nav\n     * cursor (Phase 3). `null` when nothing is selected.\n     */\n    activeCell: CellRef | null;\n    /**\n     * The fixed end (\"anchor\") of a range selection. Equal to `activeCell` when\n     * the selection is a single cell; the rectangle between the two is\n     * materialised lazily at paint (§2.4 — \"rectangles materialized at paint\").\n     */\n    anchorCell: CellRef | null;\n    /**\n     * Marks the current selection as a *whole* column or row (Ctrl+Space /\n     * Shift+Space, or a \"copy column\" action). Copy then grabs the ENTIRE column\n     * across all pages (or the whole row), not just the on-screen rectangle\n     * (H3 copy-column / H2 copy-row under pagination). Cleared by any cell-level\n     * selection change.\n     */\n    wholeSelect: {\n        type: 'column' | 'row';\n        id: string;\n    } | null;\n    /**\n     * Runtime per-column editability override, keyed by columnId. A column absent\n     * here uses its `meta.editable` default; `false` locks the whole column\n     * (read-only) and `true` unlocks it — an end-user control surfaced in the\n     * Columns menu. Consulted by `isCellEditable`; empty by default (no effect).\n     */\n    columnEdit: Record<string, boolean>;\n    /** Draft values\n  // …truncated",
+    "doc": "The interaction store (Plan.md §2.5 rule 4). All high-frequency edit / validation / selection state lives here — NOT in `table.setState` — so a keystroke or an active-cell move never re-runs the whole row model. It is a tiny, framework-agnostic external store consumed via `useSyncExternalStore`. Live keystrokes are held in the active editor's local React state and only land here on commit, so store mutations are coarse (commit / cancel / selection / validation) and never per-character."
+  },
+  {
+    "symbol": "InteractionStore",
+    "kind": "type",
+    "signature": "export type InteractionStore = Store<InteractionState>;",
+    "doc": ""
+  },
+  {
+    "symbol": "isConditionActive",
+    "kind": "function",
+    "signature": "export declare function isConditionActive(raw: unknown): boolean;",
+    "doc": "Whether a `{ op, value }` condition (or bare value) would actually filter anything — i.e. `evalCondition` wouldn't treat it as inactive. A half-built builder row (operator chosen, no value) is **inactive**; unary ops (`empty` / `isTrue` / …) are always active. Used to strip no-op conditions before sending them to a server (client mode ignores them anyway)."
+  },
+  {
+    "symbol": "isRichTextEmpty",
+    "kind": "function",
+    "signature": "export declare function isRichTextEmpty(html: unknown): boolean;",
+    "doc": "True when the rich text has no visible content."
+  },
+  {
+    "symbol": "isSettingActive",
+    "kind": "function",
+    "signature": "export declare function isSettingActive(key: BstSettingKey, props: Record<string, unknown>, seen?: Set<BstSettingKey>): boolean;",
+    "doc": "Is a setting **effectively active** — on itself AND every prerequisite (`requires`) transitively active? Drives the sheet's dependency cascade: turning a parent off disables its dependents, and re-enabling it brings them back. Pure; exported for testing. `props` should be the override-applied (effective) props."
+  },
+  {
+    "symbol": "isValidAadhaar",
+    "kind": "function",
+    "signature": "export declare function isValidAadhaar(v: string): boolean;",
+    "doc": "Aadhaar (India, UIDAI): 12 digits, first 2–9, valid Verhoeff checksum."
+  },
+  {
+    "symbol": "isValidEsic",
+    "kind": "function",
+    "signature": "export declare function isValidEsic(v: string): boolean;",
+    "doc": "ESIC number (India Employees' State Insurance): 17 digits."
+  },
+  {
+    "symbol": "isValidGstin",
+    "kind": "function",
+    "signature": "export declare function isValidGstin(v: string): boolean;",
+    "doc": "GSTIN (India GST): 2-digit state + 10-char PAN + entity + 'Z' + checksum."
+  },
+  {
+    "symbol": "isValidIban",
+    "kind": "function",
+    "signature": "export declare function isValidIban(v: string): boolean;",
+    "doc": "IBAN: 2-letter country + 2 check digits + BBAN, validated by the mod-97 rule."
+  },
+  {
+    "symbol": "isValidIec",
+    "kind": "function",
+    "signature": "export declare function isValidIec(v: string): boolean;",
+    "doc": "IEC (India Import-Export Code): a PAN since 2017, or a legacy 10-digit code."
+  },
+  {
+    "symbol": "isValidIfsc",
+    "kind": "function",
+    "signature": "export declare function isValidIfsc(v: string): boolean;",
+    "doc": "IFSC (India bank branch): 4 letters, a '0', 6 alphanumerics."
+  },
+  {
+    "symbol": "isValidPan",
+    "kind": "function",
+    "signature": "export declare function isValidPan(v: string): boolean;",
+    "doc": "PAN (India Income Tax): 5 letters, 4 digits, 1 letter."
+  },
+  {
+    "symbol": "isValidPassport",
+    "kind": "function",
+    "signature": "export declare function isValidPassport(v: string): boolean;",
+    "doc": "Indian passport: a letter followed by 7 digits (e.g. `A1234567`)."
+  },
+  {
+    "symbol": "isValidSwift",
+    "kind": "function",
+    "signature": "export declare function isValidSwift(v: string): boolean;",
+    "doc": "SWIFT / BIC: 6 letters (bank + country) + 2 alphanumerics, optional 3-char branch."
+  },
+  {
+    "symbol": "isValidUan",
+    "kind": "function",
+    "signature": "export declare function isValidUan(v: string): boolean;",
+    "doc": "PF UAN (India Universal Account Number): 12 digits."
+  },
+  {
+    "symbol": "kpiCellType",
+    "kind": "const",
+    "signature": "const kpiCellType: CellType<unknown>",
+    "doc": ""
+  },
+  {
+    "symbol": "loadGridState",
+    "kind": "function",
+    "signature": "export declare function loadGridState(key: string, storage?: BstGridStateStorage): BstGridState | undefined;",
+    "doc": "Load a persisted snapshot. Returns `undefined` when absent, unparseable, or from an incompatible schema version — feed the result straight into `useBstTable({ initialState })` for a flash-free restore."
+  },
+  {
+    "symbol": "longTextCellType",
+    "kind": "const",
+    "signature": "const longTextCellType: CellType<string>",
+    "doc": ""
+  },
+  {
+    "symbol": "luhnValid",
+    "kind": "function",
+    "signature": "export declare function luhnValid(num: string): boolean;",
+    "doc": "Luhn (mod-10) — the checksum credit/debit card numbers (13–19 digits) carry."
+  },
+  {
+    "symbol": "measureTextWidth",
+    "kind": "function",
+    "signature": "export declare function measureTextWidth(text: string, font: string): number;",
+    "doc": "Smart column auto-size (D3) — a dep-free content-measurement helper. Measures text with an **offscreen `canvas.measureText`** (no layout thrash, no DOM insertion) so a column can be sized to fit its widest sampled value. Sampling (header + the current page's cells) and the trigger (double-click the resize handle) live in the renderer; this module is the pure measurement core, also exported so consumers can auto-size programmatically."
+  },
+  {
+    "symbol": "MoveActiveOptions",
+    "kind": "interface",
+    "signature": "export interface MoveActiveOptions {\n    /** Keep the anchor and only move the focus end (Shift+Arrow range grow). */\n    extend?: boolean;\n    /** Wrap to the previous/next row when stepping off a row edge (Tab). */\n    wrap?: boolean;\n    /** Jump to the first/last row/column in the step direction (Home/End). */\n    toEdge?: boolean;\n}",
+    "doc": "Options for `moveActive` — how the keyboard cursor should step."
+  },
+  {
+    "symbol": "multiSelectCellType",
+    "kind": "const",
+    "signature": "const multiSelectCellType: CellType<string[]>",
+    "doc": ""
+  },
+  {
+    "symbol": "NUMBER_OPERATORS",
+    "kind": "const",
+    "signature": "const NUMBER_OPERATORS: FilterOperator[]",
+    "doc": ""
+  },
+  {
+    "symbol": "numberCellType",
+    "kind": "const",
+    "signature": "const numberCellType: CellType<number | null>",
+    "doc": ""
+  },
+  {
+    "symbol": "operatorArity",
+    "kind": "function",
+    "signature": "export declare function operatorArity(typeId: string | undefined, op: string): 0 | 1 | 2;",
+    "doc": "Look up an operator's arity (value-input count). Default 1."
+  },
+  {
+    "symbol": "operatorsForType",
+    "kind": "function",
+    "signature": "export declare function operatorsForType(typeId?: string): FilterOperator[];",
+    "doc": "The operators offered for a given `meta.type`."
+  },
+  {
+    "symbol": "PAGE_SIZE_ALL",
+    "kind": "const",
+    "signature": "const PAGE_SIZE_ALL = -1",
+    "doc": ""
+  },
+  {
+    "symbol": "PAGE_SIZE_ALL_APPLIED",
+    "kind": "const",
+    "signature": "const PAGE_SIZE_ALL_APPLIED: number",
+    "doc": ""
+  },
+  {
+    "symbol": "pageSizeForChoice",
+    "kind": "function",
+    "signature": "export declare function pageSizeForChoice(value: number): number;",
+    "doc": "Turn a chosen dropdown value into the page size to apply (`setPageSize`)."
+  },
+  {
+    "symbol": "partitionToolbar",
+    "kind": "function",
+    "signature": "export declare function partitionToolbar(items: readonly ToolbarItemWidth[], available: number, moreWidth: number): {\n    inline: string[];\n    overflow: string[];\n};",
+    "doc": "Decide which collapsible items stay inline vs move to overflow, given the width `available` to them and the width the \"⋯\" button costs once anything overflows. Keeps the highest-priority contiguous run that fits. Pure."
+  },
+  {
+    "symbol": "PdfThumbnailerOptions",
+    "kind": "interface",
+    "signature": "export interface PdfThumbnailerOptions {\n    /** Extra rendering scale on top of fit + devicePixelRatio (crispness). Default 1.5. */\n    scale?: number;\n    /** Cache rendered thumbnails by URL. Default true. */\n    cache?: boolean;\n    /** Canvas factory (test seam). Default `document.createElement('canvas')`. */\n    createCanvas?: () => HTMLCanvasElement;\n}",
+    "doc": "Extra rendering scale on top of fit + devicePixelRatio (crispness). Default 1.5."
+  },
+  {
+    "symbol": "PdfThumbnailRenderer",
+    "kind": "type",
+    "signature": "export type PdfThumbnailRenderer = (url: string, size: {\n    width: number;\n    height: number;\n}) => Promise<string | null>;",
+    "doc": "In-cell PDF thumbnails (B5) via **pdf.js**. Rendering a PDF's first page as a small raster can't be done reliably with the browser's native viewer (Chrome won't paint a PDF in a tiny `<iframe>`), so the crisp path is pdf.js — the tool `CLAUDE.md` §6 always named for this. The engine stays **dependency-free**: it never imports `pdfjs-dist`. Instead the consumer creates a renderer with {@link createPdfjsThumbnailer} (passing their own pdf.js, so *they* own the worker setup their bundler needs) and supplies it through {@link BstPdfThumbnailerProvider} — or per column via `cellMeta.pdfThumbnail`. The `files` cell then renders page 1 to an `<img>`."
+  },
+  {
+    "symbol": "printHtml",
+    "kind": "function",
+    "signature": "export declare function printHtml(html: string): void;",
+    "doc": "Open `html` in a print view and invoke the browser print dialog. Prefers a new window (self-contained, doesn't touch the host DOM); falls back to a hidden iframe when a popup is blocked. No-ops under SSR / jsdom."
+  },
+  {
+    "symbol": "PrintOptions",
+    "kind": "interface",
+    "signature": "export interface PrintOptions {\n    /** Document `<title>` + heading. Default `\"Table\"`. */\n    title?: string;\n    /** Include the header row. Default `true`. */\n    includeHeaders?: boolean;\n}",
+    "doc": "Options for {@link buildPrintHtml}."
+  },
+  {
+    "symbol": "qrCellType",
+    "kind": "const",
+    "signature": "const qrCellType: CellType<string>",
+    "doc": ""
+  },
+  {
+    "symbol": "QrEcLevel",
+    "kind": "type",
+    "signature": "export type QrEcLevel = 'L' | 'M' | 'Q' | 'H';",
+    "doc": "Dependency-free QR Code encoder (byte mode, versions 1–10, EC levels L/M/Q/H). Produces the module matrix; the `qr` cell type renders it to inline SVG so a QR cell needs no runtime dependency. Verified bit-for-bit against the `qrcode` reference library in tests (a dev-only dependency). Follows ISO/IEC 18004."
+  },
+  {
+    "symbol": "qrMatrix",
+    "kind": "function",
+    "signature": "export declare function qrMatrix(text: string, level?: QrEcLevel, forceMask?: number): QrMatrix;",
+    "doc": "Encode `text` to a QR module matrix. Throws if it doesn't fit in versions 1–10."
+  },
+  {
+    "symbol": "QrMatrix",
+    "kind": "interface",
+    "signature": "export interface QrMatrix {\n    /** Side length in modules. */\n    size: number;\n    /** `modules[row][col]` — true = dark. */\n    modules: boolean[][];\n}",
+    "doc": "Side length in modules."
+  },
+  {
+    "symbol": "radioCellType",
+    "kind": "const",
+    "signature": "const radioCellType: CellType<string | null>",
+    "doc": ""
+  },
+  {
+    "symbol": "RESERVED_COLUMN_PREFIX",
+    "kind": "const",
+    "signature": "const RESERVED_COLUMN_PREFIX = \"__bst\"",
+    "doc": ""
+  },
+  {
+    "symbol": "resetGridState",
+    "kind": "function",
+    "signature": "export declare function resetGridState<TData extends RowData>(table: BstTableInstance<TData>, select?: BstGridStateSelect): void;",
+    "doc": "Clear the grid's view back to defaults — sort · filter · column layout · grouping · expansion · row pinning. `pagination` and `rowSelection` are left as-is unless you pass them via `include`."
+  },
+  {
+    "symbol": "resolveActiveShortcuts",
+    "kind": "function",
+    "signature": "export declare function resolveActiveShortcuts(flags: Record<string, boolean | undefined>, query?: string, isMac?: boolean): ResolvedShortcutGroup[];",
+    "doc": "Filter the registry to the shortcuts whose required flags are **all** active, grouped by category and optionally narrowed by a free-text `query` (label or keys). Pass `isMac` to drop platform-specific entries (e.g. `⌘Y` redo on Mac); omit it to keep everything. Pure — the overlay renders exactly this."
+  },
+  {
+    "symbol": "resolveBstIcons",
+    "kind": "function",
+    "signature": "export declare function resolveBstIcons(overrides?: BstIconOverrides): BstIcons;",
+    "doc": "Merge overrides onto the defaults, skipping `undefined`/`null` so a partial map (e.g. an adapter forwarding only the slots its icon set covers) keeps the built-in SVG for every unspecified slot."
+  },
+  {
+    "symbol": "ResolvedShortcut",
+    "kind": "interface",
+    "signature": "export interface ResolvedShortcut {\n    keys: string[];\n    label: string;\n}",
+    "doc": ""
+  },
+  {
+    "symbol": "ResolvedShortcutGroup",
+    "kind": "interface",
+    "signature": "export interface ResolvedShortcutGroup {\n    category: ShortcutCategory;\n    items: ResolvedShortcut[];\n}",
+    "doc": ""
+  },
+  {
+    "symbol": "ResolvedStickyHeader",
+    "kind": "interface",
+    "signature": "export interface ResolvedStickyHeader {\n    /** The viewport is bounded + the header is pinned. */\n    enabled: boolean;\n    /** CSS `max-height` value for the scroll box (e.g. `'440px'`), when enabled. */\n    maxHeight?: string;\n}",
+    "doc": "The resolved, always-defined sticky-header config the renderer reads."
+  },
+  {
+    "symbol": "ResolvedVirtualization",
+    "kind": "interface",
+    "signature": "export interface ResolvedVirtualization {\n    /** Row virtualization requested. */\n    enabled: boolean;\n    /** Column virtualization requested (only meaningful when `enabled`). */\n    columns: boolean;\n    overscan: number;\n    estimateRowSize: number;\n    estimateColumnSize: number;\n}",
+    "doc": "The resolved, always-defined virtualization config the renderer reads."
+  },
+  {
+    "symbol": "resolveFieldFormat",
+    "kind": "function",
+    "signature": "export declare function resolveFieldFormat(pattern: unknown, patternMessage?: string): FieldFormat | null;",
+    "doc": "Resolve a `cellMeta.pattern` value to a {@link FieldFormat}: a built-in name, a `RegExp` (+ optional message), or a format object. Unknown names → `null`."
+  },
+  {
+    "symbol": "resolvePageSizeChoices",
+    "kind": "function",
+    "signature": "export declare function resolvePageSizeChoices(options: ReadonlyArray<BstPageSizeOption>, currentPageSize: number): {\n    choices: BstPageSizeChoice[];\n    value: number;\n};",
+    "doc": "Resolve the dropdown's choices plus the value that should read as selected. \"All\" is shown as selected whenever the current page size is **not** one of the offered numeric sizes (i.e. it was set to the \"All\" sentinel, or otherwise exceeds every option) — so picking a normal size like `20` still shows `20` even when there are fewer than 20 rows. Pure — unit-tested."
+  },
+  {
+    "symbol": "resolveStickyHeader",
+    "kind": "function",
+    "signature": "export declare function resolveStickyHeader(enable: boolean | BstStickyHeaderOptions | undefined): ResolvedStickyHeader;",
+    "doc": "Fold `enableStickyHeader` (`boolean | BstStickyHeaderOptions`, §12 value shape — an object implies enabled) into one resolved config. `maxHeight` wins over `maxRows`; a number is treated as pixels, a string is passed through verbatim. Pure — unit-tested."
+  },
+  {
+    "symbol": "resolveVirtualization",
+    "kind": "function",
+    "signature": "export declare function resolveVirtualization(enable: boolean | VirtualizationOptions | undefined, enableColumns: boolean | undefined): ResolvedVirtualization;",
+    "doc": "Fold `enableVirtualization` (`boolean | VirtualizationOptions`, §12 value shape — an object implies enabled) plus the `enableColumnVirtualization` sub-toggle into one resolved config. Pure — unit-tested."
+  },
+  {
+    "symbol": "richTextCellType",
+    "kind": "const",
+    "signature": "const richTextCellType: CellType<string>",
+    "doc": ""
+  },
+  {
+    "symbol": "RichTextEditor",
+    "kind": "function",
+    "signature": "export declare function RichTextEditor({ draft, commit, cancel, autoFocus }: CellEditProps<any, string>): React.JSX.Element;",
+    "doc": "Neutral inline rich-text editor: a `contentEditable` surface + a small toolbar (bold / italic / underline / lists). Self-commits on blur with the value run through `sanitizeHtml` (allow-list), so no unsafe markup is stored. Adapters override this with a popup (dialog) version."
+  },
+  {
+    "symbol": "ROW_NUMBER_COLUMN_ID",
+    "kind": "const",
+    "signature": "const ROW_NUMBER_COLUMN_ID = \"__bstRowNumber\"",
+    "doc": ""
+  },
+  {
+    "symbol": "RuntimeCtx",
+    "kind": "interface",
+    "signature": "export interface RuntimeCtx<TData extends RowData> {\n    registry: CellTypeRegistry;\n    data: TData[];\n    rowIndexById: Map<string, number>;\n    getRowId: (row: TData, index: number) => string;\n    metaByColumn: Map<string, BstColumnMeta<TData>>;\n    fieldByColumn: Map<string, string>;\n    /** `columnId → header text` (string header, else the column id) — for export. */\n    headerByColumn: Map<string, string>;\n    columnIds: string[];\n    /** Row ids in current visual (post sort/filter/pagination) order. */\n    visibleRowIds: string[];\n    /** Row ids after filter + sort but BEFORE pagination — the full column for\n     *  copy-column (H3), which must span every page, not just the visible one. */\n    allRowIds: string[];\n    /** Visible leaf column ids in current left-to-right order. */\n    visibleColumnIds: string[];\n    /** `rowId → visual row index` for the current render. */\n    rowVisualIndex: Map<string, number>;\n    /** `columnId → visual column index` for the current render. */\n    colVisualIndex: Map<string, number>;\n    enableEditing: boolean;\n    enableValidation: boolean;\n    enableCellSelection: boolean;\n    enableClipboard: boolean;\n    /** Column-copy (H3) enabled. `false` disables `selectColumn`/`copyColumn`. Default: true. */\n    enableCopyColumn?: boolean;\n    /** Row-copy (H2) enabled. `false` disables `selectRow`/`copyRow`. Default: true. */\n    enableCopyRow?: boolean;\n    enableUndoRedo: boolean;\n    /** Export capability on. `false` makes every `export*` method a no-op. */\n    enableExport?: boolean;\n    /** CSV export enabled (sub-toggle of `enableE\n  // …truncated",
+    "doc": "Everything the runtime needs from the current render, refreshed each render by the hook. Keeping it behind a ref means the stable runtime methods always read fresh data / options without the runtime object itself changing identity."
+  },
+  {
+    "symbol": "runValidators",
+    "kind": "function",
+    "signature": "export declare function runValidators<TData extends RowData>(value: unknown, cellType: CellType<any, any, TData>, ctx: CellValidateContext<TData>): FieldError[] | Promise<FieldError[]>;",
+    "doc": "Compose the validators for a cell (C3): a `required` check, then the CellType's built-in validator, then the column-level `meta.validate`. Returns a synchronous `FieldError[]` when every validator is sync, otherwise a Promise — the runtime handles async with last-write-wins + AbortSignal."
+  },
+  {
+    "symbol": "sanitizeHtml",
+    "kind": "function",
+    "signature": "export declare function sanitizeHtml(html: unknown): string;",
+    "doc": "Allow-list HTML sanitizer: keeps only formatting tags (no attributes except a safe `href`), escaping everything else. Uses `DOMParser`; on the server (no DOM) it degrades to escaped plain text."
+  },
+  {
+    "symbol": "saveGridState",
+    "kind": "function",
+    "signature": "export declare function saveGridState(key: string, state: BstGridState, storage?: BstGridStateStorage): void;",
+    "doc": "Persist a snapshot under `bst-table:state:<key>`. No-op when storage is unavailable."
+  },
+  {
+    "symbol": "SaveTrigger",
+    "kind": "type",
+    "signature": "export type SaveTrigger = 'enter' | 'blur' | 'explicit';",
+    "doc": ""
+  },
+  {
+    "symbol": "SELECT_OPERATORS",
+    "kind": "const",
+    "signature": "const SELECT_OPERATORS: FilterOperator[]",
+    "doc": ""
+  },
+  {
+    "symbol": "ShortcutCategory",
+    "kind": "type",
+    "signature": "export type ShortcutCategory = 'Navigate' | 'Edit' | 'Clipboard' | 'History';",
+    "doc": ""
+  },
+  {
+    "symbol": "shouldShowSettingsSearch",
+    "kind": "function",
+    "signature": "export declare function shouldShowSettingsSearch(search: boolean | undefined, itemCount: number): boolean;",
+    "doc": "Resolve whether the sheet shows its search box. `false` → never; `true` → always; omitted → auto (only for lists longer than a handful, so a short sheet stays clutter-free). Keeps both adapters' behaviour identical."
+  },
+  {
+    "symbol": "singleSelectCellType",
+    "kind": "const",
+    "signature": "const singleSelectCellType: CellType<string | null>",
+    "doc": ""
+  },
+  {
+    "symbol": "SpanCol",
+    "kind": "interface",
+    "signature": "export interface SpanCol {\n    id: string;\n    meta: BstColumnMeta;\n}",
+    "doc": "Minimal column shape the planner needs."
+  },
+  {
+    "symbol": "SpanPlan",
+    "kind": "interface",
+    "signature": "export interface SpanPlan {\n    /** Origin cell key → its span (colSpan/rowSpan ≥ 1). */\n    origin: Map<string, {\n        colSpan: number;\n        rowSpan: number;\n    }>;\n    /** Keys of cells hidden under an origin's block — never rendered. */\n    covered: Set<string>;\n}",
+    "doc": "The resolved span plan for the current page."
+  },
+  {
+    "symbol": "SpanRow",
+    "kind": "interface",
+    "signature": "export interface SpanRow {\n    id: string;\n    original: unknown;\n    getValue: (columnId: string) => unknown;\n}",
+    "doc": "Minimal row shape the planner needs (adapts a TanStack row)."
+  },
+  {
+    "symbol": "sparklineCellType",
+    "kind": "const",
+    "signature": "const sparklineCellType: CellType<number[] | null>",
+    "doc": ""
+  },
+  {
+    "symbol": "splitCellKey",
+    "kind": "function",
+    "signature": "export declare function splitCellKey(key: string): {\n    rowId: string;\n    columnId: string;\n};",
+    "doc": "Split a composite key back into its `rowId` / `columnId` parts."
+  },
+  {
+    "symbol": "STICKY_DEFAULT_MAX_HEIGHT_PX",
+    "kind": "const",
+    "signature": "const STICKY_DEFAULT_MAX_HEIGHT_PX = 440",
+    "doc": ""
+  },
+  {
+    "symbol": "STICKY_HEADER_PX",
+    "kind": "const",
+    "signature": "const STICKY_HEADER_PX = 44",
+    "doc": ""
+  },
+  {
+    "symbol": "STICKY_ROW_PX",
+    "kind": "const",
+    "signature": "const STICKY_ROW_PX = 40",
+    "doc": ""
+  },
+  {
+    "symbol": "Store",
+    "kind": "interface",
+    "signature": "export interface Store<S> {\n    getState: () => S;\n    setState: (updater: S | ((prev: S) => S)) => void;\n    subscribe: (listener: () => void) => () => void;\n}",
+    "doc": ""
+  },
+  {
+    "symbol": "TEXT_OPERATORS",
+    "kind": "const",
+    "signature": "const TEXT_OPERATORS: FilterOperator[]",
+    "doc": ""
+  },
+  {
+    "symbol": "textCellType",
+    "kind": "const",
+    "signature": "const textCellType: CellType<string>",
+    "doc": ""
+  },
+  {
+    "symbol": "toCsv",
+    "kind": "function",
+    "signature": "export declare function toCsv(matrix: BstExportMatrix, opts?: CsvOptions): string;",
+    "doc": "Serialize a matrix to CSV (RFC 4180: `\"\"`-escaped quotes, CRLF, optional BOM)."
+  },
+  {
+    "symbol": "ToolbarItemWidth",
+    "kind": "interface",
+    "signature": "export interface ToolbarItemWidth {\n    id: string;\n    /** Higher = more important = kept inline longer (collapses last). */\n    priority: number;\n    width: number;\n}",
+    "doc": "Higher = more important = kept inline longer (collapses last)."
+  },
+  {
+    "symbol": "toXlsx",
+    "kind": "function",
+    "signature": "export declare function toXlsx(matrix: BstExportMatrix, opts?: XlsxOptions): Uint8Array;",
+    "doc": "Serialize a matrix to a real OOXML `.xlsx` (store-only ZIP, no dependency)."
+  },
+  {
+    "symbol": "useBstDataSource",
+    "kind": "function",
+    "signature": "export declare function useBstDataSource<TData>(source: DataSource<TData>, options?: UseBstDataSourceOptions): BstDataSourceResult<TData>;",
+    "doc": "Drives a {@link DataSource} for server-side sort / filter / pagination and returns `tableProps` to spread into `useBstTable` (or an adapter). Manages the request lifecycle: **aborts** superseded requests, ignores **stale** responses, **debounces** filter/quick-filter changes (sort + paging are immediate), and **resets to page 0** exactly when the (debounced) result set changes — so a pagination inside the debounce window can't strand the grid on an empty page. The grid's existing chrome (sort headers, filter row, search box, pagination bar) drives it unchanged. **Grouping/expansion are not server-driven** — use those in client mode only. ```tsx const ds = useBstDataSource(source, { pageSize: 25 }) <BstTableShadcn columns={columns} getRowId={r => r.id} {...ds.tableProps} /> ```"
+  },
+  {
+    "symbol": "UseBstDataSourceOptions",
+    "kind": "interface",
+    "signature": "export interface UseBstDataSourceOptions {\n    /** Initial page size. Default 10. */\n    pageSize?: number;\n    initialSorting?: DsSort[];\n    initialColumnFilters?: DsColumnFilter[];\n    initialGlobalFilter?: string;\n    /**\n     * Debounce (ms) applied to **filter / quick-filter** changes so typing doesn't\n     * fire a request per keystroke. Sort + pagination changes fetch immediately.\n     * Default 300. Set `0` to disable.\n     */\n    debounceMs?: number;\n    /**\n     * Identity of the source. Change it to force a refetch when you swap to a\n     * genuinely different source (endpoint / tenant / dataset). Re-creating the\n     * *same* logical source each render (without changing this) will NOT refetch —\n     * which is what prevents an unmemoized source from looping.\n     */\n    sourceKey?: string | number;\n}",
+    "doc": "Initial page size. Default 10."
+  },
+  {
+    "symbol": "useBstGrid",
+    "kind": "function",
+    "signature": "export declare function useBstGrid<TData extends RowData>(opts: UseBstTableOptions<TData>): {\n    table: import(\"@tanstack/react-table\").ReactTable<import(\"@tanstack/table-core\").TableFeatures, RowData, import(\"@tanstack/table-core\").TableState_CellSelection & import(\"@tanstack/table-core\").TableState_ColumnFiltering & import(\"@tanstack/table-core\").TableState_ColumnGrouping & import(\"@tanstack/table-core\").TableState_ColumnOrdering & import(\"@tanstack/table-core\").TableState_ColumnPinning & import(\"@tanstack/table-core\").TableState_ColumnResizing & import(\"@tanstack/table-core\").TableState_ColumnSizing & import(\"@tanstack/table-core\").TableState_ColumnVisibility & import(\"@tanstack/table-core\").TableState_GlobalFiltering & import(\"@tanstack/table-core\").TableState_RowExpanding & import(\"@tanstack/table-core\").TableState_RowPagination & import(\"@tanstack/table-core\").TableState_RowPinning & import(\"@tanstack/table-core\").TableState_RowSelection & import(\"@tanstack/table-core\").TableState_RowSorting>;\n    runtime: BstRuntime<TData>;\n    registry: CellTypeRegistry;\n    handle: BstRuntimeHandle<TData>;\n};",
+    "doc": "Convenience hook returning the table plus direct handles to the runtime and registry — for adapter chrome that drives the grid (Add row, dirty state, bulk save via `runtime.getDirtyChanges()`)."
+  },
+  {
+    "symbol": "useBstGridState",
+    "kind": "function",
+    "signature": "export declare function useBstGridState<TData extends RowData>(table: BstTableInstance<TData>, options: BstGridStateOptions): BstGridStateController;",
+    "doc": "Persist a grid's view state to storage and keep it in sync (X21). For a **flash-free restore**, feed `loadGridState(key)` into `useBstTable({ initialState })` so the grid mounts already arranged; this hook then writes later changes back (debounced). ```tsx const table = useBstTable({ data, columns, initialState: loadGridState('orders') }) const view = useBstGridState(table, { key: 'orders' }) // <button onClick={view.reset}>Reset view</button> ```"
+  },
+  {
+    "symbol": "useBstIcons",
+    "kind": "function",
+    "signature": "export declare function useBstIcons(): BstIcons;",
+    "doc": "Read the active body-icon set (defaults when no `<BstTable>` provider is above)."
+  },
+  {
+    "symbol": "useBstInfiniteDataSource",
+    "kind": "function",
+    "signature": "export declare function useBstInfiniteDataSource<TData>(source: DataSource<TData>, options?: UseBstInfiniteDataSourceOptions): BstInfiniteDataSourceResult<TData>;",
+    "doc": ""
+  },
+  {
+    "symbol": "UseBstInfiniteDataSourceOptions",
+    "kind": "interface",
+    "signature": "export interface UseBstInfiniteDataSourceOptions {\n    /** Rows fetched per window (the scroll increment). Default 50. */\n    pageSize?: number;\n    /** Debounce (ms) on filter / quick-filter changes before the reset fetch. Default 300. */\n    debounceMs?: number;\n    initialSorting?: DsSort[];\n    initialColumnFilters?: DsColumnFilter[];\n    initialGlobalFilter?: string;\n    /** Change to force a full reset when you swap to a genuinely different source. */\n    sourceKey?: string | number;\n}",
+    "doc": "Rows fetched per window (the scroll increment). Default 50."
+  },
+  {
+    "symbol": "useBstPdfThumbnailer",
+    "kind": "function",
+    "signature": "export declare function useBstPdfThumbnailer(): PdfThumbnailRenderer | null;",
+    "doc": "The renderer from the nearest {@link BstPdfThumbnailerProvider}, or null."
+  },
+  {
+    "symbol": "useBstSettings",
+    "kind": "function",
+    "signature": "export declare function useBstSettings<P extends object>(props: P, options?: BstSettingsOptions): {\n    props: P;\n    model: BstSettingsModel;\n};",
+    "doc": "Headless settings hook the adapters wrap in a sheet. Holds the per-table override state (so it is naturally per instance), persists it to `localStorage`, and returns: - `props` — the incoming options with overrides applied, ready to feed `useBstGrid` / drive the `show*` chrome, so flipping a switch actually turns the feature on/off; and - `model` — the toggle list (grouped) the sheet renders."
+  },
+  {
+    "symbol": "useBstTable",
+    "kind": "function",
+    "signature": "export declare function useBstTable<TData extends RowData>(opts: UseBstTableOptions<TData>): import(\"@tanstack/react-table\").ReactTable<import(\"@tanstack/table-core\").TableFeatures, RowData, import(\"@tanstack/table-core\").TableState_CellSelection & import(\"@tanstack/table-core\").TableState_ColumnFiltering & import(\"@tanstack/table-core\").TableState_ColumnGrouping & import(\"@tanstack/table-core\").TableState_ColumnOrdering & import(\"@tanstack/table-core\").TableState_ColumnPinning & import(\"@tanstack/table-core\").TableState_ColumnResizing & import(\"@tanstack/table-core\").TableState_ColumnSizing & import(\"@tanstack/table-core\").TableState_ColumnVisibility & import(\"@tanstack/table-core\").TableState_GlobalFiltering & import(\"@tanstack/table-core\").TableState_RowExpanding & import(\"@tanstack/table-core\").TableState_RowPagination & import(\"@tanstack/table-core\").TableState_RowPinning & import(\"@tanstack/table-core\").TableState_RowSelection & import(\"@tanstack/table-core\").TableState_RowSorting>;",
+    "doc": "The single entry point apps use. Wraps TanStack v9 `useTable`, resolves the §12 `enable*` toggles, and (Phase 2) builds the Bst-Table runtime — cell-type registry + editing + validation + row lifecycle — attaching it to the table so `<BstTable/>` can render editors and error states. Backward compatible: a zero-config call still returns a plain read-only-capable table."
+  },
+  {
+    "symbol": "UseBstTableOptions",
+    "kind": "interface",
+    "signature": "export interface UseBstTableOptions<TData extends RowData> extends BstTableEngineToggles {\n    data: TData[];\n    columns: BstTableColumn<TData>[];\n    /** Stable row identity — required for editing/selection; strongly recommended always. */\n    getRowId?: (row: TData, index: number) => string;\n    /** Extra initial state merged over engine defaults (sorting, filters, …). */\n    initialState?: Record<string, unknown>;\n    /** Sort server-side — the grid renders `data` as-is (no client sort). */\n    manualSorting?: boolean;\n    /** Filter server-side — the grid renders `data` as-is (no client filter). */\n    manualFiltering?: boolean;\n    /** Paginate server-side — `data` is the current page; set `rowCount`. */\n    manualPagination?: boolean;\n    /** Group server-side. */\n    manualGrouping?: boolean;\n    /** Total rows across all pages (server mode) — drives the page count. */\n    rowCount?: number;\n    /** Explicit page count (alternative to `rowCount`). */\n    pageCount?: number;\n    /** Disable TanStack's automatic page-index reset (server mode manages it). */\n    autoResetPageIndex?: boolean;\n    /** Controlled table state (partial) — `{ sorting, columnFilters, globalFilter, pagination }`. */\n    state?: Record<string, unknown>;\n    /** Controlled-state change callbacks (server mode). Each receives a TanStack updater. */\n    onSortingChange?: (updater: any) => void;\n    onColumnFiltersChange?: (updater: any) => void;\n    onGlobalFilterChange?: (updater: any) => void;\n    onPaginationChange?: (updater: any) => void;\n    onGroupingChange?: (updater: any) => void;\n    onEx\n  // …truncated",
+    "doc": "Stable row identity — required for editing/selection; strongly recommended always."
+  },
+  {
+    "symbol": "useStoreSelector",
+    "kind": "function",
+    "signature": "export declare function useStoreSelector<S, T>(store: Store<S>, selector: (state: S) => T, isEqual?: (a: T, b: T) => boolean): T;",
+    "doc": "Subscribe a component to a slice of an external store with a cached snapshot, so it only re-renders when its selected slice actually changes (Plan.md §2.5 rule 5 — per-cell interaction subscriptions). No extra dependency: the snapshot is memoized against the previous state object and the previous derived value."
+  },
+  {
+    "symbol": "useToolbarOverflow",
+    "kind": "function",
+    "signature": "export declare function useToolbarOverflow(containerRef: React.RefObject<HTMLElement | null>, items: readonly {\n    id: string;\n    priority: number;\n}[]): Set<string>;",
+    "doc": "Measure the toolbar and return the set of collapsible-item ids that don't fit (should render inside \"⋯ More\" instead of inline). Attach `data-tb=\"<id>\"` to each collapsible item's inline wrapper and `data-tb-more` to the \"⋯\" button; the hook reads their widths. Widths are cached the first time each item is inline, so an overflowed (unmounted) item still has a width to promote back on."
+  },
+  {
+    "symbol": "ValidationOptions",
+    "kind": "interface",
+    "signature": "export interface ValidationOptions {\n    policy?: CommitPolicy;\n}",
+    "doc": "Options for the Validation feature (Phase 2)."
+  },
+  {
+    "symbol": "verhoeffChecksum",
+    "kind": "function",
+    "signature": "export declare function verhoeffChecksum(payload: string): string;",
+    "doc": "The Verhoeff check digit for a numeric payload (append it to make it valid)."
+  },
+  {
+    "symbol": "verhoeffValid",
+    "kind": "function",
+    "signature": "export declare function verhoeffValid(num: string): boolean;",
+    "doc": "True when a numeric string carries a valid Verhoeff check digit (last digit)."
+  },
+  {
+    "symbol": "virtualizationBypassReason",
+    "kind": "function",
+    "signature": "export declare function virtualizationBypassReason(compat: VirtualizationCompat): string | null;",
+    "doc": "The first active incompatible feature's label, or `null` when virtualization can run. Pure — unit-tested; the renderer uses it to decide the windowed vs un-windowed path and to emit a one-time dev-console warning."
+  },
+  {
+    "symbol": "VirtualizationCompat",
+    "kind": "interface",
+    "signature": "export interface VirtualizationCompat {\n    enableExpanding?: boolean;\n    enableGrouping?: boolean;\n    enableCellSpanning?: boolean;\n    enableRowPinning?: boolean;\n}",
+    "doc": "Features whose DOM shape a windowed body can't represent faithfully in v1 — multi-`<tr>` items (master-detail, grouping) or spans/pins that must know rows outside the window (cell spanning, row pinning). When any is active alongside virtualization, the renderer falls back to the un-windowed path so the layout stays correct (these target small, curated datasets — not the large flat data virtualization is for). Keyed so callers can log *which* one caused the bypass."
+  },
+  {
+    "symbol": "VirtualizationOptions",
+    "kind": "interface",
+    "signature": "export interface VirtualizationOptions {\n    /** Rows/columns rendered beyond each edge of the viewport (smoother scroll, more DOM). Default 8. */\n    overscan?: number;\n    /** Estimated row height in px before a row is measured. Keep close to the real height. Default 36. */\n    estimateRowSize?: number;\n    /** Estimated column width in px for column virtualization (real widths are used once known). Default 150. */\n    estimateColumnSize?: number;\n}",
+    "doc": "Virtualization (D1) — the render-layer companion that lets the grid paint only the rows (and, optionally, columns) inside the scroll viewport, so a 10k / 1M row dataset stays at 60fps with a bounded DOM. Built on `@tanstack/react-virtual` (MIT). This module holds only the **pure** resolve + compatibility helpers; the `useVirtualizer` wiring lives in `BstTable.tsx` (it needs the live table + refs). Opt-in per §12 (`enableVirtualization`), off by default: it retrofits into a grid whose other features assume the whole row model is in the DOM, so a handful of structurally-incompatible features (below) make it yield rather than corrupt the layout — see {@link virtualizationBypassReason}."
+  },
+  {
+    "symbol": "VisualIndex",
+    "kind": "interface",
+    "signature": "export interface VisualIndex {\n    r: number;\n    c: number;\n}",
+    "doc": "A visual (paint-order) coordinate for a cell — row + column index."
+  },
+  {
+    "symbol": "XlsxOptions",
+    "kind": "interface",
+    "signature": "export interface XlsxOptions {\n    /** Include the header row (bold). Default `true`. */\n    includeHeaders?: boolean;\n    /** Worksheet tab name. Default `\"Sheet1\"` (sanitised, ≤31 chars). */\n    sheetName?: string;\n}",
+    "doc": "Options for {@link toXlsx}."
+  }
+]

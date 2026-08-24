@@ -1,0 +1,33 @@
+---
+id: dateTime
+title: dateTime
+sidebar_label: dateTime
+---
+
+# `dateTime`
+
+date / time / datetime.
+
+## At a glance
+
+| | |
+| --- | --- |
+| Renders | date / time / datetime |
+| Value shape | `string \| Date \| null` |
+| Editable | ✅ native picker |
+| Key `cellMeta` | variant, required |
+
+## Use it
+
+```tsx
+const columns: BstTableColumn<Row>[] = [
+  { id: 'x', accessorKey: 'x', header: 'X', meta: { type: 'dateTime', /* cellMeta below */ } },
+]
+```
+
+## `cellMeta` options
+
+**`dateTime`** — also honours `meta.format` (`Intl.DateTimeFormatOptions`) and `meta.locale`.
+| `cellMeta` | Type | Effect |
+| --- | --- | --- |
+| `variant` | `'date' \| 'time' \| 'dateTime'` | Picker + display mode. Default `'date'`. |

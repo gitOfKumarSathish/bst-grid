@@ -1,0 +1,35 @@
+---
+id: showSelectionInfo
+title: Selected-count chip
+sidebar_label: showSelectionInfo
+---
+
+# Selected-count chip
+
+Prop `showSelectionInfo` — adapter chrome, default `follows enableRowSelection`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `show*` (chrome, resolved in the adapter) |
+| Type | `boolean` |
+| Default | `follows enableRowSelection` |
+| Status | ✅ done (Phase 3) |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableRowSelection          // chrome is a no-op without its behaviour flag
+  showSelectionInfo
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- **Requires** `enableRowSelection` to be on — this flag is a no-op otherwise.

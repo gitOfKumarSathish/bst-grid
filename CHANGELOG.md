@@ -10,6 +10,15 @@ this project uses [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+### Added — Documentation site (`apps/docs`)
+- **Docusaurus documentation site** under `apps/docs` — the generated reference for Bst-Table:
+  59 feature-flag pages (9 groups), 17 cell types, 261 engine API exports (signatures read from the
+  built `.d.ts`), and a 58-leaf coverage matrix. All 94 pages are **generated from the MCP corpus** +
+  engine types (`scripts/gen-features.mjs`, `gen-reference.mjs`, `extract-api.mjs`) — never
+  hand-edited — with a build-time coverage gate (`scripts/check-docs-coverage.mjs`) that fails if any
+  flag / cell type / export is undocumented. No engine/adapter code or capability changed; not yet
+  wired into the workspace install or deployed (Phase 3).
+
 ## [0.42.0] — 2026-08-24
 
 ### Added — Per-cell commit hook (`onCellCommit`) + edit log (`enableEditLog`)

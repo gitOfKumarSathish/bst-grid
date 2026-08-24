@@ -1,0 +1,42 @@
+---
+id: enableEditing
+title: Batch editing + single-call save (C2/I2/I4)
+sidebar_label: enableEditing
+---
+
+# Batch editing + single-call save (C2/I2/I4)
+
+Prop `enableEditing` — engine behaviour, default `— (opt-in)`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `EditingOptions + callback` |
+| Default | `— (opt-in)` |
+| Status | ✅ done |
+| Settings sheet | Editing |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableEditing={/* EditingOptions + callback */}
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Options
+
+| Option | Notes |
+| --- | --- |
+| `getRowId` | edits target rows by id, never by index |
+| `onDataChange` | without it committed edits have nowhere to go |
+
+## Behavior & interactions
+
+- Modes: 'cell' (default, commit per cell) · 'row' (deferred row session) · 'batch' (every edit stays a draft until an explicit save).

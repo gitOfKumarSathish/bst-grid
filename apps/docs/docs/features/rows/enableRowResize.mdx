@@ -1,0 +1,31 @@
+---
+id: enableRowResize
+title: Row resize (G2)
+sidebar_label: enableRowResize
+---
+
+# Row resize (G2)
+
+Prop `enableRowResize` — engine behaviour, default `false`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean` |
+| Default | `false` |
+| Status | ✅ done |
+| Settings sheet | Rows |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableRowResize
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.

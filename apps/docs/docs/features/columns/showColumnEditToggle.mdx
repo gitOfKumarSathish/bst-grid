@@ -1,0 +1,35 @@
+---
+id: showColumnEditToggle
+title: Per-column edit lock (F3, runtime)
+sidebar_label: showColumnEditToggle
+---
+
+# Per-column edit lock (F3, runtime)
+
+Prop `showColumnEditToggle` — adapter chrome, default `false`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `show*` (chrome, resolved in the adapter) |
+| Type | `boolean` |
+| Default | `false` |
+| Status | ✅ done |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableEditing          // chrome is a no-op without its behaviour flag
+  showColumnEditToggle
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- **Requires** `enableEditing` to be on — this flag is a no-op otherwise.

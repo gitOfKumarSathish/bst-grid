@@ -1,0 +1,26 @@
+---
+id: singleSelect
+title: singleSelect
+sidebar_label: singleSelect
+---
+
+# `singleSelect`
+
+badge (color · icon · avatar).
+
+## At a glance
+
+| | |
+| --- | --- |
+| Renders | badge (color · icon · avatar) |
+| Value shape | `string \| null` |
+| Editable | ✅ dropdown |
+| Key `cellMeta` | via meta.options |
+
+## Use it
+
+```tsx
+const columns: BstTableColumn<Row>[] = [
+  { id: 'x', accessorKey: 'x', header: 'X', meta: { type: 'singleSelect', /* cellMeta below */ } },
+]
+```

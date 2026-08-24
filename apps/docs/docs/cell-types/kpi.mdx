@@ -1,0 +1,35 @@
+---
+id: kpi
+title: kpi
+sidebar_label: kpi
+---
+
+# `kpi`
+
+value + trend delta chip + mini-spark.
+
+## At a glance
+
+| | |
+| --- | --- |
+| Renders | value + trend delta chip + mini-spark |
+| Value shape | `number or { value, delta?, data? }` |
+| Editable | read-only |
+| Key `cellMeta` | invertDelta, deltaPercent, sparkWidth |
+
+## Use it
+
+```tsx
+const columns: BstTableColumn<Row>[] = [
+  { id: 'x', accessorKey: 'x', header: 'X', meta: { type: 'kpi', /* cellMeta below */ } },
+]
+```
+
+## `cellMeta` options
+
+**`kpi`** — value is `number` or `{ value, delta?, data? }`; number formatting from `meta` applies.
+| `cellMeta` | Type | Effect |
+| --- | --- | --- |
+| `invertDelta` | `boolean` | Treat a *decrease* as good (green). |
+| `deltaPercent` | `boolean` | Render the delta as a percentage. |
+| `sparkWidth` | `number` | Width of the optional mini-spark (from `value.data`). |

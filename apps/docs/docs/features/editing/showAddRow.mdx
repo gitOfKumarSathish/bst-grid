@@ -1,0 +1,35 @@
+---
+id: showAddRow
+title: Add-row button
+sidebar_label: showAddRow
+---
+
+# Add-row button
+
+Prop `showAddRow` — adapter chrome, default `follows enableRowActions`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `show*` (chrome, resolved in the adapter) |
+| Type | `boolean` |
+| Default | `follows enableRowActions` |
+| Status | ✅ done (Phase 2) |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableRowActions          // chrome is a no-op without its behaviour flag
+  showAddRow
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- **Requires** `enableRowActions` to be on — this flag is a no-op otherwise.

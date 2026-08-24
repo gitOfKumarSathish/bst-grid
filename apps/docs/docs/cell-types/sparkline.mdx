@@ -1,0 +1,37 @@
+---
+id: sparkline
+title: sparkline
+sidebar_label: sparkline
+---
+
+# `sparkline`
+
+inline SVG line / area / bar.
+
+## At a glance
+
+| | |
+| --- | --- |
+| Renders | inline SVG line / area / bar |
+| Value shape | `number[] (or "1,2,3")` |
+| Editable | read-only |
+| Key `cellMeta` | variant, width, height, color, min, max, showValue |
+
+## Use it
+
+```tsx
+const columns: BstTableColumn<Row>[] = [
+  { id: 'x', accessorKey: 'x', header: 'X', meta: { type: 'sparkline', /* cellMeta below */ } },
+]
+```
+
+## `cellMeta` options
+
+**`sparkline`** — value is `number[]` (or a comma string).
+| `cellMeta` | Type | Effect |
+| --- | --- | --- |
+| `variant` | `'line' \| 'area' \| 'bar'` | Chart style. Default `'line'`. |
+| `width` / `height` | `number` | SVG size in px. Default `84 × 22`. |
+| `color` | CSS color | Stroke/fill. Default the accent var. |
+| `min` / `max` | `number` | Fix the value scale (else auto from data). |
+| `showValue` | `boolean` | Append the last value as text. |

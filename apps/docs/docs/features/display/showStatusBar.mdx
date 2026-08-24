@@ -1,0 +1,36 @@
+---
+id: showStatusBar
+title: Status bar (X5)
+sidebar_label: showStatusBar
+---
+
+# Status bar (X5)
+
+Prop `showStatusBar` — adapter chrome, default `false`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `show*` (chrome, resolved in the adapter) |
+| Type | `boolean` |
+| Default | `false` |
+| Status | ✅ done |
+| Settings sheet | Display |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  showStatusBar
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- Footer with total / filtered row counts (always). The selection sum / avg / min / max / count needs `enableCellSelection`.
+- Chrome flag: it only renders its control when the matching `enable*` behaviour is on.

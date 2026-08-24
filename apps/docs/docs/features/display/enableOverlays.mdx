@@ -1,0 +1,35 @@
+---
+id: enableOverlays
+title: Loading / error overlays (X23)
+sidebar_label: enableOverlays
+---
+
+# Loading / error overlays (X23)
+
+Prop `enableOverlays` — engine behaviour, default `true`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean` |
+| Default | `true` |
+| Status | ✅ done |
+| Settings sheet | Display |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableOverlays
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- Loading / error overlays, on by default. Feed state via `loading` / `error` (or wire `useBstDataSource`, whose `tableProps` already carry both). Customize via `overlayText`, `renderLoadingOverlay`, `renderErrorOverlay`. Set false to manage those states yourself.

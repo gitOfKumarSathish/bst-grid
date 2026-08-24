@@ -1,0 +1,35 @@
+---
+id: showToolbar
+title: Toolbar (whole)
+sidebar_label: showToolbar
+---
+
+# Toolbar (whole)
+
+Prop `showToolbar` — adapter chrome, default `true`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `show*` (chrome, resolved in the adapter) |
+| Type | `boolean` |
+| Default | `true` |
+| Status | ✅ done |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  showToolbar
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- The container for search, menus and buttons — turning it off hides all toolbar chrome.
+- Chrome flag: it only renders its control when the matching `enable*` behaviour is on.

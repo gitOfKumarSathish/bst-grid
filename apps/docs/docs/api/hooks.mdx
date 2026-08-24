@@ -1,0 +1,107 @@
+---
+id: hooks
+title: Hooks
+sidebar_label: Hooks
+sidebar_position: 1
+---
+
+# Hooks
+
+React hooks — the engine entry points.
+
+## useBstDataSource
+
+Drives a `DataSource` for server-side sort / filter / pagination and returns `tableProps` to spread into `useBstTable` (or an adapter). Manages the request lifecycle: **aborts** superseded requests, ignores **stale** responses, **debounces** filter/quick-filter changes (sort + paging are immediate), and **resets to page 0** exactly when the (debounced) result set changes — so a pagination inside the debounce window can't strand the grid on an empty page. The grid's existing chrome (sort headers, filter row, search box, pagination bar) drives it unchanged. **Grouping/expansion are not server-driven** — use those in client mode only.
+
+```tsx
+const ds = useBstDataSource(source, { pageSize: 25 }) <BstTableShadcn columns={columns} getRowId={r => r.id} {...ds.tableProps} />
+```
+
+```ts
+function useBstDataSource<TData>(source: DataSource<TData>, options?: UseBstDataSourceOptions): BstDataSourceResult<TData>;
+```
+
+## useBstGrid
+
+Convenience hook returning the table plus direct handles to the runtime and registry — for adapter chrome that drives the grid (Add row, dirty state, bulk save via `runtime.getDirtyChanges()`).
+
+```ts
+function useBstGrid<TData extends RowData>(opts: UseBstTableOptions<TData>): {
+    table: ReactTable<TableFeatures, RowData, TableState_CellSelection & TableState_ColumnFiltering & TableState_ColumnGrouping & TableState_ColumnOrdering & TableState_ColumnPinning & TableState_ColumnResizing & TableState_ColumnSizing & TableState_ColumnVisibility & TableState_GlobalFiltering & TableState_RowExpanding & TableState_RowPagination & TableState_RowPinning & TableState_RowSelection & TableState_RowSorting>;
+    runtime: BstRuntime<TData>;
+    registry: CellTypeRegistry;
+    handle: BstRuntimeHandle<TData>;
+};
+```
+
+## useBstGridState
+
+Persist a grid's view state to storage and keep it in sync (X21). For a **flash-free restore**, feed `loadGridState(key)` into `useBstTable({ initialState })` so the grid mounts already arranged; this hook then writes later changes back (debounced).
+
+```tsx
+const table = useBstTable({ data, columns, initialState: loadGridState('orders') }) const view = useBstGridState(table, { key: 'orders' }) // <button onClick={view.reset}>Reset view</button>
+```
+
+```ts
+function useBstGridState<TData extends RowData>(table: BstTableInstance<TData>, options: BstGridStateOptions): BstGridStateController;
+```
+
+## useBstIcons
+
+Read the active body-icon set (defaults when no `<BstTable>` provider is above).
+
+```ts
+function useBstIcons(): BstIcons;
+```
+
+## useBstInfiniteDataSource
+
+```ts
+function useBstInfiniteDataSource<TData>(source: DataSource<TData>, options?: UseBstInfiniteDataSourceOptions): BstInfiniteDataSourceResult<TData>;
+```
+
+## useBstPdfThumbnailer
+
+The renderer from the nearest `BstPdfThumbnailerProvider`, or null.
+
+```ts
+function useBstPdfThumbnailer(): PdfThumbnailRenderer | null;
+```
+
+## useBstSettings
+
+Headless settings hook the adapters wrap in a sheet. Holds the per-table override state (so it is naturally per instance), persists it to `localStorage`, and returns: - `props` — the incoming options with overrides applied, ready to feed `useBstGrid` / drive the `show*` chrome, so flipping a switch actually turns the feature on/off; and - `model` — the toggle list (grouped) the sheet renders.
+
+```ts
+function useBstSettings<P extends object>(props: P, options?: BstSettingsOptions): {
+    props: P;
+    model: BstSettingsModel;
+};
+```
+
+## useBstTable
+
+The single entry point apps use. Wraps TanStack v9 `useTable`, resolves the §12 `enable*` toggles, and (Phase 2) builds the Bst-Table runtime — cell-type registry + editing + validation + row lifecycle — attaching it to the table so `<BstTable/>` can render editors and error states. Backward compatible: a zero-config call still returns a plain read-only-capable table.
+
+```ts
+function useBstTable<TData extends RowData>(opts: UseBstTableOptions<TData>): ReactTable<TableFeatures, RowData, TableState_CellSelection & TableState_ColumnFiltering & TableState_ColumnGrouping & TableState_ColumnOrdering & TableState_ColumnPinning & TableState_ColumnResizing & TableState_ColumnSizing & TableState_ColumnVisibility & TableState_GlobalFiltering & TableState_RowExpanding & TableState_RowPagination & TableState_RowPinning & TableState_RowSelection & TableState_RowSorting>;
+```
+
+## useStoreSelector
+
+Subscribe a component to a slice of an external store with a cached snapshot, so it only re-renders when its selected slice actually changes (Plan.md §2.5 rule 5 — per-cell interaction subscriptions). No extra dependency: the snapshot is memoized against the previous state object and the previous derived value.
+
+```ts
+function useStoreSelector<S, T>(store: Store<S>, selector: (state: S) => T, isEqual?: (a: T, b: T) => boolean): T;
+```
+
+## useToolbarOverflow
+
+Measure the toolbar and return the set of collapsible-item ids that don't fit (should render inside "⋯ More" instead of inline). Attach `data-tb="<id>"` to each collapsible item's inline wrapper and `data-tb-more` to the "⋯" button; the hook reads their widths. Widths are cached the first time each item is inline, so an overflowed (unmounted) item still has a width to promote back on.
+
+```ts
+function useToolbarOverflow(containerRef: React.RefObject<HTMLElement | null>, items: readonly {
+    id: string;
+    priority: number;
+}[]): Set<string>;
+```

@@ -1,0 +1,8 @@
+{
+  "label": "Toolbar & chrome",
+  "position": 9,
+  "link": {
+    "type": "doc",
+    "id": "features/toolbar-chrome/index"
+  }
+}

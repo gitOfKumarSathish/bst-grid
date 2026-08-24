@@ -1,0 +1,34 @@
+---
+id: barcode
+title: barcode
+sidebar_label: barcode
+---
+
+# `barcode`
+
+inline-SVG Code 128.
+
+## At a glance
+
+| | |
+| --- | --- |
+| Renders | inline-SVG Code 128 |
+| Value shape | `string` |
+| Editable | ✅ input |
+| Key `cellMeta` | height, showText |
+
+## Use it
+
+```tsx
+const columns: BstTableColumn<Row>[] = [
+  { id: 'x', accessorKey: 'x', header: 'X', meta: { type: 'barcode', /* cellMeta below */ } },
+]
+```
+
+## `cellMeta` options
+
+**`barcode`**
+| `cellMeta` | Type | Effect |
+| --- | --- | --- |
+| `height` | `number` | Bar height in px. Default `38`. |
+| `showText` | `boolean` | Print the value under the bars. Default `true`. |

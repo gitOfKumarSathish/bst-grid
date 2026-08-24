@@ -1,0 +1,35 @@
+---
+id: enableColumnResizing
+title: Column resizing
+sidebar_label: enableColumnResizing
+---
+
+# Column resizing
+
+Prop `enableColumnResizing` — engine behaviour, default `true`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean` |
+| Default | `true` |
+| Status | ✅ done |
+| Settings sheet | Columns |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableColumnResizing
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- **Conflicts with** `fitColumns` — manual column resizing is suppressed while `fitColumns` is on.

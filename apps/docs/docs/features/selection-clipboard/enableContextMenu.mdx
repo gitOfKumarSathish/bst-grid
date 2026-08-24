@@ -1,0 +1,35 @@
+---
+id: enableContextMenu
+title: Context menu (X6)
+sidebar_label: enableContextMenu
+---
+
+# Context menu (X6)
+
+Prop `enableContextMenu` — engine behaviour, default `false`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean` |
+| Default | `false` |
+| Status | ✅ done |
+| Settings sheet | Selection & clipboard |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableContextMenu
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- Right-click a cell for a menu. Default items: Copy / Copy row / Copy column (with `enableClipboard`), Export CSV / Excel (with `enableExport`), Autosize column. Reshape or extend them via the `getContextMenuItems(ctx)` callback (spread `ctx.defaultItems`).

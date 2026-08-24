@@ -1,0 +1,36 @@
+---
+id: enableClipboard
+title: Clipboard (copy/paste)
+sidebar_label: enableClipboard
+---
+
+# Clipboard (copy/paste)
+
+Prop `enableClipboard` — engine behaviour, default `false`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean` |
+| Default | `false` |
+| Status | ✅ done (Phase 3; copy-column all-pages v0.24.0) |
+| Settings sheet | Selection & clipboard |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableClipboard
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- **Implies** `enableCellSelection` (turned on for you).
+- Copy works read-only; PASTE additionally requires `enableEditing`.

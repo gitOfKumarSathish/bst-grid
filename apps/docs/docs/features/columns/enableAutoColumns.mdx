@@ -1,0 +1,35 @@
+---
+id: enableAutoColumns
+title: Auto-generate columns (X27)
+sidebar_label: enableAutoColumns
+---
+
+# Auto-generate columns (X27)
+
+Prop `enableAutoColumns` — engine behaviour, default `false`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean` |
+| Default | `false` |
+| Status | ✅ done |
+| Settings sheet | Columns |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableAutoColumns
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- Generates columns from the data ONLY when `columns` is empty — one column per key found in a sample of rows, with a guessed cell type + humanized header. Ignored the moment `columns` is non-empty. Tune via `autoColumns` (sampleRows / include / exclude / header / inferType).

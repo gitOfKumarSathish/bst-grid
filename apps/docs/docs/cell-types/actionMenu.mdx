@@ -1,0 +1,26 @@
+---
+id: actionMenu
+title: actionMenu
+sidebar_label: actionMenu
+---
+
+# `actionMenu`
+
+compact ⋯ kebab → actions popup.
+
+## At a glance
+
+| | |
+| --- | --- |
+| Renders | compact ⋯ kebab → actions popup |
+| Value shape | `—` |
+| Editable | — |
+| Key `cellMeta` | via meta.actions |
+
+## Use it
+
+```tsx
+const columns: BstTableColumn<Row>[] = [
+  { id: 'x', accessorKey: 'x', header: 'X', meta: { type: 'actionMenu', /* cellMeta below */ } },
+]
+```

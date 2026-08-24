@@ -1,0 +1,292 @@
+---
+id: constants
+title: Constants
+sidebar_label: Constants
+sidebar_position: 5
+---
+
+# Constants
+
+Exported constants and registries.
+
+## actionCellType
+
+```ts
+const actionCellType: CellType<unknown>
+```
+
+## actionMenuCellType
+
+```ts
+const actionMenuCellType: CellType<unknown>
+```
+
+## advancedCellTypes
+
+```ts
+const advancedCellTypes: CellType<string, unknown, any>[]
+```
+
+## barcodeCellType
+
+```ts
+const barcodeCellType: CellType<string>
+```
+
+## BOOLEAN_OPERATORS
+
+```ts
+const BOOLEAN_OPERATORS: FilterOperator[]
+```
+
+## booleanCellType
+
+```ts
+const booleanCellType: CellType<boolean>
+```
+
+## BST_GRID_STATE_KEYS
+
+```ts
+const BST_GRID_STATE_KEYS: readonly BstGridStateKey[]
+```
+
+## BST_GRID_STATE_VERSION
+
+```ts
+const BST_GRID_STATE_VERSION = 1
+```
+
+## BST_ICON_SLOTS
+
+```ts
+const BST_ICON_SLOTS: (keyof BstIcons)[]
+```
+
+## BST_RUNTIME
+
+```ts
+const BST_RUNTIME: unique symbol
+```
+
+## BST_SETTINGS_REGISTRY
+
+```ts
+const BST_SETTINGS_REGISTRY: readonly RegistryEntry[]
+```
+
+## BST_SHORTCUTS_REGISTRY
+
+```ts
+const BST_SHORTCUTS_REGISTRY: readonly BstShortcut[]
+```
+
+## BstIconsContext
+
+```ts
+const BstIconsContext: React.Context<BstIcons>
+```
+
+## bstTableFeatures
+
+```ts
+const bstTableFeatures: {
+    rowSortingFeature: TableFeature;
+    columnFilteringFeature: TableFeature;
+    globalFilteringFeature: TableFeature;
+    rowPaginationFeature: TableFeature;
+    rowSelectionFeature: TableFeature;
+    rowExpandingFeature: TableFeature;
+    rowPinningFeature: TableFeature;
+    columnGroupingFeature: TableFeature;
+    rowAggregationFeature: TableFeature;
+    columnVisibilityFeature: TableFeature;
+    columnOrderingFeature: TableFeature;
+    columnPinningFeature: TableFeature;
+    columnSizingFeature: TableFeature;
+    columnResizingFeature: TableFeature;
+    coreRowModel: (table: Table<any, any>) => () => RowModel<any, any>;
+    sortedRowModel: (table: Table<any, any>) => () => RowModel<any, any>;
+    filteredRowModel: (table: Table<any, any>) => () => RowModel<any, any>;
+    paginatedRowModel: (table: Table<any, any>) => () => RowModel<any, any>;
+    expandedRowModel: (table: i
+  // …truncated
+```
+
+## DATE_OPERATORS
+
+```ts
+const DATE_OPERATORS: FilterOperator[]
+```
+
+## dateTimeCellType
+
+```ts
+const dateTimeCellType: CellType<string | Date | null>
+```
+
+## DEFAULT_FORMAT_PRESETS
+
+```ts
+const DEFAULT_FORMAT_PRESETS: BstFormatPreset[]
+```
+
+## defaultBstIcons
+
+```ts
+const defaultBstIcons: BstIcons
+```
+
+## defaultCellTypes
+
+```ts
+const defaultCellTypes: Array<CellType<any, any, any>>
+```
+
+## EXPORT_MIME
+
+```ts
+const EXPORT_MIME: {
+    readonly csv: 'text/csv;charset=utf-8';
+    readonly xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    readonly html: 'text/html;charset=utf-8';
+}
+```
+
+## FIELD_FORMATS
+
+```ts
+const FIELD_FORMATS: Record<string, FieldFormat>
+```
+
+## filesCellType
+
+```ts
+const filesCellType: CellType<unknown>
+```
+
+## hyperlinkCellType
+
+```ts
+const hyperlinkCellType: CellType<unknown>
+```
+
+## kpiCellType
+
+```ts
+const kpiCellType: CellType<unknown>
+```
+
+## longTextCellType
+
+```ts
+const longTextCellType: CellType<string>
+```
+
+## multiSelectCellType
+
+```ts
+const multiSelectCellType: CellType<string[]>
+```
+
+## NUMBER_OPERATORS
+
+```ts
+const NUMBER_OPERATORS: FilterOperator[]
+```
+
+## numberCellType
+
+```ts
+const numberCellType: CellType<number | null>
+```
+
+## PAGE_SIZE_ALL
+
+```ts
+const PAGE_SIZE_ALL = -1
+```
+
+## PAGE_SIZE_ALL_APPLIED
+
+```ts
+const PAGE_SIZE_ALL_APPLIED: number
+```
+
+## qrCellType
+
+```ts
+const qrCellType: CellType<string>
+```
+
+## radioCellType
+
+```ts
+const radioCellType: CellType<string | null>
+```
+
+## RESERVED_COLUMN_PREFIX
+
+```ts
+const RESERVED_COLUMN_PREFIX = "__bst"
+```
+
+## richTextCellType
+
+```ts
+const richTextCellType: CellType<string>
+```
+
+## ROW_NUMBER_COLUMN_ID
+
+```ts
+const ROW_NUMBER_COLUMN_ID = "__bstRowNumber"
+```
+
+## SELECT_OPERATORS
+
+```ts
+const SELECT_OPERATORS: FilterOperator[]
+```
+
+## singleSelectCellType
+
+```ts
+const singleSelectCellType: CellType<string | null>
+```
+
+## sparklineCellType
+
+```ts
+const sparklineCellType: CellType<number[] | null>
+```
+
+## STICKY_DEFAULT_MAX_HEIGHT_PX
+
+```ts
+const STICKY_DEFAULT_MAX_HEIGHT_PX = 440
+```
+
+## STICKY_HEADER_PX
+
+```ts
+const STICKY_HEADER_PX = 44
+```
+
+## STICKY_ROW_PX
+
+```ts
+const STICKY_ROW_PX = 40
+```
+
+## TEXT_OPERATORS
+
+```ts
+const TEXT_OPERATORS: FilterOperator[]
+```
+
+## textCellType
+
+```ts
+const textCellType: CellType<string>
+```

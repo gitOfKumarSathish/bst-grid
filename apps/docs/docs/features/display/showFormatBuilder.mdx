@@ -1,0 +1,36 @@
+---
+id: showFormatBuilder
+title: Format builder UI (K3)
+sidebar_label: showFormatBuilder
+---
+
+# Format builder UI (K3)
+
+Prop `showFormatBuilder` — adapter chrome, default `false`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `show*` (chrome, resolved in the adapter) |
+| Type | `boolean` |
+| Default | `false` |
+| Status | ✅ done |
+| Settings sheet | Display |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableConditionalFormatting          // chrome is a no-op without its behaviour flag
+  showFormatBuilder
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- **Requires** `enableConditionalFormatting` to be on — this flag is a no-op otherwise.

@@ -1,0 +1,35 @@
+---
+id: enableExport
+title: Export — CSV/Excel/print (X1–X3)
+sidebar_label: enableExport
+---
+
+# Export — CSV/Excel/print (X1–X3)
+
+Prop `enableExport` — engine behaviour, default `false`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean \| BstExportOptions` |
+| Default | `false` |
+| Status | ✅ done |
+| Settings sheet | Export |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableExport={/* boolean | BstExportOptions */}
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- Off by default. `true` enables CSV + Excel + Print; pass a `BstExportOptions` object to pick formats / file name / row scope. Drives `runtime.exportCsv` / `exportExcel` / `printTable`; adapters render an "Export" toolbar menu (`showExport`). Dependency-free — the `.xlsx` is a hand-built OOXML package, no exceljs.

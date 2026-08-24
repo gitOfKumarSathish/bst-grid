@@ -1,0 +1,41 @@
+---
+id: enableResponsive
+title: Responsive column hiding (G4)
+sidebar_label: enableResponsive
+---
+
+# Responsive column hiding (G4)
+
+Prop `enableResponsive` — engine behaviour, default `false`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean` |
+| Default | `false` |
+| Status | ✅ done |
+| Settings sheet | Columns |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableResponsive
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Options
+
+| Option | Notes |
+| --- | --- |
+| `meta.responsivePriority` | columns without a priority are hidden in arbitrary order |
+
+## Behavior & interactions
+
+- **Conflicts with** `fitColumns` — responsive hiding is a no-op under `fitColumns`.

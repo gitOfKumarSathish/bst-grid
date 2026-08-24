@@ -1,0 +1,41 @@
+---
+id: enableRowSelection
+title: Row selection
+sidebar_label: enableRowSelection
+---
+
+# Row selection
+
+Prop `enableRowSelection` — engine behaviour, default `false`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean` |
+| Default | `false` |
+| Status | ✅ done (Phase 3) |
+| Settings sheet | Selection & clipboard |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableRowSelection
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Options
+
+| Option | Notes |
+| --- | --- |
+| `getRowId` | selection state is keyed by row id; without it selection breaks on re-sort |
+
+## Behavior & interactions
+
+- Read the selection with `table.getSelectedRowModel()`.

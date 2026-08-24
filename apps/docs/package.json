@@ -1,0 +1,28 @@
+{
+  "name": "bst-docs",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "docusaurus start",
+    "build": "docusaurus build",
+    "serve": "docusaurus serve",
+    "clear": "docusaurus clear",
+    "gen:features": "cd scripts && node gen-features.mjs ../docs",
+    "gen:reference": "cd scripts && node gen-reference.mjs ../docs",
+    "gen:docs": "npm run gen:features && npm run gen:reference",
+    "check:docs": "cd scripts && node check-docs-coverage.mjs ../docs"
+  },
+  "dependencies": {
+    "@docusaurus/core": "^3.6.0",
+    "@docusaurus/preset-classic": "^3.6.0",
+    "@mdx-js/react": "^3.0.0",
+    "prism-react-renderer": "^2.3.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "browserslist": {
+    "production": [">0.5%", "not dead", "not op_mini all"],
+    "development": ["last 1 chrome version", "last 1 firefox version"]
+  },
+  "engines": { "node": ">=18.0" }
+}

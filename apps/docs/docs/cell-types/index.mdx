@@ -1,0 +1,32 @@
+---
+id: index
+title: Cell Types
+sidebar_label: Overview
+slug: /cell-types
+---
+
+# Cell Types
+
+A column's renderer + editor is chosen by `meta.type`. 17 built-in types ship, all dependency-free inline SVG, extensible via the cell-type registry.
+
+| Type | Renders | Editable |
+| --- | --- | --- |
+| [`text`](./text.mdx) | single-line text, ellipsis + title tooltip | ✅ input |
+| [`longText`](./longText.mdx) | clamped multi-line text | ✅ textarea → popup (adapters) |
+| [`number`](./number.mdx) | locale number / currency / percent | ✅ number input |
+| [`dateTime`](./dateTime.mdx) | date / time / datetime | ✅ native picker |
+| [`boolean`](./boolean.mdx) | check ✓ / muted dash | ✅ checkbox |
+| [`singleSelect`](./singleSelect.mdx) | badge (color · icon · avatar) | ✅ dropdown |
+| [`multiSelect`](./multiSelect.mdx) | chips + +N more overflow | ✅ checkbox dropdown |
+| [`radio`](./radio.mdx) | badge | ✅ radio group |
+| [`hyperlink`](./hyperlink.mdx) | anchor | ✅ url input |
+| [`files`](./files.mdx) | image thumbnail / PDF thumbnail (pdfThumbnail) / icon + name · click to preview (image inline, PDF native viewer) | popup: add/remove (adapters) |
+| [`sparkline`](./sparkline.mdx) | inline SVG line / area / bar | read-only |
+| [`kpi`](./kpi.mdx) | value + trend delta chip + mini-spark | read-only |
+| [`qr`](./qr.mdx) | inline-SVG QR code (byte mode, v1–10) | ✅ input |
+| [`barcode`](./barcode.mdx) | inline-SVG Code 128 | ✅ input |
+| [`richText`](./richText.mdx) | sanitized-HTML preview or formatted | ✅ toolbar → popup (adapters) |
+| [`action`](./action.mdx) | inline Edit / Save / Copy / Delete buttons | — |
+| [`actionMenu`](./actionMenu.mdx) | compact ⋯ kebab → actions popup | — |
+
+_Generated from the `@bloomskill/table-mcp` corpus._

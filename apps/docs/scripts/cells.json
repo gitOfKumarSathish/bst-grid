@@ -1,0 +1,132 @@
+[
+  {
+    "type": "text",
+    "renders": "single-line text, ellipsis + title tooltip",
+    "valueShape": "string",
+    "editable": "✅ input",
+    "cellMeta": "required, pattern"
+  },
+  {
+    "type": "longText",
+    "renders": "clamped multi-line text",
+    "valueShape": "string",
+    "editable": "✅ textarea → popup (adapters)",
+    "cellMeta": "required"
+  },
+  {
+    "type": "number",
+    "renders": "locale number / currency / percent",
+    "valueShape": "number | null",
+    "editable": "✅ number input",
+    "cellMeta": "precision, currency, useGrouping, required, pattern",
+    "cellMetaDetail": "**`number`** — also honours `meta.format` (`'currency'` / `'percent'` / `Intl.NumberFormatOptions`) and `meta.locale`.\n| `cellMeta` | Type | Effect |\n| --- | --- | --- |\n| `precision` | `number` | Fixed min+max fraction digits. |\n| `currency` | `string` (ISO 4217) | Currency format, e.g. `'USD'`, `'INR'`. |\n| `useGrouping` | `boolean` | Thousands separators on/off. |"
+  },
+  {
+    "type": "dateTime",
+    "renders": "date / time / datetime",
+    "valueShape": "string | Date | null",
+    "editable": "✅ native picker",
+    "cellMeta": "variant, required",
+    "cellMetaDetail": "**`dateTime`** — also honours `meta.format` (`Intl.DateTimeFormatOptions`) and `meta.locale`.\n| `cellMeta` | Type | Effect |\n| --- | --- | --- |\n| `variant` | `'date' \\| 'time' \\| 'dateTime'` | Picker + display mode. Default `'date'`. |"
+  },
+  {
+    "type": "boolean",
+    "renders": "check ✓ / muted dash",
+    "valueShape": "boolean",
+    "editable": "✅ checkbox",
+    "cellMeta": "—"
+  },
+  {
+    "type": "singleSelect",
+    "renders": "badge (color · icon · avatar)",
+    "valueShape": "string | null",
+    "editable": "✅ dropdown",
+    "cellMeta": "via meta.options"
+  },
+  {
+    "type": "multiSelect",
+    "renders": "chips + +N more overflow",
+    "valueShape": "string[]",
+    "editable": "✅ checkbox dropdown",
+    "cellMeta": "maxChips, fitChips",
+    "cellMetaDetail": "**`multiSelect`**\n| `cellMeta` | Type | Effect |\n| --- | --- | --- |\n| `maxChips` | `number` | Max chips before `+N more`. Default `3`. |\n| `fitChips` | `boolean` | Width-aware: show as many chips as the column width fits, fold the rest into `+N more` (widen → more chips). `maxChips` then acts as an upper cap. |"
+  },
+  {
+    "type": "radio",
+    "renders": "badge",
+    "valueShape": "string | null",
+    "editable": "✅ radio group",
+    "cellMeta": "layout",
+    "cellMetaDetail": "**`radio`**\n| `cellMeta` | Type | Effect |\n| --- | --- | --- |\n| `layout` | `'vertical' \\| 'horizontal'` | Radio arrangement. Default `'vertical'`. |"
+  },
+  {
+    "type": "hyperlink",
+    "renders": "anchor",
+    "valueShape": "string or { href, label }",
+    "editable": "✅ url input",
+    "cellMeta": "target",
+    "cellMetaDetail": "**`hyperlink`**\n| `cellMeta` | Type | Effect |\n| --- | --- | --- |\n| `target` | `string` | Anchor `target`. Default `'_blank'`. |"
+  },
+  {
+    "type": "files",
+    "renders": "image thumbnail / PDF thumbnail (pdfThumbnail) / icon + name · click to preview (image inline, PDF native viewer)",
+    "valueShape": "FileRef[] ({ name, url, thumbnailUrl?, contentType? })",
+    "editable": "popup: add/remove (adapters)",
+    "cellMeta": "preview, pdfThumbnail, onUpload, onDelete, accept",
+    "cellMetaDetail": "**`files`** — an attachments cell (images, PDFs, any file). The full how-to is\n[**Files columns — images & PDFs**](#files-columns--images--pdfs) below; in short, the value is a\n`FileRef[]`, image files thumbnail automatically, and PDFs thumbnail once you wire pdf.js.\n| `cellMeta` | Type | Effect |\n| --- | --- | --- |\n| `preview` | `boolean` | Click-to-preview. Default `true` (a file needs a `url` to preview). |\n| `pdfThumbnail` | `boolean \\| PdfThumbnailRenderer` | Render PDFs as an in-cell page-1 thumbnail via **pdf.js**. `true` uses the renderer from `<BstPdfThumbnailerProvider>`; a function is a per-column renderer. Default `false`. Falls back to the icon with no renderer; `thumbnailUrl` wins when present. |\n| `onUpload` | `(file: File) => FileRef \\| Promise<FileRef>` | Called for each picked file — upload it and return the stored ref (busy state shown). Without it, the editor keeps a local object URL so preview still works offline. |\n| `onDelete` | `(file: FileRef) => void \\| Promise<void>` | Called before a file is removed (e.g. delete it on the server). |\n| `accept` / `multiple` | `string` / `boolean` | Passed to the file `<input>`. |"
+  },
+  {
+    "type": "sparkline",
+    "renders": "inline SVG line / area / bar",
+    "valueShape": "number[] (or \"1,2,3\")",
+    "editable": "read-only",
+    "cellMeta": "variant, width, height, color, min, max, showValue",
+    "cellMetaDetail": "**`sparkline`** — value is `number[]` (or a comma string).\n| `cellMeta` | Type | Effect |\n| --- | --- | --- |\n| `variant` | `'line' \\| 'area' \\| 'bar'` | Chart style. Default `'line'`. |\n| `width` / `height` | `number` | SVG size in px. Default `84 × 22`. |\n| `color` | CSS color | Stroke/fill. Default the accent var. |\n| `min` / `max` | `number` | Fix the value scale (else auto from data). |\n| `showValue` | `boolean` | Append the last value as text. |"
+  },
+  {
+    "type": "kpi",
+    "renders": "value + trend delta chip + mini-spark",
+    "valueShape": "number or { value, delta?, data? }",
+    "editable": "read-only",
+    "cellMeta": "invertDelta, deltaPercent, sparkWidth",
+    "cellMetaDetail": "**`kpi`** — value is `number` or `{ value, delta?, data? }`; number formatting from `meta` applies.\n| `cellMeta` | Type | Effect |\n| --- | --- | --- |\n| `invertDelta` | `boolean` | Treat a *decrease* as good (green). |\n| `deltaPercent` | `boolean` | Render the delta as a percentage. |\n| `sparkWidth` | `number` | Width of the optional mini-spark (from `value.data`). |"
+  },
+  {
+    "type": "qr",
+    "renders": "inline-SVG QR code (byte mode, v1–10)",
+    "valueShape": "string",
+    "editable": "✅ input",
+    "cellMeta": "ecLevel, size, margin",
+    "cellMetaDetail": "**`qr`**\n| `cellMeta` | Type | Effect |\n| --- | --- | --- |\n| `ecLevel` | `'L' \\| 'M' \\| 'Q' \\| 'H'` | Error-correction level. Default `'M'`. |\n| `size` | `number` | Rendered px. Default `88`. |\n| `margin` | `number` | Quiet-zone modules. Default `2`. |"
+  },
+  {
+    "type": "barcode",
+    "renders": "inline-SVG Code 128",
+    "valueShape": "string",
+    "editable": "✅ input",
+    "cellMeta": "height, showText",
+    "cellMetaDetail": "**`barcode`**\n| `cellMeta` | Type | Effect |\n| --- | --- | --- |\n| `height` | `number` | Bar height in px. Default `38`. |\n| `showText` | `boolean` | Print the value under the bars. Default `true`. |"
+  },
+  {
+    "type": "richText",
+    "renders": "sanitized-HTML preview or formatted",
+    "valueShape": "HTML string",
+    "editable": "✅ toolbar → popup (adapters)",
+    "cellMeta": "render",
+    "cellMetaDetail": "**`richText`**\n| `cellMeta` | Type | Effect |\n| --- | --- | --- |\n| `render` | `'text' \\| 'html'` | `'text'` (default) = safe one-line plain preview; `'html'` = show the *sanitized* HTML **formatted** (bold / lists / …). |"
+  },
+  {
+    "type": "action",
+    "renders": "inline Edit / Save / Copy / Delete buttons",
+    "valueShape": "—",
+    "editable": "—",
+    "cellMeta": "via meta.actions"
+  },
+  {
+    "type": "actionMenu",
+    "renders": "compact ⋯ kebab → actions popup",
+    "valueShape": "—",
+    "editable": "—",
+    "cellMeta": "via meta.actions"
+  }
+]

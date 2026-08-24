@@ -1,0 +1,33 @@
+---
+id: hyperlink
+title: hyperlink
+sidebar_label: hyperlink
+---
+
+# `hyperlink`
+
+anchor.
+
+## At a glance
+
+| | |
+| --- | --- |
+| Renders | anchor |
+| Value shape | `string or { href, label }` |
+| Editable | ✅ url input |
+| Key `cellMeta` | target |
+
+## Use it
+
+```tsx
+const columns: BstTableColumn<Row>[] = [
+  { id: 'x', accessorKey: 'x', header: 'X', meta: { type: 'hyperlink', /* cellMeta below */ } },
+]
+```
+
+## `cellMeta` options
+
+**`hyperlink`**
+| `cellMeta` | Type | Effect |
+| --- | --- | --- |
+| `target` | `string` | Anchor `target`. Default `'_blank'`. |

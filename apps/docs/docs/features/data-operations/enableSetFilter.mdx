@@ -1,0 +1,36 @@
+---
+id: enableSetFilter
+title: Set Filter (X4)
+sidebar_label: enableSetFilter
+---
+
+# Set Filter (X4)
+
+Prop `enableSetFilter` — engine behaviour, default `false`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean` |
+| Default | `false` |
+| Status | ✅ done |
+| Settings sheet | Data operations |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableSetFilter
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- **Requires** `enableColumnFilters` to be on — this flag is a no-op otherwise.
+- Excel-style checklist of distinct values per column, rendered in the per-column filter row — so also turn on `enableColumnFilterRow`. Categorical columns (singleSelect / multiSelect / radio / boolean) are auto-eligible; force or skip per column via `meta.filter: "set" | "condition"`.

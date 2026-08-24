@@ -1,0 +1,822 @@
+[
+  {
+    "flag": "showSearch",
+    "feature": "Global search box",
+    "layer": "chrome",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "true",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enableGlobalFilter",
+    "feature": "Global filter",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "true",
+    "group": "Data operations",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enableSorting",
+    "feature": "Sorting",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "true",
+    "group": "Data operations",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enableColumnFilters",
+    "feature": "Column filters",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "true",
+    "group": "Data operations",
+    "status": "✅ done (Phase 3)"
+  },
+  {
+    "flag": "showFilterBuilder",
+    "feature": "Filter builder UI (E3)",
+    "layer": "chrome",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "false",
+    "group": "Display",
+    "status": "✅ done (Phase 3)"
+  },
+  {
+    "flag": "showFormatBuilder",
+    "feature": "Format builder UI (K3)",
+    "layer": "chrome",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "false",
+    "group": "Display",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enableColumnFilterRow",
+    "feature": "Per-column filter row (\"dual filter\")",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "false",
+    "group": "Columns",
+    "status": "✅ done (Phase 3; always-in-settings v0.29.0)"
+  },
+  {
+    "flag": "pagination",
+    "feature": "Pagination (logic)",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean | {pageSize}",
+    "default": "true",
+    "group": "Data operations",
+    "status": "✅ done"
+  },
+  {
+    "flag": "showPagination",
+    "feature": "Pagination bar",
+    "layer": "chrome",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "true",
+    "status": "✅ done"
+  },
+  {
+    "flag": "pageSizeOptions",
+    "feature": "Page-size choices",
+    "layer": "chrome",
+    "kind": "prop",
+    "type": "(number | 'all')[]",
+    "default": "[5,10,20,50]",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enableHiding",
+    "feature": "Column visibility",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "true",
+    "group": "Columns",
+    "status": "✅ done"
+  },
+  {
+    "flag": "showColumnsMenu",
+    "feature": "Columns menu",
+    "layer": "chrome",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "true",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enableColumnResizing",
+    "feature": "Column resizing",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "true",
+    "group": "Columns",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enableColumnPinning",
+    "feature": "Column pinning",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "false",
+    "group": "Columns",
+    "status": "✅ done (Phase 3)"
+  },
+  {
+    "flag": "enableColumnOrdering",
+    "feature": "Column reordering",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "false",
+    "group": "Columns",
+    "status": "✅ done (Phase 3)"
+  },
+  {
+    "flag": "showToolbar",
+    "feature": "Toolbar (whole)",
+    "layer": "chrome",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "true",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enableEditing",
+    "feature": "Inline editing",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean | {mode,saveOn,policy}",
+    "default": "false",
+    "group": "Editing",
+    "status": "✅ done (Phase 2)"
+  },
+  {
+    "flag": "enableValidation",
+    "feature": "Validation",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean | {policy}",
+    "default": "false",
+    "group": "Editing",
+    "status": "✅ done (Phase 2)"
+  },
+  {
+    "flag": "enableRowActions",
+    "feature": "Row add/delete/duplicate",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "false",
+    "group": "Editing",
+    "status": "✅ done (Phase 2)"
+  },
+  {
+    "flag": "cellTypes",
+    "feature": "Cell-type registry",
+    "layer": "engine",
+    "kind": "prop",
+    "type": "CellTypeRegistry",
+    "default": "neutral defaults",
+    "status": "✅ done (Phase 2)"
+  },
+  {
+    "flag": "showAddRow",
+    "feature": "Add-row button",
+    "layer": "chrome",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "follows enableRowActions",
+    "status": "✅ done (Phase 2)"
+  },
+  {
+    "flag": "showSaveBar",
+    "feature": "Save/Discard bar",
+    "layer": "chrome",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "follows enableEditing",
+    "status": "✅ done (Phase 2)"
+  },
+  {
+    "flag": "enableCellSelection",
+    "feature": "Cell/range selection + keyboard nav",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "false",
+    "group": "Selection & clipboard",
+    "status": "✅ done (Phase 3)"
+  },
+  {
+    "flag": "enableClipboard",
+    "feature": "Clipboard (copy/paste)",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "false",
+    "group": "Selection & clipboard",
+    "status": "✅ done (Phase 3; copy-column all-pages v0.24.0)"
+  },
+  {
+    "flag": "enableCopyColumn",
+    "feature": "Copy column (H3)",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "true",
+    "group": "Selection & clipboard",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enableCopyRow",
+    "feature": "Copy row (H2)",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "true",
+    "group": "Selection & clipboard",
+    "status": "✅ done"
+  },
+  {
+    "flag": "disabled",
+    "feature": "Grid disable (F1)",
+    "layer": "engine",
+    "kind": "prop",
+    "type": "boolean",
+    "default": "false",
+    "status": "✅ done (Phase 2)"
+  },
+  {
+    "flag": "rowDisabled",
+    "feature": "Row disable (F2)",
+    "layer": "engine",
+    "kind": "prop",
+    "type": "(row)=>bool",
+    "default": "—",
+    "status": "✅ done (Phase 2)"
+  },
+  {
+    "flag": "meta.disabled",
+    "feature": "Column / cell disable (F3/F4)",
+    "layer": "engine",
+    "kind": "meta",
+    "type": "boolean | (row)=>bool",
+    "default": "—",
+    "status": "✅ done (Phase 3)"
+  },
+  {
+    "flag": "cellDisabled",
+    "feature": "Cell disable predicate (F4)",
+    "layer": "engine",
+    "kind": "prop",
+    "type": "(ctx)=>bool",
+    "default": "—",
+    "status": "✅ done (Phase 3)"
+  },
+  {
+    "flag": "enableRowSelection",
+    "feature": "Row selection",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "false",
+    "group": "Selection & clipboard",
+    "status": "✅ done (Phase 3)"
+  },
+  {
+    "flag": "showSelectionInfo",
+    "feature": "Selected-count chip",
+    "layer": "chrome",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "follows enableRowSelection",
+    "status": "✅ done (Phase 3)"
+  },
+  {
+    "flag": "enableUndoRedo",
+    "feature": "Undo/redo (C5)",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "false",
+    "group": "Editing",
+    "status": "✅ done (Phase 3)"
+  },
+  {
+    "flag": "showUndoRedo",
+    "feature": "Undo/Redo buttons",
+    "layer": "chrome",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "follows enableUndoRedo",
+    "status": "✅ done (Phase 3)"
+  },
+  {
+    "flag": "(in columns menu)",
+    "feature": "Column pin/reorder controls",
+    "layer": "chrome",
+    "kind": "note",
+    "type": "—",
+    "default": "follows enableColumnPinning / enableColumnOrdering",
+    "status": "✅ done (Phase 3)"
+  },
+  {
+    "flag": "(in columns menu)",
+    "feature": "Column hide/show control",
+    "layer": "chrome",
+    "kind": "note",
+    "type": "—",
+    "default": "follows enableHiding",
+    "status": "✅ done"
+  },
+  {
+    "flag": "showDensityToggle",
+    "feature": "Density toggle",
+    "layer": "chrome",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "false",
+    "group": "Display",
+    "status": "✅ done (Phase 3)"
+  },
+  {
+    "flag": "showSettings",
+    "feature": "Runtime settings sheet",
+    "layer": "chrome",
+    "kind": "toggle",
+    "type": "boolean | BstSettingsOptions",
+    "default": "false",
+    "status": "✅ done"
+  },
+  {
+    "flag": "classNames",
+    "feature": "Custom-CSS slots (K1/K2)",
+    "layer": "engine",
+    "kind": "prop",
+    "type": "BstClassNames / BstStyles",
+    "default": "— (opt-in by presence)",
+    "status": "✅ done"
+  },
+  {
+    "flag": "meta.headerClassName",
+    "feature": "Per-column header CSS",
+    "layer": "engine",
+    "kind": "meta",
+    "type": "string / CSSProperties",
+    "default": "—",
+    "status": "✅ done"
+  },
+  {
+    "flag": "className",
+    "feature": "Outer-card CSS",
+    "layer": "chrome",
+    "kind": "prop",
+    "type": "string / CSSProperties",
+    "default": "—",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enableCellSpanning",
+    "feature": "Cell spanning (A5)",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "false",
+    "group": "Display",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enableExpanding",
+    "feature": "Master-detail (A4)",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "false",
+    "group": "Rows",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enableRowPinning",
+    "feature": "Row pinning (G1)",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "false",
+    "group": "Rows",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enableRowResize",
+    "feature": "Row resize (G2)",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "false",
+    "group": "Rows",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enableAutoRowHeight",
+    "feature": "Auto row height (X26)",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "false",
+    "group": "Rows",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enableGrouping",
+    "feature": "Grouping (E4)",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "false",
+    "group": "Data operations",
+    "status": "✅ done"
+  },
+  {
+    "flag": "theme",
+    "feature": "Theme inheritance (shadcn)",
+    "layer": "chrome",
+    "kind": "prop",
+    "type": "'zinc' | 'inherit' (+ 'hsl' | 'oklch')",
+    "default": "'zinc' / 'hsl'",
+    "status": "✅ done"
+  },
+  {
+    "flag": "dark",
+    "feature": "Ambient dark mode (shadcn)",
+    "layer": "chrome",
+    "kind": "prop",
+    "type": "boolean (tri-state)",
+    "default": "follows ambient .dark",
+    "status": "✅ done"
+  },
+  {
+    "flag": "icons",
+    "feature": "Pluggable icons (shadcn)",
+    "layer": "chrome",
+    "kind": "prop",
+    "type": "Partial<BstShadcnIcons>",
+    "default": "built-in lucide-styled SVGs",
+    "status": "✅ done"
+  },
+  {
+    "flag": "conditionalFormats",
+    "feature": "Conditional formatting (K3/F5)",
+    "layer": "engine",
+    "kind": "prop",
+    "type": "BstFormatRule[]",
+    "default": "— (opt-in by presence)",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enableConditionalFormatting",
+    "feature": "Conditional formatting runtime toggle (K3)",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "true",
+    "group": "Display",
+    "status": "✅ done"
+  },
+  {
+    "flag": "meta.type",
+    "feature": "In-cell visualization (M1/M2)",
+    "layer": "engine",
+    "kind": "meta",
+    "type": "cell type",
+    "default": "—",
+    "status": "✅ done"
+  },
+  {
+    "flag": "meta.type",
+    "feature": "QR / barcode / rich-text cells (B1, J2)",
+    "layer": "engine",
+    "kind": "meta",
+    "type": "cell type",
+    "default": "—",
+    "status": "✅ done"
+  },
+  {
+    "flag": "meta.type",
+    "feature": "Row action overflow menu (B10)",
+    "layer": "engine",
+    "kind": "meta",
+    "type": "cell type",
+    "default": "—",
+    "status": "✅ done"
+  },
+  {
+    "flag": "cellMeta",
+    "feature": "ERP field formats (B1/B2)",
+    "layer": "engine",
+    "kind": "prop",
+    "type": "preset name | RegExp | FieldFormat",
+    "default": "— (opt-in by presence)",
+    "status": "✅ done"
+  },
+  {
+    "flag": "cellMeta",
+    "feature": "Width-aware multiSelect chips (B7)",
+    "layer": "engine",
+    "kind": "prop",
+    "type": "boolean",
+    "default": "false",
+    "status": "✅ done"
+  },
+  {
+    "flag": "files",
+    "feature": "File preview + upload/delete (B5/I3)",
+    "layer": "engine",
+    "kind": "prop",
+    "type": "boolean / callbacks",
+    "default": "preview on",
+    "status": "✅ done"
+  },
+  {
+    "flag": "cellMeta",
+    "feature": "In-cell PDF thumbnail (B5)",
+    "layer": "engine",
+    "kind": "prop",
+    "type": "boolean | PdfThumbnailRenderer",
+    "default": "false",
+    "status": "✅ done"
+  },
+  {
+    "flag": "fitColumns",
+    "feature": "Fit columns to viewport (G3)",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "false",
+    "group": "Columns",
+    "status": "✅ done"
+  },
+  {
+    "flag": "icons",
+    "feature": "Injectable body icons (engine)",
+    "layer": "engine",
+    "kind": "prop",
+    "type": "Partial<BstIcons>",
+    "default": "built-in skin-neutral inline SVGs",
+    "status": "✅ done"
+  },
+  {
+    "flag": "computeAutoWidth",
+    "feature": "Column auto-size (D3)",
+    "layer": "engine",
+    "kind": "note",
+    "type": "interaction",
+    "default": "—",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enableResponsive",
+    "feature": "Responsive column hiding (G4)",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "false",
+    "group": "Columns",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enableStickyHeader",
+    "feature": "Sticky-header viewport (G3/G4)",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean | {maxHeight,maxRows}",
+    "default": "false",
+    "group": "Rows",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enableVirtualization",
+    "feature": "Row virtualization (D1)",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean | {overscan,estimateRowSize,estimateColumnSize}",
+    "default": "false",
+    "group": "Performance",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enableColumnVirtualization",
+    "feature": "Column virtualization (D1)",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "false",
+    "group": "Performance",
+    "status": "✅ done"
+  },
+  {
+    "flag": "useBstInfiniteDataSource",
+    "feature": "Infinite scroll (A2)",
+    "layer": "engine",
+    "kind": "prop",
+    "type": "hook + () => void callback",
+    "default": "— (opt-in)",
+    "status": "✅ done"
+  },
+  {
+    "flag": "DataSource",
+    "feature": "File ops verbs (I3)",
+    "layer": "engine",
+    "kind": "prop",
+    "type": "optional DataSource methods + bridge helper",
+    "default": "— (opt-in)",
+    "status": "✅ done"
+  },
+  {
+    "flag": "getGridState",
+    "feature": "Grid-state save/restore (X21)",
+    "layer": "engine",
+    "kind": "note",
+    "type": "functions + hook · BstGridStateOptions",
+    "default": "— (opt-in)",
+    "status": "✅ done"
+  },
+  {
+    "flag": "showColumnEditToggle",
+    "feature": "Per-column edit lock (F3, runtime)",
+    "layer": "chrome",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "false",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enableEditing",
+    "feature": "Batch editing + single-call save (C2/I2/I4)",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "EditingOptions + callback",
+    "default": "— (opt-in)",
+    "group": "Editing",
+    "status": "✅ done"
+  },
+  {
+    "flag": "showChangesSheet",
+    "feature": "Review-changes sheet",
+    "layer": "chrome",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "follows mode: 'batch'",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enableBatchEditing",
+    "feature": "Batch-editing runtime switch",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "— (follows enableEditing.mode)",
+    "group": "Editing",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enableExport",
+    "feature": "Export — CSV/Excel/print (X1–X3)",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean | BstExportOptions",
+    "default": "false",
+    "group": "Export",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enableCsvExport",
+    "feature": "CSV export (X1)",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "true",
+    "group": "Export",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enableExcelExport",
+    "feature": "Excel export (X2)",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "true",
+    "group": "Export",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enablePrint",
+    "feature": "Print (X3)",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "true",
+    "group": "Export",
+    "status": "✅ done"
+  },
+  {
+    "flag": "showExport",
+    "feature": "Export menu",
+    "layer": "chrome",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "follows enableExport",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enableSetFilter",
+    "feature": "Set Filter (X4)",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "false",
+    "group": "Data operations",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enableMultiFilter",
+    "feature": "Multi-filter (X11)",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "false",
+    "group": "Data operations",
+    "status": "✅ done"
+  },
+  {
+    "flag": "showStatusBar",
+    "feature": "Status bar (X5)",
+    "layer": "chrome",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "false",
+    "group": "Display",
+    "status": "✅ done"
+  },
+  {
+    "flag": "showShortcuts",
+    "feature": "Keyboard-shortcuts overlay",
+    "layer": "chrome",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "false",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enableContextMenu",
+    "feature": "Context menu (X6)",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "false",
+    "group": "Selection & clipboard",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enableRowNumbers",
+    "feature": "Row-number column (X9)",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "false",
+    "group": "Columns",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enableAutoColumns",
+    "feature": "Auto-generate columns (X27)",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "false",
+    "group": "Columns",
+    "status": "✅ done"
+  },
+  {
+    "flag": "enableOverlays",
+    "feature": "Loading / error overlays (X23)",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "true",
+    "group": "Display",
+    "status": "✅ done"
+  }
+]

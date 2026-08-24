@@ -1,0 +1,36 @@
+---
+id: enableColumnVirtualization
+title: Column virtualization (D1)
+sidebar_label: enableColumnVirtualization
+---
+
+# Column virtualization (D1)
+
+Prop `enableColumnVirtualization` — engine behaviour, default `false`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean` |
+| Default | `false` |
+| Status | ✅ done |
+| Settings sheet | Performance |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableColumnVirtualization
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- **Requires** `enableVirtualization` to be on — this flag is a no-op otherwise.
+- Also windows columns horizontally, for very wide grids. Falls back to all-columns under column pinning, `fitColumns`, grouped headers or cell spanning.

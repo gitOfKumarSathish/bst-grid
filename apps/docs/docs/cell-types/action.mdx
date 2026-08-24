@@ -1,0 +1,26 @@
+---
+id: action
+title: action
+sidebar_label: action
+---
+
+# `action`
+
+inline Edit / Save / Copy / Delete buttons.
+
+## At a glance
+
+| | |
+| --- | --- |
+| Renders | inline Edit / Save / Copy / Delete buttons |
+| Value shape | `—` |
+| Editable | — |
+| Key `cellMeta` | via meta.actions |
+
+## Use it
+
+```tsx
+const columns: BstTableColumn<Row>[] = [
+  { id: 'x', accessorKey: 'x', header: 'X', meta: { type: 'action', /* cellMeta below */ } },
+]
+```

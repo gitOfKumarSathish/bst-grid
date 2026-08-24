@@ -1,0 +1,36 @@
+---
+id: enableMultiFilter
+title: Multi-filter (X11)
+sidebar_label: enableMultiFilter
+---
+
+# Multi-filter (X11)
+
+Prop `enableMultiFilter` — engine behaviour, default `false`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean` |
+| Default | `false` |
+| Status | ✅ done |
+| Settings sheet | Data operations |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableMultiFilter
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- **Requires** `enableColumnFilters`, `enableColumnFilterRow` to be on — this flag is a no-op otherwise.
+- Multi-filter — stack several filter types on ONE column. Opt a column in with an ARRAY `meta.filter`, e.g. `meta.filter: ["condition", "set"]`, which stacks those filters in its filter row; a row must satisfy all of them (AND). A `"set"` part also needs `enableSetFilter`. When off, an array `meta.filter` falls back to its first entry.

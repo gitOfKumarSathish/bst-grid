@@ -1,0 +1,36 @@
+---
+id: enableValidation
+title: Validation
+sidebar_label: enableValidation
+---
+
+# Validation
+
+Prop `enableValidation` — engine behaviour, default `false`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean \| {policy}` |
+| Default | `false` |
+| Status | ✅ done (Phase 2) |
+| Settings sheet | Editing |
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableValidation={/* boolean | {policy} */}
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- **Requires** `enableEditing` to be on — this flag is a no-op otherwise.
+- Policy `'blockCommitOnError'` (default) refuses an invalid commit; `'commitButFlag'` accepts and marks it.
