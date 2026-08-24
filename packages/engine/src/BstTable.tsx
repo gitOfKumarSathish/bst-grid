@@ -597,7 +597,7 @@ export function BstTable({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rowVirtActive, activeRowId])
 
-  // Right-click context menu (AG6) — event-delegated on the scroll box: find the
+  // Right-click context menu (X6) — event-delegated on the scroll box: find the
   // clicked cell via its data-attrs, assemble the default items from what's
   // enabled, let `getContextMenuItems` reshape them, then open a dep-free popup at
   // the cursor. If the resolved list is empty the native browser menu is left be.
@@ -670,7 +670,7 @@ export function BstTable({
     }
   }, [ctxMenu])
 
-  // Loading / error overlays (AG23). Error wins when both are set. The overlay
+  // Loading / error overlays (X23). Error wins when both are set. The overlay
   // covers the (non-scrolling) viewport wrapper, so it stays put as the body
   // scrolls beneath it.
   const overlayError = handle.error
@@ -1248,7 +1248,7 @@ function SelectAllCheckbox({ table }: { table: any }) {
  * The condition input (operator-less, type-appropriate) for one filter slot — a
  * select for option/boolean columns, else a text / number / date input. Bound to a
  * `{ op, value }` condition via `value` / `onChange`, so it works standalone in the
- * filter row **or** as one part of a stacked multi-filter (AG11).
+ * filter row **or** as one part of a stacked multi-filter (X11).
  */
 function ConditionInput({
   column,
@@ -1315,7 +1315,7 @@ function ConditionInput({
 }
 
 /**
- * Stacked **multi-filter** (AG11) — renders each configured filter part (a Set
+ * Stacked **multi-filter** (X11) — renders each configured filter part (a Set
  * Filter or a condition input) bound to its own slot in the column's compound
  * `{ op:'and', conditions }` value, so a row must satisfy every part.
  */
@@ -1369,7 +1369,7 @@ function MultiColumnFilter({
  * own `columnFilters` entry via `setFilterValue({ op, value })` using the
  * operator-aware `bstCondition` filterFn — so it and the filter-builder panel
  * are two views of the same state. The control shape follows `meta.type`; an
- * array `meta.filter` **stacks** several (multi-filter, AG11).
+ * array `meta.filter` **stacks** several (multi-filter, X11).
  */
 function ColumnFilterCell({
   column,
@@ -1388,7 +1388,7 @@ function ColumnFilterCell({
       ? column.columnDef.header
       : column.id
 
-  // Multi-filter (AG11): an array `meta.filter` with 2+ parts stacks those filters.
+  // Multi-filter (X11): an array `meta.filter` with 2+ parts stacks those filters.
   const filterMeta = meta.filter as 'set' | 'condition' | Array<'set' | 'condition'> | undefined
   if (handle?.enableMultiFilter && Array.isArray(filterMeta) && filterMeta.length > 1 && table) {
     return (
@@ -1398,7 +1398,7 @@ function ColumnFilterCell({
   // Single filter — when multi is off, an array collapses to its first entry.
   const single = Array.isArray(filterMeta) ? filterMeta[0] : filterMeta
 
-  // Set Filter (AG4): a distinct-values checklist for categorical / opted-in
+  // Set Filter (X4): a distinct-values checklist for categorical / opted-in
   // columns (needs `enableSetFilter`). `'condition'` opts back out.
   const setEligible =
     !!handle?.enableSetFilter &&

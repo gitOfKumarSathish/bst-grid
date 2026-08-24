@@ -50,7 +50,7 @@ component-library styling**, so you pair it with a skin:
 &nbsp;· [Custom CSS](#custom-css)
 &nbsp;· [Body icons](#body-icons)
 &nbsp;· [Runtime settings sheet](#runtime-settings-sheet)
-&nbsp;· [Grid state (save / restore views)](#grid-state--save--restore-views-ag21)
+&nbsp;· [Grid state (save / restore views)](#grid-state--save--restore-views-x21)
 &nbsp;· [Server mode (DataSource)](#server-mode-datasource)
 
 **Reference** &nbsp;· [Exports](#exports) &nbsp;· [Requirements](#requirements) &nbsp;· [License](#license)
@@ -210,7 +210,7 @@ settings (e.g. `pagination={{ pageSize: 25 }}`). Follow a link for the full guid
 | [Conditional formatting](#conditional-formatting) | `conditionalFormats` + `enableConditionalFormatting` | on when rules present |
 | [Injectable body icons](#body-icons) | `icons` | built-in SVGs |
 | [Runtime settings sheet](#runtime-settings-sheet) | `useBstSettings` (`showSettings` in adapters) | `false` |
-| [Grid state save/restore (AG21)](#grid-state--save--restore-views-ag21) | `useBstGridState` / `loadGridState` (`gridState={{ key }}` in adapters) | off (opt-in) |
+| [Grid state save/restore (X21)](#grid-state--save--restore-views-x21) | `useBstGridState` / `loadGridState` (`gridState={{ key }}` in adapters) | off (opt-in) |
 | [Server-side DataSource](#server-mode-datasource) | `useBstDataSource(source)` | client mode |
 
 ---
@@ -561,8 +561,8 @@ means *passing the object implies enabled*.
 | `enableSorting` | `boolean` | `true` | Column sorting (v9). |
 | `enableGlobalFilter` | `boolean` | `true` | Global search. |
 | `enableColumnFilters` | `boolean` | `true` | Per-column filtering / filter builder. |
-| `enableSetFilter` | `boolean` | `false` | [Set Filter](#filtering) (AG4) — a distinct-values checklist per column in the filter row. Needs `enableColumnFilters` + `enableColumnFilterRow`. |
-| `enableMultiFilter` | `boolean` | `false` | [Multi-filter](#filtering) (AG11) — a column with an array `meta.filter` (e.g. `['condition','set']`) stacks those filters (AND). Needs `enableColumnFilters` + `enableColumnFilterRow`. |
+| `enableSetFilter` | `boolean` | `false` | [Set Filter](#filtering) (X4) — a distinct-values checklist per column in the filter row. Needs `enableColumnFilters` + `enableColumnFilterRow`. |
+| `enableMultiFilter` | `boolean` | `false` | [Multi-filter](#filtering) (X11) — a column with an array `meta.filter` (e.g. `['condition','set']`) stacks those filters (AND). Needs `enableColumnFilters` + `enableColumnFilterRow`. |
 | `enableGrouping` | `boolean` | `false` | Multi-column [grouping](#grouping-and-aggregation) + aggregates. |
 | `pagination` | `boolean \| { pageSize?: number }` | `true` (10) | Pagination; `false` shows all rows. |
 
@@ -578,9 +578,9 @@ means *passing the object implies enabled*.
 | `enableResponsive` | `boolean` | `false` | Hide lowest-priority columns when narrow (G4). No-op under `fitColumns`. |
 | `enableStickyHeader` | `boolean \| { maxHeight?: number \| string; maxRows?: number }` | `false` | Cap the body to a bounded height so rows scroll under a pinned header + filter row (G3/G4). `maxHeight` = px number / CSS length; `maxRows` = approx row count; default 440px. Skipped when `enableVirtualization` is on (it already does this). |
 | `enableColumnFilterRow` | `boolean` | `false` | Per-column filter inputs under the header. |
-| `enableRowNumbers` | `boolean` | `false` | [Row-number column](#row-numbers-auto-columns--overlays) (AG9) — a leading `#` column numbering the current view (continuous across pages; reflects sort + filter). Non-interactive; **pinned sticky-left by default** (stays leftmost even when other columns are pinned); stays out of sort / filter / columns menu / export. |
+| `enableRowNumbers` | `boolean` | `false` | [Row-number column](#row-numbers-auto-columns--overlays) (X9) — a leading `#` column numbering the current view (continuous across pages; reflects sort + filter). Non-interactive; **pinned sticky-left by default** (stays leftmost even when other columns are pinned); stays out of sort / filter / columns menu / export. |
 | `rowNumberHeader` | `ReactNode` | `'#'` | Header for the row-number column. |
-| `enableAutoColumns` | `boolean` | `false` | [Auto-generate columns](#row-numbers-auto-columns--overlays) (AG27) — infer columns from the data when `columns` is empty. Ignored once `columns` is non-empty. |
+| `enableAutoColumns` | `boolean` | `false` | [Auto-generate columns](#row-numbers-auto-columns--overlays) (X27) — infer columns from the data when `columns` is empty. Ignored once `columns` is non-empty. |
 | `autoColumns` | `AutoColumnsOptions` | — | Tune auto-generation: `{ sampleRows?, include?, exclude?, header?, inferType? }`. |
 
 **Rows**
@@ -594,7 +594,7 @@ means *passing the object implies enabled*.
 | `getRowCanExpand` | `(row) => boolean` | all rows | Which rows can expand. |
 | `enableRowPinning` | `boolean` | `false` | Freeze rows top/bottom (G1). |
 | `enableRowResize` | `boolean` | `false` | Drag a row's bottom edge to set its height (G2). |
-| `enableAutoRowHeight` | `boolean` | `false` | [Auto row height](#row-layout) (AG26) — cells wrap and rows grow to fit content; per-column via `meta.wrapText`. |
+| `enableAutoRowHeight` | `boolean` | `false` | [Auto row height](#row-layout) (X26) — cells wrap and rows grow to fit content; per-column via `meta.wrapText`. |
 | `enableVirtualization` | `boolean \| VirtualizationOptions` | `false` | [Row virtualization](#virtualization-d1) (D1) — window visible rows for large data. Object tunes `overscan` / `estimateRowSize` / `estimateColumnSize`. |
 | `enableColumnVirtualization` | `boolean` | `false` | Also window columns (needs `enableVirtualization`). |
 | `onReachEnd` | `() => void` | — | Infinite scroll (A2) — fires near the end of a virtualized body. |
@@ -621,19 +621,19 @@ means *passing the object implies enabled*.
 | `enableCellSelection` | `boolean` | `false` | [Cell/range selection](#selection-keyboard-and-clipboard) + keyboard nav. |
 | `enableClipboard` | `boolean` | `false` | Copy/paste. Implies `enableCellSelection`; paste needs `enableEditing`. |
 | `enableCopyColumn` / `enableCopyRow` | `boolean` | `true` | Sub-toggles of clipboard for whole-column / whole-row copy. |
-| `enableContextMenu` | `boolean` | `false` | [Right-click menu](#selection-keyboard-and-clipboard) (AG6) — Copy / Export / Autosize defaults; customize via `getContextMenuItems`. |
+| `enableContextMenu` | `boolean` | `false` | [Right-click menu](#selection-keyboard-and-clipboard) (X6) — Copy / Export / Autosize defaults; customize via `getContextMenuItems`. |
 | `disabled` | `boolean` | `false` | Disable the whole grid (F1). |
 | `rowDisabled` | `(row) => boolean` | — | Disable interaction per row (F2). |
 | `cellDisabled` | `({ row, rowId, columnId }) => boolean` | — | Disable interaction per cell (F4). |
 
-**Export (AG1–AG3)**
+**Export (X1–X3)**
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
 | `enableExport` | `boolean \| BstExportOptions` | `false` | [Export](#export-csv--excel--print) as CSV / Excel / print. Object form: `{ csv?, excel?, print?, fileName?, scope?, includeHeaders? }` (an object implies enabled). |
 | `enableCsvExport` / `enableExcelExport` / `enablePrint` | `boolean` | `true` | Per-format sub-toggles of `enableExport` (also the settings-sheet switches). |
 
-**Loading / error overlays (AG23)**
+**Loading / error overlays (X23)**
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -783,9 +783,9 @@ const table = useBstTable<Task>({
 - **Whole-row copy (H2)** — **Shift+Space** / `runtime.copyRow(id)`. Gate with `enableCopyRow` (default `true`).
 - **Drive it programmatically** — via `useBstGrid` → `runtime.setActiveCell` / `moveActive` /
   `getSelectionMatrix` / `copySelection` / `pasteFromText`. `runtime.getSelectionStats()` returns
-  `{ count, numericCount, sum, avg, min, max }` over the selection — the AG5 **status bar**
+  `{ count, numericCount, sum, avg, min, max }` over the selection — the X5 **status bar**
   (`showStatusBar` in the adapters) renders it.
-- **Right-click menu (AG6)** — `enableContextMenu` opens a menu at the cursor with **Copy · Copy row ·
+- **Right-click menu (X6)** — `enableContextMenu` opens a menu at the cursor with **Copy · Copy row ·
   Copy column** (while clipboard is on), **Export CSV / Excel** (while export is on) and **Autosize
   column**. Reshape it with **`getContextMenuItems(ctx) => BstContextMenuItem[]`** — spread
   `ctx.defaultItems` and add your own (each `{ label, onSelect, disabled?, separator?, icon? }`). Both
@@ -921,13 +921,13 @@ return (
   number (`= ≠ > < between`), date (on / after / before / between), select (is / is not), boolean.
 - **Per-column filter row** — `enableColumnFilterRow` renders a type-aware input under each header
   (the "dual filter"; coexists with the builder panel).
-- **Set Filter (AG4)** — `enableSetFilter` turns the filter-row control for categorical columns
+- **Set Filter (X4)** — `enableSetFilter` turns the filter-row control for categorical columns
   (`singleSelect` / `multiSelect` / `radio` / `boolean`) into an Excel-style **checklist of distinct
   values** (`BstSetFilter`: search · select-all / clear · per-value counts · a "(Blanks)" bucket).
   Force it on any column with `meta.filter: 'set'`, or off with `meta.filter: 'condition'`. It writes an
   `{ op: 'set' }` condition, so it composes with the builder and `bstCondition`. Needs
   `enableColumnFilters` **and** the filter row visible (`enableColumnFilterRow`).
-- **Multi-filter (AG11)** — `enableMultiFilter` lets a column **stack several filter types**. Set its
+- **Multi-filter (X11)** — `enableMultiFilter` lets a column **stack several filter types**. Set its
   `meta.filter` to an **array** (e.g. `['condition', 'set']`) and the filter row shows those filters
   stacked; a row must satisfy **all** of them (AND). Stored as a compound
   `{ op: 'and', conditions }` value the same `bstCondition` filterFn understands (helpers
@@ -996,7 +996,7 @@ Adapters add a **density** toggle (`showDensityToggle` → `data-bst-density` �
 | **Master-detail** | `enableExpanding` + `renderDetail(row)` | Leading expander column; clicking opens a full-width detail panel. `getRowCanExpand(row)` gates which rows expand. |
 | **Row pinning** | `enableRowPinning` | Leading pin column; the toggle cycles a row **top → bottom → unpinned**. Pinned rows survive sort/filter/pagination and stick while the body scrolls. |
 | **Row resizing** | `enableRowResize` | Drag any row's **bottom edge** to set its height (min 24px; **double-click** resets). Heights are local UI state. |
-| **Auto row height** | `enableAutoRowHeight` | Body cells **wrap** and each row grows to fit its content — **browser-measured, no JS**. Opt a single column in with `meta.wrapText`. A manually-resized row keeps its set height and clips the wrapped content (AG26). |
+| **Auto row height** | `enableAutoRowHeight` | Body cells **wrap** and each row grows to fit its content — **browser-measured, no JS**. Opt a single column in with `meta.wrapText`. A manually-resized row keeps its set height and clips the wrapped content (X26). |
 | **Sticky-header viewport** | `enableStickyHeader` | Caps the scroll box to a bounded height so rows scroll under a **sticky header + filter row** instead of the table growing taller as the page size grows (G3/G4). `true` → 440px; `{ maxHeight: 500 }` / `{ maxHeight: '60vh' }` / `{ maxRows: 10 }` to size it. Already included in `enableVirtualization`, so the standalone class is skipped when windowing is on. Height overridable via `styles.root` / the `--bst-max-height` var. |
 
 ```tsx
@@ -1012,14 +1012,14 @@ useBstTable<Order>({
 
 Three zero-config conveniences, each a §12 toggle (all appear in the runtime settings sheet):
 
-**Row numbers (AG9)** — `enableRowNumbers` prepends a leading, non-interactive `#` column that
+**Row numbers (X9)** — `enableRowNumbers` prepends a leading, non-interactive `#` column that
 numbers the **current view**: numbering is continuous across pages and follows the active sort +
 filter (not the raw data order). It never sorts, filters, hides, resizes or reorders, so it stays out
 of the columns menu, filter row and export. It is **pinned to the start (sticky-left) by default**, so
 it stays the leftmost column even when you pin another column, and stays visible during horizontal
 scroll. Override the header with `rowNumberHeader`.
 
-**Auto-generate columns (AG27)** — `enableAutoColumns` infers columns from the data **when you pass
+**Auto-generate columns (X27)** — `enableAutoColumns` infers columns from the data **when you pass
 no `columns`** (an empty array): one column per key found across a sample of rows, with the cell type
 guessed (number / boolean / date, else text) and a humanized header (`unitPrice` → "Unit Price").
 Explicit columns always win. The pure helper is exported too:
@@ -1030,7 +1030,7 @@ const columns = autoGenerateColumns(rows, { exclude: ['id'], sampleRows: 100 })
 // or just: useBstTable({ data, columns: [], enableAutoColumns: true, getRowId })
 ```
 
-**Loading / error overlays (AG23)** — `enableOverlays` (on by default) paints an overlay over the
+**Loading / error overlays (X23)** — `enableOverlays` (on by default) paints an overlay over the
 grid while `loading` is true or when `error` is set (error wins). Wire it to a server source and it
 works for free — `useBstDataSource` / `useBstInfiniteDataSource` expose `loading` + `error` on their
 `tableProps`:
@@ -1190,7 +1190,7 @@ const table = useBstTable(effective)   // enable*/show* now reflect the user's c
   (the search helpers), and `BST_SETTINGS_REGISTRY` (ordered metadata). The list is derived from the
   engine's own toggle interface, so new features show up automatically.
 
-## Grid state — save / restore views (AG21)
+## Grid state — save / restore views (X21)
 
 Persist a grid's **view** — sort · filter · global filter · column order/size/visibility/pinning ·
 grouping · expansion · row pinning · selection · pagination — so a **per-user view** survives reloads.
@@ -1405,7 +1405,7 @@ preview fallback. New exports: `createFileHandlers`, types `BstFileRef`, `DataSo
 `BstSettingKey`, `BstSettingsItem`, `BstSettingsGroup`, `BstSettingsModel`, `BstSettingsOptions`,
 `BstSettingsOverrides`.
 
-**Grid state (AG21)** — `getGridState` · `applyGridState` · `resetGridState` · `emptyGridState` ·
+**Grid state (X21)** — `getGridState` · `applyGridState` · `resetGridState` · `emptyGridState` ·
 `loadGridState` · `saveGridState` · `clearGridState` · `useBstGridState` · `BST_GRID_STATE_KEYS` ·
 `BST_GRID_STATE_VERSION` + types `BstGridState`, `BstGridStateKey`, `BstGridStateSelect`,
 `BstGridStateOptions`, `BstGridStateController`, `BstGridStateStorage`.
@@ -1413,7 +1413,7 @@ preview fallback. New exports: `createFileHandlers`, types `BstFileRef`, `DataSo
 **PDF thumbnails (B5)** — `BstPdfThumbnailerProvider` · `useBstPdfThumbnailer` · `createPdfjsThumbnailer`
 + types `PdfThumbnailRenderer`, `PdfThumbnailerOptions`. Needs `pdfjs-dist` (yours to install).
 
-**Filtering (E3 / AG11)** — `evalCondition` · `isConditionActive` · `combineFilterConditions` ·
+**Filtering (E3 / X11)** — `evalCondition` · `isConditionActive` · `combineFilterConditions` ·
 `operatorsForType` · `operatorArity` · `filterFn_bstCondition` · `TEXT_OPERATORS` / `NUMBER_OPERATORS` /
 `DATE_OPERATORS` / `SELECT_OPERATORS` / `BOOLEAN_OPERATORS` + types `FilterOperator`, `FilterCondition`,
 `FilterConditionGroup`.

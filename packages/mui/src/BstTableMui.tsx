@@ -116,14 +116,14 @@ export interface BstTableMuiProps<TData extends RowData> extends UseBstTableOpti
   /** Row-height density toggle button (compact / normal / comfortable). Default: false. */
   showDensityToggle?: boolean
   /**
-   * Export menu (CSV / Excel / Print) in the toolbar (AG1–AG3). Requires
+   * Export menu (CSV / Excel / Print) in the toolbar (X1–X3). Requires
    * `enableExport`; the menu items follow the per-format sub-toggles
    * (`enableCsvExport` / `enableExcelExport` / `enablePrint`). Default: follows
    * `enableExport`.
    */
   showExport?: boolean
   /**
-   * Status bar footer (AG5) — total / filtered row count, and, when a cell range
+   * Status bar footer (X5) — total / filtered row count, and, when a cell range
    * is selected, the sum / avg / min / max / count of its numeric cells. Default:
    * false.
    */
@@ -160,7 +160,7 @@ export interface BstTableMuiProps<TData extends RowData> extends UseBstTableOpti
    * ⌘/Ctrl key rendering (default auto-detects). Default: false (opt-in). */
   showShortcuts?: boolean | { platform?: 'mac' | 'pc' | 'auto' }
   /**
-   * Grid-state save/restore (AG21). Pass `{ key }` to persist this grid's **view**
+   * Grid-state save/restore (X21). Pass `{ key }` to persist this grid's **view**
    * — sort · filter · column order/size/visibility/pinning · grouping · … — to
    * `localStorage` and restore it on the next mount (a per-user "view" that
    * survives reloads). One prop does both: it seeds `initialState` from the stored
@@ -183,7 +183,7 @@ export interface BstTableMuiProps<TData extends RowData> extends UseBstTableOpti
 }
 
 /**
- * Null-rendering child that wires grid-state persistence (AG21) via the engine
+ * Null-rendering child that wires grid-state persistence (X21) via the engine
  * hook. Rendered only when `gridState` is set, so grids that don't use it pay
  * nothing (no per-render snapshot).
  */
@@ -257,7 +257,7 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
   }
 
   const preset = React.useMemo(() => cellTypes ?? createMuiPreset(), [cellTypes])
-  // Grid-state restore (AG21): seed initialState from the stored snapshot once,
+  // Grid-state restore (X21): seed initialState from the stored snapshot once,
   // unless the caller passed their own initialState. Read once on mount so a later
   // save doesn't re-seed. Persistence (save-on-change) is the child below.
   const restoredInitialState = React.useMemo(
@@ -274,7 +274,7 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
   } as UseBstTableOptions<TData>
   const { table, runtime, handle } = useBstGrid<TData>(gridOpts)
   const theme = useTheme()
-  // Grid-state save/restore (AG21) — the manual "Save view" / "Reset view" controls
+  // Grid-state save/restore (X21) — the manual "Save view" / "Reset view" controls
   // rendered in the settings-sheet footer below. These persist the *arrangement*
   // (sort · filter · column layout · grouping · …), distinct from the settings Reset,
   // which clears feature toggles. In manual mode (`gridState.persist === false`) the
@@ -461,7 +461,7 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
   const to = Math.min((pg.pageIndex + 1) * pg.pageSize, total)
   // "Rows per page" choices (numeric sizes + an optional `'all'` → every row).
   const pageSizeSelect = resolvePageSizeChoices(pageSizeOptions, pg.pageSize)
-  // Status bar (AG5): pre-filter total + selection aggregates.
+  // Status bar (X5): pre-filter total + selection aggregates.
   const statusBarTotal = table.getPreFilteredRowModel().rows.length
   const selStats = statusBarOn ? runtime.getSelectionStats() : null
   const fmtStat = (n: number) => n.toLocaleString(undefined, { maximumFractionDigits: 2 })
@@ -480,7 +480,7 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
   }
   const orderedColumns = (
     orderingOn ? orderNow().map((id) => colById.get(id)) : table.getAllLeafColumns()
-  ).filter((c: any) => c && !String(c.id).startsWith('__bst')) // hide the row-number column (AG9)
+  ).filter((c: any) => c && !String(c.id).startsWith('__bst')) // hide the row-number column (X9)
   const moveColumn = (colId: string, dir: -1 | 1) => {
     const order = orderNow()
     const i = order.indexOf(colId)

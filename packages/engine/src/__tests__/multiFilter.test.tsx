@@ -12,7 +12,7 @@ import {
 import type { BstTableColumn, FilterCondition } from '../index'
 
 /**
- * Multi-filter (AG11) — stack several filter types on one column via an array
+ * Multi-filter (X11) — stack several filter types on one column via an array
  * `meta.filter` (e.g. `['condition', 'set']`). The column stores a compound
  * `{ op:'and', conditions }` value the `bstCondition` filterFn understands; the
  * filter row stacks the widgets, each bound to its own slot.
@@ -20,7 +20,7 @@ import type { BstTableColumn, FilterCondition } from '../index'
 const AND = (c: (FilterCondition | undefined)[]) => ({ op: 'and' as const, conditions: c })
 const OR = (c: (FilterCondition | undefined)[]) => ({ op: 'or' as const, conditions: c })
 
-describe('multi-filter — compound conditions (AG11)', () => {
+describe('multi-filter — compound conditions (X11)', () => {
   test('AND: a cell must satisfy every active part', () => {
     const g = AND([{ op: 'contains', value: 'a' }, { op: 'set', value: ['admin', 'user'] }])
     expect(evalCondition('admin', g)).toBe(true) // has 'a' + in set
@@ -100,7 +100,7 @@ function renderGrid(props?: Record<string, unknown>) {
   return render(<G />)
 }
 
-describe('multi-filter — stacked filter row (AG11)', () => {
+describe('multi-filter — stacked filter row (X11)', () => {
   test('an array meta.filter stacks the parts (condition + set)', () => {
     renderGrid()
     const multi = document.querySelector('.bst-multifilter')

@@ -97,8 +97,8 @@ const SETTINGS_META: Record<BstSettingKey, SettingMeta> = {
   enableSorting: { group: 'Data operations', default: true, alwaysShow: true, label: 'Sorting' },
   enableGlobalFilter: { group: 'Data operations', default: true, alwaysShow: true, label: 'Global search', hint: 'The toolbar search box' },
   enableColumnFilters: { group: 'Data operations', default: true, alwaysShow: true, label: 'Column filters' },
-  enableSetFilter: { group: 'Data operations', default: false, alwaysShow: true, label: 'Set filter', hint: 'Checklist of distinct values per column (AG4) · needs the per-column filter row', requires: ['enableColumnFilterRow'] },
-  enableMultiFilter: { group: 'Data operations', default: false, alwaysShow: true, label: 'Multi-filter', hint: 'Stack several filter types on one column via array meta.filter (AG11) · needs the per-column filter row', requires: ['enableColumnFilterRow'] },
+  enableSetFilter: { group: 'Data operations', default: false, alwaysShow: true, label: 'Set filter', hint: 'Checklist of distinct values per column · needs the per-column filter row', requires: ['enableColumnFilterRow'] },
+  enableMultiFilter: { group: 'Data operations', default: false, alwaysShow: true, label: 'Multi-filter', hint: 'Stack several filter types on one column via array meta.filter · needs the per-column filter row', requires: ['enableColumnFilterRow'] },
   pagination: { group: 'Data operations', default: true, alwaysShow: true, label: 'Pagination', hint: 'Off shows every row' },
   enableGrouping: { group: 'Data operations', default: false, alwaysShow: true, label: 'Row grouping', hint: 'Group rows + aggregates (E4)' },
   // Columns
@@ -109,13 +109,13 @@ const SETTINGS_META: Record<BstSettingKey, SettingMeta> = {
   enableColumnFilterRow: { group: 'Columns', default: false, alwaysShow: true, label: 'Per-column filter row', hint: 'Filter inputs under each header · needs Column filters', requires: ['enableColumnFilters'] },
   fitColumns: { group: 'Columns', default: false, label: 'Fit columns to width', hint: 'No horizontal scroll (G3)' },
   enableResponsive: { group: 'Columns', default: false, label: 'Responsive columns', hint: 'Hide low-priority columns when narrow (G4)' },
-  enableRowNumbers: { group: 'Columns', default: false, alwaysShow: true, label: 'Row numbers', hint: 'Leading # column numbering the current view (AG9)' },
-  enableAutoColumns: { group: 'Columns', default: false, label: 'Auto-generate columns', hint: 'Infer columns from the data when none are defined (AG27)' },
+  enableRowNumbers: { group: 'Columns', default: false, alwaysShow: true, label: 'Row numbers', hint: 'Leading # column numbering the current view' },
+  enableAutoColumns: { group: 'Columns', default: false, label: 'Auto-generate columns', hint: 'Infer columns from the data when none are defined' },
   // Rows
   enableExpanding: { group: 'Rows', default: false, label: 'Master-detail rows', hint: 'Expandable detail panel (A4)' },
   enableRowPinning: { group: 'Rows', default: false, label: 'Pin rows', hint: 'Freeze rows top / bottom (G1)' },
   enableRowResize: { group: 'Rows', default: false, alwaysShow: true, label: 'Resize rows', hint: 'Drag a row edge to set its height (G2)' },
-  enableAutoRowHeight: { group: 'Rows', default: false, alwaysShow: true, label: 'Auto row height', hint: 'Rows grow to fit wrapped content (AG26)' },
+  enableAutoRowHeight: { group: 'Rows', default: false, alwaysShow: true, label: 'Auto row height', hint: 'Rows grow to fit wrapped content' },
   enableStickyHeader: { group: 'Rows', default: false, alwaysShow: true, label: 'Sticky header', hint: 'Cap the body height so rows scroll under a pinned header (G3/G4)' },
   // Editing
   enableEditing: { group: 'Editing', default: false, label: 'Inline editing' },
@@ -144,7 +144,7 @@ const SETTINGS_META: Record<BstSettingKey, SettingMeta> = {
   enableClipboard: { group: 'Selection & clipboard', default: false, label: 'Copy & paste', hint: 'Ctrl/⌘+C · Ctrl/⌘+V' },
   enableCopyColumn: { group: 'Selection & clipboard', default: true, alwaysShow: true, label: 'Copy column', hint: 'Ctrl/⌘+Space · needs Copy & paste', requires: ['enableClipboard'] },
   enableCopyRow: { group: 'Selection & clipboard', default: true, alwaysShow: true, label: 'Copy row', hint: 'Shift+Space · needs Copy & paste', requires: ['enableClipboard'] },
-  enableContextMenu: { group: 'Selection & clipboard', default: false, alwaysShow: true, label: 'Context menu', hint: 'Right-click a cell for Copy / Export actions (AG6)' },
+  enableContextMenu: { group: 'Selection & clipboard', default: false, alwaysShow: true, label: 'Context menu', hint: 'Right-click a cell for Copy / Export actions' },
   // Display
   enableCellSpanning: { group: 'Display', default: false, label: 'Cell spanning', hint: 'Merge repeated cells (A5)' },
   enableConditionalFormatting: {
@@ -164,9 +164,9 @@ const SETTINGS_META: Record<BstSettingKey, SettingMeta> = {
     requires: ['enableConditionalFormatting'],
   },
   showDensityToggle: { group: 'Display', default: false, label: 'Density toggle' },
-  showStatusBar: { group: 'Display', default: false, label: 'Status bar', hint: 'Row counts + sum / avg / min / max of the selection (AG5)' },
-  enableOverlays: { group: 'Display', default: true, alwaysShow: true, label: 'Loading / error overlays', hint: 'Show an overlay while fetching or on error (AG23)' },
-  // Export (AG1–AG3) — an opt-in capability plus per-format sub-toggles, mirroring
+  showStatusBar: { group: 'Display', default: false, label: 'Status bar', hint: 'Row counts + sum / avg / min / max of the selection' },
+  enableOverlays: { group: 'Display', default: true, alwaysShow: true, label: 'Loading / error overlays', hint: 'Show an overlay while fetching or on error' },
+  // Export (X1–X3) — an opt-in capability plus per-format sub-toggles, mirroring
   // the clipboard pattern (master off; formats default-on, always shown with a
   // "needs Export" hint) so an end-user can switch export on and pick formats.
   enableExport: {

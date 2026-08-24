@@ -5,7 +5,7 @@ import { evalCondition, isConditionActive, filterFn_bstCondition, BstSetFilter }
 
 /* ------------------------------------------------------- the `set` operator */
 
-describe('set filter — condition operator (AG4)', () => {
+describe('set filter — condition operator (X4)', () => {
   test('a row passes when its value is in the selected set; blanks via ""', () => {
     expect(evalCondition('a', { op: 'set', value: ['a', 'b'] })).toBe(true)
     expect(evalCondition('c', { op: 'set', value: ['a', 'b'] })).toBe(false)
@@ -64,7 +64,7 @@ const mockTable = (vals: unknown[]) => ({
   getCoreRowModel: () => ({ rows: vals.map((v) => ({ getValue: () => v })) }),
 })
 
-describe('BstSetFilter component (AG4)', () => {
+describe('BstSetFilter component (X4)', () => {
   test('renders "All" and opens a checklist of distinct values + (Blanks)', () => {
     const column = mockColumn()
     render(<BstSetFilter column={column} table={mockTable(['a', 'b', 'a', null])} />)

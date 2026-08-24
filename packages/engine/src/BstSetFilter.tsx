@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 /**
- * Set Filter (AG4) — an Excel-style **checklist of distinct values** for one
+ * Set Filter (X4) — an Excel-style **checklist of distinct values** for one
  * column. A dependency-free popover (search · select-all / clear · per-value
  * counts · a "(Blanks)" entry) that drives the column's own `columnFilters` entry
  * via `setFilterValue({ op: 'set', value })` — interpreted by the `bstCondition`
@@ -32,7 +32,7 @@ export interface BstSetFilterProps {
   /** Accessible label; defaults to the column header / id. */
   label?: string
   /**
-   * Controlled slot (multi-filter, AG11). When `onChange` is given, the checklist
+   * Controlled slot (multi-filter, X11). When `onChange` is given, the checklist
    * reads/writes this `{ op:'set', value }` condition instead of the column's whole
    * filter value — so it can be one part of a stacked filter. Omit both for the
    * default standalone mode (drives `column.setFilterValue` directly).

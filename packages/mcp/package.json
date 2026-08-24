@@ -1,7 +1,7 @@
 {
   "name": "@bloomskill/table-mcp",
-  "version": "0.41.0",
-  "description": "Bst-Table MCP server — gives AI coding agents accurate, version-pinned knowledge of @bloomskill/table-* : docs search, the feature-toggle registry, cell types, config validation and grid scaffolding.",
+  "version": "0.41.1",
+  "description": "Bst-Table MCP server \u2014 gives AI coding agents accurate, version-pinned knowledge of @bloomskill/table-* : docs search, the feature-toggle registry, cell types, config validation and grid scaffolding.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gitOfKumarSathish/bst-grid.git",
@@ -37,7 +37,7 @@
     "ai"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json && node ./dist/generate/run.js",
+    "build": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && tsc -p tsconfig.json && node ./dist/generate/run.js",
     "dev": "tsc -p tsconfig.json --watch",
     "start": "node ./dist/cli.js",
     "smoke": "node ./scripts/smoke.mjs",

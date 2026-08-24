@@ -4,8 +4,8 @@ import type { AutoColumnsOptions, BstTableColumn } from './types.js'
 
 /**
  * Column construction helpers for two "zero-config column" features:
- *   • AG9  — a leading row-number (`#`) column (`enableRowNumbers`)
- *   • AG27 — columns inferred from the data (`enableAutoColumns`)
+ *   • X9  — a leading row-number (`#`) column (`enableRowNumbers`)
+ *   • X27 — columns inferred from the data (`enableAutoColumns`)
  *
  * Both produce ordinary TanStack column defs, so they flow through the normal
  * render / sizing / virtualization path with no special-casing in `<BstTable>`.
@@ -13,7 +13,7 @@ import type { AutoColumnsOptions, BstTableColumn } from './types.js'
 
 /** Reserved id prefix. Adapters skip columns with this prefix in their chrome. */
 export const RESERVED_COLUMN_PREFIX = '__bst'
-/** Reserved id of the row-number column (AG9). */
+/** Reserved id of the row-number column (X9). */
 export const ROW_NUMBER_COLUMN_ID = '__bstRowNumber'
 
 /**
@@ -42,7 +42,7 @@ function rowNumberFor(table: any, rowId: string): number | undefined {
 }
 
 /**
- * The leading row-number column (AG9). Non-interactive: it never sorts, filters,
+ * The leading row-number column (X9). Non-interactive: it never sorts, filters,
  * hides, resizes, reorders or groups, so it stays out of every chrome surface
  * (sort arrows, filter row, columns menu, export) by construction. The number is
  * computed from the live, painted row model, so it always reflects the current
@@ -84,7 +84,7 @@ export function humanizeKey(key: string): string {
     .replace(/\b\w/g, (c) => c.toUpperCase())
 }
 
-/** Built-in cell-type guess from a sample value (AG27). Text → undefined (untyped). */
+/** Built-in cell-type guess from a sample value (X27). Text → undefined (untyped). */
 export function inferCellType(_key: string, value: unknown): string | undefined {
   if (typeof value === 'number') return 'number'
   if (typeof value === 'boolean') return 'boolean'
@@ -94,7 +94,7 @@ export function inferCellType(_key: string, value: unknown): string | undefined 
 }
 
 /**
- * Infer columns from row data (AG27) — one column per key found across a sample
+ * Infer columns from row data (X27) — one column per key found across a sample
  * of rows (first-seen order), with a humanized header and a guessed cell type.
  * Returns `[]` for empty / non-object data (the grid then renders no columns).
  */

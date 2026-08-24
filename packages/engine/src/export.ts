@@ -1,5 +1,5 @@
 /**
- * Export (Phase 5, AG1–AG3) — **dependency-free** CSV / Excel (`.xlsx`) / print
+ * Export (Phase 5, X1–X3) — **dependency-free** CSV / Excel (`.xlsx`) / print
  * builders. The core is pure and DOM-free (so it unit-tests in node): the runtime
  * gathers a {@link BstExportMatrix} from the grid — values formatted per cell type,
  * exactly like the clipboard — and these functions serialize it. Two DOM helpers
@@ -66,7 +66,7 @@ export interface PrintOptions {
   includeHeaders?: boolean
 }
 
-/** Which export formats a grid offers (AG1–AG3). */
+/** Which export formats a grid offers (X1–X3). */
 export type BstExportFormat = 'csv' | 'excel' | 'print'
 
 /** Row scope for an export — every filtered+sorted row (all pages) or just the current page. */

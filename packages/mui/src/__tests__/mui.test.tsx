@@ -297,7 +297,7 @@ describe('@bloomskill/table-mui — "Rows per page" All option', () => {
   })
 })
 
-describe('@bloomskill/table-mui — Save view / Reset view controls (AG21)', () => {
+describe('@bloomskill/table-mui — Save view / Reset view controls (X21)', () => {
   beforeEach(() => window.localStorage.clear())
 
   test('manual mode: the settings footer Save view writes the snapshot, Reset view clears it', () => {
@@ -512,7 +512,7 @@ describe('@bloomskill/table-mui — Batch editing toggle in the settings sheet',
   })
 })
 
-describe('BstTableMui — gridState prop (AG21)', () => {
+describe('BstTableMui — gridState prop (X21)', () => {
   function makeStorage() {
     const map = new Map<string, string>()
     return {

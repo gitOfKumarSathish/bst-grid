@@ -59,9 +59,9 @@ export interface BstServerTableProps<TData> {
   onColumnFiltersChange: (u: Updater<DsColumnFilter[]>) => void
   onGlobalFilterChange: (u: Updater<string>) => void
   onPaginationChange: (u: Updater<DsPagination>) => void
-  /** Fetch in flight (AG23) — drives the loading overlay. */
+  /** Fetch in flight (X23) — drives the loading overlay. */
   loading: boolean
-  /** Last fetch error, or null (AG23) — drives the error overlay. */
+  /** Last fetch error, or null (X23) — drives the error overlay. */
   error: Error | null
 }
 

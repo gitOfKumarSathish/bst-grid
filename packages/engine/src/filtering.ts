@@ -21,7 +21,7 @@ export interface FilterCondition {
 
 /**
  * A compound of column conditions combined with `and` / `or` — the value a
- * **multi-filter** column stores (AG11), so several filter types (e.g. a text
+ * **multi-filter** column stores (X11), so several filter types (e.g. a text
  * condition **+** a Set Filter) stack on ONE column. `evalCondition` /
  * `isConditionActive` understand it, so it flows through the same `bstCondition`
  * filterFn as a single condition. Slots are positional (one per filter part) and
@@ -45,7 +45,7 @@ function isGroup(raw: unknown): raw is FilterConditionGroup {
  * Combine several conditions into the value a **multi-filter** column stores.
  * Keeps every slot (positional, `undefined` allowed) so the stacked widgets stay
  * aligned; returns `undefined` when no slot is active (so the column reads as
- * unfiltered). `op` defaults to `and` (AG-Grid multi-filter semantics).
+ * unfiltered). `op` defaults to `and` (every part must match).
  */
 export function combineFilterConditions(
   conditions: (FilterCondition | undefined)[],
@@ -173,7 +173,7 @@ const includesArr = (cell: unknown, value: unknown): boolean =>
 /** Evaluate a `{ op, value }` condition (or a bare value → contains) on a cell. */
 export function evalCondition(cell: unknown, raw: unknown): boolean {
   if (raw == null) return true
-  // Compound group (multi-filter, AG11): AND / OR of the active sub-conditions.
+  // Compound group (multi-filter, X11): AND / OR of the active sub-conditions.
   // Inactive slots (half-built / empty) don't restrict, matching a single filter.
   if (isGroup(raw)) {
     const active = raw.conditions.filter((c) => isConditionActive(c)) as FilterCondition[]
@@ -193,7 +193,7 @@ export function evalCondition(cell: unknown, raw: unknown): boolean {
     op = 'contains'
     value = raw
   }
-  // Set filter (AG4): `value` is the list of selected values; a row passes if its
+  // Set filter (X4): `value` is the list of selected values; a row passes if its
   // value — or, for a multi-value cell, ANY element — is selected. Blank cells match
   // the '' sentinel. Handled here, BEFORE the empty-value short-circuit below, so an
   // empty selection correctly matches nothing (rather than being read as inactive).

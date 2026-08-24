@@ -10,8 +10,35 @@ this project uses [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+## [0.41.1] — 2026-08-24
+### Changed — neutral naming (docs, comments and shipped strings)
+- Bst-Table now describes its **own** capabilities in its **own** words. Every reference to a
+  third-party grid product — and to its commercial licensing tiers — has been removed from the
+  repository: documentation, source comments, the settings-sheet hints shipped to end users, and
+  the MCP server's prompts and tool descriptions shipped to AI agents.
+- **Roadmap IDs renamed `AG*` → `X1`–`X29`** ("extended capability matrix", beyond the original
+  `A1–M2` spec) across `COVERAGE.md`, `Plan.md`, `CLAUDE.md`, source comments, tests and the demo.
+  The IDs were **removed entirely** from user-visible settings hints and agent-visible MCP rule
+  notes — a roadmap ID has no business in an end-user settings sheet.
+- The old vendor gap-analysis doc is now **[`docs/capability-roadmap.md`](docs/capability-roadmap.md)**,
+  rewritten from Bst-Table's own feature registry rather than from anyone else's feature matrix.
+  Vendor tier columns dropped; several stale statuses re-synced with `COVERAGE.md` in the process.
+- **`COVERAGE.md`** — the second matrix is now the **"Extended capability matrix"**; the vendor-tier
+  column is gone from both of its tables.
+- **New guard: `npm run verify:naming`** (`scripts/verify-naming.mjs`) fails the build if a banned
+  term reappears in any tracked file, and is now part of the `CLAUDE.md` §13 Definition of Done and
+  release flow.
+- **Fixed: a stale build artifact was shipping to npm.** `packages/engine/dist/BstColumnPanel.{js,d.ts}`
+  — the compiled remains of the sidebar prototype whose source was reverted in 2026-08-17 — survived in
+  `dist/` because `tsc` never deletes stale outputs and the package publishes `files: ["dist"]`. It was
+  dead code in the tarball (unreferenced by `index.js`) **and** it carried the last old-scheme ID. All
+  four packages now **wipe `dist/` before compiling**, and `verify:naming` scans the **publish payload**
+  (`packages/*/{dist,styles}`), not only git-tracked sources — the scope that let this through.
+- **No API change.** No exported symbol, flag, CSS class or data attribute was touched — every edit
+  was a comment, doc, test title or display string. Existing code needs no changes.
+
 ## [0.41.0] — 2026-08-24
-### Added — Save view / Reset view controls in the settings sheet (AG21)
+### Added — Save view / Reset view controls in the settings sheet (X21)
 - The **settings-sheet footer** now shows grid-state **view** controls in **both** adapters when
   `gridState` is configured: a **Reset view** button always, and a **Save view** button in
   **manual mode** (`gridState={{ key, persist: false }}`). Manual mode still restores the saved view
@@ -34,13 +61,13 @@ this project uses [Semantic Versioning](https://semver.org).
   (`bst-table:settings:*` auto, `bst-table:state:*` manual) with separate Resets, which read as a bug
   when unlabelled. shadcn adds `.sc-view-footer` / `.sc-view-heading` / `.sc-view-actions`.
 - **Demo:** the primary **MUI** and **shadcn** grids now pass `gridState` too, so the view controls
-  are demonstrable on the main tables (own keys, `persist: false`). Both — and the AG21 section —
+  are demonstrable on the main tables (own keys, `persist: false`). Both — and the X21 section —
   wrap `localStorage` in a small logging `gridState.storage`, so clicking **Save view** logs the exact
   persisted snapshot to the console. Uses the public `BstGridStateStorage` contract; no library change.
 
 ## [0.40.0] — 2026-08-20
-### Added — Row numbers (AG9) · loading/error overlays (AG23) · auto-generate columns (AG27)
-- **Row-number column (`AG9`) — `enableRowNumbers`** (+ **`rowNumberHeader`**). A leading,
+### Added — Row numbers (X9) · loading/error overlays (X23) · auto-generate columns (X27)
+- **Row-number column (`X9`) — `enableRowNumbers`** (+ **`rowNumberHeader`**). A leading,
   non-interactive `#` column numbering the **current view** — continuous across pages, reflecting the
   active sort + filter (not the raw data order). It's injected as a real leaf column under the reserved
   `__bst` id prefix, so it stays out of sorting, the filter row, the columns menu and export **by
@@ -49,14 +76,14 @@ this project uses [Semantic Versioning](https://semver.org).
   user-pinned column — and stays visible during horizontal scroll (the pin is seeded even when a
   consumer `initialState` / `gridState` sets its own column pinning). In the runtime settings sheet
   under **Columns → "Row numbers"** (always shown). Both skins inherit it.
-- **Loading / error overlays (`AG23`) — `enableOverlays`** (default **on**) + **`loading`** / **`error`**
+- **Loading / error overlays (`X23`) — `enableOverlays`** (default **on**) + **`loading`** / **`error`**
   (+ **`overlayText`** / **`renderLoadingOverlay`** / **`renderErrorOverlay`**). A formal overlay paints
   over the grid while `loading` is true or when `error` is set (error wins), instead of a blank / stale
   body. `useBstDataSource` **and** `useBstInfiniteDataSource` now surface `loading` + `error` on their
   `tableProps`, so a server-wired grid shows the overlays with no extra code. Default content is a
   spinner + "Loading…" / the error message; fully replaceable via the render props. Settings sheet:
   **Display → "Loading / error overlays"**.
-- **Auto-generate columns (`AG27`) — `enableAutoColumns`** (+ **`autoColumns`**). When **no `columns`**
+- **Auto-generate columns (`X27`) — `enableAutoColumns`** (+ **`autoColumns`**). When **no `columns`**
   are supplied (empty array), the grid infers one column per key found across a sample of rows
   (first-seen order), guessing the cell type (number / boolean / date, else text) and humanizing the
   header (`unitPrice` → "Unit Price"). Ignored the moment `columns` is non-empty — explicit columns
@@ -66,10 +93,10 @@ this project uses [Semantic Versioning](https://semver.org).
   `.bst-overlay*` / `.bst-rownum-cell`). Settings-sheet parity + MCP flag-rules entries added for all
   three flags; §12 registry rows added. Tested in `columns.test.tsx` (17 cases: auto-column inference,
   row-number ordering/pagination continuity, overlay states). Demo: `enableRowNumbers` on the main grid
-  + dedicated **AG27** and **AG23** sections.
+  + dedicated **X27** and **X23** sections.
 
-### Marked optional (kept, out of scope) — AG18 / AG19 / AG24
-- **Cell notes / comments (`AG18`)**, **i18n / localeText (`AG19`)** and **RTL (`AG24`)** are moved to a
+### Marked optional (kept, out of scope) — X18 / X19 / X24
+- **Cell notes / comments (`X18`)**, **i18n / localeText (`X19`)** and **RTL (`X24`)** are moved to a
   new **"Optional — kept but out of scope"** section in [`COVERAGE.md`](COVERAGE.md) (and flagged in
   `Plan.md`). They stay documented but are **not scheduled** and no longer counted as missing work.
 
@@ -112,10 +139,10 @@ this project uses [Semantic Versioning](https://semver.org).
   Show); `icons.test.tsx` now covers the two new slots across all presets.
 
 ## [0.39.0] — 2026-08-17
-### Added — Multi-filter (AG11): stack filter types on one column
+### Added — Multi-filter (X11): stack filter types on one column
 - `enableMultiFilter` lets a column **stack several filter types** in its filter row. A column opts in
   with an **array** `meta.filter` (e.g. `['condition', 'set']`), which renders those filters stacked;
-  a row must satisfy **all** of them (**AND**). Closes AG11 (parity now ✅ 9 / 🟡 4 / ❌ 15).
+  a row must satisfy **all** of them (**AND**). Closes X11 (parity now ✅ 9 / 🟡 4 / ❌ 15).
 - Stored as a compound **`{ op: 'and', conditions }`** value the existing `bstCondition` filterFn
   understands — so it composes with the filter builder and server mode. New engine exports:
   **`combineFilterConditions`** + type **`FilterConditionGroup`**; `evalCondition` / `isConditionActive`
@@ -125,7 +152,7 @@ this project uses [Semantic Versioning](https://semver.org).
   to a reusable `ConditionInput`. Needs `enableColumnFilters` + `enableColumnFilterRow` (a `'set'` part
   needs `enableSetFilter`); with `enableMultiFilter` off, an array `meta.filter` falls back to its first
   entry.
-- Settings-sheet toggle ("Data operations"); demo shows it in a **dedicated "Multi-filter (AG11)"
+- Settings-sheet toggle ("Data operations"); demo shows it in a **dedicated "Multi-filter (X11)"
   section** (Name column stacks a "contains" input + a distinct-names checklist) so the main grids keep
   their single filters. Verified in a headless browser (popup opens correctly below the trigger). Tested
   in `multiFilter.test.tsx` (10 cases).
@@ -170,11 +197,11 @@ this project uses [Semantic Versioning](https://semver.org).
   thumbnails show in the main grids, not just the dedicated Files section.
 
 ## [0.37.0] — 2026-08-17
-### Added — Grid-state save/restore (AG21): per-user view snapshots
+### Added — Grid-state save/restore (X21): per-user view snapshots
 - New engine module: **`getGridState`** / **`applyGridState`** / **`resetGridState`** /
   **`emptyGridState`** snapshot and restore a grid's **view** — sort · filter · global filter · column
   order/size/visibility/pinning · grouping · expansion · row pinning · selection · pagination — as
-  plain, version-stamped JSON (`BstGridState`). This is the AG21 gap; it complements the settings
+  plain, version-stamped JSON (`BstGridState`). This is the X21 gap; it complements the settings
   sheet (which toggles *features*, not view layout).
 - **`applyGridState` drops entries for columns that no longer exist**, so a saved view survives a
   column-set change instead of wedging the grid. `include` / `exclude` narrow which slices are
@@ -189,7 +216,7 @@ this project uses [Semantic Versioning](https://semver.org).
   don't use it pay nothing.
 - v9 detail: v9 removed `table.getState()`; this reads `table.store.state` and restores through the
   per-slice setters. New demo section "Grid state — save / restore view"; tested in
-  `gridState.test.tsx` (12 cases). Closes **AG21** in `COVERAGE.md` (parity now ✅ 8 / 🟡 4 / ❌ 16).
+  `gridState.test.tsx` (12 cases). Closes **X21** in `COVERAGE.md` (parity now ✅ 8 / 🟡 4 / ❌ 16).
 
 ### Fixed — MCP corpus: stale "PDF thumbnails not built" claim
 - Removed the `NOT_BUILT` rule for in-cell PDF thumbnails (`packages/mcp/src/rules.ts`) — they shipped
@@ -236,13 +263,13 @@ this project uses [Semantic Versioning](https://semver.org).
 - **Mac-aware:** keys auto-detect (⌘/⇧ on Mac); `showShortcuts={{ platform: 'mac' | 'pc' | 'auto' }}`
   forces it when detection is unreliable, and the `⌘Y` redo-alt (a Windows convention) is hidden on Mac.
 
-### Added — Context menu (Phase 6, AG6)
+### Added — Context menu (Phase 6, X6)
 - **`enableContextMenu`** — a dependency-free **right-click menu** at the cursor. Default items: Copy /
   Copy row / Copy column (with `enableClipboard`), Export CSV / Excel (with `enableExport`), Autosize
   column. Reshape or extend via **`getContextMenuItems(ctx) => BstContextMenuItem[]`** (spread
   `ctx.defaultItems`, add your own). Event-delegated on the scroll box (`data-bst-rowid` / `-colid`);
   right-click selects the cell. Settings-sheet toggle ("Selection & clipboard"). Tested
-  (`contextMenu.test.tsx`). Closes COVERAGE `AG6`. `@bloomskill/table-engine` (both adapters inherit it).
+  (`contextMenu.test.tsx`). Closes COVERAGE `X6`. `@bloomskill/table-engine` (both adapters inherit it).
 ### Added — Settings sheet: section dividers + dependency cascade
 - **Section dividers** — a hairline rule now separates each settings group (both skins), so
   "Data operations / Columns / Rows / …" read as distinct sections (paired with the prominent
@@ -264,25 +291,25 @@ this project uses [Semantic Versioning](https://semver.org).
   pseudo-elements, shadcn `.sc-dep-child` / `.sc-dep-last`).
 
 ## [0.35.0] — 2026-08-17
-### Added — Auto row height (Phase 8, AG26)
+### Added — Auto row height (Phase 8, X26)
 - **`enableAutoRowHeight`** — body cells wrap and each row grows to fit its content, **browser-measured
   (no JS)**. Opt individual columns in with **`meta.wrapText`**. Keeps `overflow: hidden`, so a
   manually-resized row (`enableRowResize`) still clips to its set height while auto rows grow.
   Settings-sheet toggle ("Rows", always shown). Tested (`autoRowHeight.test.tsx`). Closes COVERAGE
-  `AG26`. `@bloomskill/table-engine` (both adapters inherit it).
-### Added — Set Filter + status bar (Phase 6, AG4–AG5)
-- **Set Filter (`enableSetFilter`, AG4)** — an Excel-style **checklist of distinct values** per column
+  `X26`. `@bloomskill/table-engine` (both adapters inherit it).
+### Added — Set Filter + status bar (Phase 6, X4–X5)
+- **Set Filter (`enableSetFilter`, X4)** — an Excel-style **checklist of distinct values** per column
   in the filter row (`BstSetFilter`: search · select-all / clear · per-value counts · a "(Blanks)"
   bucket). A new `{ op: 'set' }` condition on the existing `bstCondition` filterFn, so it composes with
   the filter builder; multi-value cells match on any element; selecting every value clears the filter,
   an empty selection matches nothing. Categorical columns (`singleSelect`/`multiSelect`/`radio`/
   `boolean`) are auto-eligible; `meta.filter: 'set' | 'condition'` forces or opts out. Needs
   `enableColumnFilters` + `enableColumnFilterRow`. Exported `BstSetFilter`. `@bloomskill/table-engine`.
-- **Status bar (`showStatusBar`, AG5)** — an adapter footer with total / filtered row counts and, when
+- **Status bar (`showStatusBar`, X5)** — an adapter footer with total / filtered row counts and, when
   a cell range is selected, the **sum · avg · min · max · count** of its numeric cells via new
   **`runtime.getSelectionStats()`** (exported `BstSelectionStats`). MUI + shadcn.
 - Both are settings-sheet toggles (`enableSetFilter` → "Data operations", `showStatusBar` → "Display").
-  Tested (`setFilter.test.tsx`, `selectionStats.test.ts`). Closes COVERAGE `AG4`–`AG5`; see `Plan.md`
+  Tested (`setFilter.test.tsx`, `selectionStats.test.ts`). Closes COVERAGE `X4`–`X5`; see `Plan.md`
   PART 3 "Phase 6".
 ### Fixed — engine
 - Set Filter popover no longer inherits the header cell's centred / bold typography — the panel owns
@@ -302,7 +329,7 @@ this project uses [Semantic Versioning](https://semver.org).
 > Builds on the **0.34.0** Export slice documented below; shipped together in this publish.
 
 ## [0.34.0] — 2026-08-17
-### Added — Export: CSV / Excel / print (Phase 5, AG1–AG3)
+### Added — Export: CSV / Excel / print (Phase 5, X1–X3)
 - **`enableExport`** (`boolean | BstExportOptions`) adds a toolbar **Export** menu (`showExport`) and
   the runtime API `runtime.exportCsv()` / `exportExcel()` / `printTable()`. Values are formatted
   **per cell type** (the file matches the grid and copy output); the default scope is **every filtered
@@ -317,7 +344,7 @@ this project uses [Semantic Versioning](https://semver.org).
 - Adapters render the menu — MUI `Menu`, shadcn Radix `DropdownMenu` (`@bloomskill/table-mui`,
   `@bloomskill/table-shadcn`). Action columns and grouped / aggregate rows are skipped automatically.
 - Tested (`export.test.ts`: CSV escaping/BOM/scope, `.xlsx` ZIP + OOXML structure, print HTML,
-  per-format gating). Closes COVERAGE `AG1`–`AG3`; see `Plan.md` PART 3 "Phase 5".
+  per-format gating). Closes COVERAGE `X1`–`X3`; see `Plan.md` PART 3 "Phase 5".
 
 ### Changed — `@bloomskill/table-engine`
 - **Row resize (G2) is now always shown in the settings sheet** (`enableRowResize`, "Rows" group,
@@ -499,8 +526,8 @@ with a regression test (`packages/*/src/__tests__/tier*.test.tsx`). Full tracker
 ## [0.32.4] — 2026-08-13
 ### Added — `@bloomskill/table-mcp`: an MCP server for AI coding agents (new package)
 A fourth package, published alongside the other three and versioned in lockstep with them.
-No language model has seen Bst-Table, so an agent asked to build one of these grids emits AG Grid
-or MUI X DataGrid code instead. This server gives any MCP client (Claude Code, Cursor, Copilot)
+No language model has seen Bst-Table, so an agent asked to build one of these grids emits some
+other grid library's code instead. This server gives any MCP client (Claude Code, Cursor, Copilot)
 accurate, version-pinned knowledge of the packages — plus scaffolding and validation.
 
 - **Knowledge base generated from source at build time**, not hand-written: `BST_SETTINGS_REGISTRY`

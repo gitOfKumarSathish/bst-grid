@@ -1,0 +1,25 @@
+name: verify
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # verify:naming uses `git ls-files`
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      # Naming guard runs AFTER the build so it also scans the publish payload
+      # (packages/*/dist) — the scope that let a stale artifact ship once before.
+      - run: npm run verify:naming
+      - run: npm test
+      - run: npm run mcp

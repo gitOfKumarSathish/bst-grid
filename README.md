@@ -46,7 +46,7 @@ See [`COVERAGE.md`](COVERAGE.md) for the requirement-by-requirement status matri
 ## AI coding agents (MCP)
 
 No model was trained on this library, so an agent asked for "a Bst-Table grid with batch editing"
-writes **AG Grid** or **MUI X DataGrid** code — the APIs this project exists to replace.
+writes some other grid library's code — the APIs this project exists to replace.
 [`@bloomskill/table-mcp`](packages/mcp) closes that gap: an MCP server carrying searchable docs, the
 61-flag toggle registry, all 17 cell types, 150 API signatures, plus grid **scaffolding** and config
 **validation**. Register it once, at user scope so it covers every project on the machine:

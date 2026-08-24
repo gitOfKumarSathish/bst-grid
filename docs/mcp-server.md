@@ -6,7 +6,7 @@ teaches AI coding agents how to use Bst-Table.
 - **What it is:** a [Model Context Protocol](https://modelcontextprotocol.io) server exposing
   8 tools, 4 prompts and `bst://` resources over stdio.
 - **Why it exists:** no language model has seen Bst-Table, so asked to "build a Bst-Table grid"
-  an agent emits **AG Grid** or **MUI X DataGrid** code — the libraries this project replaces.
+  an agent emits some **other grid library's** code — the libraries this project replaces.
   The server gives the agent accurate, version-pinned knowledge instead.
 - **How it stays correct:** its knowledge base is **generated from this repo at build time**
   (the §12 toggle registry, `COVERAGE.md`, TSDoc, the built `.d.ts`, every README and example),
@@ -399,7 +399,7 @@ Each one hands the agent the right tool order so it doesn't fall back on another
 | `bst-quick-start` | Build a new grid from a plain-language description. |
 | `bst-add-feature` | Switch a capability on with every dependency it needs. |
 | `bst-new-cell-type` | Author + register a custom `CellType`. |
-| `bst-migrate` | Port an AG Grid / MUI X DataGrid table to Bst-Table. |
+| `bst-migrate` | Port a table from another grid library to Bst-Table. |
 
 ---
 
@@ -433,12 +433,12 @@ code — the generated component wires `getRowId`, `onDataChange` and a single-c
 It looks up `enableClipboard`, learns it implies `enableCellSelection` (and paste needs editing),
 applies the change, and re-validates.
 
-**Migrate off AG Grid / MUI X:**
+**Migrate off another grid library:**
 
-> Migrate this AG Grid table to Bst-Table. [paste code]
+> Migrate this grid to Bst-Table. [paste code]
 
 It maps each capability to a Bst-Table equivalent, flags anything with no equivalent, and notes
-that master-detail / range-selection / clipboard — paid in AG Grid Enterprise — are included here.
+that master-detail / range-selection / clipboard — commonly paid-tier elsewhere — are included here.
 
 ---
 

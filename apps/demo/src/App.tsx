@@ -400,7 +400,7 @@ const docColumns: BstTableColumn<DocRow>[] = [
 ];
 
 /**
- * Grid state — save / restore view (AG21). The MUI adapter's one-line
+ * Grid state — save / restore view (X21). The MUI adapter's one-line
  * `gridState={{ key }}` prop persists this grid's view (sort · filter · column
  * order/size/visibility/pinning · grouping) to `localStorage` and restores it on
  * mount. Interact, then reload the page — the view comes back.
@@ -418,7 +418,7 @@ const gsColumns: BstTableColumn<Person>[] = [
   { id: 'email', accessorKey: 'email', header: 'Email', meta: { type: 'text' } },
 ];
 
-// Multi-filter (AG11) — a DEDICATED section so it doesn't clutter the main grids.
+// Multi-filter (X11) — a DEDICATED section so it doesn't clutter the main grids.
 // The Name column opts in via an array meta.filter to stack a "contains" input + a
 // distinct-values checklist; the other columns keep their single filter.
 const mfColumns: BstTableColumn<Person>[] = [
@@ -435,7 +435,7 @@ const mfColumns: BstTableColumn<Person>[] = [
 function MultiFilterSection() {
   return (
     <section>
-      <h3 style={{ margin: '0 0 8px' }}>Multi-filter — stack filter types on one column (AG11)</h3>
+      <h3 style={{ margin: '0 0 8px' }}>Multi-filter — stack filter types on one column (X11)</h3>
       <div style={{ ...box, marginBottom: 8 }}>
         <code>enableMultiFilter</code> lets a column opt in via an <b>array</b> <code>meta.filter</code>{' '}
         (here <code>['condition', 'set']</code> on <b>Name</b>) to <b>stack</b> two filters in its filter
@@ -459,7 +459,7 @@ function MultiFilterSection() {
 }
 
 /**
- * AG27 — auto-generate columns. The grid is given `columns={[]}` + `enableAutoColumns`,
+ * X27 — auto-generate columns. The grid is given `columns={[]}` + `enableAutoColumns`,
  * so it infers one column per key in the data, with a guessed cell type + humanized header.
  */
 const autoRows = [
@@ -470,7 +470,7 @@ const autoRows = [
 function AutoColumnsSection() {
   return (
     <section>
-      <h3 style={{ margin: '0 0 8px' }}>Auto-generate columns from data (AG27)</h3>
+      <h3 style={{ margin: '0 0 8px' }}>Auto-generate columns from data (X27)</h3>
       <div style={{ ...box, marginBottom: 8 }}>
         No <code>columns</code> are passed — just <code>columns=&#123;[]&#125;</code> +{' '}
         <code>enableAutoColumns</code>. The grid infers one column per data key (first-seen order),
@@ -492,7 +492,7 @@ function AutoColumnsSection() {
 }
 
 /**
- * AG23 — loading / error overlays. Toggle the two states to see the engine's
+ * X23 — loading / error overlays. Toggle the two states to see the engine's
  * overlays paint over the grid. `useBstDataSource` feeds these automatically in a
  * real server grid; here they're driven by buttons for the demo.
  */
@@ -501,7 +501,7 @@ function OverlaysSection() {
   const [errored, setErrored] = React.useState(false);
   return (
     <section>
-      <h3 style={{ margin: '0 0 8px' }}>Loading / error overlays (AG23)</h3>
+      <h3 style={{ margin: '0 0 8px' }}>Loading / error overlays (X23)</h3>
       <div style={{ ...box, marginBottom: 8 }}>
         <code>enableOverlays</code> (on by default) paints an overlay while <code>loading</code> is
         true or when <code>error</code> is set (error wins). A server grid wired with{' '}
@@ -541,15 +541,15 @@ function loggingStorage(label: string): BstGridStateStorage {
   return {
     getItem: (k) => {
       const raw = window.localStorage.getItem(k);
-      console.log(`[AG21] ${label} · restore ←`, k, raw ? JSON.parse(raw) : null);
+      console.log(`[X21] ${label} · restore ←`, k, raw ? JSON.parse(raw) : null);
       return raw;
     },
     setItem: (k, v) => {
-      console.log(`[AG21] ${label} · Save view →`, k, JSON.parse(v));
+      console.log(`[X21] ${label} · Save view →`, k, JSON.parse(v));
       window.localStorage.setItem(k, v);
     },
     removeItem: (k) => {
-      console.log(`[AG21] ${label} · Reset view → cleared`, k);
+      console.log(`[X21] ${label} · Reset view → cleared`, k);
       window.localStorage.removeItem(k);
     },
   };
@@ -558,7 +558,7 @@ function loggingStorage(label: string): BstGridStateStorage {
 // Module-level so the object identity is stable across renders.
 const muiViewStorage = loggingStorage('MUI');
 const scViewStorage = loggingStorage('shadcn');
-const sectionViewStorage = loggingStorage('AG21 section');
+const sectionViewStorage = loggingStorage('X21 section');
 
 function GridStateSection() {
   const [nonce, setNonce] = React.useState(0);
@@ -577,7 +577,7 @@ function GridStateSection() {
   }, [nonce]);
   return (
     <section>
-      <h3 style={{ margin: '0 0 8px' }}>Grid state — save / restore view (AG21)</h3>
+      <h3 style={{ margin: '0 0 8px' }}>Grid state — save / restore view (X21)</h3>
       <div style={{ ...box, marginBottom: 8 }}>
         <b>Sort, resize, reorder, hide or pin</b> a column below, then open the <b>⚙ settings gear</b>{' '}
         and click <b>Save view</b> at the bottom of the sheet — now <b>reload the page</b> and your
@@ -752,12 +752,12 @@ export default function App() {
     showDensityToggle: true, // compact / normal / comfortable
     showFilterBuilder: true, // per-column condition builder (E3)
     enableColumnFilterRow: true, // per-column filter inputs under the header ("dual filter")
-    enableSetFilter: true, // AG4: categorical columns (see role/plan) get a distinct-values checklist
-    showStatusBar: true, // AG5: footer — row counts + selection sum/avg/min/max
-    enableAutoRowHeight: true, // AG26: rows grow to fit wrapped content (browser-measured)
+    enableSetFilter: true, // X4: categorical columns (see role/plan) get a distinct-values checklist
+    showStatusBar: true, // X5: footer — row counts + selection sum/avg/min/max
+    enableAutoRowHeight: true, // X26: rows grow to fit wrapped content (browser-measured)
     enableStickyHeader: { maxRows: 12 }, // G3/G4: cap the body → sticky header + body scroll (try a bigger page size / "All")
-    enableContextMenu: true, // AG6: right-click a cell → Copy / Export / Autosize (+ getContextMenuItems)
-    enableRowNumbers: true, // AG9: leading # column numbering the current view
+    enableContextMenu: true, // X6: right-click a cell → Copy / Export / Autosize (+ getContextMenuItems)
+    enableRowNumbers: true, // X9: leading # column numbering the current view
     enableExpanding: true, // master-detail (A4): click ▸ for a detail panel
     renderDetail: (r: Person) => (
       <div
@@ -927,9 +927,9 @@ export default function App() {
             showFormatBuilder // K3: 🎨 Formats button → conditional-format rule builder
             conditionalFormats={cfRules}
             onConditionalFormatsChange={setCfRules}
-            enableExport={{ fileName: 'people' }} // Phase 5 (AG1–AG3): CSV / Excel / Print toolbar menu
+            enableExport={{ fileName: 'people' }} // Phase 5 (X1–X3): CSV / Excel / Print toolbar menu
             showSettings={{ persistKey: 'demo-mui' }}
-            gridState={{ key: 'demo-mui-view', persist: false, storage: muiViewStorage }} // AG21: ⚙ sheet footer → Save view / Reset view
+            gridState={{ key: 'demo-mui-view', persist: false, storage: muiViewStorage }} // X21: ⚙ sheet footer → Save view / Reset view
             showShortcuts // ⌨ keyboard-shortcuts overlay (also opens on ?)
           />
         </section>
@@ -948,9 +948,9 @@ export default function App() {
             showFormatBuilder // K3: 🎨 Formats button → conditional-format rule builder
             conditionalFormats={cfRules}
             onConditionalFormatsChange={setCfRules}
-            enableExport={{ fileName: 'people' }} // Phase 5 (AG1–AG3): CSV / Excel / Print toolbar menu
+            enableExport={{ fileName: 'people' }} // Phase 5 (X1–X3): CSV / Excel / Print toolbar menu
             showSettings={{ persistKey: 'demo-sc' }}
-            gridState={{ key: 'demo-sc-view', persist: false, storage: scViewStorage }} // AG21: ⚙ sheet footer → Save view / Reset view
+            gridState={{ key: 'demo-sc-view', persist: false, storage: scViewStorage }} // X21: ⚙ sheet footer → Save view / Reset view
             showShortcuts // ⌨ keyboard-shortcuts overlay (also opens on ?)
           />
         </section>

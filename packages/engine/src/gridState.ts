@@ -3,7 +3,7 @@ import type { RowData } from '@tanstack/react-table'
 import type { BstTableInstance } from './useBstTable.js'
 
 /**
- * Grid-state save/restore (AG21). A serializable snapshot of a grid's **view
+ * Grid-state save/restore (X21). A serializable snapshot of a grid's **view
  * state** — sort, filters, and the column layout (order · size · visibility ·
  * pinning) plus grouping, expansion, row pinning, selection and pagination — so a
  * per-user "view" can be persisted and restored across reloads.
@@ -125,7 +125,7 @@ const SETTER: Record<BstGridStateKey, string> = {
 }
 
 /**
- * Snapshot the grid's current view state as plain JSON (AG21). Pass `include` /
+ * Snapshot the grid's current view state as plain JSON (X21). Pass `include` /
  * `exclude` to capture only some slices (e.g. skip `rowSelection` / `pagination`).
  */
 export function getGridState<TData extends RowData>(
@@ -171,7 +171,7 @@ function sanitizeColumnSlice(k: BstGridStateKey, raw: unknown, valid: Set<string
 }
 
 /**
- * Restore a (partial) view-state snapshot onto the grid (AG21). Entries that
+ * Restore a (partial) view-state snapshot onto the grid (X21). Entries that
  * reference a column which no longer exists are dropped, so a snapshot survives a
  * column-set change without wedging the grid. Pass `include` / `exclude` to
  * restore a subset. Silently ignores an absent snapshot.
@@ -332,7 +332,7 @@ export interface BstGridStateController {
 }
 
 /**
- * Persist a grid's view state to storage and keep it in sync (AG21).
+ * Persist a grid's view state to storage and keep it in sync (X21).
  *
  * For a **flash-free restore**, feed `loadGridState(key)` into
  * `useBstTable({ initialState })` so the grid mounts already arranged; this hook

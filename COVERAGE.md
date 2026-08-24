@@ -4,10 +4,10 @@ _2026-08-13, synced at **v0.39.0**. Compares the `CLAUDE.md` §11 requirement le
 (A1–M2) against what has shipped (`CHANGELOG` v0.1.0 → v0.39.0), verified against the
 engine + adapter source. Re-run when a version ships._
 
-> **Two matrices below.** (1) the original 58-leaf spec (A1–M2, immediately following); (2) **AG Grid
-> parity gaps** (`AG1–AG29`, at the bottom) — capabilities beyond the original spec, from the
-> 2026-08-13 AG Grid audit ([`docs/ag-grid-gap-analysis.md`](docs/ag-grid-gap-analysis.md)), phased in
-> `Plan.md` PART 3 "Phases 5–8".
+> **Two matrices below.** (1) the original 58-leaf spec (A1–M2, immediately following); (2) the
+> **extended capability matrix** (`X1–X29`, at the bottom) — capabilities beyond the original spec,
+> from the 2026-08-13 market review ([`docs/capability-roadmap.md`](docs/capability-roadmap.md)),
+> phased in `Plan.md` PART 3 "Phases 5–8".
 
 **Legend:** ✅ built · 🟡 partial · ❌ missing (needs the Phase-4 foundation / a new dep) · ⏭️ deliberately skipped · ⚪ optional / out of scope (kept, not scheduled)
 **Tally:** ✅ 55 built · 🟡 2 partial · ❌ 1 missing (of 58). _(**B5 now ✅** — in-cell **PDF thumbnail** (`cellMeta.pdfThumbnail`, rendered by **pdf.js** via an injected renderer — engine stays dep-free), the last B5 gap; I3 file ops ✅ — formal `DataSource.uploadFile`/`deleteFile`/`getFileUrl` verbs + `createFileHandlers` bridge on top of the cell-level upload/delete; D1 row/column virtualization + A2 infinite scroll shipped on `@tanstack/react-virtual` → both ✅, leaving I5 the only ❌; v0.30.0 — batch editing + `getChangeSet` + single-call `onSave` → I4 now partial; v0.28.0 server DataSource foundation → A3 server pagination done; v0.25.0 G2 row resize; v0.23.0 B1 QR/barcode + J2 rich-text)_
@@ -96,65 +96,65 @@ tier proven end-to-end (A6).
 
 ---
 
-## AG Grid parity gaps (beyond the original 58 leaves)
+## Extended capability matrix (beyond the original 58 leaves)
 
-_Added 2026-08-13 from an audit vs **AG Grid** Community + Enterprise — full analysis in
-[`docs/ag-grid-gap-analysis.md`](docs/ag-grid-gap-analysis.md), phased in `Plan.md` PART 3
-(Phase-4 remainder → Phase 8). **AG tier** = where AG Grid gates it: 🆓 Community · 💷 Enterprise (paid).
-Everything below ships **free** (MIT/Apache)._
+_Added 2026-08-13 from a review of what commercial enterprise data grids offer — full analysis in
+[`docs/capability-roadmap.md`](docs/capability-roadmap.md), phased in `Plan.md` PART 3 (Phase-4
+remainder → Phase 8). Many of these sit behind a paid tier in commercial products; everything below
+ships **free** (MIT/Apache)._
 
-| ID | Feature | AG tier | Status | Target phase |
-|---|---|---|---|---|
-| AG1 | CSV export | 🆓 | ✅ | P5 — **v0.34.0** (`enableExport`, dep-free `toCsv`) |
-| AG2 | Excel (.xlsx) export | 💷 | ✅ | P5 — **v0.34.0** (`enableExcelExport`, dep-free `toXlsx` — real OOXML, no exceljs) |
-| AG3 | Print / print-friendly view | 🆓 | ✅ | P5 — **v0.34.0** (`enablePrint`, `runtime.printTable`) |
-| AG4 | Set Filter (distinct-values checklist) | 💷 | ✅ | P6 — `enableSetFilter` + `BstSetFilter` (`{op:'set'}` condition) |
-| AG5 | Status bar (row count + range sum/avg/count) | 💷 | ✅ | P6 — `showStatusBar` + `runtime.getSelectionStats()` |
-| AG6 | Right-click context menu | 💷 | ✅ | P6 — `enableContextMenu` + `getContextMenuItems` (dep-free popup: Copy / Export / Autosize + custom) |
-| AG7 | Tool-panel sidebar (Columns + Filters) | 💷 | ⏭️ skip | **Deliberately not built** (2026-08-17) — redundant with the toolbar's **Columns** menu (show/hide · pin · reorder · group) + **Filters** button. Was prototyped (`showSidebar` + `BstColumnPanel`) and reverted. |
-| AG8 | Find (highlight + jump between matches) | 💷 | ❌ | P6 |
-| AG9 | Row-number column | 💷 | ✅ | **`enableRowNumbers`** (+ `rowNumberHeader`) — leading non-interactive `#` column numbering the current view (continuous across pages; reflects sort + filter). **Pinned to the start (sticky-left) by default**, so it stays leftmost even when other columns are pinned. Settings-toggle ("Columns"). Both skins |
-| AG10 | Managed row dragging (reorder) | 🆓 | ❌ | P6 |
-| AG11 | Multi-filter (stack filter types per column) | 💷 | ✅ | P6 — `enableMultiFilter` + array `meta.filter` (e.g. `['condition','set']`); stacked in the filter row, AND-combined via `combineFilterConditions` / `FilterConditionGroup` |
-| AG12 | Fill handle (drag-to-fill range) | 💷 | ❌ | P6 |
-| AG13 | Tree data (self-referencing hierarchy) | 💷 | ⚪ | **Optional — out of scope** (see below) |
-| AG14 | Pivoting | 💷 | ⚪ | **Optional — out of scope** (see below) |
-| AG15 | Integrated charts (range → chart) | 💷 | ❌ | P7 |
-| AG16 | Advanced server-side row model (server group/pivot/tree, lazy expand) | 💷 | 🟡 | P7 |
-| AG17 | Calculated / formula columns | 💷 | 🟡 | P7 |
-| AG18 | Cell notes / comments | 💷 | ⚪ | **Optional — out of scope** (see below) |
-| AG19 | Localization / i18n (localeText) | 🆓 | ⚪ | **Optional — out of scope** (see below) |
-| AG20 | Accessibility / ARIA grid audit | 🆓 | 🟡 | P4 |
-| AG21 | Grid-state save/restore API | 🆓 | ✅ | P4 — `getGridState`/`applyGridState`/`loadGridState`/`useBstGridState` (+ adapters' one-line `gridState={{ key }}`); full view snapshot, stale-column-safe |
-| AG22 | Live / streaming updates (I5, WebSocket merge) | — | ❌ | P4 |
-| AG23 | Formal loading / error overlays | 🆓 | ✅ | **`enableOverlays`** (default on) + `loading` / `error` (+ `overlayText` / `renderLoadingOverlay` / `renderErrorOverlay`); `useBstDataSource` / `useBstInfiniteDataSource` `tableProps` feed both, so server grids get it free |
-| AG24 | RTL support | 🆓 | ⚪ | **Optional — out of scope** (see below) |
-| AG25 | Row / column animations | 🆓 | ❌ | P8 |
-| AG26 | Auto row height (content-measured) | 🆓 | ✅ | P8 — `enableAutoRowHeight` + `meta.wrapText` (CSS wrap, browser-measured, dep-free) |
-| AG27 | Auto-generate columns from data | 🆓 | ✅ | **`enableAutoColumns`** (+ `autoColumns`) — infer columns from data when none supplied; helper `autoGenerateColumns(data, opts)`; settings-toggle ("Columns") |
-| AG28 | Cell flashing on data change | 🆓 | ❌ | P8 |
-| AG29 | Aligned grids (shared column state) | 🆓 | ❌ | P8 |
+| ID | Feature | Status | Target phase |
+|---|---|---|---|
+| X1 | CSV export | ✅ | P5 — **v0.34.0** (`enableExport`, dep-free `toCsv`) |
+| X2 | Excel (.xlsx) export | ✅ | P5 — **v0.34.0** (`enableExcelExport`, dep-free `toXlsx` — real OOXML, no exceljs) |
+| X3 | Print / print-friendly view | ✅ | P5 — **v0.34.0** (`enablePrint`, `runtime.printTable`) |
+| X4 | Set Filter (distinct-values checklist) | ✅ | P6 — `enableSetFilter` + `BstSetFilter` (`{op:'set'}` condition) |
+| X5 | Status bar (row count + range sum/avg/count) | ✅ | P6 — `showStatusBar` + `runtime.getSelectionStats()` |
+| X6 | Right-click context menu | ✅ | P6 — `enableContextMenu` + `getContextMenuItems` (dep-free popup: Copy / Export / Autosize + custom) |
+| X7 | Tool-panel sidebar (Columns + Filters) | ⏭️ skip | **Deliberately not built** (2026-08-17) — redundant with the toolbar's **Columns** menu (show/hide · pin · reorder · group) + **Filters** button. Was prototyped (`showSidebar` + `BstColumnPanel`) and reverted. |
+| X8 | Find (highlight + jump between matches) | ❌ | P6 |
+| X9 | Row-number column | ✅ | **`enableRowNumbers`** (+ `rowNumberHeader`) — leading non-interactive `#` column numbering the current view (continuous across pages; reflects sort + filter). **Pinned to the start (sticky-left) by default**, so it stays leftmost even when other columns are pinned. Settings-toggle ("Columns"). Both skins |
+| X10 | Managed row dragging (reorder) | ❌ | P6 |
+| X11 | Multi-filter (stack filter types per column) | ✅ | P6 — `enableMultiFilter` + array `meta.filter` (e.g. `['condition','set']`); stacked in the filter row, AND-combined via `combineFilterConditions` / `FilterConditionGroup` |
+| X12 | Fill handle (drag-to-fill range) | ❌ | P6 |
+| X13 | Tree data (self-referencing hierarchy) | ⚪ | **Optional — out of scope** (see below) |
+| X14 | Pivoting | ⚪ | **Optional — out of scope** (see below) |
+| X15 | Integrated charts (range → chart) | ❌ | P7 |
+| X16 | Advanced server-side row model (server group/pivot/tree, lazy expand) | 🟡 | P7 |
+| X17 | Calculated / formula columns | 🟡 | P7 |
+| X18 | Cell notes / comments | ⚪ | **Optional — out of scope** (see below) |
+| X19 | Localization / i18n (localeText) | ⚪ | **Optional — out of scope** (see below) |
+| X20 | Accessibility / ARIA grid audit | 🟡 | P4 |
+| X21 | Grid-state save/restore API | ✅ | P4 — `getGridState`/`applyGridState`/`loadGridState`/`useBstGridState` (+ adapters' one-line `gridState={{ key }}`); full view snapshot, stale-column-safe |
+| X22 | Live / streaming updates (I5, WebSocket merge) | ❌ | P4 |
+| X23 | Formal loading / error overlays | ✅ | **`enableOverlays`** (default on) + `loading` / `error` (+ `overlayText` / `renderLoadingOverlay` / `renderErrorOverlay`); `useBstDataSource` / `useBstInfiniteDataSource` `tableProps` feed both, so server grids get it free |
+| X24 | RTL support | ⚪ | **Optional — out of scope** (see below) |
+| X25 | Row / column animations | ❌ | P8 |
+| X26 | Auto row height (content-measured) | ✅ | P8 — `enableAutoRowHeight` + `meta.wrapText` (CSS wrap, browser-measured, dep-free) |
+| X27 | Auto-generate columns from data | ✅ | **`enableAutoColumns`** (+ `autoColumns`) — infer columns from data when none supplied; helper `autoGenerateColumns(data, opts)`; settings-toggle ("Columns") |
+| X28 | Cell flashing on data change | ❌ | P8 |
+| X29 | Aligned grids (shared column state) | ❌ | P8 |
 
-**Tally:** 29 parity items — ✅ 12 built · 🟡 3 partial (AG16 SSRM · AG17 formula cols · AG20 a11y) ·
-❌ 8 missing · ⏭️ 1 skipped (AG7 sidebar) · ⚪ 5 optional/out-of-scope (AG13 · AG14 · AG18 · AG19 · AG24).
-**12 of the 29 are AG Grid Enterprise-paid** — they ship free here. _(v0.40.0 added **AG9** row-number
-column, **AG23** loading/error overlays, **AG27** auto-generate columns; and moved **AG18/AG19/AG24** to
-Optional below. **2026-08-24:** moved **AG13** tree data + **AG14** pivoting to Optional too.)_
+**Tally:** 29 extended capabilities — ✅ 12 built · 🟡 3 partial (X16 SSRM · X17 formula cols · X20 a11y) ·
+❌ 8 missing · ⏭️ 1 skipped (X7 sidebar) · ⚪ 5 optional/out-of-scope (X13 · X14 · X18 · X19 · X24).
+**12 of the 29 are paid-tier capabilities in commercial grids** — they ship free here. _(v0.40.0 added **X9** row-number
+column, **X23** loading/error overlays, **X27** auto-generate columns; and moved **X18/X19/X24** to
+Optional below. **2026-08-24:** moved **X13** tree data + **X14** pivoting to Optional too.)_
 
-**Already matched (AG Grid Enterprise-paid, shipped free):** cell/range selection · clipboard
+**Already matched (paid-tier elsewhere, shipped free):** cell/range selection · clipboard
 copy/paste · batch editing · row grouping + aggregation · master-detail · sparklines · advanced-filter
 builder · server row model. See "Built beyond the original spec" above and `CLAUDE.md` §12.
 
 ### Optional — kept but out of scope (not scheduled)
 
-These parity items are **intentionally not on the roadmap** (decisions 2026-08-20 and 2026-08-24). They
+These capability items are **intentionally not on the roadmap** (decisions 2026-08-20 and 2026-08-24). They
 remain documented here for completeness and can be picked up later, but no phase owns them and they are
 **not** counted toward the missing tally as work-to-do.
 
-| ID | Feature | AG tier | Why deferred |
-|---|---|---|---|
-| AG13 | Tree data (self-referencing hierarchy) | 💷 | Master-detail (A4) + multi-column grouping (E4) cover the hierarchical needs of the target apps; recursive self-referencing tree data (BOM/org/folder) is L-effort and no consuming app requires it yet. Revisit if one does. |
-| AG14 | Pivoting | 💷 | The heavyweight cross-tab reporting feature (L-effort); grouping + aggregation cover current reporting needs and no target app requires pivot/reshape. Revisit if one does. |
-| AG18 | Cell notes / comments | 💷 | Collaboration/annotation feature outside the current grid scope; no consuming app needs it yet. |
-| AG19 | Localization / i18n (`localeText`) | 🆓 | The grid's few built-in strings are overridable at the call site (e.g. `overlayText`, headers, labels); a full `localeText` catalog isn't required for the target apps. |
-| AG24 | RTL support | 🆓 | No RTL-locale app currently consumes the grid; revisit if/when one does. |
+| ID | Feature | Why deferred |
+|---|---|---|
+| X13 | Tree data (self-referencing hierarchy) | Master-detail (A4) + multi-column grouping (E4) cover the hierarchical needs of the target apps; recursive self-referencing tree data (BOM/org/folder) is L-effort and no consuming app requires it yet. Revisit if one does. |
+| X14 | Pivoting | The heavyweight cross-tab reporting feature (L-effort); grouping + aggregation cover current reporting needs and no target app requires pivot/reshape. Revisit if one does. |
+| X18 | Cell notes / comments | Collaboration/annotation feature outside the current grid scope; no consuming app needs it yet. |
+| X19 | Localization / i18n (`localeText`) | The grid's few built-in strings are overridable at the call site (e.g. `overlayText`, headers, labels); a full `localeText` catalog isn't required for the target apps. |
+| X24 | RTL support | No RTL-locale app currently consumes the grid; revisit if/when one does. |

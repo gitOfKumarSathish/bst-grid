@@ -3,8 +3,8 @@
 ## Context
 
 Kagami wants **one** React grid ("Bst-Table") standardized across all apps, built on
-**MIT/Apache open-source only** — no per-seat / Enterprise licensing (the AG Grid Enterprise
-trap: master-detail, range-selection, clipboard, pivoting are all paid there). Engine:
+**MIT/Apache open-source only** — no per-seat / Enterprise licensing (the commercial-grid trap:
+master-detail, range-selection, clipboard and pivoting all sit behind paid tiers there). Engine:
 **TanStack Table v9** (stable since Aug 4 2026, `latest` = 9.1.2, MIT, headless) — **confirmed by a
 Phase-1 spike**, v8 = documented fallback only (PART 6). This doc answers: what's out-of-the-box vs custom,
 what overlaps, how feasible the custom-plugin idea is, and — now that key decisions are made —
@@ -35,11 +35,11 @@ the concrete architecture and MVP phasing.
 Entire stack is MIT/Apache. MUI split: `@mui/material`, `@mui/icons-material`, `@emotion/*`,
 `@mui/x-date-pickers` (community) = **MIT, free forever**. **HARD RULE: never add** `*-pro` /
 `*-premium` MUI X packages (`@mui/x-date-pickers-pro`, `@mui/x-data-grid-pro|premium`) — those are
-per-dev commercial. We build the grid on TanStack, not MUI's DataGrid, so we never need them.
+per-dev commercial. We build the grid on TanStack, not on any vendor's data grid, so we never need them.
 
 > **Framing:** TanStack Table is *headless* — it ships the correct **state engine** and **zero
 > markup**. A large share of this spec being "custom" is the point: it's the control Kagami buys by
-> not licensing AG Grid Enterprise.
+> not licensing a commercial grid.
 
 ---
 
@@ -151,7 +151,7 @@ TanStack covers ~25–30% of the spec's *mechanisms* (data-ops + structural laye
   Multi-col grouping (E4) · Pagination client+server (A3) · Column visibility/ordering/**resizing**/
   **pinning** · **Row pinning** (G1) · **Row** selection · **cell/range selection**
   (`cellSelectionFeature`) · **cell spanning** (`cellSpanningFeature`) · Master-detail *state* via
-  Expanding (A4). *(Master-detail + the basis for clipboard are AG Grid Enterprise-only; free here.)*
+  Expanding (A4). *(Master-detail + the basis for clipboard are paid-tier elsewhere; free here.)*
 - **Not in v9 (we build):** editing · validation · virtualization (→TanStack Virtual) · clipboard ·
   keyboard nav · charts · files · all styling. *(v9 DOES ship cell/range selection + spanning — above.)*
 
@@ -508,63 +508,63 @@ column-virtualization flip-on, server-side grouping, viz cell types.
 
 ---
 
-### Phases 5–8 — AG Grid parity roadmap  *(post-original-spec, added 2026-08-13)*
+### Phases 5–8 — Extended capability roadmap  *(post-original-spec, added 2026-08-13)*
 
-Phases 1–4 deliver the original 58-leaf spec. A 2026-08-13 audit against **AG Grid** (Community +
-Enterprise) found Bst-Table already matches most AG Grid **Enterprise** paid features — range
-selection, clipboard, batch editing, grouping + aggregation, master-detail, sparklines, advanced-filter
-builder, server row model — all shipped **free**. The remaining parity gaps schedule as four new phases
-(easy → hard). Full analysis: [`docs/ag-grid-gap-analysis.md`](docs/ag-grid-gap-analysis.md); status
-IDs **`AG1–AG29`** in [`COVERAGE.md`](COVERAGE.md). These map to Milestones A–D in the gap doc.
+Phases 1–4 deliver the original 58-leaf spec. A 2026-08-13 review of what commercial enterprise grids
+offer found Bst-Table already covers most of the capabilities those products gate behind paid tiers —
+range selection, clipboard, batch editing, grouping + aggregation, master-detail, sparklines,
+advanced-filter builder, server row model — all shipped **free**. The remaining gaps schedule as four
+new phases (easy → hard). Full analysis: [`docs/capability-roadmap.md`](docs/capability-roadmap.md);
+status IDs **`X1–X29`** in [`COVERAGE.md`](COVERAGE.md). These map to Milestones A–D in the roadmap doc.
 
-**Phase 4 remainder (parity-relevant, already in Phase 4 scope):** i18n / localeText (`AG19` — ⚪ **now optional**, see below) ·
-a11y / ARIA grid audit (`AG20`) · grid-state save/restore API (`AG21` ✅) · live / WebSocket updates —
-I5 (`AG22`) · formal loading / error overlays (`AG23` ✅ **v0.40.0** — `enableOverlays` + `loading`/`error`).
+**Phase 4 remainder (parity-relevant, already in Phase 4 scope):** i18n / localeText (`X19` — ⚪ **now optional**, see below) ·
+a11y / ARIA grid audit (`X20`) · grid-state save/restore API (`X21` ✅) · live / WebSocket updates —
+I5 (`X22`) · formal loading / error overlays (`X23` ✅ **v0.40.0** — `enableOverlays` + `loading`/`error`).
 
 > **⚪ Out of scope (optional, 2026-08-20).** Three parity items are **kept but deliberately not
-> scheduled** — no phase owns them: **cell notes / comments (`AG18`)**, **i18n / localeText
-> (`AG19`)**, **RTL (`AG24`)**. Rationale in [`COVERAGE.md`](COVERAGE.md) "Optional — kept but out of
+> scheduled** — no phase owns them: **cell notes / comments (`X18`)**, **i18n / localeText
+> (`X19`)**, **RTL (`X24`)**. Rationale in [`COVERAGE.md`](COVERAGE.md) "Optional — kept but out of
 > scope". They can be picked up later if an app needs them.
 
 **Phase 5 — Export & interop**  *(✅ shipped v0.34.0)*
-CSV export (`AG1`) · Excel `.xlsx` export (`AG2`) · print / print-friendly view (`AG3`). Delivered
+CSV export (`X1`) · Excel `.xlsx` export (`X2`) · print / print-friendly view (`X3`). Delivered
 **dependency-free** — `toCsv` / `toXlsx` (hand-built store-only ZIP + OOXML, **no ExcelJS**) /
 `buildPrintHtml`, gated by `enableExport` (+ per-format `enableCsvExport`/`enableExcelExport`/
 `enablePrint` settings switches), driven by `runtime.exportCsv`/`exportExcel`/`printTable`, with an
 Export menu in both adapters (`showExport`).
 → *Deliverable:* every grid can download CSV / Excel and print.
 
-**Phase 6 — AG-Grid-grade chrome & filtering**  *(in progress)*
-**Set Filter** — distinct-values checklist (`AG4` ✅) · **status bar** — row count + sum/avg/count of
-selection (`AG5` ✅) · right-click context menu (`AG6` ✅) · tool-panel sidebar — Columns + Filters
-(`AG7`) · Find — highlight + jump (`AG8`) · row-number column (`AG9`) · managed row dragging (`AG10`) ·
-multi-filter per column (`AG11`) · fill handle (`AG12`).
-→ *Deliverable:* the chrome + filtering an AG Grid user expects on day one.
-**Shipped:** `AG4` (`enableSetFilter` + `BstSetFilter`, an `{op:'set'}` condition) and `AG5`
-(`showStatusBar` + `runtime.getSelectionStats`) and `AG6` (`enableContextMenu` + `getContextMenuItems`)
-and `AG9` (`enableRowNumbers` + `rowNumberHeader`, **v0.40.0** — leading `#` column, settings-toggle)
-and `AG11` (`enableMultiFilter`).
-**Remaining:** AG7 (⏭️ skipped) · AG8 · AG10 · AG12.
+**Phase 6 — Enterprise-grade chrome & filtering**  *(in progress)*
+**Set Filter** — distinct-values checklist (`X4` ✅) · **status bar** — row count + sum/avg/count of
+selection (`X5` ✅) · right-click context menu (`X6` ✅) · tool-panel sidebar — Columns + Filters
+(`X7`) · Find — highlight + jump (`X8`) · row-number column (`X9`) · managed row dragging (`X10`) ·
+multi-filter per column (`X11`) · fill handle (`X12`).
+→ *Deliverable:* the chrome + filtering an enterprise-grid user expects on day one.
+**Shipped:** `X4` (`enableSetFilter` + `BstSetFilter`, an `{op:'set'}` condition) and `X5`
+(`showStatusBar` + `runtime.getSelectionStats`) and `X6` (`enableContextMenu` + `getContextMenuItems`)
+and `X9` (`enableRowNumbers` + `rowNumberHeader`, **v0.40.0** — leading `#` column, settings-toggle)
+and `X11` (`enableMultiFilter`).
+**Remaining:** X7 (⏭️ skipped) · X8 · X10 · X12.
 
 **Phase 7 — Hierarchy, analytics & scale**
-Tree data — self-referencing hierarchy (`AG13` — ⚪ **now optional 2026-08-24**, see COVERAGE.md
-"Optional") · pivoting (`AG14` — ⚪ **now optional 2026-08-24**, see COVERAGE.md "Optional") · integrated
-charts, range → chart (`AG15`) · advanced server-side row model — server group/pivot/tree + lazy expand
-(`AG16`) · calculated / formula columns (`AG17`) · cell notes / comments (`AG18` — ⚪ optional).
-→ *Deliverable:* enterprise-heavyweight analytics + true server-side scale. _(With AG13/AG14/AG18 now
-optional, the scheduled remainder here is AG15 integrated charts + the partial AG16 SSRM / AG17 formula
+Tree data — self-referencing hierarchy (`X13` — ⚪ **now optional 2026-08-24**, see COVERAGE.md
+"Optional") · pivoting (`X14` — ⚪ **now optional 2026-08-24**, see COVERAGE.md "Optional") · integrated
+charts, range → chart (`X15`) · advanced server-side row model — server group/pivot/tree + lazy expand
+(`X16`) · calculated / formula columns (`X17`) · cell notes / comments (`X18` — ⚪ optional).
+→ *Deliverable:* enterprise-heavyweight analytics + true server-side scale. _(With X13/X14/X18 now
+optional, the scheduled remainder here is X15 integrated charts + the partial X16 SSRM / X17 formula
 columns.)_
 
 **Phase 8 — Polish & parity tail**  *(in progress)*
-RTL (`AG24` — ⚪ **now optional**, see above) · row/column move+sort animations (`AG25`) · **auto row
-height** (`AG26` ✅) · auto-generate columns (`AG27` ✅) · cell flashing on change (`AG28`) · aligned
-grids (`AG29`).
+RTL (`X24` — ⚪ **now optional**, see above) · row/column move+sort animations (`X25`) · **auto row
+height** (`X26` ✅) · auto-generate columns (`X27` ✅) · cell flashing on change (`X28`) · aligned
+grids (`X29`).
 → *Deliverable:* the last-mile polish.
-**Shipped:** `AG26` — `enableAutoRowHeight` + `meta.wrapText` (CSS wrap; browser-measured, dep-free) ·
-`AG27` — `enableAutoColumns` + `autoColumns` + `autoGenerateColumns(data, opts)` (**v0.40.0**).
+**Shipped:** `X26` — `enableAutoRowHeight` + `meta.wrapText` (CSS wrap; browser-measured, dep-free) ·
+`X27` — `enableAutoColumns` + `autoColumns` + `autoGenerateColumns(data, opts)` (**v0.40.0**).
 
 Each item ships behind a §12 toggle (`enable*` / `show*`) with the full Definition of Done (demo +
-README + CHANGELOG + version bump). Every **AG Grid Enterprise-paid** capability above that we build
+README + CHANGELOG + version bump). Every **commonly paid-tier** capability above that we build
 (Set Filter, status bar, context menu, fill handle, integrated charts, advanced SSRM, multi-filter)
 ships **free** — MIT/Apache only, per the licensing constraint. _(Tree data, pivoting and cell notes are
 ⚪ optional/out-of-scope; the tool-panel sidebar is ⏭️ skipped.)_
@@ -616,7 +616,7 @@ UI `@mui/material` + `@emotion/react|styled` (MIT) · Pickers `@mui/x-date-picke
 Radix (MIT) · Dates date-fns/Day.js (MIT) · Charts uPlot(perf)/Recharts(DX)/visx/ECharts (MIT/Apache)
 · QR/Barcode qrcode/bwip-js (MIT) · PDF thumbnails pdf.js (Apache) · DnD dnd-kit (MIT) · Export
 ExcelJS/SheetJS-community (MIT/Apache) · Schema zod (MIT).
-**Avoid:** MUI X `*-pro`/`*-premium`, AG Grid Enterprise, Highcharts (all commercial per-seat).
+**Avoid:** MUI X `*-pro`/`*-premium`, commercial enterprise grids, Highcharts (all per-seat).
 
 ---
 
@@ -678,7 +678,7 @@ nobody. **Result: 44/58 clean, 14 findings, all closed or converted to an open q
 | 2 | **D3 auto-size** absent from the 12-concern table *and* all phases; content measurement conflicts with virtualization | Design gap | §2.7b — sampled `canvas.measureText`, on-demand only; concern #1; Phase 3 |
 | 3 | **I3 view + delete** missing — contract had `uploadFile` only | Design gap | §2.2 — `getFileUrl` (Phase 1, B5 thumbnails) + `deleteFile` (Phase 4) |
 | 4 | **A2 ≡ D1 was wrong** — infinite scroll (fetch) ≠ virtual scroll (render) | Definition | §2.7c + overlap #1 rewritten; A2 maps to concerns #8 **and** #11 |
-| 5 | **A4 master-detail** analysed but in no phase — despite being a headline win over AG Grid Enterprise | Unscheduled | Phase 1 (read panel, nested table instance) |
+| 5 | **A4 master-detail** analysed but in no phase — despite being a headline win over the paid alternatives | Unscheduled | Phase 1 (read panel, nested table instance) |
 | 6 | **E3 advanced-filter builder UI** analysed but in no phase | Unscheduled | Phase 3 |
 | 7 | **G1 pin rendering** (sticky CSS) in no phase; also missing from the 12-concern table | Unscheduled | Phase 1 + concern #1 |
 | 8 | **G2 row resize / row-height** in no phase | Unscheduled | Phase 3 |
@@ -743,13 +743,13 @@ nobody. **Result: 44/58 clean, 14 findings, all closed or converted to an open q
       sampled auto-size** were not in the shipped layout slice; **Phase 4** (server DataSource / 1M
       tier, infinite scroll, viz cells, live updates, a11y/perf hardening) is next.
 - [ ] **Phase 4 remainder** — server DataSource / virtualization / infinite scroll / viz cells shipped;
-      **still open:** i18n (`AG19`), a11y/ARIA audit (`AG20`), grid-state save/restore API (`AG21`),
-      live/WebSocket updates I5 (`AG22`), formal loading/error overlays (`AG23`).
-- [x] **Phase 5 — Export (AG1–AG3) shipped** (v0.34.0) — CSV / Excel (`.xlsx`, dependency-free) / print
+      **still open:** i18n (`X19`), a11y/ARIA audit (`X20`), grid-state save/restore API (`X21`),
+      live/WebSocket updates I5 (`X22`), formal loading/error overlays (`X23`).
+- [x] **Phase 5 — Export (X1–X3) shipped** (v0.34.0) — CSV / Excel (`.xlsx`, dependency-free) / print
       via `enableExport` + `runtime.exportCsv`/`exportExcel`/`printTable`; both adapters render the
       Export menu (`showExport`). `export.test.ts` green.
-- [ ] **Phase 6 in progress** — ✅ Set Filter (`AG4`) + status bar (`AG5`) shipped; **remaining:**
-      context menu (`AG6`), tool-panel sidebar (`AG7`), Find (`AG8`), row-number column (`AG9`), row
-      drag (`AG10`), multi-filter (`AG11`), fill handle (`AG12`).
-- [ ] **Phases 7–8 — AG Grid parity roadmap** — hierarchy/analytics P7 · polish P8. See PART 3
-      "Phases 5–8", the `AG1–AG29` matrix in `COVERAGE.md`, and `docs/ag-grid-gap-analysis.md`.
+- [ ] **Phase 6 in progress** — ✅ Set Filter (`X4`) + status bar (`X5`) shipped; **remaining:**
+      context menu (`X6`), tool-panel sidebar (`X7`), Find (`X8`), row-number column (`X9`), row
+      drag (`X10`), multi-filter (`X11`), fill handle (`X12`).
+- [ ] **Phases 7–8 — extended capability roadmap** — hierarchy/analytics P7 · polish P8. See PART 3
+      "Phases 5–8", the `X1–X29` matrix in `COVERAGE.md`, and `docs/capability-roadmap.md`.

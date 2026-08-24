@@ -63,9 +63,9 @@ export interface BstInfiniteTableProps<TData> {
   onColumnFiltersChange: (u: Updater<DsColumnFilter[]>) => void
   onGlobalFilterChange: (u: Updater<string>) => void
   onPaginationChange: (u: Updater<unknown>) => void
-  /** Initial fetch in flight (AG23) — drives the loading overlay (not appends). */
+  /** Initial fetch in flight (X23) — drives the loading overlay (not appends). */
   loading: boolean
-  /** Last fetch error, or null (AG23) — drives the error overlay. */
+  /** Last fetch error, or null (X23) — drives the error overlay. */
   error: Error | null
 }
 

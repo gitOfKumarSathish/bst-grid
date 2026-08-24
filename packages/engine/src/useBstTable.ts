@@ -43,9 +43,9 @@ export interface BstRuntimeHandle<TData extends RowData> {
   enableColumnOrdering: boolean
   /** Per-column header filter row is rendered (Phase 3, "dual filter"). */
   enableColumnFilterRow: boolean
-  /** Set Filter (AG4) — eligible columns show a distinct-values checklist in the filter row. */
+  /** Set Filter (X4) — eligible columns show a distinct-values checklist in the filter row. */
   enableSetFilter: boolean
-  /** Multi-filter (AG11) — columns with an array `meta.filter` stack those filters. */
+  /** Multi-filter (X11) — columns with an array `meta.filter` stack those filters. */
   enableMultiFilter: boolean
   /** Cell/range selection + keyboard nav is active (Phase 3). */
   enableCellSelection: boolean
@@ -81,9 +81,9 @@ export interface BstRuntimeHandle<TData extends RowData> {
   enableRowPinning: boolean
   /** Row resizing (G2) — drag a row's bottom edge to set its height. */
   enableRowResize: boolean
-  /** Auto row height (AG26) — body cells wrap and rows grow to fit their content. */
+  /** Auto row height (X26) — body cells wrap and rows grow to fit their content. */
   enableAutoRowHeight: boolean
-  /** Right-click context menu (AG6). */
+  /** Right-click context menu (X6). */
   enableContextMenu: boolean
   /** Builds the context-menu items for the clicked cell (given the defaults). */
   getContextMenuItems?: (ctx: BstContextMenuContext<TData>) => BstContextMenuItem[]
@@ -108,25 +108,25 @@ export interface BstRuntimeHandle<TData extends RowData> {
   onReachEnd?: () => void
   /** Rows-from-end that trigger `onReachEnd`. Default 8. */
   endReachedThreshold?: number
-  /** Export (AG1–AG3) is enabled — adapters render the "Export" toolbar menu. */
+  /** Export (X1–X3) is enabled — adapters render the "Export" toolbar menu. */
   enableExport: boolean
   /** Which export formats are on (CSV / Excel / Print) — filters the menu items. */
   exportFormats: { csv: boolean; excel: boolean; print: boolean }
-  /** Row-number column (AG9) is active — a leading `#` column was injected. */
+  /** Row-number column (X9) is active — a leading `#` column was injected. */
   enableRowNumbers: boolean
-  /** Auto-generated columns (AG27) were used because no columns were supplied. */
+  /** Auto-generated columns (X27) were used because no columns were supplied. */
   enableAutoColumns: boolean
-  /** Loading / error overlays (AG23) may render (default true). */
+  /** Loading / error overlays (X23) may render (default true). */
   enableOverlays: boolean
-  /** Loading state (AG23) — drives the loading overlay. */
+  /** Loading state (X23) — drives the loading overlay. */
   loading?: boolean
-  /** Error state (AG23) — drives the error overlay. */
+  /** Error state (X23) — drives the error overlay. */
   error?: React.ReactNode | Error | null
-  /** Overlay label overrides (AG23). */
+  /** Overlay label overrides (X23). */
   overlayText?: { loading?: string; error?: string }
-  /** Custom loading overlay (AG23). */
+  /** Custom loading overlay (X23). */
   renderLoadingOverlay?: () => React.ReactNode
-  /** Custom error overlay (AG23). */
+  /** Custom error overlay (X23). */
   renderErrorOverlay?: (error: unknown) => React.ReactNode
 }
 
@@ -171,7 +171,7 @@ function resolveValidation(
 }
 
 /**
- * Resolve the export toggles (Phase 5, AG1–AG3). `enableExport` is the master
+ * Resolve the export toggles (Phase 5, X1–X3). `enableExport` is the master
  * (`boolean | BstExportOptions`, an object implying enabled); the top-level
  * per-format flags (`enableCsvExport`/`enableExcelExport`/`enablePrint`, the
  * settings-sheet switches) win over the object's `csv`/`excel`/`print` fields.
@@ -360,7 +360,7 @@ export function useBstTable<TData extends RowData>(opts: UseBstTableOptions<TDat
     }
   }
 
-  // Effective columns: AG27 auto-generate when none are supplied, then AG9
+  // Effective columns: X27 auto-generate when none are supplied, then X9
   // prepend the row-number column. Memoized on the inputs that determine them so
   // a stable `columns`/`data` ref does not churn the table's column state.
   const columns = React.useMemo(() => {
@@ -381,7 +381,7 @@ export function useBstTable<TData extends RowData>(opts: UseBstTableOptions<TDat
     opts.autoColumns,
   ])
 
-  // Seed state. The row-number column (AG9) is pinned to the **start** so it stays
+  // Seed state. The row-number column (X9) is pinned to the **start** so it stays
   // the leftmost data column — ahead of any user-pinned column — and sticks during
   // horizontal scroll. Injected here (not just in the column def) so it survives a
   // consumer-supplied `initialState`/`gridState` that sets its own column pinning.

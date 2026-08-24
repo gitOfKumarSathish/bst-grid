@@ -22,7 +22,7 @@ import type {
 } from '../index'
 
 /**
- * Grid-state save/restore (AG21). `getGridState` / `applyGridState` snapshot and
+ * Grid-state save/restore (X21). `getGridState` / `applyGridState` snapshot and
  * restore a grid's view (sort · filter · column layout · grouping · …);
  * `loadGridState` feeds `initialState` for a flash-free restore; `useBstGridState`
  * persists changes to storage.
@@ -64,7 +64,7 @@ function mountGrid(initialState?: Record<string, unknown>) {
   return ref
 }
 
-describe('grid-state — snapshot / restore (AG21)', () => {
+describe('grid-state — snapshot / restore (X21)', () => {
   test('getGridState captures sort + visibility + order from the live table', () => {
     const ref = mountGrid()
     act(() => {

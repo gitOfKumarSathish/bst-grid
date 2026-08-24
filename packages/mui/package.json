@@ -1,7 +1,7 @@
 {
   "name": "@bloomskill/table-mui",
-  "version": "0.41.0",
-  "description": "Bst-Table MUI style adapter — Material UI toolbar/menus/pagination around the @bloomskill/table-engine grid body.",
+  "version": "0.41.1",
+  "description": "Bst-Table MUI style adapter \u2014 Material UI toolbar/menus/pagination around the @bloomskill/table-engine grid body.",
   "keywords": [
     "react",
     "table",
@@ -34,19 +34,19 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json"
+    "build": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && tsc -p tsconfig.json"
   },
   "peerDependencies": {
     "react": ">=18",
     "react-dom": ">=18",
-    "@bloomskill/table-engine": "^0.41.0",
+    "@bloomskill/table-engine": "^0.41.1",
     "@mui/material": ">=6",
     "@mui/icons-material": ">=6",
     "@emotion/react": ">=11",
     "@emotion/styled": ">=11"
   },
   "devDependencies": {
-    "@bloomskill/table-engine": "^0.41.0",
+    "@bloomskill/table-engine": "^0.41.1",
     "@mui/material": "^9.3.1",
     "@mui/icons-material": "^9.3.1",
     "@emotion/react": "^11.14.0",

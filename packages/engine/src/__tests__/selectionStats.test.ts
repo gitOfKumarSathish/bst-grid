@@ -46,7 +46,7 @@ function makeRuntime() {
   return createRuntime<Row>(ctx)
 }
 
-describe('runtime.getSelectionStats (AG5)', () => {
+describe('runtime.getSelectionStats (X5)', () => {
   test('null when nothing is selected', () => {
     expect(makeRuntime().getSelectionStats()).toBeNull()
   })

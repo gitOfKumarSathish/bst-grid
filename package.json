@@ -15,6 +15,8 @@
     "demo": "npm run build && npm run dev -w @bloomskill/demo",
     "demo:fast": "npm run dev -w @bloomskill/demo",
     "verify:portability": "bash scripts/pack-and-verify.sh",
+    "verify:naming": "node scripts/verify-naming.mjs",
+    "prepare": "git config core.hooksPath .githooks || true",
     "mcp": "npm run build -w @bloomskill/table-mcp && vitest run packages/mcp && npm run smoke -w @bloomskill/table-mcp && npm run typecheck:scaffold -w @bloomskill/table-mcp",
     "version:patch": "node scripts/bump-version.mjs patch && npm install",
     "version:minor": "node scripts/bump-version.mjs minor && npm install",

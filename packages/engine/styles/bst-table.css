@@ -170,7 +170,7 @@
   vertical-align: top;
 }
 
-/* Auto row height (AG26) — cells wrap and the row grows to fit its content (the
+/* Auto row height (X26) — cells wrap and the row grows to fit its content (the
    browser measures it — no JS). `overflow: hidden` is kept from `.bst-table-td`,
    so a manually-resized row still clips to its set height while an auto row grows. */
 .bst-auto-rowheight .bst-table-td,
@@ -1220,7 +1220,7 @@
 .bst-colfilter::placeholder {
   color: var(--bst-table-muted);
 }
-/* Multi-filter (AG11) — stack the parts vertically inside one filter-row cell. */
+/* Multi-filter (X11) — stack the parts vertically inside one filter-row cell. */
 .bst-multifilter {
   display: flex;
   flex-direction: column;
@@ -1331,7 +1331,7 @@
   pointer-events: none;
 }
 
-/* Set Filter (AG4) — per-column checklist in the filter row + its popover. */
+/* Set Filter (X4) — per-column checklist in the filter row + its popover. */
 .bst-setfilter-trigger {
   display: inline-flex;
   align-items: center;
@@ -1445,7 +1445,7 @@
   font-size: 12px;
 }
 
-/* Right-click context menu (AG6) — dep-free popup at the cursor. */
+/* Right-click context menu (X6) — dep-free popup at the cursor. */
 .bst-ctxmenu {
   z-index: 1001;
   min-width: 168px;
@@ -1493,7 +1493,7 @@
   background: var(--bst-table-border);
 }
 
-/* ---- Loading / error overlays (AG23) ---------------------------------------
+/* ---- Loading / error overlays (X23) ---------------------------------------
    `.bst-table-viewport` is the positioned ancestor wrapping the scroll box, so
    the overlay covers the visible grid and stays put while the body scrolls
    (the wrapper does not scroll — the inner `.bst-table-scroll` does). */
@@ -1544,7 +1544,7 @@
   }
 }
 
-/* Row-number column (AG9) — muted, non-selectable digits. */
+/* Row-number column (X9) — muted, non-selectable digits. */
 .bst-rownum-cell {
   color: var(--bst-table-muted);
   font-variant-numeric: tabular-nums;

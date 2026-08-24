@@ -4,8 +4,8 @@
 
 [Bst-Table](https://github.com/gitOfKumarSathish/bst-grid) is a React data grid
 (`@bloomskill/table-engine` + MUI/shadcn skins). No language model was trained on it, so asked to
-"build a Bst-Table grid with batch editing" an agent confidently writes **AG Grid** or **MUI X
-DataGrid** code — the very libraries this project exists to replace. Point your agent at this
+"build a Bst-Table grid with batch editing" an agent confidently writes some **other grid
+library's** code — the very libraries this project exists to replace. Point your agent at this
 server and it gets the real API instead: searchable docs, the full feature-toggle registry, every
 cell type, exact type signatures, plus the ability to **scaffold** and **validate** working grids.
 
@@ -112,7 +112,7 @@ live / WebSocket merge (I5) isn't built.
 
 **Prompts** (slash commands in most clients) — `bst-quick-start` (new grid) · `bst-add-feature`
 (switch a capability on, dependencies included) · `bst-new-cell-type` (author a custom
-renderer/editor) · `bst-migrate` (port an AG Grid or MUI X DataGrid table over).
+renderer/editor) · `bst-migrate` (port a table over from another grid library).
 
 **Resources** — `bst://coverage` · `bst://features` · `bst://cell-types` · `bst://example/{name}`.
 
@@ -166,7 +166,7 @@ The version tracks the library it documents — **`@bloomskill/table-mcp@0.32.4`
 | Server shows as failed / not connected | Check Node ≥ 18 (`node -v`). Run `npx -y @bloomskill/table-mcp` in a terminal — it should start and wait silently on stdio (Ctrl+C to exit). Any error prints there. |
 | `command not found: npx` in the client | GUI apps don't always inherit your shell `PATH` (common with nvm). Use an absolute path as `command`, e.g. `/Users/you/.nvm/versions/node/v22.0.0/bin/npx`. |
 | Registered but the agent ignores it | Restart the client — servers are read at startup. Then ask explicitly: *"use the bst-table MCP server to …"*. |
-| Agent still writes AG Grid / MUI X code | It answered from memory instead of calling a tool. Say *"check with bst_search_docs first"* once; it sticks for the session. |
+| Agent still writes another library's grid code | It answered from memory instead of calling a tool. Say *"check with bst_search_docs first"* once; it sticks for the session. |
 | Advice doesn't match your installed version | Run `bst_detect_version`, then align — `npm i @bloomskill/table-mcp@<your table version>`. |
 | Corporate registry / offline | `npm i -g @bloomskill/table-mcp` once, then use `bst-table-mcp` (no args) as the `command`. |
 

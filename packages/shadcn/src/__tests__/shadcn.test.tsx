@@ -294,7 +294,7 @@ describe('@bloomskill/table-shadcn — "Rows per page" All option', () => {
   })
 })
 
-describe('@bloomskill/table-shadcn — Save view / Reset view controls (AG21)', () => {
+describe('@bloomskill/table-shadcn — Save view / Reset view controls (X21)', () => {
   beforeEach(() => window.localStorage.clear())
 
   test('manual mode: the settings footer Save view writes the snapshot, Reset view clears it', () => {

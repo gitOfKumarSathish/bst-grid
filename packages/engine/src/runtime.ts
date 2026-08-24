@@ -96,7 +96,7 @@ export interface VisualIndex {
   c: number
 }
 
-/** Aggregate of the current cell selection — shown in the status bar (AG5). */
+/** Aggregate of the current cell selection — shown in the status bar (X5). */
 export interface BstSelectionStats {
   /** Total selected cells (real data rows only). */
   count: number
@@ -157,7 +157,7 @@ export interface RuntimeCtx<TData extends RowData> {
   /** Row-copy (H2) enabled. `false` disables `selectRow`/`copyRow`. Default: true. */
   enableCopyRow?: boolean
   enableUndoRedo: boolean
-  // ---- export (Phase 5, AG1–AG3) ----
+  // ---- export (Phase 5, X1–X3) ----
   /** Export capability on. `false` makes every `export*` method a no-op. */
   enableExport?: boolean
   /** CSV export enabled (sub-toggle of `enableExport`). Default: true. */
@@ -257,7 +257,7 @@ export interface BstRuntime<TData extends RowData> {
   /** The row / column ids inside the current selection rectangle (visual order). */
   getSelectionMatrix: () => { rowIds: string[]; columnIds: string[] } | null
   /** Aggregate stats (count / sum / avg / min / max) over the current selection —
-   *  the AG5 status bar reads this. `null` when nothing is selected. */
+   *  the X5 status bar reads this. `null` when nothing is selected. */
   getSelectionStats: () => BstSelectionStats | null
 
   // ---- clipboard (H1–H4) ----
@@ -276,7 +276,7 @@ export interface BstRuntime<TData extends RowData> {
   /** Parse TSV and write it from the selection's top-left, honouring editability. */
   pasteFromText: (text: string) => void
 
-  // ---- export (Phase 5, AG1–AG3) ----
+  // ---- export (Phase 5, X1–X3) ----
   /** Build the export payload — headers + formatted display strings (+ raw values
    *  for numeric Excel typing) for the current columns/rows. Skips action columns
    *  and non-data (group/aggregate) rows. Scope `'all'` = every filtered+sorted
@@ -1325,7 +1325,7 @@ export function createRuntime<TData extends RowData>(
   /** Columns to export — visible leaf columns minus pure-UI + row-number columns. */
   const exportColumnIds = (): string[] =>
     ctx.visibleColumnIds.filter((id) => {
-      if (id.startsWith('__bst')) return false // row-number column (AG9)
+      if (id.startsWith('__bst')) return false // row-number column (X9)
       const t = metaOf(id).type
       return t !== 'action' && t !== 'actionMenu'
     })

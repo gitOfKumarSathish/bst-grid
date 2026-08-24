@@ -21,8 +21,8 @@ function Grid(props: Partial<UseBstTableOptions<Row>>) {
   return <BstTable table={table} />
 }
 
-// ---------------------------------------------------------------- AG27
-describe('AG27 — auto-generate columns from data', () => {
+// ---------------------------------------------------------------- X27
+describe('X27 — auto-generate columns from data', () => {
   test('humanizeKey turns camel/snake/kebab into Title Case', () => {
     expect(humanizeKey('unitPrice')).toBe('Unit Price')
     expect(humanizeKey('created_at')).toBe('Created At')
@@ -74,8 +74,8 @@ describe('AG27 — auto-generate columns from data', () => {
   })
 })
 
-// ---------------------------------------------------------------- AG9
-describe('AG9 — row-number column', () => {
+// ---------------------------------------------------------------- X9
+describe('X9 — row-number column', () => {
   test('off by default: no # column', () => {
     const { container } = render(<Grid />)
     expect(container.querySelector('.bst-rownum-cell')).toBeNull()
@@ -128,8 +128,8 @@ describe('AG9 — row-number column', () => {
   })
 })
 
-// ---------------------------------------------------------------- AG23
-describe('AG23 — loading / error overlays', () => {
+// ---------------------------------------------------------------- X23
+describe('X23 — loading / error overlays', () => {
   test('loading shows the loading overlay + spinner', () => {
     const { container } = render(<Grid loading />)
     const ov = container.querySelector('.bst-overlay')

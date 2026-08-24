@@ -24,7 +24,7 @@ function Grid({ wrapNote, ...opts }: { wrapNote?: boolean } & Record<string, unk
   return <BstTable table={table} />
 }
 
-describe('auto row height (AG26)', () => {
+describe('auto row height (X26)', () => {
   test('off by default — no root class, cells still truncate', () => {
     const { container } = render(<Grid />)
     expect(container.querySelector('.bst-auto-rowheight')).toBeNull()

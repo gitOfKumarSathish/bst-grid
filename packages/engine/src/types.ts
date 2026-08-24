@@ -98,7 +98,7 @@ export interface BstTableEngineToggles {
   /** Per-column filtering behaviour (drives the E3 filter builder). Maps to v9 `enableColumnFilters`. Default: true. */
   enableColumnFilters?: boolean
   /**
-   * Set Filter (AG4) — an Excel-style **checklist of distinct values** per column,
+   * Set Filter (X4) — an Excel-style **checklist of distinct values** per column,
    * rendered in the per-column filter row. When on, categorical columns
    * (`singleSelect` / `multiSelect` / `radio` / `boolean`) use the checklist; any
    * column can force it via `meta.filter: 'set'` or opt out via
@@ -107,7 +107,7 @@ export interface BstTableEngineToggles {
    */
   enableSetFilter?: boolean
   /**
-   * Multi-filter (AG11) — **stack several filter types on one column**. A column
+   * Multi-filter (X11) — **stack several filter types on one column**. A column
    * opts in with `meta.filter` as an array (e.g. `['condition', 'set']`), which
    * renders the listed filters **stacked** in its filter row; a row must satisfy
    * **all** of them (AND). Needs `enableColumnFilters` + `enableColumnFilterRow`
@@ -241,7 +241,7 @@ export interface BstTableEngineToggles {
    */
   enableColumnVirtualization?: boolean
   /**
-   * Export (Phase 5, AG1–AG3) — download the grid as **CSV** / **Excel** (`.xlsx`)
+   * Export (Phase 5, X1–X3) — download the grid as **CSV** / **Excel** (`.xlsx`)
    * or open a **print** view. `true` enables all three; pass a
    * {@link BstExportOptions} object to choose formats and set the file name / row
    * scope (an object implies enabled, §12). Opt-in. Default false. Adapters render
@@ -251,23 +251,23 @@ export interface BstTableEngineToggles {
    */
   enableExport?: boolean | BstExportOptions
   /**
-   * CSV export sub-toggle (AG1). `false` hides the CSV menu item and makes
+   * CSV export sub-toggle (X1). `false` hides the CSV menu item and makes
    * `runtime.exportCsv()` a no-op, while keeping Excel/Print. Needs
    * `enableExport`. Default: true.
    */
   enableCsvExport?: boolean
   /**
-   * Excel `.xlsx` export sub-toggle (AG2). `false` hides the Excel menu item and
+   * Excel `.xlsx` export sub-toggle (X2). `false` hides the Excel menu item and
    * makes `runtime.exportExcel()` a no-op. Needs `enableExport`. Default: true.
    */
   enableExcelExport?: boolean
   /**
-   * Print sub-toggle (AG3). `false` hides the Print menu item and makes
+   * Print sub-toggle (X3). `false` hides the Print menu item and makes
    * `runtime.printTable()` a no-op. Needs `enableExport`. Default: true.
    */
   enablePrint?: boolean
   /**
-   * Auto row height (AG26) — rows grow to fit **wrapped** content instead of
+   * Auto row height (X26) — rows grow to fit **wrapped** content instead of
    * truncating each cell to one line; the browser measures the content, so no
    * JS measurement is needed. Every body cell wraps; opt individual columns in
    * (or out) with `meta.wrapText`. Composes with manual row resize (a resized row
@@ -275,7 +275,7 @@ export interface BstTableEngineToggles {
    */
   enableAutoRowHeight?: boolean
   /**
-   * Right-click context menu (AG6) — a menu at the cursor with default actions
+   * Right-click context menu (X6) — a menu at the cursor with default actions
    * (Copy · Copy row · Copy column while clipboard is on; Export CSV / Excel while
    * export is on; Autosize column) plus any items returned by `getContextMenuItems`.
    * If the resolved item list is empty the native browser menu is left alone.
@@ -283,7 +283,7 @@ export interface BstTableEngineToggles {
    */
   enableContextMenu?: boolean
   /**
-   * Row-number column (AG9) — a leading, non-interactive `#` column showing each
+   * Row-number column (X9) — a leading, non-interactive `#` column showing each
    * row's 1-based position in the **current view** (continuous across pages;
    * reflects sort + filter). It never sorts, filters, hides, resizes, reorders or
    * pins, and stays out of the columns menu / filter row / export. Header defaults
@@ -291,7 +291,7 @@ export interface BstTableEngineToggles {
    */
   enableRowNumbers?: boolean
   /**
-   * Auto-generate columns from data (AG27) — when **no `columns` are supplied**
+   * Auto-generate columns from data (X27) — when **no `columns` are supplied**
    * (an empty array), infer them from the row data: one column per key found in a
    * sample of rows, with the cell type guessed from the value (number / boolean /
    * date / text) and a humanized header. Ignored the moment `columns` is
@@ -300,7 +300,7 @@ export interface BstTableEngineToggles {
    */
   enableAutoColumns?: boolean
   /**
-   * Loading / error overlays (AG23) — render a formal overlay over the grid while
+   * Loading / error overlays (X23) — render a formal overlay over the grid while
    * `loading` is true or when `error` is set, instead of leaving the body blank or
    * stale. On by default so a grid wired to a server `DataSource`
    * (`useBstDataSource`, which reports `loading`/`error`) shows them for free; set
@@ -311,7 +311,7 @@ export interface BstTableEngineToggles {
   enableOverlays?: boolean
 }
 
-/** One entry in the right-click context menu (AG6). */
+/** One entry in the right-click context menu (X6). */
 export interface BstContextMenuItem {
   /** Stable key (React list key). */
   key?: string
@@ -437,7 +437,7 @@ export interface UseBstTableOptions<TData extends RowData> extends BstTableEngin
    */
   renderDetail?: (row: TData) => React.ReactNode
   /**
-   * Build the right-click context menu (AG6, needs `enableContextMenu`). Receives
+   * Build the right-click context menu (X6, needs `enableContextMenu`). Receives
    * the clicked cell plus `defaultItems` (Copy / Export / …); return the final
    * list — spread `defaultItems` to keep them, prepend/append your own, or return
    * a fresh array. Omit to show the defaults.
@@ -493,30 +493,30 @@ export interface UseBstTableOptions<TData extends RowData> extends BstTableEngin
   onReachEnd?: () => void
   /** How many rows from the end trigger `onReachEnd`. Default 8. */
   endReachedThreshold?: number
-  /** Header for the row-number column (AG9, `enableRowNumbers`). Default `'#'`. */
+  /** Header for the row-number column (X9, `enableRowNumbers`). Default `'#'`. */
   rowNumberHeader?: React.ReactNode
-  /** Tuning for auto-generated columns (AG27, `enableAutoColumns`). */
+  /** Tuning for auto-generated columns (X27, `enableAutoColumns`). */
   autoColumns?: AutoColumnsOptions
   /**
-   * Loading state (AG23) — while true the grid shows a loading overlay (unless
+   * Loading state (X23) — while true the grid shows a loading overlay (unless
    * `enableOverlays` is false). Usually wired from `useBstDataSource(...).loading`.
    */
   loading?: boolean
   /**
-   * Error state (AG23) — when set the grid shows an error overlay (unless
+   * Error state (X23) — when set the grid shows an error overlay (unless
    * `enableOverlays` is false). Accepts an `Error`, a message string, or any React
    * node. Usually wired from `useBstDataSource(...).error`.
    */
   error?: React.ReactNode | Error | null
-  /** Overlay label overrides (AG23). Defaults: "Loading…" / the error message. */
+  /** Overlay label overrides (X23). Defaults: "Loading…" / the error message. */
   overlayText?: { loading?: string; error?: string }
-  /** Fully custom loading overlay (AG23) — replaces the default spinner + text. */
+  /** Fully custom loading overlay (X23) — replaces the default spinner + text. */
   renderLoadingOverlay?: () => React.ReactNode
-  /** Fully custom error overlay (AG23) — receives the `error` value. */
+  /** Fully custom error overlay (X23) — receives the `error` value. */
   renderErrorOverlay?: (error: unknown) => React.ReactNode
 }
 
-/** Tuning for auto-generated columns (AG27). All optional. */
+/** Tuning for auto-generated columns (X27). All optional. */
 export interface AutoColumnsOptions {
   /** How many rows to sample when collecting keys. Default 50. */
   sampleRows?: number

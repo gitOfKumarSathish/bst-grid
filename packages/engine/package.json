@@ -1,7 +1,7 @@
 {
   "name": "@bloomskill/table-engine",
-  "version": "0.41.0",
-  "description": "Bst-Table headless engine — TanStack Table v9 wiring + neutral renderer + CSS-var theme tokens. UI-library agnostic.",
+  "version": "0.41.1",
+  "description": "Bst-Table headless engine \u2014 TanStack Table v9 wiring + neutral renderer + CSS-var theme tokens. UI-library agnostic.",
   "keywords": [
     "react",
     "table",
@@ -43,7 +43,7 @@
     "*.css"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && tsc -p tsconfig.json",
     "dev": "tsc -p tsconfig.json --watch"
   },
   "peerDependencies": {

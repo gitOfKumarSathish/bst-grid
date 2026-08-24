@@ -1,0 +1,20 @@
+#!/bin/sh
+# Bst-Table pre-push gate.
+#
+# Blocks a push that would put a third-party grid product name (or a retired
+# AG-scheme roadmap ID) into the remote — in sources OR in the compiled output
+# we publish. See CLAUDE.md §13 "Neutral naming" and scripts/verify-naming.mjs.
+#
+# Installed automatically by `npm install` (root "prepare" script sets
+# core.hooksPath=.githooks). Bypass in a genuine emergency with --no-verify.
+
+if ! command -v node >/dev/null 2>&1; then
+  echo "pre-push: node not on PATH — skipping verify:naming (run 'npm run verify:naming' manually)" >&2
+  exit 0
+fi
+
+node "$(git rev-parse --show-toplevel)/scripts/verify-naming.mjs" || {
+  echo "" >&2
+  echo "pre-push BLOCKED — fix the references above, or push with --no-verify if you truly must." >&2
+  exit 1
+}

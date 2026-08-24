@@ -55,11 +55,11 @@ export const RULES: Record<string, FlagRule> = {
   },
   enableSetFilter: {
     requires: ['enableColumnFilters'],
-    note: 'Excel-style checklist of distinct values per column (AG4), rendered in the per-column filter row — so also turn on `enableColumnFilterRow`. Categorical columns (singleSelect / multiSelect / radio / boolean) are auto-eligible; force or skip per column via `meta.filter: "set" | "condition"`.',
+    note: 'Excel-style checklist of distinct values per column, rendered in the per-column filter row — so also turn on `enableColumnFilterRow`. Categorical columns (singleSelect / multiSelect / radio / boolean) are auto-eligible; force or skip per column via `meta.filter: "set" | "condition"`.',
   },
   enableMultiFilter: {
     requires: ['enableColumnFilters', 'enableColumnFilterRow'],
-    note: 'Multi-filter (AG11) — stack several filter types on ONE column. Opt a column in with an ARRAY `meta.filter`, e.g. `meta.filter: ["condition", "set"]`, which stacks those filters in its filter row; a row must satisfy all of them (AND). A `"set"` part also needs `enableSetFilter`. When off, an array `meta.filter` falls back to its first entry.',
+    note: 'Multi-filter — stack several filter types on ONE column. Opt a column in with an ARRAY `meta.filter`, e.g. `meta.filter: ["condition", "set"]`, which stacks those filters in its filter row; a row must satisfy all of them (AND). A `"set"` part also needs `enableSetFilter`. When off, an array `meta.filter` falls back to its first entry.',
   },
   fitColumns: {
     conflictsWith: [
@@ -77,10 +77,10 @@ export const RULES: Record<string, FlagRule> = {
     note: 'Caps the scroll box to a bounded height (default 440px; size it with `{ maxHeight }` or `{ maxRows }`) so the body scrolls under a pinned header + filter row, instead of the table growing taller with the page size. Row virtualization already does this, so the engine skips the standalone class when `enableVirtualization` is on — the two never stack.',
   },
   enableRowNumbers: {
-    note: 'Prepends a leading, non-interactive `#` column (AG9) numbering the current view — continuous across pages, reflecting sort + filter. It stays out of sorting, filtering, the columns menu, the filter row and export. Override the header via `rowNumberHeader`.',
+    note: 'Prepends a leading, non-interactive `#` column numbering the current view — continuous across pages, reflecting sort + filter. It stays out of sorting, filtering, the columns menu, the filter row and export. Override the header via `rowNumberHeader`.',
   },
   enableAutoColumns: {
-    note: 'Generates columns from the data (AG27) ONLY when `columns` is empty — one column per key found in a sample of rows, with a guessed cell type + humanized header. Ignored the moment `columns` is non-empty. Tune via `autoColumns` (sampleRows / include / exclude / header / inferType).',
+    note: 'Generates columns from the data ONLY when `columns` is empty — one column per key found in a sample of rows, with a guessed cell type + humanized header. Ignored the moment `columns` is non-empty. Tune via `autoColumns` (sampleRows / include / exclude / header / inferType).',
   },
 
   // ---- Rows ----
@@ -141,10 +141,10 @@ export const RULES: Record<string, FlagRule> = {
     note: 'Defaults to ON — set false to disable Shift+Space row copy while keeping the rest of the clipboard.',
   },
   enableContextMenu: {
-    note: 'Right-click a cell for a menu (AG6). Default items: Copy / Copy row / Copy column (with `enableClipboard`), Export CSV / Excel (with `enableExport`), Autosize column. Reshape or extend them via the `getContextMenuItems(ctx)` callback (spread `ctx.defaultItems`).',
+    note: 'Right-click a cell for a menu. Default items: Copy / Copy row / Copy column (with `enableClipboard`), Export CSV / Excel (with `enableExport`), Autosize column. Reshape or extend them via the `getContextMenuItems(ctx)` callback (spread `ctx.defaultItems`).',
   },
 
-  // ---- Export (AG1–AG3) ----
+  // ---- Export (X1–X3) ----
   enableExport: {
     note: 'Off by default. `true` enables CSV + Excel + Print; pass a `BstExportOptions` object to pick formats / file name / row scope. Drives `runtime.exportCsv` / `exportExcel` / `printTable`; adapters render an "Export" toolbar menu (`showExport`). Dependency-free — the `.xlsx` is a hand-built OOXML package, no exceljs.',
   },
@@ -168,10 +168,10 @@ export const RULES: Record<string, FlagRule> = {
     ],
   },
   enableAutoRowHeight: {
-    note: 'Body cells wrap and each row grows to fit its content (AG26) — browser-measured, no JS. Opt individual columns in/out with `meta.wrapText`. A manually-resized row (`enableRowResize`) keeps its set height and clips the wrapped content.',
+    note: 'Body cells wrap and each row grows to fit its content — browser-measured, no JS. Opt individual columns in/out with `meta.wrapText`. A manually-resized row (`enableRowResize`) keeps its set height and clips the wrapped content.',
   },
   enableOverlays: {
-    note: 'Loading / error overlays (AG23), on by default. Feed state via `loading` / `error` (or wire `useBstDataSource`, whose `tableProps` already carry both). Customize via `overlayText`, `renderLoadingOverlay`, `renderErrorOverlay`. Set false to manage those states yourself.',
+    note: 'Loading / error overlays, on by default. Feed state via `loading` / `error` (or wire `useBstDataSource`, whose `tableProps` already carry both). Customize via `overlayText`, `renderLoadingOverlay`, `renderErrorOverlay`. Set false to manage those states yourself.',
   },
 
   // ---- Performance (D1 — row/column virtualization) ----

@@ -62,20 +62,20 @@ export interface BstColumnMeta<TData extends RowData = any, TValue = any> {
   /** Options for option-based cells (singleSelect / multiSelect / radio). */
   options?: BstOption[]
   /**
-   * Per-column filter UI in the filter row (AG4 / AG11). With `enableSetFilter` on,
+   * Per-column filter UI in the filter row (X4 / X11). With `enableSetFilter` on,
    * `'set'` forces the **Set Filter** (a checklist of distinct values) for this
    * column, and `'condition'` opts back into the default operator input. When
    * unset, categorical columns (`singleSelect` / `multiSelect` / `radio` /
    * `boolean`) use the Set Filter and the rest use the condition input.
    *
-   * **Multi-filter (AG11):** an **array** (e.g. `['condition', 'set']`) **stacks**
+   * **Multi-filter (X11):** an **array** (e.g. `['condition', 'set']`) **stacks**
    * those filters in the row — a row must satisfy all of them (AND). Needs
    * `enableMultiFilter`; falls back to the first entry when it's off.
    */
   filter?: 'set' | 'condition' | Array<'set' | 'condition'>
   /**
    * Wrap this column's content onto multiple lines and let the row grow to fit it
-   * (AG26). Turns off the single-line truncation for this column only — the row
+   * (X26). Turns off the single-line truncation for this column only — the row
    * sizes to the tallest cell. Independent of the grid-wide `enableAutoRowHeight`.
    */
   wrapText?: boolean

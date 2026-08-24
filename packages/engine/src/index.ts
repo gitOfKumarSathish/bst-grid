@@ -103,7 +103,7 @@ export type {
   AutoColumnsOptions,
 } from './types.js'
 
-// ---- column helpers: auto-generate (AG27) + row-number (AG9) ----
+// ---- column helpers: auto-generate (X27) + row-number (X9) ----
 export {
   autoGenerateColumns,
   humanizeKey,
@@ -124,7 +124,7 @@ export type { BstCellSpan, BstSpanContext, SpanPlan, SpanRow, SpanCol } from './
 export { computeAutoWidth, measureTextWidth } from './autosize.js'
 export type { AutoSizeOptions } from './autosize.js'
 
-// Export (Phase 5, AG1–AG3) — dep-free CSV / Excel / print serializers + DOM glue.
+// Export (Phase 5, X1–X3) — dep-free CSV / Excel / print serializers + DOM glue.
 export {
   toCsv,
   toXlsx,
@@ -176,7 +176,7 @@ export type {
   BstSettingsOverrides,
 } from './settings.js'
 
-// ---- grid-state save/restore (AG21 — per-user view snapshots) ----
+// ---- grid-state save/restore (X21 — per-user view snapshots) ----
 export {
   useBstGridState,
   getGridState,

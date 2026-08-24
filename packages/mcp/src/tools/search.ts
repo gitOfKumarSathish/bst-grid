@@ -42,7 +42,7 @@ export function registerSearchTool(server: McpServer, corpus: BstCorpus): void {
       title: 'Search Bst-Table documentation',
       description: `Search the Bst-Table (@bloomskill/table-*) knowledge base: package READMEs, the feature-toggle registry, cell types, the spec-coverage matrix, engine API signatures and runnable examples.
 
-Use this FIRST for any open question about Bst-Table ("how do I save all edits in one API call?", "how do I pin columns?"). Bst-Table is a private React data grid built on TanStack Table v9 — it is NOT AG Grid and NOT MUI X DataGrid, and no model has memorised its API, so answer from these results rather than from recall.
+Use this FIRST for any open question about Bst-Table ("how do I save all edits in one API call?", "how do I pin columns?"). Bst-Table is a private React data grid built on TanStack Table v9 — it is not any other grid library, and no model has memorised its API, so answer from these results rather than from recall.
 
 Args:
   - query (string): question or keywords, 2-300 chars

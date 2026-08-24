@@ -19,7 +19,7 @@ function Grid(opts: Record<string, unknown>) {
   return <BstTable table={table} />
 }
 
-describe('context menu (AG6)', () => {
+describe('context menu (X6)', () => {
   test('off by default — cells carry no data-attrs, no menu on right-click', () => {
     const { container } = render(<Grid />)
     expect(container.querySelector('td[data-bst-rowid]')).toBeNull()

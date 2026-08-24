@@ -11,7 +11,7 @@ import type { BstCorpus } from './types.js'
 export function registerPrompts(server: McpServer, corpus: BstCorpus): void {
   const preamble =
     `Bst-Table (\`@bloomskill/table-*\`, v${corpus.version}) is a private React data grid built on TanStack Table v9. ` +
-    `It is NOT AG Grid and NOT MUI X DataGrid — do not use APIs from those libraries. ` +
+    `It is not any other grid library — do not use APIs from other grids. ` +
     `Every capability is a per-instance flag: \`enable*\` = engine behaviour, \`show*\` = adapter chrome, and chrome is a no-op without its behaviour flag.`
 
   server.registerPrompt(
@@ -124,9 +124,9 @@ export function registerPrompts(server: McpServer, corpus: BstCorpus): void {
     'bst-migrate',
     {
       title: 'Migrate a grid to Bst-Table',
-      description: 'Port an AG Grid or MUI X DataGrid table to Bst-Table.',
+      description: 'Port a table from another grid library to Bst-Table.',
       argsSchema: {
-        from: z.string().describe("The library being replaced, e.g. 'ag-grid', 'mui-x-datagrid'"),
+        from: z.string().describe('The grid library being replaced (package name or product name).'),
         code: z.string().optional().describe('The existing grid code'),
       },
     },
@@ -149,7 +149,7 @@ export function registerPrompts(server: McpServer, corpus: BstCorpus): void {
               '4. `bst_scaffold_grid` for the new component, then port the data and handlers.',
               '5. `bst_validate_config` on the result.',
               '',
-              'Report anything with no equivalent explicitly instead of silently dropping it. Note that master-detail, range selection and clipboard — paid features in AG Grid Enterprise — are all included here.',
+              'Report anything with no equivalent explicitly instead of silently dropping it. Note that master-detail, range selection and clipboard — commonly paid-tier features elsewhere — are all included here.',
             ].join('\n'),
           },
         },

@@ -585,7 +585,7 @@
   border-top: 1px solid var(--sc-border);
 }
 
-/* Grid-state view controls (AG21) — caption on its own line, buttons right-aligned
+/* Grid-state view controls (X21) — caption on its own line, buttons right-aligned
    below it, so the narrow sheet never squeezes "Save view" / "Reset view". */
 .sc-view-footer {
   flex-direction: column;
