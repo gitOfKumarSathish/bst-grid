@@ -12,23 +12,22 @@ truth) and phased per [`Plan.md`](../Plan.md) PART 3. Snapshot: **v0.41.1, 2026-
 **Effort:** **S** small · **M** medium · **L** large.
 **Status:** 🟡 partial (started) · ❌ pending (not started).
 
-**Snapshot tally (v0.41.1):** original spec 58 → ✅ 55 · 🟡 2 · ❌ 1 · extended X1–X29 → ✅ 12 ·
-🟡 3 · ❌ 8 · ⏭️ 1 skipped · ⚪ 5 optional. This backlog lists the **13 open items** (5 partial +
-8 pending); the ⚪ optional / ⏭️ skipped items are parked at the bottom and are **not** work-to-do.
+**Snapshot tally (v0.41.1):** original spec 58 → ✅ 55 · 🟡 2 · ❌ 1 · extended X1–X29 → ✅ 13 ·
+🟡 3 · ❌ 7 · ⏭️ 1 skipped · ⚪ 5 optional _(X8 Find shipped, unreleased)_. This backlog lists the
+**12 open items** (5 partial + 7 pending); the ⚪ optional / ⏭️ skipped items are parked at the
+bottom and are **not** work-to-do.
 
 ---
 
-## Phase 6 — Chrome & filtering  *(in progress — closest to done)*
+## Phase 6 — Chrome & filtering  _(in progress — closest to done)_
 
 Self-contained **M**-effort features that build on foundations already shipped. Finish this phase first.
 
-- [ ] **X8 · Find** — 🟡❌ pending — **M**
+- [x] **X8 · Find** — ✅ done (unreleased) — **M**
   Search box that **highlights matches and jumps between them** (Next/Prev), hiding nothing —
-  distinct from the global filter (which removes non-matches). Builds on existing render + global-filter infra.
-  _Done when:_ a `Find` control cycles matches with a visible highlight + "n of m", no rows removed.
-- [ ] **X12 · Fill handle** — ❌ pending — **M**
-  Drag a range corner to **fill / increment** across a selection. Builds on shipped `enableCellSelection`.
-  _Done when:_ dragging the handle fills the range (copy + linear series), gated behind a toggle.
+  distinct from the global filter (which removes non-matches). Shipped: `enableFind` (+ `BstFindOptions`),
+  adapters' `showFind`, ⌘/Ctrl+F · Enter/F3 · Esc, "n / m" counter, in-place `<mark>` + cell tint.
+  _Done:_ the Find control cycles matches with a visible highlight + "n of m", no rows removed.
 - [ ] **X10 · Managed row dragging** — ❌ pending — **M**
   Drag to **reorder rows**. Builds on the existing column drag-drop mechanism.
   _Done when:_ rows reorder via a drag handle, with an `onRowOrderChange`-style callback.
@@ -76,7 +75,7 @@ Heavier features; schedule after Phase 6 closes.
 
 ---
 
-## Phase 8 — Polish & parity tail  *(in progress)*
+## Phase 8 — Polish & parity tail  _(in progress)_
 
 - [ ] **X28 · Cell flashing on data change** — ❌ pending — **S**
   Briefly highlight changed cells (live-data feedback). Pairs with X22 live updates.
@@ -93,22 +92,24 @@ Heavier features; schedule after Phase 6 closes.
 ## Recommended pick-up order
 
 1. **X8 · Find** — high value, no dependency on unfinished work, cleanly scoped → best single next ask.
-2. **X12 · Fill handle** — leans directly on shipped range selection.
-3. **X10 · Managed row dragging** — closes out Phase 6.
-4. **I4 · Backend reconcile** → unblocks **X22 / I5** live updates.
-5. **X20 · a11y audit** — production-hardening, do before broad adoption.
-6. Then the Phase 7 analytics block (**X17 → X16 → X15**), with **A6** proven alongside **X16**.
-7. Phase 8 polish (**X28 → X25 → X29**) as the tail.
+2. **X10 · Managed row dragging** — closes out Phase 6.
+3. **I4 · Backend reconcile** → unblocks **X22 / I5** live updates.
+4. **X20 · a11y audit** — production-hardening, do before broad adoption.
+5. Then the Phase 7 analytics block (**X17 → X16 → X15**), with **A6** proven alongside **X16**.
+6. Phase 8 polish (**X28 → X25 → X29**) as the tail.
 
 ---
 
 ## Parked — not work-to-do
 
 **⏭️ Skipped**
+
 - **X7 · Tool-panel sidebar** — deliberately not built (2026-08-17); redundant with the toolbar's
   Columns menu (show/hide · pin · reorder · group) + Filters button. Prototyped and reverted.
 
 **⚪ Optional / out of scope** (rationale in [`COVERAGE.md`](../COVERAGE.md) "Optional — kept but out of scope")
+
+- **X12 · Fill handle** (drag corner to fill / increment) — range selection + clipboard copy/paste cover bulk-fill needs; no consuming app needs the drag gesture yet.
 - **X13 · Tree data** (self-referencing hierarchy) — master-detail + grouping cover current needs.
 - **X14 · Pivoting** — grouping + aggregation cover current reporting needs.
 - **X18 · Cell notes / comments** — annotation feature outside current scope.

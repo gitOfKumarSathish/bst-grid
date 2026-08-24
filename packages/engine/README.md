@@ -147,6 +147,7 @@ settings (e.g. `pagination={{ pageSize: 25 }}`). Follow a link for the full guid
 | --- | --- | --- |
 | [Sorting](#sorting) | `enableSorting` | `true` |
 | [Global search](#filtering) | `enableGlobalFilter` | `true` |
+| [Find (highlight + jump)](#find) | `enableFind` | `false` |
 | [Column filters](#filtering) | `enableColumnFilters` | `true` |
 | [Filter builder UI](#filtering) | `<BstFilterBuilder>` / `enableColumnFilterRow` | `false` |
 | [Pagination](#pagination) | `pagination` | `true` |
@@ -622,6 +623,7 @@ means *passing the object implies enabled*.
 | `enableClipboard` | `boolean` | `false` | Copy/paste. Implies `enableCellSelection`; paste needs `enableEditing`. |
 | `enableCopyColumn` / `enableCopyRow` | `boolean` | `true` | Sub-toggles of clipboard for whole-column / whole-row copy. |
 | `enableContextMenu` | `boolean` | `false` | [Right-click menu](#selection-keyboard-and-clipboard) (X6) — Copy / Export / Autosize defaults; customize via `getContextMenuItems`. |
+| `enableFind` | `boolean \| BstFindOptions` | `false` | [Find](#find) (X8) — search box that **highlights matches + jumps between them** (⌘/Ctrl+F · Enter/F3 cycle · Esc close), **without hiding rows**. Object form: `{ caseSensitive?, scope?: 'view' \| 'all' }`. |
 | `disabled` | `boolean` | `false` | Disable the whole grid (F1). |
 | `rowDisabled` | `(row) => boolean` | — | Disable interaction per row (F2). |
 | `cellDisabled` | `({ row, rowId, columnId }) => boolean` | — | Disable interaction per cell (F4). |
@@ -797,6 +799,28 @@ const table = useBstTable<Task>({
 > Selection lives in the interaction store (not `table.setState`) and is materialised at paint from the
 > active/anchor cell ids — moving the cursor re-renders only the cells whose state changed, never the
 > whole grid.
+
+## Find
+
+**Use it.** `enableFind` adds an in-grid **find bar** that **highlights every match and jumps between
+them** — the browser-`Ctrl+F` experience *inside* the grid. It is **distinct from global search**
+(`enableGlobalFilter`), which hides non-matching rows: Find **hides nothing**, so you keep the
+surrounding context while locating a value.
+
+- **Open** with **⌘/Ctrl+F** (or the adapters' toolbar **⌕ Find** button, `showFind`). **Cycle** with
+  **Enter / Shift+Enter** in the box or **F3 / Shift+F3**; **close** with **Esc**. A **"n / m"** counter
+  shows the current position.
+- **What matches** — the cell's *display* text (the same `formatValue` used by copy/export), so
+  "what you find" equals "what you copy". Plain-text cells get in-place `<mark>` highlights; every
+  matched cell (including non-text ones) gets a tint, and the current match is outlined and scrolled
+  into view.
+- **Configure** via the object form: `enableFind={{ caseSensitive: true, scope: 'all' }}` —
+  `scope: 'view'` (default) searches the current page/window, `'all'` searches every filtered row.
+- **Drive it programmatically** — `runtime.openFind()` / `closeFind()` / `setFindQuery(q)` /
+  `findNext()` / `findPrev()`.
+
+> Works independently of `enableCellSelection`. Match state lives in the interaction store and is
+> painted per-cell, so typing / stepping re-renders only the matched cells, never the whole grid.
 
 ## Export (CSV / Excel / print)
 

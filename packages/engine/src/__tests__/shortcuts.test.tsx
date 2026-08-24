@@ -19,6 +19,7 @@ const KNOWN_FLAGS = [
   'enableUndoRedo',
   'enableCopyColumn',
   'enableCopyRow',
+  'enableFind',
 ]
 
 const ALL_ON = Object.fromEntries(KNOWN_FLAGS.map((f) => [f, true]))
@@ -63,9 +64,9 @@ describe('resolveActiveShortcuts (pure)', () => {
     expect(labels).not.toContain('Paste') // Paste requires enableEditing
   })
 
-  test('everything on → all four groups populated', () => {
+  test('everything on → all five groups populated', () => {
     const groups = resolveActiveShortcuts(ALL_ON)
-    expect(groups.map((g) => g.category)).toEqual(['Navigate', 'Edit', 'Clipboard', 'History'])
+    expect(groups.map((g) => g.category)).toEqual(['Navigate', 'Find', 'Edit', 'Clipboard', 'History'])
     const paste = groups
       .find((g) => g.category === 'Clipboard')!
       .items.map((i) => i.label)
@@ -131,5 +132,20 @@ describe('BstShortcuts overlay', () => {
     render(<Harness />)
     fireEvent.click(screen.getByRole('button', { name: 'Keyboard shortcuts' }))
     expect(screen.getByText(/No keyboard shortcuts are active/i)).toBeInTheDocument()
+  })
+
+  // Regression guard: the overlay must pass `enableFind` through to the resolver
+  // (the flags object is derived from the registry, so a new group can't be
+  // dropped). The pure-resolver tests alone did not catch the overlay omission.
+  test('Find (X8) group appears iff enableFind is on', () => {
+    const { unmount } = render(<Harness enableFind />)
+    fireEvent.click(screen.getByRole('button', { name: 'Keyboard shortcuts' }))
+    expect(screen.getByText('Open find')).toBeInTheDocument()
+    expect(screen.getByText('Close find')).toBeInTheDocument()
+    unmount()
+
+    render(<Harness enableCellSelection />)
+    fireEvent.click(screen.getByRole('button', { name: 'Keyboard shortcuts' }))
+    expect(screen.queryByText('Open find')).toBeNull()
   })
 })

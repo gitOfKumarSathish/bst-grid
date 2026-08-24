@@ -174,6 +174,12 @@ npm run release
   (demo + README + CHANGELOG + §12 registry + version) is in `CLAUDE.md` §13; the running log is
   [`CHANGELOG.md`](CHANGELOG.md).
 
+> **Docs-in-sync rule (AI-assisted work).** "Commit and push" is a trigger to **sync the docs in the
+> same commit** — never commit code alone. Before committing any change, update the pieces it touches:
+> `COVERAGE.md` (status), `docs/backlog.md`, the affected package README(s) (Features + Props),
+> `CHANGELOG.md`, the `CLAUDE.md` §12 registry, and the roadmap docs where relevant — then run the
+> gates. The authoritative version of this rule lives in [`CLAUDE.md` §13](CLAUDE.md).
+
 ## Portability
 
 `npm run verify:portability` packs the engine + adapter tarballs, installs them into a throwaway

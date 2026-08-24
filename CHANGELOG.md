@@ -10,6 +10,35 @@ this project uses [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+### Added — Find (X8): highlight + jump between matches, without hiding rows
+- **`enableFind`** (engine) adds an in-grid **find bar** that **highlights every match and jumps
+  between them** (Next / Prev with an "n / m" counter) — the browser-`Ctrl+F` experience *inside*
+  the grid. It is **distinct from global search** (`enableGlobalFilter`): Find **hides nothing**, so
+  the surrounding rows stay visible while you locate a value. Off by default.
+- **Keyboard** — ⌘/Ctrl+F opens (independent of `enableCellSelection`); **Enter / Shift+Enter** cycle
+  in the box, **F3 / Shift+F3** cycle from the grid, **Esc** closes. A new **Find** shortcut group is
+  listed in the `showShortcuts` overlay.
+- **Matching + highlight** — matches are computed over each cell's *display* text (the same
+  `formatValue` ∘ `draftAwareValue` used by copy / export, so "what you find" == "what you copy").
+  **Every matched cell gets the same whole-cell tint** (`bst-find-hit`) so text and rich cells
+  (chips / selects / links) read consistently; **plain-text cells additionally** get in-place
+  `<mark>`s on the matched letters, and the **current** match is stronger + outlined
+  (`bst-find-current`) and scrolled into view (virtualized `scrollToIndex` + `scrollIntoView`). Match
+  state lives in the interaction store and is painted per-cell via the `CellSlice`, so typing /
+  stepping re-renders **only** the matched cells.
+- **Shortcuts overlay** — the `showShortcuts` overlay now derives its active-flag set **from the
+  shortcut registry itself** (reads each shortcut's `requires` off the handle), so the new **Find**
+  group shows correctly and no future group can be silently dropped from a hand-kept list.
+- **Config + API** — object form `enableFind={{ caseSensitive?, scope?: 'view' | 'all' }}`
+  (`'view'` = current page/window, `'all'` = every filtered row). Programmatic:
+  `runtime.openFind()` / `closeFind()` / `setFindQuery(q)` / `refreshFind()` / `findNext()` /
+  `findPrev()`. New type `BstFindOptions`.
+- **Adapters** — both **MUI** and **shadcn** add a toolbar **Find** button (`showFind`, follows
+  `enableFind`). In the settings sheet under **Data operations** (always shown). Registered in the MCP
+  rules corpus (`enableFind` / `showFind`).
+- Tested in `find.test.tsx` (matches without removing rows · cycle + wrap · numeric cells ·
+  case-sensitivity · close clears). No API break — purely additive.
+
 ## [0.41.1] — 2026-08-24
 ### Changed — neutral naming (docs, comments and shipped strings)
 - Bst-Table now describes its **own** capabilities in its **own** words. Every reference to a

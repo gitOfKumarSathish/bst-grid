@@ -283,6 +283,15 @@ export interface BstTableEngineToggles {
    */
   enableContextMenu?: boolean
   /**
+   * Find (X8) — an in-grid search box that **highlights matches and jumps between
+   * them** (Next / Prev) WITHOUT hiding rows — distinct from the global search
+   * (`enableGlobalFilter`), which removes non-matching rows. Open with ⌘/Ctrl+F,
+   * cycle with Enter / F3 (Shift for previous), close with Esc. Pass an object
+   * (`{ caseSensitive?, scope? }`) to configure; an object implies enabled (§12).
+   * Default: false.
+   */
+  enableFind?: boolean | BstFindOptions
+  /**
    * Row-number column (X9) — a leading, non-interactive `#` column showing each
    * row's 1-based position in the **current view** (continuous across pages;
    * reflects sort + filter). It never sorts, filters, hides, resizes, reorders or
@@ -309,6 +318,18 @@ export interface BstTableEngineToggles {
    * `renderLoadingOverlay`, `renderErrorOverlay`. Default: true.
    */
   enableOverlays?: boolean
+}
+
+/** Configuration for Find (X8) — the object form of `enableFind`. */
+export interface BstFindOptions {
+  /** Match case. Default: false (case-insensitive). */
+  caseSensitive?: boolean
+  /**
+   * Which rows Find searches: `'view'` = the rows currently in the view (the
+   * active page / virtual window), `'all'` = every row across all pages
+   * (pre-pagination). Default: `'view'`.
+   */
+  scope?: 'view' | 'all'
 }
 
 /** One entry in the right-click context menu (X6). */

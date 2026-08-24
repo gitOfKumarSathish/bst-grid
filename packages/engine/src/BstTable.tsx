@@ -7,8 +7,8 @@ import { combineFilterConditions } from './filtering.js'
 import type { FilterCondition, FilterConditionGroup } from './filtering.js'
 import { getBstRuntime } from './useBstTable.js'
 import type { BstRuntimeHandle } from './useBstTable.js'
-import { cellKey } from './interaction/store.js'
-import type { InteractionState } from './interaction/store.js'
+import { cellKey, splitCellKey } from './interaction/store.js'
+import type { InteractionState, FindRange } from './interaction/store.js'
 import { useStoreSelector } from './interaction/useStoreSelector.js'
 import type { BstRuntime } from './runtime.js'
 import type { BstColumnMeta, CellType } from './registry/types.js'
@@ -124,7 +124,7 @@ export function BstTable({
   // <table> so keyboard users can Tab in and Arrow to the first cell.
   const hasActive = useStoreSelector(runtime.store, (s) => s.activeCell != null)
   // The table takes keyboard focus for cell nav OR undo/redo shortcuts.
-  const focusable = handle.enableCellSelection || handle.enableUndoRedo
+  const focusable = handle.enableCellSelection || handle.enableUndoRedo || handle.enableFind
 
   // Fit-to-viewport (G3) — a pure render overlay. When `fitColumns` is on we
   // measure the scroll box and hand each data column a width so the table fills
@@ -273,6 +273,29 @@ export function BstTable({
         e.preventDefault()
         runtime.redo()
         return
+      }
+    }
+    // Find (X8) — independent of cell selection. ⌘/Ctrl+F opens; while open, F3 /
+    // Shift+F3 cycle and Esc closes. (Enter / Shift+Enter / Esc typed INTO the
+    // find input are handled on the input itself — those never reach here.)
+    if (handle.enableFind && !st.editingCell) {
+      if (mod && (e.key === 'f' || e.key === 'F')) {
+        e.preventDefault()
+        runtime.openFind()
+        return
+      }
+      if (st.find.open) {
+        if (e.key === 'F3') {
+          e.preventDefault()
+          if (shift) runtime.findPrev()
+          else runtime.findNext()
+          return
+        }
+        if (e.key === 'Escape') {
+          e.preventDefault()
+          runtime.closeFind()
+          return
+        }
       }
     }
     if (!handle.enableCellSelection) return
@@ -597,6 +620,39 @@ export function BstTable({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rowVirtActive, activeRowId])
 
+  // Find (X8): scroll the current match's row into the virtual window (the cell
+  // itself does a `scrollIntoView` once painted — see GridCell). Independent of
+  // cell selection.
+  const findCurrentRowId = useStoreSelector(runtime.store, (s) =>
+    s.find.currentKey ? splitCellKey(s.find.currentKey).rowId : null,
+  )
+  React.useEffect(() => {
+    if (!rowVirtActive || !findCurrentRowId) return
+    const idx = bodyRows.findIndex((r) => (r.id as string) === findCurrentRowId)
+    if (idx >= 0) rowVirtualizer.scrollToIndex(idx, { align: 'auto' })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rowVirtActive, findCurrentRowId])
+
+  // Find (X8): recompute matches when the view changes under an open find (sort /
+  // filter / page / row-count / data), so the highlights + "n of m" stay correct.
+  // Deps are stable v9 state slices + a row count, so this never loops per render.
+  const findActive = useStoreSelector(
+    runtime.store,
+    (s) => s.find.open && !!s.find.query,
+  )
+  React.useEffect(() => {
+    if (findActive) runtime.refreshFind()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    findActive,
+    bodyRows.length,
+    tState.sorting,
+    tState.columnFilters,
+    tState.globalFilter,
+    tState.pagination,
+    tState.grouping,
+  ])
+
   // Right-click context menu (X6) — event-delegated on the scroll box: find the
   // clicked cell via its data-attrs, assemble the default items from what's
   // enabled, let `getContextMenuItems` reshape them, then open a dep-free popup at
@@ -691,6 +747,7 @@ export function BstTable({
   return (
     <BstIconsContext.Provider value={I}>
     <div className="bst-table-viewport" style={{ position: 'relative' }}>
+    {handle.enableFind ? <BstFindBar handle={handle} /> : null}
     <div
       ref={scrollRef}
       className={cx(
@@ -1478,6 +1535,115 @@ function GroupRow({ row, handle }: { row: any; handle: BstRuntimeHandle<any> }) 
   )
 }
 
+/** Cell types whose read view is plain `formatValue` text, so Find can wrap the
+ *  matched substrings in `<mark>` in place. Other (non-text / custom) matched
+ *  cells still get the cell-level `bst-find-hit` tint. */
+const FIND_HIGHLIGHTABLE = new Set<string | undefined>([undefined, 'text', 'number'])
+
+/** Render `text` with the given `[start,end)` spans wrapped in `<mark>` (X8). */
+function renderFindHighlight(
+  text: string,
+  ranges: FindRange[],
+  current: boolean,
+): React.ReactNode {
+  if (!ranges.length || !text) return text
+  const out: React.ReactNode[] = []
+  let last = 0
+  ranges.forEach(([s, e], i) => {
+    if (s > last) out.push(text.slice(last, s))
+    out.push(
+      <mark key={i} className={cx('bst-find-mark', current && 'bst-find-mark-current')}>
+        {text.slice(s, e)}
+      </mark>,
+    )
+    last = e
+  })
+  if (last < text.length) out.push(text.slice(last))
+  return out
+}
+
+/** The Find (X8) bar — input + prev / next + "n of m" + close, mounted in the
+ *  grid viewport while `find.open`. Enter / Shift+Enter cycle, Esc closes;
+ *  opening (⌘/Ctrl+F), F3 and grid-level Esc live in the grid's onKeyDown. */
+function BstFindBar({ handle }: { handle: BstRuntimeHandle<any> }) {
+  const { runtime } = handle
+  const inputRef = React.useRef<HTMLInputElement>(null)
+  const find = useStoreSelector(
+    runtime.store,
+    (s) => s.find,
+    (a, b) =>
+      a.open === b.open &&
+      a.query === b.query &&
+      a.matches.length === b.matches.length &&
+      a.current === b.current,
+  )
+  React.useEffect(() => {
+    if (find.open) inputRef.current?.focus()
+  }, [find.open])
+  if (!find.open) return null
+  const total = find.matches.length
+  const pos = total ? find.current + 1 : 0
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      if (e.shiftKey) runtime.findPrev()
+      else runtime.findNext()
+    } else if (e.key === 'Escape') {
+      e.preventDefault()
+      runtime.closeFind()
+    }
+  }
+  return (
+    <div className="bst-find-bar" role="search">
+      <input
+        ref={inputRef}
+        className="bst-find-input"
+        type="text"
+        placeholder="Find…"
+        aria-label="Find in table"
+        value={find.query}
+        onChange={(e) => runtime.setFindQuery(e.target.value)}
+        onKeyDown={onKeyDown}
+      />
+      <span className="bst-find-count" aria-live="polite">
+        {find.query ? `${pos} / ${total}` : ''}
+      </span>
+      <button
+        type="button"
+        className="bst-find-btn"
+        aria-label="Previous match"
+        disabled={!total}
+        onClick={() => runtime.findPrev()}
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 15l6-6 6 6" />
+        </svg>
+      </button>
+      <button
+        type="button"
+        className="bst-find-btn"
+        aria-label="Next match"
+        disabled={!total}
+        onClick={() => runtime.findNext()}
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
+        </svg>
+      </button>
+      <button
+        type="button"
+        className="bst-find-btn"
+        aria-label="Close find"
+        onClick={() => runtime.closeFind()}
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" d="M6 6l12 12M18 6L6 18" />
+        </svg>
+      </button>
+    </div>
+  )
+}
+
 interface CellSlice {
   isEditing: boolean
   hasDraft: boolean
@@ -1490,6 +1656,11 @@ interface CellSlice {
   /** Runtime per-column edit override — so a cell re-renders when its column is
    *  locked/unlocked in the Columns menu (undefined = use meta.editable). */
   editOverride: boolean | undefined
+  /** Find (X8) match spans within this cell's display text, or null (not a match).
+   *  A fresh identity per recompute; unchanged between steps → cheap ref compare. */
+  findRanges: FindRange[] | null
+  /** This cell is the current (focused) find match. */
+  isCurrentFind: boolean
 }
 
 function sliceEqual(a: CellSlice, b: CellSlice): boolean {
@@ -1502,7 +1673,9 @@ function sliceEqual(a: CellSlice, b: CellSlice): boolean {
     a.pending === b.pending &&
     a.isActive === b.isActive &&
     a.isSelected === b.isSelected &&
-    a.editOverride === b.editOverride
+    a.editOverride === b.editOverride &&
+    a.findRanges === b.findRanges &&
+    a.isCurrentFind === b.isCurrentFind
   )
 }
 
@@ -1571,6 +1744,8 @@ const GridCell = React.memo(function GridCell({
         isActive,
         isSelected,
         editOverride: s.columnEdit[columnId],
+        findRanges: s.find.matchRanges.get(key) ?? null,
+        isCurrentFind: s.find.currentKey === key,
       }
     },
     [rowId, columnId, key, runtime],
@@ -1589,6 +1764,16 @@ const GridCell = React.memo(function GridCell({
       }
     }
   }, [handle.enableCellSelection, slice.isActive, slice.isEditing, slice.inRowSession])
+
+  // Find (X8): bring the current match into view. Uses `scrollIntoView` (NOT
+  // `.focus()`) so it works without cell selection and never steals focus from
+  // the find input.
+  React.useEffect(() => {
+    if (slice.isCurrentFind) {
+      // Optional-chain the method too — jsdom (tests) has no `scrollIntoView`.
+      tdRef.current?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' })
+    }
+  }, [slice.isCurrentFind])
 
   const row = cell.row.original
   const meta = runtime.metaOf(columnId)
@@ -1658,7 +1843,9 @@ const GridCell = React.memo(function GridCell({
     (extraClass ? ' ' + extraClass : '') +
     (rowFmtClass ? ' ' + rowFmtClass : '') +
     (meta.wrapText ? ' bst-wrap' : '') +
-    (cellFmt?.className ? ' ' + cellFmt.className : '')
+    (cellFmt?.className ? ' ' + cellFmt.className : '') +
+    (slice.findRanges ? ' bst-find-hit' : '') +
+    (slice.isCurrentFind ? ' bst-find-current' : '')
 
   // Precedence: active editor → user-authored `cell` → cell-type registry read
   // renderer. (v9 always sets a *default* `cell`, so we can't just null-check it.)
@@ -1671,6 +1858,14 @@ const GridCell = React.memo(function GridCell({
     />
   ) : handle.userCellColumns.has(columnId) ? (
     flexRender(cell.column.columnDef.cell, cell.getContext())
+  ) : slice.findRanges && FIND_HIGHLIGHTABLE.has(meta.type as string | undefined) ? (
+    // Find (X8): for plain-text cells, paint the matched substrings in place. The
+    // spans were computed against this same `formatValue` text, so they line up.
+    renderFindHighlight(
+      runtime.formatValue(columnId, runtime.draftAwareValue(rowId, columnId)),
+      slice.findRanges,
+      slice.isCurrentFind,
+    )
   ) : (
     cellType.renderRead(renderProps)
   )

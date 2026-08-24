@@ -7,6 +7,7 @@ import {
 } from './interaction/store.js'
 import type {
   CellRef,
+  FindRange,
   InteractionState,
   InteractionStore,
 } from './interaction/store.js'
@@ -157,6 +158,13 @@ export interface RuntimeCtx<TData extends RowData> {
   /** Row-copy (H2) enabled. `false` disables `selectRow`/`copyRow`. Default: true. */
   enableCopyRow?: boolean
   enableUndoRedo: boolean
+  // ---- find (X8) ----
+  /** Find is enabled (search box + highlight + jump). */
+  enableFind?: boolean
+  /** Find matches case-sensitively. Default: false. */
+  findCaseSensitive?: boolean
+  /** Find scope — `'view'` (current page / window) or `'all'` (all filtered rows). Default: `'view'`. */
+  findScope?: 'view' | 'all'
   // ---- export (Phase 5, X1–X3) ----
   /** Export capability on. `false` makes every `export*` method a no-op. */
   enableExport?: boolean
@@ -200,6 +208,21 @@ export interface BstRuntime<TData extends RowData> {
   store: InteractionStore
   updateCtx: (ctx: RuntimeCtx<TData>) => void
   reset: () => void
+
+  // ---- find (X8) ----
+  /** Open the find bar (highlights matches; never hides rows). */
+  openFind: () => void
+  /** Close the find bar and clear all match highlights. */
+  closeFind: () => void
+  /** Set the query and recompute matches (the cursor resets to the first match). */
+  setFindQuery: (query: string) => void
+  /** Recompute matches for the current query after a view / data change, keeping
+   *  the cursor on the same cell when it survives (else clamping to the first). */
+  refreshFind: () => void
+  /** Advance the cursor to the next match (wraps). */
+  findNext: () => void
+  /** Move the cursor to the previous match (wraps). */
+  findPrev: () => void
 
   // ---- editing ----
   /** Resolved save triggers (`enter`/`blur`/`explicit`). The inline editor
@@ -1173,6 +1196,112 @@ export function createRuntime<TData extends RowData>(
     return ctx.visibleColumnIds.map((cid) => cellClipboardText(rowId, cid)).join('\t')
   }
 
+  /* ------------------------------------------------------------------ find */
+
+  // Find (X8) — an in-grid search that HIGHLIGHTS matches and jumps between them
+  // WITHOUT hiding rows (distinct from the v9 globalFilter). Matches are computed
+  // over the visible cell *display* text (`cellClipboardText`, so "what you find"
+  // == "what you copy / export"), held in the interaction store, and painted
+  // per-cell via the CellSlice — so only matched cells repaint on a query / step.
+
+  /** All `[start, end)` spans of `needle` within `hay` (both pre-case-folded). */
+  const findSpans = (hay: string, needle: string): FindRange[] => {
+    if (!needle) return []
+    const spans: FindRange[] = []
+    let from = 0
+    for (;;) {
+      const i = hay.indexOf(needle, from)
+      if (i < 0) break
+      spans.push([i, i + needle.length])
+      from = i + needle.length
+    }
+    return spans
+  }
+
+  const computeFindMatches = (
+    query: string,
+  ): { matches: CellRef[]; matchRanges: Map<string, FindRange[]> } => {
+    const matches: CellRef[] = []
+    const matchRanges = new Map<string, FindRange[]>()
+    if (!query) return { matches, matchRanges }
+    const cs = !!ctx.findCaseSensitive
+    const needle = cs ? query : query.toLowerCase()
+    const rowIds =
+      ctx.findScope === 'all' && ctx.allRowIds.length ? ctx.allRowIds : ctx.visibleRowIds
+    for (const rowId of rowIds) {
+      for (const columnId of ctx.visibleColumnIds) {
+        const text = cellClipboardText(rowId, columnId)
+        if (!text) continue
+        const spans = findSpans(cs ? text : text.toLowerCase(), needle)
+        if (spans.length) {
+          matches.push({ rowId, columnId })
+          matchRanges.set(cellKey(rowId, columnId), spans)
+        }
+      }
+    }
+    return { matches, matchRanges }
+  }
+
+  const setFindQuery = (query: string) => {
+    const { matches, matchRanges } = computeFindMatches(query)
+    set((s) => ({
+      ...s,
+      find: {
+        open: true,
+        query,
+        matches,
+        matchRanges,
+        current: matches.length ? 0 : -1,
+        currentKey: matches.length ? cellKey(matches[0].rowId, matches[0].columnId) : null,
+      },
+    }))
+  }
+
+  const refreshFind = () => {
+    const { query, currentKey } = store.getState().find
+    if (!query) return
+    const { matches, matchRanges } = computeFindMatches(query)
+    let current = matches.findIndex((m) => cellKey(m.rowId, m.columnId) === currentKey)
+    if (current < 0) current = matches.length ? 0 : -1
+    set((s) => ({
+      ...s,
+      find: {
+        ...s.find,
+        matches,
+        matchRanges,
+        current,
+        currentKey:
+          current >= 0 ? cellKey(matches[current].rowId, matches[current].columnId) : null,
+      },
+    }))
+  }
+
+  const openFind = () => set((s) => ({ ...s, find: { ...s.find, open: true } }))
+
+  const closeFind = () =>
+    set((s) => ({
+      ...s,
+      find: {
+        open: false,
+        query: '',
+        matches: [],
+        matchRanges: new Map(),
+        currentKey: null,
+        current: -1,
+      },
+    }))
+
+  const stepFind = (delta: number) =>
+    set((s) => {
+      const n = s.find.matches.length
+      if (!n) return s
+      const current = s.find.current < 0 ? 0 : (s.find.current + delta + n) % n
+      const m = s.find.matches[current]
+      return { ...s, find: { ...s.find, current, currentKey: cellKey(m.rowId, m.columnId) } }
+    })
+  const findNext = () => stepFind(1)
+  const findPrev = () => stepFind(-1)
+
   const getSelectionClipboardText = (): string | null => {
     // A whole-column / whole-row selection copies EVERYTHING (all pages), not
     // just the on-screen rectangle. Falls through to the range otherwise.
@@ -1428,6 +1557,12 @@ export function createRuntime<TData extends RowData>(
       ctx = next
     },
     reset: () => store.setState(initialInteractionState),
+    openFind,
+    closeFind,
+    setFindQuery,
+    refreshFind,
+    findNext,
+    findPrev,
     startEditing,
     cancelEditing,
     setDraft,

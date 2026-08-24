@@ -96,6 +96,7 @@ const SETTINGS_META: Record<BstSettingKey, SettingMeta> = {
   // Data operations (default-on — the user may switch these off)
   enableSorting: { group: 'Data operations', default: true, alwaysShow: true, label: 'Sorting' },
   enableGlobalFilter: { group: 'Data operations', default: true, alwaysShow: true, label: 'Global search', hint: 'The toolbar search box' },
+  enableFind: { group: 'Data operations', default: false, alwaysShow: true, label: 'Find', hint: 'Highlight + jump between matches — does not hide rows (X8)' },
   enableColumnFilters: { group: 'Data operations', default: true, alwaysShow: true, label: 'Column filters' },
   enableSetFilter: { group: 'Data operations', default: false, alwaysShow: true, label: 'Set filter', hint: 'Checklist of distinct values per column · needs the per-column filter row', requires: ['enableColumnFilterRow'] },
   enableMultiFilter: { group: 'Data operations', default: false, alwaysShow: true, label: 'Multi-filter', hint: 'Stack several filter types on one column via array meta.filter · needs the per-column filter row', requires: ['enableColumnFilterRow'] },

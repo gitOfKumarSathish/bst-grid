@@ -757,6 +757,7 @@ export default function App() {
     enableAutoRowHeight: true, // X26: rows grow to fit wrapped content (browser-measured)
     enableStickyHeader: { maxRows: 12 }, // G3/G4: cap the body → sticky header + body scroll (try a bigger page size / "All")
     enableContextMenu: true, // X6: right-click a cell → Copy / Export / Autosize (+ getContextMenuItems)
+    enableFind: true, // X8: ⌘/Ctrl+F (or the toolbar ⌕) → highlight + jump between matches (no rows hidden)
     enableRowNumbers: true, // X9: leading # column numbering the current view
     enableExpanding: true, // master-detail (A4): click ▸ for a detail panel
     renderDetail: (r: Person) => (

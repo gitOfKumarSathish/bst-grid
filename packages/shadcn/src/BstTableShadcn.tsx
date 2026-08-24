@@ -96,6 +96,12 @@ export interface BstTableShadcnProps<TData extends RowData> extends UseBstTableO
    */
   showExport?: boolean
   /**
+   * Find button (X8) in the toolbar — opens the in-grid find bar (highlight +
+   * jump between matches; ⌘/Ctrl+F also opens it). Requires `enableFind`.
+   * Default: follows `enableFind`.
+   */
+  showFind?: boolean
+  /**
    * Status bar footer (X5) — total / filtered row count, and, when a cell range
    * is selected, the sum / avg / min / max / count of its numeric cells. Default:
    * false.
@@ -251,6 +257,7 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
     showUndoRedo,
     showDensityToggle,
     showExport,
+    showFind,
     showStatusBar,
     showFilterBuilder,
     showFormatBuilder,
@@ -445,6 +452,7 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
   const exportEnabled =
     handle.enableExport && (exportFmts.csv || exportFmts.excel || exportFmts.print)
   const exportOn = (showExport ?? exportEnabled) && exportEnabled
+  const findOn = (showFind ?? handle.enableFind) && handle.enableFind
   const filterBuilderOn = !!showFilterBuilder && (rest.enableColumnFilters ?? true)
   const formatBuilderOn = !!showFormatBuilder && rest.enableConditionalFormatting !== false
   const [formatsOpen, setFormatsOpen] = React.useState(false)
@@ -494,6 +502,7 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
     showToolbar &&
     (Boolean(title) ||
       searchOn ||
+      findOn ||
       colsMenuOn ||
       addRowOn ||
       saveBarOn ||
@@ -598,6 +607,33 @@ export function BstTableShadcn<TData extends RowData>(props: BstTableShadcnProps
               <button className="sc-btn" onClick={() => setFiltersOpen((o) => !o)}>
                 <I.filter size={16} />
                 Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
+              </button>
+            </span>
+          )}
+          {findOn && (
+            <span data-tb="find" style={{ display: 'inline-flex' }}>
+              <button
+                className="sc-btn"
+                onClick={() => runtime.openFind()}
+                aria-label="Find"
+                title="Find (Ctrl/⌘+F)"
+              >
+                {/* Inline find glyph (magnifier), so no icon-slot churn. */}
+                <svg
+                  width={16}
+                  height={16}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="M21 21l-4.3-4.3" />
+                </svg>
               </button>
             </span>
           )}

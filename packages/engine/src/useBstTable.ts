@@ -87,6 +87,10 @@ export interface BstRuntimeHandle<TData extends RowData> {
   enableContextMenu: boolean
   /** Builds the context-menu items for the clicked cell (given the defaults). */
   getContextMenuItems?: (ctx: BstContextMenuContext<TData>) => BstContextMenuItem[]
+  /** Find (X8) — the in-grid search box (highlight + jump) is active. */
+  enableFind: boolean
+  /** Find matches case-sensitively (X8). */
+  findCaseSensitive: boolean
   /** Multi-column grouping (E4) — collapsible group rows + aggregates. */
   enableGrouping: boolean
   /** Conditional-format rules (K3) applied to cells/rows at render. */
@@ -241,6 +245,9 @@ function buildCtx<TData extends RowData>(
     opts.enableExcelExport,
     opts.enablePrint,
   )
+  // Find (X8) — `enableFind` is `boolean | BstFindOptions` (an object implies on).
+  const findOpts =
+    typeof opts.enableFind === 'object' && opts.enableFind !== null ? opts.enableFind : undefined
 
   // Visual (paint-order) maps — the coordinate space selection + keyboard nav
   // operate in. Row order is post sort/filter/pagination; column order is the
@@ -299,6 +306,9 @@ function buildCtx<TData extends RowData>(
     enableCopyColumn: opts.enableCopyColumn,
     enableCopyRow: opts.enableCopyRow,
     enableUndoRedo: !!opts.enableUndoRedo,
+    enableFind: !!opts.enableFind,
+    findCaseSensitive: !!findOpts?.caseSensitive,
+    findScope: findOpts?.scope ?? 'view',
     enableExport: exp.enabled,
     enableCsvExport: exp.csv,
     enableExcelExport: exp.excel,
@@ -486,6 +496,8 @@ export function useBstTable<TData extends RowData>(opts: UseBstTableOptions<TDat
     enableAutoRowHeight: !!opts.enableAutoRowHeight,
     enableContextMenu: !!opts.enableContextMenu,
     getContextMenuItems: opts.getContextMenuItems,
+    enableFind: !!ctx.enableFind,
+    findCaseSensitive: !!ctx.findCaseSensitive,
     enableGrouping: !!opts.enableGrouping,
     conditionalFormats:
       opts.enableConditionalFormatting !== false ? opts.conditionalFormats : undefined,

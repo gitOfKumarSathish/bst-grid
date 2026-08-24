@@ -5,7 +5,7 @@
 // as the settings sheet). Mirrors the real key handling in `BstTable.tsx`'s
 // `onKeyDown` — keep the two in sync (guarded by `shortcuts.test.tsx`).
 
-export type ShortcutCategory = 'Navigate' | 'Edit' | 'Clipboard' | 'History'
+export type ShortcutCategory = 'Navigate' | 'Find' | 'Edit' | 'Clipboard' | 'History'
 
 export interface BstShortcut {
   /** Key tokens for one chord. `'Mod'` → ⌘ on Mac / Ctrl elsewhere; `'Shift'` →
@@ -34,6 +34,13 @@ export const BST_SHORTCUTS_REGISTRY: readonly BstShortcut[] = [
   { keys: ['Mod', 'Home'], label: 'Grid start', category: 'Navigate', requires: ['enableCellSelection'] },
   { keys: ['Mod', 'End'], label: 'Grid end', category: 'Navigate', requires: ['enableCellSelection'] },
   { keys: ['Mod', 'A'], label: 'Select all', category: 'Navigate', requires: ['enableCellSelection'] },
+  // Find (X8) — highlight + jump between matches (never hides rows)
+  { keys: ['Mod', 'F'], label: 'Open find', category: 'Find', requires: ['enableFind'] },
+  { keys: ['Enter'], label: 'Next match (in find box)', category: 'Find', requires: ['enableFind'] },
+  { keys: ['Shift', 'Enter'], label: 'Previous match (in find box)', category: 'Find', requires: ['enableFind'] },
+  { keys: ['F3'], label: 'Next match', category: 'Find', requires: ['enableFind'] },
+  { keys: ['Shift', 'F3'], label: 'Previous match', category: 'Find', requires: ['enableFind'] },
+  { keys: ['Esc'], label: 'Close find', category: 'Find', requires: ['enableFind'] },
   // Edit
   { keys: ['Enter'], label: 'Edit cell (or move down)', category: 'Edit', requires: ['enableCellSelection', 'enableEditing'] },
   { keys: ['F2'], label: 'Edit cell in place', category: 'Edit', requires: ['enableEditing'] },
@@ -73,7 +80,7 @@ export interface ResolvedShortcutGroup {
   items: ResolvedShortcut[]
 }
 
-const CATEGORY_ORDER: ShortcutCategory[] = ['Navigate', 'Edit', 'Clipboard', 'History']
+const CATEGORY_ORDER: ShortcutCategory[] = ['Navigate', 'Find', 'Edit', 'Clipboard', 'History']
 
 /**
  * Filter the registry to the shortcuts whose required flags are **all** active,

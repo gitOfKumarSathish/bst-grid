@@ -4,6 +4,7 @@ import { getBstRuntime } from './useBstTable.js'
 import {
   resolveActiveShortcuts,
   formatShortcutToken,
+  BST_SHORTCUTS_REGISTRY,
   type ResolvedShortcutGroup,
 } from './shortcuts.js'
 
@@ -52,13 +53,12 @@ export function BstShortcuts<TData extends RowData>({
   )
 
   const handle = getBstRuntime<TData>(table) as unknown as Record<string, boolean>
-  const flags: Record<string, boolean> = {
-    enableCellSelection: !!handle.enableCellSelection,
-    enableClipboard: !!handle.enableClipboard,
-    enableUndoRedo: !!handle.enableUndoRedo,
-    enableEditing: !!handle.enableEditing,
-    enableCopyColumn: !!handle.enableCopyColumn,
-    enableCopyRow: !!handle.enableCopyRow,
+  // Read exactly the flags the registry references, straight from the handle — so
+  // a newly added shortcut group can never silently fail to show (its `requires`
+  // flag is picked up here automatically, no separate list to keep in sync).
+  const flags: Record<string, boolean> = {}
+  for (const s of BST_SHORTCUTS_REGISTRY) {
+    for (const f of s.requires) flags[f] = !!handle[f]
   }
   const groups = resolveActiveShortcuts(flags, query, isMac)
 

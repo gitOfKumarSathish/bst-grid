@@ -51,6 +51,7 @@ import ListSubheader from '@mui/material/ListSubheader'
 import InputAdornment from '@mui/material/InputAdornment'
 import Divider from '@mui/material/Divider'
 import SearchIcon from '@mui/icons-material/Search'
+import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import ViewColumnIcon from '@mui/icons-material/ViewColumn'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
@@ -122,6 +123,12 @@ export interface BstTableMuiProps<TData extends RowData> extends UseBstTableOpti
    * `enableExport`.
    */
   showExport?: boolean
+  /**
+   * Find button (X8) in the toolbar — opens the in-grid find bar (highlight +
+   * jump between matches; ⌘/Ctrl+F also opens it). Requires `enableFind`.
+   * Default: follows `enableFind`.
+   */
+  showFind?: boolean
   /**
    * Status bar footer (X5) — total / filtered row count, and, when a cell range
    * is selected, the sum / avg / min / max / count of its numeric cells. Default:
@@ -228,6 +235,7 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
     showUndoRedo,
     showDensityToggle,
     showExport,
+    showFind,
     showStatusBar,
     showFilterBuilder,
     showFormatBuilder,
@@ -387,6 +395,7 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
   const exportEnabled =
     handle.enableExport && (exportFmts.csv || exportFmts.excel || exportFmts.print)
   const exportOn = (showExport ?? exportEnabled) && exportEnabled
+  const findOn = (showFind ?? handle.enableFind) && handle.enableFind
   const filterBuilderOn = !!showFilterBuilder && (rest.enableColumnFilters ?? true)
   const formatBuilderOn = !!showFormatBuilder && rest.enableConditionalFormatting !== false
   const [formatsOpen, setFormatsOpen] = React.useState(false)
@@ -431,6 +440,7 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
     showToolbar &&
     (Boolean(title) ||
       searchOn ||
+      findOn ||
       colsMenuOn ||
       addRowOn ||
       saveBarOn ||
@@ -583,6 +593,18 @@ export function BstTableMui<TData extends RowData>(props: BstTableMuiProps<TData
               >
                 Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
               </Button>
+            </span>
+          )}
+          {findOn && (
+            <span data-tb="find" style={{ display: 'inline-flex' }}>
+              <IconButton
+                size="small"
+                onClick={() => runtime.openFind()}
+                aria-label="Find"
+                title="Find (Ctrl/⌘+F)"
+              >
+                <ManageSearchIcon fontSize="small" />
+              </IconButton>
             </span>
           )}
           <span style={{ flex: 1 }} />

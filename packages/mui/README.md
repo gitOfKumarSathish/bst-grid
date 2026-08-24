@@ -27,6 +27,7 @@ without touching your data code.
 - 🔎 **Set Filter (Phase 6, X4)** — `enableSetFilter` gives categorical columns an Excel-style **checklist of distinct values** in the filter row (search · select-all/clear · counts · (Blanks)); needs `enableColumnFilterRow`.
 - 🔎 **Multi-filter (X11)** — `enableMultiFilter` lets a column **stack filter types** via an array `meta.filter` (e.g. `['condition', 'set']`): the filters render stacked in the row and a row must satisfy all of them (AND). Needs `enableColumnFilterRow`.
 - 📊 **Status bar (Phase 6, X5)** — `showStatusBar` adds a footer with total / filtered row counts and, when a cell range is selected, the **sum / avg / min / max / count** of its numeric cells.
+- 🔎 **Find (X8)** — `enableFind` adds an in-grid **find bar** (toolbar **⌕** button `showFind`, or ⌘/Ctrl+F) that **highlights matches and jumps between them** (Next / Prev · "n / m") **without hiding rows** — distinct from global search, which filters non-matches out.
 - 🔢 **Row numbers · auto-columns · overlays (X9 / X27 / X23)** — engine features inherited by this skin: `enableRowNumbers` adds a leading `#` column (numbering the current view); `enableAutoColumns` infers columns from the data when you pass `columns={[]}`; `enableOverlays` (on by default) shows loading / error overlays fed by `loading` / `error` (which `useBstDataSource` provides). All three are in the ⚙ settings sheet.
 - 🔎 **Filter builder (Phase 3, E3)** — `showFilterBuilder` adds a "Filters (n)" button + a panel with per-column condition rows (operator-aware). Add `enableColumnFilterRow` for a second, inline per-column filter row; drag a header to reorder, drag its edge to resize.
 - 🎨 **Conditional-format builder (K3)** — `showFormatBuilder` adds a "Formats (n)" button that opens/closes a panel hosting `<BstConditionalFormatBuilder>`: end-users add / edit / delete `conditionalFormats` rules at runtime (uncontrolled local state by default; pass `onConditionalFormatsChange` to own the rules). Hidden while `enableConditionalFormatting` is off.
@@ -255,6 +256,7 @@ Plus the MUI-only chrome props:
 | `showUndoRedo` | `boolean` | follows `enableUndoRedo` | Show the Undo/Redo buttons. |
 | `showDensityToggle` | `boolean` | `false` | Show the row-height density button. |
 | `showExport` | `boolean` | follows `enableExport` | Show the Export menu (CSV / Excel / Print). Requires `enableExport`. |
+| `showFind` | `boolean` | follows `enableFind` | Show the toolbar **⌕ Find** button — opens the in-grid find bar (highlight + jump; ⌘/Ctrl+F also opens it). Requires `enableFind`. |
 | `showStatusBar` | `boolean` | `false` | Show the status-bar footer — row counts + sum/avg/min/max/count of the selected range. |
 | `showColumnEditToggle` | `boolean` | `false` | Add a per-column **edit lock/unlock** (✏️) to the Columns menu, so an end-user can make an editable column read-only at runtime. Requires `enableEditing`. |
 | `showFilterBuilder` | `boolean` | `false` | Show the Filters button + filter-builder panel (E3). |

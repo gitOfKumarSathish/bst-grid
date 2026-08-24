@@ -6,6 +6,29 @@ export interface CellRef {
   columnId: string
 }
 
+/** One contiguous match span within a cell's display text: `[start, end)`. */
+export type FindRange = readonly [number, number]
+
+/**
+ * Find (X8) state — the in-grid search box: query, ordered matches, and the
+ * current cursor. Deliberately SEPARATE from v9 `globalFilter` so matches
+ * HIGHLIGHT in place rather than hiding non-matching rows.
+ */
+export interface FindState {
+  /** The find bar is visible. */
+  open: boolean
+  /** Current query string (empty ⇒ no matches). */
+  query: string
+  /** Matched cells in visual order — drives the "n of m" count + Next/Prev. */
+  matches: CellRef[]
+  /** `cellKey → match spans`, for painting `<mark>`s (O(1) per-cell lookup). */
+  matchRanges: Map<string, FindRange[]>
+  /** `cellKey` of the current (focused) match, or `null`. */
+  currentKey: string | null
+  /** Index of the current match within `matches`, or `-1` when none. */
+  current: number
+}
+
 /**
  * The interaction store (Plan.md §2.5 rule 4). All high-frequency edit /
  * validation / selection state lives here — NOT in `table.setState` — so a
@@ -63,6 +86,8 @@ export interface InteractionState {
   undoDepth: number
   /** Redo-stack depth (Phase 3) — drives `canRedo` reactively for chrome. */
   redoDepth: number
+  /** Find (X8) — the search box + match cursor (highlights, never hides rows). */
+  find: FindState
 }
 
 export const initialInteractionState: InteractionState = {
@@ -80,6 +105,7 @@ export const initialInteractionState: InteractionState = {
   pending: {},
   undoDepth: 0,
   redoDepth: 0,
+  find: { open: false, query: '', matches: [], matchRanges: new Map(), currentKey: null, current: -1 },
 }
 
 /** Composite key for a cell (`rowId` first so a row's cells sort together). */

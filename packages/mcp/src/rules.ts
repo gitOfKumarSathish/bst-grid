@@ -143,6 +143,9 @@ export const RULES: Record<string, FlagRule> = {
   enableContextMenu: {
     note: 'Right-click a cell for a menu. Default items: Copy / Copy row / Copy column (with `enableClipboard`), Export CSV / Excel (with `enableExport`), Autosize column. Reshape or extend them via the `getContextMenuItems(ctx)` callback (spread `ctx.defaultItems`).',
   },
+  enableFind: {
+    note: 'Find (X8) — a search box that HIGHLIGHTS matches and jumps between them (Next / Prev, "n of m") WITHOUT hiding rows — distinct from `enableGlobalFilter`, which removes non-matching rows. Open with ⌘/Ctrl+F, cycle with Enter / F3 (Shift for previous), close with Esc. Pass `{ caseSensitive?, scope? }` to configure (an object implies enabled). Off by default. Adapters expose a toolbar "Find" button via `showFind`.',
+  },
 
   // ---- Export (X1–X3) ----
   enableExport: {
@@ -192,6 +195,7 @@ export const RULES: Record<string, FlagRule> = {
   // ---- Adapter chrome (§12: chrome follows behaviour) ----
   showToolbar: { note: 'The container for search, menus and buttons — turning it off hides all toolbar chrome.' },
   showSearch: { requires: ['enableGlobalFilter'] },
+  showFind: { requires: ['enableFind'] },
   showFilterBuilder: { requires: ['enableColumnFilters'] },
   showFormatBuilder: { requires: ['enableConditionalFormatting'] },
   showColumnsMenu: { requires: ['enableHiding'] },

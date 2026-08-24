@@ -101,6 +101,7 @@ export type {
   BstContextMenuItem,
   BstContextMenuContext,
   AutoColumnsOptions,
+  BstFindOptions,
 } from './types.js'
 
 // ---- column helpers: auto-generate (X27) + row-number (X9) ----

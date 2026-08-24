@@ -115,11 +115,11 @@ ships **free** (MIT/Apache)._
 | X5 | Status bar (row count + range sum/avg/count) | ✅ | P6 — `showStatusBar` + `runtime.getSelectionStats()` |
 | X6 | Right-click context menu | ✅ | P6 — `enableContextMenu` + `getContextMenuItems` (dep-free popup: Copy / Export / Autosize + custom) |
 | X7 | Tool-panel sidebar (Columns + Filters) | ⏭️ skip | **Deliberately not built** (2026-08-17) — redundant with the toolbar's **Columns** menu (show/hide · pin · reorder · group) + **Filters** button. Was prototyped (`showSidebar` + `BstColumnPanel`) and reverted. |
-| X8 | Find (highlight + jump between matches) | ❌ | P6 |
+| X8 | Find (highlight + jump between matches) | ✅ | P6 — `enableFind` (+ `BstFindOptions`) · adapters' `showFind` — dep-free find bar: highlights matches + jumps (Next/Prev · "n/m"), **never hides rows**; ⌘/Ctrl+F · Enter/F3 · Esc |
 | X9 | Row-number column | ✅ | **`enableRowNumbers`** (+ `rowNumberHeader`) — leading non-interactive `#` column numbering the current view (continuous across pages; reflects sort + filter). **Pinned to the start (sticky-left) by default**, so it stays leftmost even when other columns are pinned. Settings-toggle ("Columns"). Both skins |
 | X10 | Managed row dragging (reorder) | ❌ | P6 |
 | X11 | Multi-filter (stack filter types per column) | ✅ | P6 — `enableMultiFilter` + array `meta.filter` (e.g. `['condition','set']`); stacked in the filter row, AND-combined via `combineFilterConditions` / `FilterConditionGroup` |
-| X12 | Fill handle (drag-to-fill range) | ❌ | P6 |
+| X12 | Fill handle (drag-to-fill range) | ⚪ | **Optional — out of scope** (see below) |
 | X13 | Tree data (self-referencing hierarchy) | ⚪ | **Optional — out of scope** (see below) |
 | X14 | Pivoting | ⚪ | **Optional — out of scope** (see below) |
 | X15 | Integrated charts (range → chart) | ❌ | P7 |
@@ -138,11 +138,11 @@ ships **free** (MIT/Apache)._
 | X28 | Cell flashing on data change | ❌ | P8 |
 | X29 | Aligned grids (shared column state) | ❌ | P8 |
 
-**Tally:** 29 extended capabilities — ✅ 12 built · 🟡 3 partial (X16 SSRM · X17 formula cols · X20 a11y) ·
-❌ 8 missing · ⏭️ 1 skipped (X7 sidebar) · ⚪ 5 optional/out-of-scope (X13 · X14 · X18 · X19 · X24).
+**Tally:** 29 extended capabilities — ✅ 13 built · 🟡 3 partial (X16 SSRM · X17 formula cols · X20 a11y) ·
+❌ 6 missing · ⏭️ 1 skipped (X7 sidebar) · ⚪ 6 optional/out-of-scope (X12 · X13 · X14 · X18 · X19 · X24).
 **12 of the 29 are paid-tier capabilities in commercial grids** — they ship free here. _(v0.40.0 added **X9** row-number
 column, **X23** loading/error overlays, **X27** auto-generate columns; and moved **X18/X19/X24** to
-Optional below. **2026-08-24:** moved **X13** tree data + **X14** pivoting to Optional too.)_
+Optional below. **2026-08-24:** moved **X13** tree data + **X14** pivoting — and **X12** fill handle — to Optional too.)_
 
 **Already matched (paid-tier elsewhere, shipped free):** cell/range selection · clipboard
 copy/paste · batch editing · row grouping + aggregation · master-detail · sparklines · advanced-filter
@@ -156,6 +156,7 @@ remain documented here for completeness and can be picked up later, but no phase
 
 | ID | Feature | Why deferred |
 |---|---|---|
+| X12 | Fill handle (drag-to-fill / increment a range) | Range selection + clipboard copy/paste across a selection (H1–H4) already cover bulk-fill needs; the spreadsheet drag-to-fill / increment gesture is M-effort and no consuming app requires it yet. Revisit if one does. |
 | X13 | Tree data (self-referencing hierarchy) | Master-detail (A4) + multi-column grouping (E4) cover the hierarchical needs of the target apps; recursive self-referencing tree data (BOM/org/folder) is L-effort and no consuming app requires it yet. Revisit if one does. |
 | X14 | Pivoting | The heavyweight cross-tab reporting feature (L-effort); grouping + aggregation cover current reporting needs and no target app requires pivot/reshape. Revisit if one does. |
 | X18 | Cell notes / comments | Collaboration/annotation feature outside the current grid scope; no consuming app needs it yet. |
