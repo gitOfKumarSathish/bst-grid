@@ -39,6 +39,18 @@ this project uses [Semantic Versioning](https://semver.org).
 - Tested in `find.test.tsx` (matches without removing rows · cycle + wrap · numeric cells ·
   case-sensitivity · close clears). No API break — purely additive.
 
+### Fixed
+- **React `key`-in-spread warning** — the column-virtualization spacer
+  (`enableColumnVirtualization`) built `{ key, className, style, aria-hidden }` and spread it into
+  its `<td>` / `<th>`; `key` is now passed to JSX directly (React 19 warns on spread keys). No
+  behaviour change.
+- **MUI page-size `<Select>` "out-of-range value" warning** — a grid whose `pagination.pageSize`
+  isn't one of `pageSizeOptions` (e.g. `pageSize: 8` with the default `[5, 10, 20, 50]`) rendered a
+  Select value with no matching option. `resolvePageSizeChoices` now **surfaces the current page
+  size as its own choice** (kept sorted) when it isn't listed and there's no `'all'` fallback, so the
+  control's value always matches an option. Engine-level fix — benefits both adapters, any consumer
+  `pageSize`. Covered in `stickyHeader.test.tsx`.
+
 ## [0.41.1] — 2026-08-24
 ### Changed — neutral naming (docs, comments and shipped strings)
 - Bst-Table now describes its **own** capabilities in its **own** words. Every reference to a

@@ -121,6 +121,18 @@ describe('resolvePageSizeChoices / pageSizeForChoice (pure)', () => {
     expect(resolvePageSizeChoices([10, 20], 999).value).toBe(999)
   })
 
+  test('an off-list numeric size is surfaced as its own choice (sorted), so the <select> value always matches an option', () => {
+    // A consumer set `pagination: { pageSize: 8 }` but kept default options.
+    const { choices, value } = resolvePageSizeChoices([5, 10, 20, 50], 8)
+    expect(choices.map((c) => c.value)).toEqual([5, 8, 10, 20, 50]) // 8 injected, ascending
+    expect(choices).toContainEqual({ value: 8, label: '8' })
+    expect(value).toBe(8) // value ∈ choices → no MUI "out-of-range value" warning
+    // When 'all' is offered, an unlisted size still reads as All (no numeric inject).
+    const withAll = resolvePageSizeChoices([10, 20, 'all'], 8)
+    expect(withAll.value).toBe(PAGE_SIZE_ALL)
+    expect(withAll.choices.map((c) => c.value)).toEqual([10, 20, PAGE_SIZE_ALL])
+  })
+
   test('pageSizeForChoice maps the All sentinel to the applied size, else identity', () => {
     expect(pageSizeForChoice(PAGE_SIZE_ALL)).toBe(PAGE_SIZE_ALL_APPLIED)
     expect(pageSizeForChoice(25)).toBe(25)

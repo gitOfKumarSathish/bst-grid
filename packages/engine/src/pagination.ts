@@ -41,6 +41,16 @@ export function resolvePageSizeChoices(
   )
   const hasAll = options.includes('all')
   const numeric = new Set(choices.map((c) => c.value).filter((v) => v !== PAGE_SIZE_ALL))
+  // If the current page size isn't one of the offered sizes (a consumer set a
+  // custom `pagination.pageSize` / `initialState`), surface it as its own choice so
+  // the rendered <select> value ALWAYS matches an option — otherwise MUI's Select
+  // warns "out-of-range value". When 'all' is offered it already represents an
+  // unlisted size, so only inject a numeric choice when there's no 'all' fallback.
+  if (currentPageSize > 0 && !numeric.has(currentPageSize) && !hasAll) {
+    choices.push({ value: currentPageSize, label: String(currentPageSize) })
+    choices.sort((a, b) => a.value - b.value) // pure numeric here (no PAGE_SIZE_ALL)
+    numeric.add(currentPageSize)
+  }
   const value = hasAll && !numeric.has(currentPageSize) ? PAGE_SIZE_ALL : currentPageSize
   return { choices, value }
 }

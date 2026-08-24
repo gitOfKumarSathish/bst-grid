@@ -581,8 +581,9 @@ export function BstTable({
     if (!colWindow) return items.map(render)
     const spacer = (key: string, w: number) => {
       if (w <= 0) return null
-      const p: any = { key, className: 'bst-virtual-colspacer', style: { width: w }, 'aria-hidden': true }
-      return tag === 'th' ? <th {...p} /> : <td {...p} />
+      // `key` must be passed to JSX directly, never spread from a props object (React 19 warns).
+      const p: any = { className: 'bst-virtual-colspacer', style: { width: w }, 'aria-hidden': true }
+      return tag === 'th' ? <th key={key} {...p} /> : <td key={key} {...p} />
     }
     return (
       <>
