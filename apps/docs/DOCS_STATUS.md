@@ -14,14 +14,14 @@ _Verified against the corpus + working tree on 2026-08-26. Everything below is c
 | **Corpus capabilities** | **90** | generated reference page each ✅ |
 | ↳ `enable*` / `show*` toggle flags | **61** | page **+ prose guide each** ✅ (0 without a guide) |
 | ↳ config props / cell-meta / notes | 29 | on the relevant feature / cell / API page |
-| Cell types | **17** | page **+ prose guide + live demo each** ✅ (15 also have a standalone screenshot) |
+| Cell types | **17** | page **+ prose guide + live demo + standalone screenshot each** ✅ (all 17 imaged) |
 | ↳ cellMeta sub-options | 38 | on each cell page |
 | Engine API exports | **262** | page each ✅ (fn · hooks · iface · type · const) |
 | Spec-coverage leaves | **58** | coverage matrix ✅ |
 | Prose guides (hand-written) | **88** | 62 flag guides + 9 group overviews + 17 cell-type guides |
 | Generated pages | 90 | 72 feature + 18 cell + API + coverage |
-| **Live Sandpack demos** | **~34** | headline flags + 15 cells + 6 features + showcase + dark |
-| **Screenshots** | **33** | see breakdown below |
+| **Live Sandpack demos** | **~60** | a live demo on **every feature page** + 17 cells + showcase + dark |
+| **Screenshots** | **59** | see breakdown below |
 
 Coverage gate (`check-docs-coverage.mjs`) is **green** — every flag, cell and export is accounted for.
 **82 of the 90** corpus entries carry a `since:` version (0.1.0 → 0.42.0), so pages show when each landed.
@@ -46,17 +46,22 @@ Coverage gate (`check-docs-coverage.mjs`) is **green** — every flag, cell and 
 - **Getting Started**, **Styling & Theming**, **AI Agents & MCP**, **Migration** (vendor-neutral).
 
 ### Live interactive demos (Sandpack)
-- `<BstSandbox>` renders editable grids from the published packages: 10 headline flags + 15 cell types
-  + 6 distinct features + a cell-type showcase + dark mode. Chrome trimmed (`showOpenInCodeSandbox` off).
+- `<BstSandbox>` renders editable grids from the published packages: a live demo on **every feature page**
+  + all 17 cell types + a cell-type showcase + dark mode. Chrome trimmed (`showOpenInCodeSandbox` off).
 
-### Screenshots (33) — all headless-captured, each **labeled with an orange highlight** on the live feature
+### Screenshots (59) — all headless-captured, each **labeled with an orange highlight** on the live feature
 - **1** hero (Getting Started)
 - **9** feature groups (each shows the feature active: menu open, cell editing, range selected, settings sheet…)
 - **1** cell-types showcase + **1** dark mode
-- **15** cell types (`text, longText, number, dateTime, boolean, singleSelect, multiSelect, radio,
-  hyperlink, files, sparkline, kpi, qr, barcode, richText`)
-- **6** distinct features (`conditional formatting, master-detail, grouping, filter builder, undo/redo, row actions`)
-- **All 33 are committed + pushed** and render on every page (no pending/uncommitted images).
+- **17** cell types — all of them, incl. `action` / `actionMenu`
+- **30** distinct features — the 6 original (`conditional formatting, master-detail, grouping, filter builder,
+  undo/redo, row actions`) **+ 24 more**: `column/row pinning, sticky header, row & cell/range selection,
+  set/multi filter, per-column filter row, status bar, find, row numbers, pagination, density, auto row
+  height, row resize, fit columns, context menu, settings sheet, export menu, format builder, shortcuts
+  overlay, loading overlay, cell spanning, batch review`
+- **All 59 are committed + pushed**; the build resolves every image ref (0 missing). Interaction/scroll
+  shots (find, shortcuts, status bar, density, pinning, range selection) came from `apps/demo` (0.44.0,
+  where those features render); the rest from the feature pages' Sandpack demos.
 
 ### Infrastructure
 - Coverage gate wired; **`verify:naming` hardened** — the build fails on any third-party grid product name,
@@ -69,22 +74,22 @@ Coverage gate (`check-docs-coverage.mjs`) is **green** — every flag, cell and 
 
 ## MISSING / BACKLOG ⬜ (pick up in future chats)
 
-1. **`action` / `actionMenu` standalone screenshots** — the only 2 cell types still without a static PNG
-   (no headless-capture tooling for them). They now have their own **live Sandpack demos + prose**, so the
-   pages are no longer bare — only the static screenshot is outstanding.
-2. **Prose layer for API Reference (262)** — the API-export pages still have no hand-written "when/why"
-   prose. _Extend the guide injection to API pages._ (Cell Types are now **done** — a "when to use / how it
-   works / gotchas" guide for all 17 in `guides/cell-types/`, injected under `## Guide` like the flag guides.)
-3. **~7 more distinct-feature images (optional)** — captured 6; not yet imaged: `density toggle, sticky
-   header, row pinning, context menu, set filter, multi-filter, status-bar aggregates`.
-4. **Animated hero GIF** — only a static hero exists. Needs a screen recording of the live grid.
-5. **Actual Cloudflare Pages deploy** — needs the Cloudflare account. Settings are in `apps/docs/README.md`
+1. **Prose layer for API Reference (262)** — the API-export pages still have no hand-written "when/why"
+   prose. _Extend the guide injection to API pages._ (Cell Types are **done** — a guide for all 17 in
+   `guides/cell-types/`; feature flags all have guides too.)
+2. **Animated hero GIF** — only a static hero exists. Needs a screen recording of the live grid.
+3. **Actual Cloudflare Pages deploy** — needs the Cloudflare account. Settings are in `apps/docs/README.md`
    (root `apps/docs`, build `npm run build`, output `build`, domain `bst-grid.pages.dev`).
-6. **Merge `docs/add-docusaurus-site` → `main`** — the branch holds everything above.
-7. **Guides for any NEW flags** from future corpus re-dumps — the last re-dump grew the corpus to 90 and
+4. **Merge `docs/add-docusaurus-site` → `main`** — the branch holds everything above.
+5. **Guides for any NEW flags** from future corpus re-dumps — the last re-dump grew the corpus to 90 and
    every toggle is now covered; a future flag needs a new `guides/<group>/<flag>.mdx` (the gate will flag it).
-8. **Sandpack dep pins** in `src/components/BstSandbox.tsx` load a **published** package version — bump the
-   pins when a newer version publishes so demos match the current docs.
+6. **Sandpack dep pins** in `src/components/BstSandbox.tsx` load the **published 0.41.0**; features newer
+   than that (e.g. `enableFind`@0.42.0) can't render live until 0.42.0+ is published — bump the pins then.
+   (Their **screenshots** are already captured from `apps/demo`, so the pages aren't bare.)
+
+**Recently completed** (was on this list): `action`/`actionMenu` cell screenshots ✅ · the 24 distinct-feature
+screenshots (pinning, selection, filters, status bar, find, context menu, overlays, spanning, …) ✅ ·
+a live demo on every feature page ✅ · Mac/Windows keyboard-shortcuts reference ✅.
 
 > **Per-flag screenshots (61) were deliberately skipped** — most flags render as the same grid, so the group
 > + cell + feature images cover the actual visual variety. This is a choice, not a gap.
