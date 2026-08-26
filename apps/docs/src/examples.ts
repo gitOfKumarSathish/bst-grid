@@ -210,3 +210,39 @@ export default function App() {
 }
 `,
 }
+
+// ---- per-cell-type demos — a small 2-column grid per cell type -------------
+// Each renders `Item` + one column of the given `meta.type` with correct data.
+const CELL_DEMO_DATA: Record<string, { rows: string; col: string }> = {
+  text:         { rows: `[{ id:'1', item:'Widget A', v:'In stock' }, { id:'2', item:'Widget B', v:'Backorder' }]`, col: `{ id:'v', accessorKey:'v', header:'Text', meta:{ type:'text' } }` },
+  longText:     { rows: `[{ id:'1', item:'Note', v:'A longer note that wraps across the cell when there is room, or truncates with a tooltip.' }, { id:'2', item:'Short', v:'Brief.' }]`, col: `{ id:'v', accessorKey:'v', header:'Long text', meta:{ type:'longText' } }` },
+  number:       { rows: `[{ id:'1', item:'Revenue', v:1234.5 }, { id:'2', item:'Units', v:89 }]`, col: `{ id:'v', accessorKey:'v', header:'Number', meta:{ type:'number', cellMeta:{ currency:'USD', precision:2 } } }` },
+  dateTime:     { rows: `[{ id:'1', item:'Created', v:'2026-08-24' }, { id:'2', item:'Updated', v:'2026-01-05' }]`, col: `{ id:'v', accessorKey:'v', header:'Date', meta:{ type:'dateTime', cellMeta:{ variant:'date' } } }` },
+  boolean:      { rows: `[{ id:'1', item:'Active', v:true }, { id:'2', item:'Archived', v:false }]`, col: `{ id:'v', accessorKey:'v', header:'Boolean', meta:{ type:'boolean' } }` },
+  singleSelect: { rows: `[{ id:'1', item:'Acme', v:'active' }, { id:'2', item:'Globex', v:'churned' }]`, col: `{ id:'v', accessorKey:'v', header:'Status', meta:{ type:'singleSelect', options:[{ value:'active', label:'Active', color:'#22c55e' }, { value:'churned', label:'Churned', color:'#ef4444' }] } }` },
+  multiSelect:  { rows: `[{ id:'1', item:'Nimbus', v:['api','pro'] }, { id:'2', item:'Cirrus', v:['new'] }]`, col: `{ id:'v', accessorKey:'v', header:'Tags', meta:{ type:'multiSelect', options:[{ value:'api', label:'API', color:'#3b82f6' }, { value:'pro', label:'Pro', color:'#a855f7' }, { value:'new', label:'New', color:'#10b981' }] } }` },
+  radio:        { rows: `[{ id:'1', item:'Q1', v:'yes' }, { id:'2', item:'Q2', v:'no' }]`, col: `{ id:'v', accessorKey:'v', header:'Radio', meta:{ type:'radio', options:[{ value:'yes', label:'Yes' }, { value:'no', label:'No' }] } }` },
+  hyperlink:    { rows: `[{ id:'1', item:'Docs', v:'https://bst-grid.pages.dev' }, { id:'2', item:'Repo', v:'https://example.com' }]`, col: `{ id:'v', accessorKey:'v', header:'Link', meta:{ type:'hyperlink' } }` },
+  files:        { rows: `[{ id:'1', item:'Spec', v:[{ name:'spec.pdf', url:'#' }] }, { id:'2', item:'Logo', v:[{ name:'logo.png', url:'#' }] }]`, col: `{ id:'v', accessorKey:'v', header:'Files', meta:{ type:'files' } }` },
+  sparkline:    { rows: `[{ id:'1', item:'Nimbus', v:[3,5,4,6,7,9] }, { id:'2', item:'Stratus', v:[8,6,7,5,4,3] }]`, col: `{ id:'v', accessorKey:'v', header:'Trend', meta:{ type:'sparkline', cellMeta:{ variant:'area' } } }` },
+  kpi:          { rows: `[{ id:'1', item:'MRR', v:{ value:42000, delta:12 } }, { id:'2', item:'Churn', v:{ value:9800, delta:-4 } }]`, col: `{ id:'v', accessorKey:'v', header:'KPI', meta:{ type:'kpi', cellMeta:{ deltaPercent:true } } }` },
+  qr:           { rows: `[{ id:'1', item:'Docs', v:'https://bst-grid.pages.dev' }, { id:'2', item:'SKU', v:'BST-2026' }]`, col: `{ id:'v', accessorKey:'v', header:'QR', meta:{ type:'qr' } }` },
+  barcode:      { rows: `[{ id:'1', item:'Nimbus', v:'NB-1001' }, { id:'2', item:'Stratus', v:'ST-2043' }]`, col: `{ id:'v', accessorKey:'v', header:'Barcode', meta:{ type:'barcode', cellMeta:{ height:44 } } }` },
+  richText:     { rows: `[{ id:'1', item:'Formatted', v:'<b>Bold</b> and <i>italic</i>' }, { id:'2', item:'Plain', v:'Plain text' }]`, col: `{ id:'v', accessorKey:'v', header:'Rich text', meta:{ type:'richText', cellMeta:{ render:'html' } } }` },
+}
+function cellDemo(d: { rows: string; col: string }): string {
+  return `import React from 'react'
+import { BstTableMui } from '@bloomskill/table-mui'
+import type { BstTableColumn } from '@bloomskill/table-engine'
+import '@bloomskill/table-engine/styles.css'
+const rows = ${d.rows}
+const columns: BstTableColumn<any>[] = [
+  { id: 'item', accessorKey: 'item', header: 'Item' },
+  ${d.col},
+]
+export default function App() {
+  return <BstTableMui data={rows} columns={columns} getRowId={(r) => r.id} pagination={false} />
+}
+`
+}
+for (const [t, d] of Object.entries(CELL_DEMO_DATA)) EXAMPLES['cell-' + t] = cellDemo(d)
