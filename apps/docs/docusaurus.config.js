@@ -8,7 +8,7 @@ module.exports = {
   url: 'https://bst-grid.pages.dev',
   baseUrl: '/',
   onBrokenLinks: 'warn',
-  markdown: { hooks: { onBrokenMarkdownLinks: 'warn' } },
+  markdown: { hooks: { onBrokenMarkdownLinks: 'warn', onBrokenMarkdownImages: 'warn' } },
   presets: [
     [
       'classic',
