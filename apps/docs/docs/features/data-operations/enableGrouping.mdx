@@ -33,8 +33,12 @@ in the group header. Both skins add a group toggle (▤) in the columns menu.
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `boolean` |
 | Default | `false` |
+| Maps to | v9 columnGroupingFeature + rowAggregationFeature — collapsible group rows + aggregates; adapters add a group toggle (▤) in the columns menu |
 | Status | ✅ done |
+| Since | v0.15.0 |
 | Settings sheet | Data operations |
+
+Multi-column grouping (E4) — group rows by one or more columns, with collapsible group headers and per-column aggregates. Opt-in. Default false. Set which columns to group via `initialState.grouping` (or `table.setGrouping`); a column aggregates by declaring `aggregationFn` (`'sum' | 'count' | 'mean' | 'min' | 'max' | 'extent' | 'uniqueCount'`). Maps to v9 `enableGrouping` + `columnGroupingFeature`.
 
 ## Enable it
 
@@ -48,6 +52,16 @@ in the group header. Both skins add a group toggle (▤) in the columns menu.
 
 > Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
 
+## Options
+
+| Option | Notes |
+| --- | --- |
+| `aggregationFn` | Related prop for this feature. |
+
 ## Behavior & interactions
 
 - Set which columns to group via `initialState.grouping` (or `table.setGrouping`); a column aggregates by declaring `aggregationFn`.
+
+## Spec coverage
+
+- **E4 · Multi-column grouping** — ✅ built. v0.15.0 — enableGrouping + aggregates + group toggle

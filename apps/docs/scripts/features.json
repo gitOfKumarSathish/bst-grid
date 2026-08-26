@@ -6,7 +6,13 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "true",
-    "status": "✅ done"
+    "status": "✅ done",
+    "mapsTo": "adapter toolbar",
+    "related": [
+      "showSearch"
+    ],
+    "requirements": [],
+    "since": "0.32.4"
   },
   {
     "flag": "enableGlobalFilter",
@@ -15,8 +21,15 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "true",
+    "status": "✅ done",
+    "mapsTo": "v9 enableGlobalFilter",
     "group": "Data operations",
-    "status": "✅ done"
+    "doc": "Global search filtering behaviour. Maps to v9 `enableGlobalFilter`. Default: true.",
+    "related": [
+      "enableGlobalFilter"
+    ],
+    "requirements": [],
+    "since": "0.32.4"
   },
   {
     "flag": "enableSorting",
@@ -25,8 +38,17 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "true",
+    "status": "✅ done",
+    "mapsTo": "v9 enableSorting",
     "group": "Data operations",
-    "status": "✅ done"
+    "doc": "Column context handed to the `headerCell` class/style slot. */ export interface BstHeaderSlotContext { columnId: string } /** Consumer-owned class names for the grid's structural slots — the custom-CSS hook (K1/K2). Static strings for fixed parts; `headerCell` / `row` / `cell` also accept a function for per-item classes. Every slot **composes with** (never replaces) the built-in `bst-*` classes, so themes keep working. `root` targets the same element as the `<BstTable className>` prop (the scroll wrapper). Slots map to: `root`→`.bst-table-scroll`, `table`→`<table>`, `header`→`<thead>`, `headerRow`→header `<tr>`, `headerCell`→`<th>`, `filterRow`→the per-column filter `<tr>`, `body`→`<tbody>`, `row`→body `<tr>`, `cell`→body `<td>`, `empty`→the \"No rows\" `<td>`. / export interface BstClassNames<TData extends RowData = any> { root?: string table?: string header?: string headerRow?: string headerCell?: string | ((ctx: BstHeaderSlotContext) => string | undefined) filterRow?: string body?: string row?: string | ((ctx: BstRowContext<TData>) => string | undefined) cell?: string | ((ctx: CellRenderProps<TData>) => string | undefined) empty?: string } /** Inline styles / CSS variables per structural slot — parallels {@link BstClassNames}. */ export interface BstStyles<TData extends RowData = any> { root?: React.CSSProperties table?: React.CSSProperties header?: React.CSSProperties headerRow?: React.CSSProperties headerCell?: | React.CSSProperties | ((ctx: BstHeaderSlotContext) => React.CSSProperties | undefined) filterRow?: React.CSSProperties body?: React.CSSProperties row?: React.CSSProperties | ((ctx: BstRowContext<TData>) => React.CSSProperties | undefined) cell?: React.CSSProperties | ((ctx: CellRenderProps<TData>) => React.CSSProperties | undefined) empty?: React.CSSProperties } /** Engine-behaviour toggles (§12 `enable*` layer). OOTB data features default ON (opt-out); heavy features (editing, validation) default OFF (opt-in). / export interface BstTableEngineToggles { /** Column sorting. Maps to v9 `enableSorting`. Default: true.",
+    "related": [
+      "enableSorting"
+    ],
+    "requirements": [
+      "K1",
+      "K2"
+    ]
   },
   {
     "flag": "enableColumnFilters",
@@ -35,8 +57,17 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "true",
+    "status": "✅ done (Phase 3)",
+    "mapsTo": "v9 enableColumnFilters (+ bstCondition filterFn)",
     "group": "Data operations",
-    "status": "✅ done (Phase 3)"
+    "doc": "Per-column filtering behaviour (drives the E3 filter builder). Maps to v9 `enableColumnFilters`. Default: true.",
+    "related": [
+      "enableColumnFilters"
+    ],
+    "requirements": [
+      "E3"
+    ],
+    "since": "0.9.0"
   },
   {
     "flag": "showFilterBuilder",
@@ -45,8 +76,16 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "false",
+    "status": "✅ done (Phase 3)",
+    "mapsTo": "adapter panel hosting BstFilterBuilder",
     "group": "Display",
-    "status": "✅ done (Phase 3)"
+    "related": [
+      "showFilterBuilder"
+    ],
+    "requirements": [
+      "E3"
+    ],
+    "since": "0.9.0"
   },
   {
     "flag": "showFormatBuilder",
@@ -55,8 +94,17 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "false",
+    "status": "✅ done",
+    "mapsTo": "adapter toolbar \"Formats\" button + panel hosting BstConditionalFormatBuilder — end-users build conditionalFormats rules at runtime (uncontrolled local state, or controlled via the callback). Builder columns auto-derived from the grid's columns. Needs enableConditionalFormatting. In settings (\"Display\", always shown). shadcn: new format icon slot (palette)",
     "group": "Display",
-    "status": "✅ done"
+    "related": [
+      "showFormatBuilder",
+      "onConditionalFormatsChange"
+    ],
+    "requirements": [
+      "K3"
+    ],
+    "since": "0.31.0"
   },
   {
     "flag": "enableColumnFilterRow",
@@ -65,8 +113,15 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "false",
+    "status": "✅ done (Phase 3; always-in-settings v0.29.0)",
+    "mapsTo": "engine header row (needs enableColumnFilters). Always shown in the settings sheet (\"Columns\", alwaysShow) so end-users can switch it on themselves",
     "group": "Columns",
-    "status": "✅ done (Phase 3; always-in-settings v0.29.0)"
+    "doc": "Render a per-column filter row under the header (the \"dual filter\" — works alongside the filter-builder panel; both drive `columnFilters`). Each column gets a type-appropriate control (text/number/date input, select dropdown, boolean tri-state). Needs `enableColumnFilters`. Default: false.",
+    "related": [
+      "enableColumnFilterRow"
+    ],
+    "requirements": [],
+    "since": "0.9.0"
   },
   {
     "flag": "pagination",
@@ -75,8 +130,15 @@
     "kind": "toggle",
     "type": "boolean | {pageSize}",
     "default": "true",
+    "status": "✅ done",
+    "mapsTo": "v9 pagination",
     "group": "Data operations",
-    "status": "✅ done"
+    "doc": "Pagination behaviour + initial page size. `false` shows all rows. Default: true.",
+    "related": [
+      "pagination"
+    ],
+    "requirements": [],
+    "since": "0.1.0"
   },
   {
     "flag": "showPagination",
@@ -85,7 +147,12 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "true",
-    "status": "✅ done"
+    "status": "✅ done",
+    "mapsTo": "adapter footer",
+    "related": [
+      "showPagination"
+    ],
+    "requirements": []
   },
   {
     "flag": "pageSizeOptions",
@@ -94,7 +161,13 @@
     "kind": "prop",
     "type": "(number | 'all')[]",
     "default": "[5,10,20,50]",
-    "status": "✅ done"
+    "status": "✅ done",
+    "mapsTo": "adapter select — each entry is a numeric page size, or the string 'all' for an All choice that shows every (filtered) row. Resolved by the engine's pure resolvePageSizeChoices / pageSizeForChoice so both skins behave identically",
+    "related": [
+      "pageSizeOptions"
+    ],
+    "requirements": [],
+    "since": "0.1.0"
   },
   {
     "flag": "enableHiding",
@@ -103,8 +176,15 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "true",
+    "status": "✅ done",
+    "mapsTo": "v9 enableHiding",
     "group": "Columns",
-    "status": "✅ done"
+    "doc": "Column show/hide behaviour. Maps to v9 `enableHiding`. Default: true.",
+    "related": [
+      "enableHiding"
+    ],
+    "requirements": [],
+    "since": "0.40.0"
   },
   {
     "flag": "showColumnsMenu",
@@ -113,7 +193,12 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "true",
-    "status": "✅ done"
+    "status": "✅ done",
+    "mapsTo": "adapter toolbar",
+    "related": [
+      "showColumnsMenu"
+    ],
+    "requirements": []
   },
   {
     "flag": "enableColumnResizing",
@@ -122,8 +207,14 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "true",
+    "status": "✅ done",
+    "mapsTo": "v9 enableColumnResizing",
     "group": "Columns",
-    "status": "✅ done"
+    "doc": "Column resizing. Maps to v9 `enableColumnResizing`. Default: true.",
+    "related": [
+      "enableColumnResizing"
+    ],
+    "requirements": []
   },
   {
     "flag": "enableColumnPinning",
@@ -132,8 +223,15 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "false",
+    "status": "✅ done (Phase 3)",
+    "mapsTo": "v9 enableColumnPinning (state {start,end})",
     "group": "Columns",
-    "status": "✅ done (Phase 3)"
+    "doc": "Column pinning (sticky left/right). Maps to v9 `enableColumnPinning`. Default: false.",
+    "related": [
+      "enableColumnPinning"
+    ],
+    "requirements": [],
+    "since": "0.7.0"
   },
   {
     "flag": "enableColumnOrdering",
@@ -142,8 +240,15 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "false",
+    "status": "✅ done (Phase 3)",
+    "mapsTo": "v9 setColumnOrder (adapter menu + header drag-drop)",
     "group": "Columns",
-    "status": "✅ done (Phase 3)"
+    "doc": "Column reordering — the adapter column menu (move left/right) **and** drag-to-reorder on the header (→ v9 `setColumnOrder`). Default: false.",
+    "related": [
+      "enableColumnOrdering"
+    ],
+    "requirements": [],
+    "since": "0.7.0"
   },
   {
     "flag": "showToolbar",
@@ -152,7 +257,12 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "true",
-    "status": "✅ done"
+    "status": "✅ done",
+    "mapsTo": "adapter",
+    "related": [
+      "showToolbar"
+    ],
+    "requirements": []
   },
   {
     "flag": "enableEditing",
@@ -161,8 +271,15 @@
     "kind": "toggle",
     "type": "boolean | {mode,saveOn,policy}",
     "default": "false",
+    "status": "✅ done (Phase 2)",
+    "mapsTo": "custom feature",
     "group": "Editing",
-    "status": "✅ done (Phase 2)"
+    "doc": "Inline editing feature. `boolean | EditingOptions`. Default: false (opt-in).",
+    "related": [
+      "enableEditing"
+    ],
+    "requirements": [],
+    "since": "0.2.0"
   },
   {
     "flag": "enableValidation",
@@ -171,8 +288,15 @@
     "kind": "toggle",
     "type": "boolean | {policy}",
     "default": "false",
+    "status": "✅ done (Phase 2)",
+    "mapsTo": "custom feature",
     "group": "Editing",
-    "status": "✅ done (Phase 2)"
+    "doc": "Validation feature. `boolean | ValidationOptions`. Default: false (opt-in).",
+    "related": [
+      "enableValidation"
+    ],
+    "requirements": [],
+    "since": "0.2.0"
   },
   {
     "flag": "enableRowActions",
@@ -181,8 +305,15 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "false",
+    "status": "✅ done (Phase 2)",
+    "mapsTo": "custom feature",
     "group": "Editing",
-    "status": "✅ done (Phase 2)"
+    "doc": "Row add/delete/duplicate lifecycle. Default: false (opt-in).",
+    "related": [
+      "enableRowActions"
+    ],
+    "requirements": [],
+    "since": "0.2.0"
   },
   {
     "flag": "cellTypes",
@@ -191,7 +322,13 @@
     "kind": "prop",
     "type": "CellTypeRegistry",
     "default": "neutral defaults",
-    "status": "✅ done (Phase 2)"
+    "status": "✅ done (Phase 2)",
+    "mapsTo": "custom feature",
+    "doc": "Cell-type registry (Plan.md §2.3). Adapters supply one via their preset (`createMuiPreset` / `createShadcnPreset`). Falls back to the engine's neutral default renderers when omitted.",
+    "related": [
+      "cellTypes"
+    ],
+    "requirements": []
   },
   {
     "flag": "showAddRow",
@@ -200,7 +337,13 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "follows enableRowActions",
-    "status": "✅ done (Phase 2)"
+    "status": "✅ done (Phase 2)",
+    "mapsTo": "adapter toolbar",
+    "related": [
+      "showAddRow"
+    ],
+    "requirements": [],
+    "since": "0.2.0"
   },
   {
     "flag": "showSaveBar",
@@ -209,7 +352,13 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "follows enableEditing",
-    "status": "✅ done (Phase 2)"
+    "status": "✅ done (Phase 2)",
+    "mapsTo": "adapter toolbar",
+    "related": [
+      "showSaveBar"
+    ],
+    "requirements": [],
+    "since": "0.2.0"
   },
   {
     "flag": "enableCellSelection",
@@ -218,8 +367,37 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "false",
+    "status": "✅ done (Phase 3)",
+    "mapsTo": "custom feature",
     "group": "Selection & clipboard",
-    "status": "✅ done (Phase 3)"
+    "doc": "Cell / range selection + keyboard navigation (Phase 3). Click / Shift-click to select a range; Arrow / Shift+Arrow / Tab / Home / End / Ctrl+A to move the active cell; Enter / F2 to edit. Default: false (opt-in).",
+    "related": [
+      "enableCellSelection"
+    ],
+    "requirements": [
+      "F2"
+    ],
+    "since": "0.3.0"
+  },
+  {
+    "flag": "enableTypeToEdit",
+    "feature": "Type-to-edit (C5/C6)",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "false",
+    "status": "✅ done",
+    "mapsTo": "custom — spreadsheet-style entry: a printable keystroke on a selected cell opens the editor seeded with that char (overwrite, via the cell type parse), then Enter commits & moves down / Tab commits & moves right (⇧ reverses each). Needs enableEditing + enableCellSelection (resolved on the runtime handle so it's true only with both on); a no-op otherwise. Seeds only non-overlay editors that expose parse (text/number) and declines keys the type can't represent (a letter in a number cell → NaN). Commit-and-move routes through the existing commitCell (no new write path). In settings (\"Editing\", requires both prereqs). Both adapters inherit it (engine-level behaviour)",
+    "group": "Editing",
+    "doc": "Type-to-edit — spreadsheet-style data entry layered on cell selection + editing. On a selected (not-yet-editing) cell: start typing a printable character to open the editor seeded with that character, overwriting the old value (via the cell type's `parse`, so text and number cells both work). Enter then commits and moves the active cell **down**; Tab commits and moves **right** (Shift reverses each). Needs both `enableEditing` and `enableCellSelection` — a no-op without them. Default: false (opt-in).",
+    "related": [
+      "enableTypeToEdit"
+    ],
+    "requirements": [
+      "C5",
+      "C6"
+    ],
+    "since": "0.42.0"
   },
   {
     "flag": "enableClipboard",
@@ -228,8 +406,20 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "false",
+    "status": "✅ done (Phase 3; copy-column all-pages v0.24.0)",
+    "mapsTo": "custom feature (implies enableCellSelection; paste needs enableEditing). Copy-column (H3): Ctrl+Space / copyColumn copies the whole column across ALL pages (pre-pagination); Shift+Space / copyRow for rows",
     "group": "Selection & clipboard",
-    "status": "✅ done (Phase 3; copy-column all-pages v0.24.0)"
+    "doc": "Clipboard copy / paste (Phase 3, H1–H4). Copy the selection as TSV (Ctrl/Cmd+C); paste TSV from the active cell (Ctrl/Cmd+V) honouring editability + validation. Implies `enableCellSelection`; paste additionally requires `enableEditing`. Default: false (opt-in).",
+    "related": [
+      "enableClipboard"
+    ],
+    "requirements": [
+      "H1",
+      "H2",
+      "H3",
+      "H4"
+    ],
+    "since": "0.3.0"
   },
   {
     "flag": "enableCopyColumn",
@@ -238,8 +428,17 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "true",
+    "status": "✅ done",
+    "mapsTo": "custom — sub-toggle of clipboard; gates selectColumn/copyColumn (the Ctrl/⌘+Space gesture and the Columns-menu copy button) at the runtime choke point. In settings (\"Selection & clipboard\", always shown)",
     "group": "Selection & clipboard",
-    "status": "✅ done"
+    "doc": "Copy a whole **column** across all pages (H3) — the Ctrl/Cmd+Space gesture and the Columns-menu \"Copy column\" button. A sub-toggle of clipboard; set `false` to disable column-copy while keeping the rest of the clipboard. Default: true.",
+    "related": [
+      "enableCopyColumn"
+    ],
+    "requirements": [
+      "H3"
+    ],
+    "since": "0.27.0"
   },
   {
     "flag": "enableCopyRow",
@@ -248,8 +447,17 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "true",
+    "status": "✅ done",
+    "mapsTo": "custom — sub-toggle of clipboard; gates selectRow/copyRow (Shift+Space). In settings (\"Selection & clipboard\", always shown)",
     "group": "Selection & clipboard",
-    "status": "✅ done"
+    "doc": "Copy a whole **row** (H2) — the Shift+Space gesture / `runtime.copyRow`. A sub-toggle of clipboard; set `false` to disable row-copy. Default: true.",
+    "related": [
+      "enableCopyRow"
+    ],
+    "requirements": [
+      "H2"
+    ],
+    "since": "0.27.0"
   },
   {
     "flag": "disabled",
@@ -258,7 +466,16 @@
     "kind": "prop",
     "type": "boolean",
     "default": "false",
-    "status": "✅ done (Phase 2)"
+    "status": "✅ done (Phase 2)",
+    "mapsTo": "custom (access cascade)",
+    "doc": "Greyed out + non-interactive.",
+    "related": [
+      "disabled"
+    ],
+    "requirements": [
+      "F1"
+    ],
+    "since": "0.2.0"
   },
   {
     "flag": "rowDisabled",
@@ -267,7 +484,16 @@
     "kind": "prop",
     "type": "(row)=>bool",
     "default": "—",
-    "status": "✅ done (Phase 2)"
+    "status": "✅ done (Phase 2)",
+    "mapsTo": "custom (access cascade)",
+    "doc": "F2 — disable interaction per row.",
+    "related": [
+      "rowDisabled"
+    ],
+    "requirements": [
+      "F2"
+    ],
+    "since": "0.2.0"
   },
   {
     "flag": "meta.disabled",
@@ -276,7 +502,14 @@
     "kind": "meta",
     "type": "boolean | (row)=>bool",
     "default": "—",
-    "status": "✅ done (Phase 3)"
+    "status": "✅ done (Phase 3)",
+    "mapsTo": "custom (access cascade)",
+    "related": [],
+    "requirements": [
+      "F3",
+      "F4"
+    ],
+    "since": "0.4.0"
   },
   {
     "flag": "cellDisabled",
@@ -285,7 +518,16 @@
     "kind": "prop",
     "type": "(ctx)=>bool",
     "default": "—",
-    "status": "✅ done (Phase 3)"
+    "status": "✅ done (Phase 3)",
+    "mapsTo": "custom (access cascade)",
+    "doc": "F4 — disable interaction per cell (grid-level, cross-cutting predicate). Complements per-column `meta.disabled`; either disabling wins. Runs only for cells whose row is present.",
+    "related": [
+      "cellDisabled"
+    ],
+    "requirements": [
+      "F4"
+    ],
+    "since": "0.4.0"
   },
   {
     "flag": "enableRowSelection",
@@ -294,8 +536,15 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "false",
+    "status": "✅ done (Phase 3)",
+    "mapsTo": "v9 enableRowSelection",
     "group": "Selection & clipboard",
-    "status": "✅ done (Phase 3)"
+    "doc": "Row selection (Phase 3) — a leading checkbox column with header \"select all\" (indeterminate when partial) and per-row checkboxes. Maps to v9 `enableRowSelection`; state lives in `table.state.rowSelection`, keyed by `getRowId`. Read it via `table.getSelectedRowModel()`. Default: false (opt-in).",
+    "related": [
+      "enableRowSelection"
+    ],
+    "requirements": [],
+    "since": "0.5.0"
   },
   {
     "flag": "showSelectionInfo",
@@ -304,7 +553,13 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "follows enableRowSelection",
-    "status": "✅ done (Phase 3)"
+    "status": "✅ done (Phase 3)",
+    "mapsTo": "adapter toolbar",
+    "related": [
+      "showSelectionInfo"
+    ],
+    "requirements": [],
+    "since": "0.5.0"
   },
   {
     "flag": "enableUndoRedo",
@@ -313,8 +568,17 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "false",
+    "status": "✅ done (Phase 3)",
+    "mapsTo": "custom feature (needs onDataChange)",
     "group": "Editing",
-    "status": "✅ done (Phase 3)"
+    "doc": "Undo / redo of committed data changes (Phase 3, C5) — cell edits, paste, and row add/delete/duplicate. Ctrl/Cmd+Z undoes, Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y redoes; adapters also render Undo/Redo buttons. Snapshot-based, so it needs `onDataChange`. Default: false (opt-in).",
+    "related": [
+      "enableUndoRedo"
+    ],
+    "requirements": [
+      "C5"
+    ],
+    "since": "0.6.0"
   },
   {
     "flag": "showUndoRedo",
@@ -323,7 +587,13 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "follows enableUndoRedo",
-    "status": "✅ done (Phase 3)"
+    "status": "✅ done (Phase 3)",
+    "mapsTo": "adapter toolbar",
+    "related": [
+      "showUndoRedo"
+    ],
+    "requirements": [],
+    "since": "0.6.0"
   },
   {
     "flag": "(in columns menu)",
@@ -332,7 +602,10 @@
     "kind": "note",
     "type": "—",
     "default": "follows enableColumnPinning / enableColumnOrdering",
-    "status": "✅ done (Phase 3)"
+    "status": "✅ done (Phase 3)",
+    "mapsTo": "adapter columns menu",
+    "related": [],
+    "requirements": []
   },
   {
     "flag": "(in columns menu)",
@@ -341,7 +614,10 @@
     "kind": "note",
     "type": "—",
     "default": "follows enableHiding",
-    "status": "✅ done"
+    "status": "✅ done",
+    "mapsTo": "adapter columns menu — per-column eye / eye-off toggle (aria Hide <col> / Show <col>) beside pin/reorder/copy/edit, alongside the existing row visibility checkbox; calls col.toggleVisibility(). Hidden columns stay listed (menu iterates getAllLeafColumns) so they can be restored. shadcn adds eye/eyeOff icon slots (all presets)",
+    "related": [],
+    "requirements": []
   },
   {
     "flag": "showDensityToggle",
@@ -350,8 +626,14 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "false",
+    "status": "✅ done (Phase 3)",
+    "mapsTo": "adapter toolbar (data-bst-density)",
     "group": "Display",
-    "status": "✅ done (Phase 3)"
+    "related": [
+      "showDensityToggle"
+    ],
+    "requirements": [],
+    "since": "0.7.0"
   },
   {
     "flag": "showSettings",
@@ -360,7 +642,13 @@
     "kind": "toggle",
     "type": "boolean | BstSettingsOptions",
     "default": "false",
-    "status": "✅ done"
+    "status": "✅ done",
+    "mapsTo": "adapter gear → sheet (MUI Drawer / shadcn slide-over); engine useBstSettings resolves overrides → per-table enable/show, persisted to localStorage. Covers every instance-level boolean toggle via BSTSETTINGSREGISTRY (grouped: Data ops · Columns · Rows · Editing · Selection & clipboard · Display) — keep in sync per \"settings-sheet parity\" above. Sheet chrome: highlighted header band, divider-separated sections with prominent uppercase headings, and a search box (BstSettingsOptions.search, auto for 30+ lists) filtering by label/hint/group via the shared pure helpers filterSettingsGroups / shouldShowSettingsSearch. Dependency cascade: a toggle whose prerequisite is off renders disabled (\"Needs \\<parent\\>\"), transitive + reversible — via requires edges on the registry (mirror packages/mcp/src/rules.ts) resolved by the pure export isSettingActive; in-section parent→child pairs also draw a dotted branch connector (git-graph style) via parentKey/lastChild on BstSettingsItem",
+    "related": [
+      "showSettings"
+    ],
+    "requirements": [],
+    "since": "0.11.0"
   },
   {
     "flag": "classNames",
@@ -369,7 +657,18 @@
     "kind": "prop",
     "type": "BstClassNames / BstStyles",
     "default": "— (opt-in by presence)",
-    "status": "✅ done"
+    "status": "✅ done",
+    "mapsTo": "slot class/style on grid parts (root · table · header · headerRow · headerCell · filterRow · body · row · cell · empty); headerCell/row/cell accept a fn",
+    "doc": "Custom CSS hooks — extra class names per structural slot (root, table, header, headerRow, headerCell, filterRow, body, row, cell, empty). Static strings, or a function for `headerCell` / `row` / `cell`. They compose with the built-in classes, so consumers can style the grid with their own CSS without forking the renderer (K1/K2).",
+    "related": [
+      "classNames",
+      "styles"
+    ],
+    "requirements": [
+      "K1",
+      "K2"
+    ],
+    "since": "0.10.0"
   },
   {
     "flag": "meta.headerClassName",
@@ -378,7 +677,11 @@
     "kind": "meta",
     "type": "string / CSSProperties",
     "default": "—",
-    "status": "✅ done"
+    "status": "✅ done",
+    "mapsTo": "header <th> for that column",
+    "related": [],
+    "requirements": [],
+    "since": "0.10.0"
   },
   {
     "flag": "className",
@@ -387,7 +690,14 @@
     "kind": "prop",
     "type": "string / CSSProperties",
     "default": "—",
-    "status": "✅ done"
+    "status": "✅ done",
+    "mapsTo": "adapter card wrapper (<Paper> / .sc-card)",
+    "related": [
+      "className",
+      "style"
+    ],
+    "requirements": [],
+    "since": "0.10.0"
   },
   {
     "flag": "enableCellSpanning",
@@ -396,8 +706,18 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "false",
+    "status": "✅ done",
+    "mapsTo": "custom render feature — colSpan and rowSpan; covered cells skipped (Plan.md §2.7a; no v9 feature in 9.1.2)",
     "group": "Display",
-    "status": "✅ done"
+    "doc": "Cell spanning (A5) — merge body cells across columns and/or rows. Opt-in. Default false. Declare spans via `meta.rowSpan: 'group'` (auto-merge equal values in a column) and/or the `getCellSpan` callback below.",
+    "related": [
+      "enableCellSpanning",
+      "getCellSpan"
+    ],
+    "requirements": [
+      "A5"
+    ],
+    "since": "0.12.0"
   },
   {
     "flag": "enableExpanding",
@@ -406,8 +726,19 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "false",
+    "status": "✅ done",
+    "mapsTo": "v9 rowExpandingFeature — leading expander column + full-width detail panel row",
     "group": "Rows",
-    "status": "✅ done"
+    "doc": "Master-detail (A4) — a leading expander column; clicking it reveals a detail panel row rendered by `renderDetail`. Opt-in. Default false. Built on v9's `rowExpandingFeature`.",
+    "related": [
+      "enableExpanding",
+      "renderDetail",
+      "getRowCanExpand"
+    ],
+    "requirements": [
+      "A4"
+    ],
+    "since": "0.13.0"
   },
   {
     "flag": "enableRowPinning",
@@ -416,8 +747,17 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "false",
+    "status": "✅ done",
+    "mapsTo": "v9 rowPinningFeature — leading pin column; frozen top/bottom rows (sticky)",
     "group": "Rows",
-    "status": "✅ done"
+    "doc": "Row pinning (G1) — freeze rows to the top/bottom of the grid via a leading pin column; pinned rows stay put across sort/filter/pagination and stick while the body scrolls. Opt-in. Default false. Maps to v9 `enableRowPinning`.",
+    "related": [
+      "enableRowPinning"
+    ],
+    "requirements": [
+      "G1"
+    ],
+    "since": "0.14.0"
   },
   {
     "flag": "enableRowResize",
@@ -426,8 +766,17 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "false",
+    "status": "✅ done",
+    "mapsTo": "custom — per-cell bottom drag handle → per-row height (local state); double-click resets; always shown in the settings sheet (\"Rows\", alwaysShow) so an end-user can switch it on without developer wiring (like row/column virtualization)",
     "group": "Rows",
-    "status": "✅ done"
+    "doc": "Row resizing (G2) — drag the bottom edge of any row to set its height; the whole row's cells grow/shrink and content is clipped when shorter. Per-row heights are local UI state (double-click a row's handle to reset it). Opt-in. Default false. Column resize is separate (`enableColumnResizing`).",
+    "related": [
+      "enableRowResize"
+    ],
+    "requirements": [
+      "G2"
+    ],
+    "since": "0.25.0"
   },
   {
     "flag": "enableAutoRowHeight",
@@ -436,8 +785,15 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "false",
+    "status": "✅ done",
+    "mapsTo": "custom — browser-measured, dep-free: body cells white-space: normal so each row grows to fit wrapped content (root class bst-auto-rowheight; per-column meta.wrapText → bst-wrap). Keeps overflow:hidden, so a manually-resized row still clips to its set height. In settings (\"Rows\", always shown)",
     "group": "Rows",
-    "status": "✅ done"
+    "doc": "Auto row height (X26) — rows grow to fit **wrapped** content instead of truncating each cell to one line; the browser measures the content, so no JS measurement is needed. Every body cell wraps; opt individual columns in (or out) with `meta.wrapText`. Composes with manual row resize (a resized row keeps its explicit height and clips the wrapped content). Default: false.",
+    "related": [
+      "enableAutoRowHeight"
+    ],
+    "requirements": [],
+    "since": "0.35.0"
   },
   {
     "flag": "enableGrouping",
@@ -446,8 +802,18 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "false",
+    "status": "✅ done",
+    "mapsTo": "v9 columnGroupingFeature + rowAggregationFeature — collapsible group rows + aggregates; adapters add a group toggle (▤) in the columns menu",
     "group": "Data operations",
-    "status": "✅ done"
+    "doc": "Multi-column grouping (E4) — group rows by one or more columns, with collapsible group headers and per-column aggregates. Opt-in. Default false. Set which columns to group via `initialState.grouping` (or `table.setGrouping`); a column aggregates by declaring `aggregationFn` (`'sum' | 'count' | 'mean' | 'min' | 'max' | 'extent' | 'uniqueCount'`). Maps to v9 `enableGrouping` + `columnGroupingFeature`.",
+    "related": [
+      "enableGrouping",
+      "aggregationFn"
+    ],
+    "requirements": [
+      "E4"
+    ],
+    "since": "0.15.0"
   },
   {
     "flag": "theme",
@@ -456,7 +822,14 @@
     "kind": "prop",
     "type": "'zinc' | 'inherit' (+ 'hsl' | 'oklch')",
     "default": "'zinc' / 'hsl'",
-    "status": "✅ done"
+    "status": "✅ done",
+    "mapsTo": "@bloomskill/table-shadcn — 'inherit' re-points --sc- at host shadcn tokens (.sc-inherit / .sc-fmt-color classes); 'zinc' = self-contained palette",
+    "related": [
+      "theme",
+      "tokenFormat"
+    ],
+    "requirements": [],
+    "since": "0.16.0"
   },
   {
     "flag": "dark",
@@ -465,7 +838,13 @@
     "kind": "prop",
     "type": "boolean (tri-state)",
     "default": "follows ambient .dark",
-    "status": "✅ done"
+    "status": "✅ done",
+    "mapsTo": "@bloomskill/table-shadcn — omitted follows ancestor .dark / [data-theme=dark]; true/false force via .sc-dark / .sc-light; ignored under theme=\"inherit\"",
+    "related": [
+      "dark"
+    ],
+    "requirements": [],
+    "since": "0.1.0"
   },
   {
     "flag": "icons",
@@ -474,7 +853,13 @@
     "kind": "prop",
     "type": "Partial<BstShadcnIcons>",
     "default": "built-in lucide-styled SVGs",
-    "status": "✅ done"
+    "status": "✅ done",
+    "mapsTo": "@bloomskill/table-shadcn — icon slots; optional-peer presets at ./icons/{lucide,tabler,hugeicons,phosphor,remix}; unspecified slots fall back to defaults",
+    "related": [
+      "icons"
+    ],
+    "requirements": [],
+    "since": "0.16.0"
   },
   {
     "flag": "conditionalFormats",
@@ -483,7 +868,18 @@
     "kind": "prop",
     "type": "BstFormatRule[]",
     "default": "— (opt-in by presence)",
-    "status": "✅ done"
+    "status": "✅ done",
+    "mapsTo": "declarative rules (E3 operators) → cell/row class+style, or blank a cell (F5); composes with classNames/styles",
+    "doc": "Conditional formatting (K3) — declarative rules that map a condition to a cell/row class + style (or blank the cell for F5). Reuses the E3 operators; build the rules with `<BstConditionalFormatBuilder>`. Composes with the `classNames`/`styles` slots and `meta.cellStyle`. Applied only while `enableConditionalFormatting` (default true) is on — the runtime off-switch.",
+    "related": [
+      "conditionalFormats"
+    ],
+    "requirements": [
+      "E3",
+      "F5",
+      "K3"
+    ],
+    "since": "0.18.0"
   },
   {
     "flag": "enableConditionalFormatting",
@@ -492,8 +888,17 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "true",
+    "status": "✅ done",
+    "mapsTo": "gates conditionalFormats at the useBstTable choke point — false makes the rules inert without dropping them. In settings (\"Display\", always shown; no-op on grids without rules)",
     "group": "Display",
-    "status": "✅ done"
+    "doc": "Conditional formatting (K3) — whether the `conditionalFormats` rules are applied. The rules themselves stay on `conditionalFormats` (presence is the developer opt-in); this flag lets the applied styling be switched off/on at runtime — e.g. from the settings sheet — without dropping the rules. Default: true.",
+    "related": [
+      "enableConditionalFormatting"
+    ],
+    "requirements": [
+      "K3"
+    ],
+    "since": "0.29.0"
   },
   {
     "flag": "meta.type",
@@ -502,7 +907,14 @@
     "kind": "meta",
     "type": "cell type",
     "default": "—",
-    "status": "✅ done"
+    "status": "✅ done",
+    "mapsTo": "dep-free inline-SVG cell renderers — sparkline (line/area/bar via cellMeta.variant) + KPI (value · delta chip · mini-spark)",
+    "related": [],
+    "requirements": [
+      "M1",
+      "M2"
+    ],
+    "since": "0.9.0"
   },
   {
     "flag": "meta.type",
@@ -511,7 +923,14 @@
     "kind": "meta",
     "type": "cell type",
     "default": "—",
-    "status": "✅ done"
+    "status": "✅ done",
+    "mapsTo": "dep-free — qr inline-SVG QR (byte mode, v1–10, verified vs qrcode), barcode Code 128; richText = sanitized-HTML cell (allow-list sanitizer + plain-text preview or cellMeta.render:'html' formatted read + contentEditable editor); adapters add a popup rich-text editor",
+    "related": [],
+    "requirements": [
+      "B1",
+      "J2"
+    ],
+    "since": "0.9.0"
   },
   {
     "flag": "meta.type",
@@ -520,7 +939,13 @@
     "kind": "meta",
     "type": "cell type",
     "default": "—",
-    "status": "✅ done"
+    "status": "✅ done",
+    "mapsTo": "dep-free \"⋯\" kebab → position:fixed popup of the row's actions (edit/save/cancel/duplicate/delete via the cell api), the compact alternative to the inline action buttons. Reuses meta.actions; closes on outside-click/Escape/scroll. Both skins inherit it (shadcn via ...defaultCellTypes, MUI via preset)",
+    "related": [],
+    "requirements": [
+      "B10"
+    ],
+    "since": "0.9.0"
   },
   {
     "flag": "cellMeta",
@@ -529,7 +954,16 @@
     "kind": "prop",
     "type": "preset name | RegExp | FieldFormat",
     "default": "— (opt-in by presence)",
-    "status": "✅ done"
+    "status": "✅ done",
+    "mapsTo": "Frappe-style validation + input-mask + normalizer on text/number cells. Built-ins: aadhaar (Verhoeff), pan, gstin (mod-36), tan, ifsc, email, phone, pincode, url, upi, passport, iec, esic, pf (UAN), iban (mod-97), swift, creditCard (Luhn). Extensible via defineFieldFormat / FIELDFORMATS / a bare RegExp; standalone validators exported (isValidAadhaar · isValidGstin · isValidIban · luhnValid · …). Lives in cells/formats.ts; both skins inherit it",
+    "related": [
+      "patternMessage"
+    ],
+    "requirements": [
+      "B1",
+      "B2"
+    ],
+    "since": "0.19.0"
   },
   {
     "flag": "cellMeta",
@@ -538,7 +972,13 @@
     "kind": "prop",
     "type": "boolean",
     "default": "false",
-    "status": "✅ done"
+    "status": "✅ done",
+    "mapsTo": "multiSelect read cell fits as many chips as the column width allows, folding the rest into +N more (widen → more chips, shrink → fewer); a hidden ghost row is measured + a ResizeObserver recomputes. maxChips (if set) becomes an upper cap. Both skins inherit it",
+    "related": [],
+    "requirements": [
+      "B7"
+    ],
+    "since": "0.19.0"
   },
   {
     "flag": "files",
@@ -547,7 +987,19 @@
     "kind": "prop",
     "type": "boolean / callbacks",
     "default": "preview on",
-    "status": "✅ done"
+    "status": "✅ done",
+    "mapsTo": "Click a file → dep-free preview overlay (BstFilePreview, exported): images inline, PDFs via the browser's native <iframe> viewer (no pdf.js), else open/download. Adapters' popup editor adds/removes files; onUpload(file)=>FileRef / onDelete(file) wire a real backend (busy state), else a local object URL keeps preview working offline. cellMeta.preview:false opts out",
+    "related": [
+      "files",
+      "onUpload",
+      "onDelete",
+      "accept"
+    ],
+    "requirements": [
+      "B5",
+      "I3"
+    ],
+    "since": "0.2.0"
   },
   {
     "flag": "cellMeta",
@@ -556,7 +1008,13 @@
     "kind": "prop",
     "type": "boolean | PdfThumbnailRenderer",
     "default": "false",
-    "status": "✅ done"
+    "status": "✅ done",
+    "mapsTo": "files read cell renders page 1 of a PDF as a raster <img> thumbnail via pdf.js (§6's named tool — the native <iframe> won't paint a PDF at thumbnail size). The engine stays dep-free: it never imports pdf.js — the app injects a renderer with createPdfjsThumbnailer(pdfjs) through <BstPdfThumbnailerProvider> (or per-column: cellMeta.pdfThumbnail = a renderer fn). Shows the file-type icon while rendering / if no renderer / on failure. A server raster (thumbnailUrl) still wins. The full-size click preview (BstFilePreview) still uses the native <iframe> (with data:→blob: for Chrome). Opt-in per column; both skins inherit it. Not a settings-sheet toggle (a cellMeta option)",
+    "related": [],
+    "requirements": [
+      "B5"
+    ],
+    "since": "0.19.0"
   },
   {
     "flag": "fitColumns",
@@ -565,8 +1023,17 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "false",
+    "status": "✅ done",
+    "mapsTo": "custom render measure — sizes visible columns to the scroll box (utility columns fixed) so there is no horizontal scroll; overflow-x:hidden + resizers suppressed while on. Pure render overlay via distributeFitWidths (no model mutation)",
     "group": "Columns",
-    "status": "✅ done"
+    "doc": "Fit-to-viewport layout (G3) — size columns to the container so there is **no horizontal scroll**. The data columns share the available width in proportion to their own sizes (utility columns stay fixed); manual column resizing is suppressed while this is on. Default: false.",
+    "related": [
+      "fitColumns"
+    ],
+    "requirements": [
+      "G3"
+    ],
+    "since": "0.20.0"
   },
   {
     "flag": "icons",
@@ -575,7 +1042,13 @@
     "kind": "prop",
     "type": "Partial<BstIcons>",
     "default": "built-in skin-neutral inline SVGs",
-    "status": "✅ done"
+    "status": "✅ done",
+    "mapsTo": "@bloomskill/table-engine — sort/expander/pin/boolean/file/KPI-trend/remove glyphs are inline SVG (never emoji), overridable via context; adapters forward their icon set so the whole grid matches one library",
+    "related": [
+      "icons"
+    ],
+    "requirements": [],
+    "since": "0.16.0"
   },
   {
     "flag": "computeAutoWidth",
@@ -584,7 +1057,15 @@
     "kind": "note",
     "type": "interaction",
     "default": "—",
-    "status": "✅ done"
+    "status": "✅ done",
+    "mapsTo": "sampled offscreen canvas.measureText (header + current page), clamped to minSize/maxSize → setColumnSizing; exports computeAutoWidth / measureTextWidth",
+    "related": [
+      "computeAutoWidth"
+    ],
+    "requirements": [
+      "D3"
+    ],
+    "since": "0.22.0"
   },
   {
     "flag": "enableResponsive",
@@ -593,8 +1074,17 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "false",
+    "status": "✅ done",
+    "mapsTo": "ResizeObserver hides lowest-priority columns when too narrow (v9 columnVisibility), restores as it widens; only auto-hidden columns are restored; no-op under fitColumns",
     "group": "Columns",
-    "status": "✅ done"
+    "doc": "Responsive column hiding (G4) — when the grid is too narrow to fit its columns, hide the lowest-priority ones (per `meta.responsivePriority`, higher = kept longer) until they fit; restore them as it widens. Only auto-hidden columns are restored, so it never fights a manual hide. No-op under `fitColumns`. Default: false.",
+    "related": [
+      "enableResponsive"
+    ],
+    "requirements": [
+      "G4"
+    ],
+    "since": "0.22.0"
   },
   {
     "flag": "enableStickyHeader",
@@ -603,8 +1093,18 @@
     "kind": "toggle",
     "type": "boolean | {maxHeight,maxRows}",
     "default": "false",
+    "status": "✅ done",
+    "mapsTo": "custom render — caps the scroll box to a bounded height (--bst-max-height; default 440px, or maxHeight px/CSS length, or maxRows × row estimate) so the body scrolls under a sticky header + filter row instead of the table growing taller as the page size grows (resolveStickyHeader pure helper; class bst-sticky-header). Row virtualization already does this, so the standalone class is skipped when enableVirtualization is on (the two never stack). In settings (\"Rows\", always shown so an end-user can switch it on)",
     "group": "Rows",
-    "status": "✅ done"
+    "doc": "Sticky-header viewport (G3/G4) — cap the scrollable body to a bounded height so the rows scroll **inside** the grid under a header (and per-column filter row) that stays pinned, instead of the whole table growing taller as the page size grows. `true` uses a default height (440px); pass an object to size it by pixels (`{ maxHeight }`) or by a number of visible rows (`{ maxRows }`). An object implies enabled (§12). Opt-in. Default: false. Row virtualization (`enableVirtualization`) already includes this behaviour — it also caps the body and sticks the header — so this is the same viewport **without** row windowing, for small / medium grids. The height is overridable via `styles.root`.",
+    "related": [
+      "enableStickyHeader"
+    ],
+    "requirements": [
+      "G3",
+      "G4"
+    ],
+    "since": "0.40.0"
   },
   {
     "flag": "enableVirtualization",
@@ -613,8 +1113,18 @@
     "kind": "toggle",
     "type": "boolean | {overscan,estimateRowSize,estimateColumnSize}",
     "default": "false",
+    "status": "✅ done",
+    "mapsTo": "custom render feature — @tanstack/react-virtual; paints only rows in the viewport (resolveVirtualization pure helper, useVirtualizer in BstTable). Yields to (renders un-windowed under) master-detail / grouping / cell spanning / row pinning — see virtualizationBypassReason. In settings (\"Performance\", always shown so an end-user can switch it on for a large grid)",
     "group": "Performance",
-    "status": "✅ done"
+    "doc": "Row virtualization (D1) — render only the rows inside the scroll viewport (plus overscan), so a 10k / 1M-row grid stays fast with a bounded DOM. Pass `true`, or an object to tune it (`{ overscan, estimateRowSize, estimateColumnSize }` — an object implies enabled, §12). Opt-in. Default false. The scroll box needs a bounded height — one is applied by default and can be overridden via `styles.root`. **Yields to** master-detail, grouping, cell spanning and row pinning (the grid renders un-windowed when one of those is on). Built on `@tanstack/react-virtual`.",
+    "related": [
+      "enableVirtualization",
+      "VirtualizationOptions"
+    ],
+    "requirements": [
+      "D1"
+    ],
+    "since": "0.33.0"
   },
   {
     "flag": "enableColumnVirtualization",
@@ -623,8 +1133,17 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "false",
+    "status": "✅ done",
+    "mapsTo": "sub-toggle of enableVirtualization (needs it on) — also windows columns horizontally for very wide grids (header + filter row + body kept aligned via spacer cells); falls back to all-columns under column pinning / fitColumns / grouped headers / cell spanning. In settings (\"Performance\", always shown)",
     "group": "Performance",
-    "status": "✅ done"
+    "doc": "Column virtualization (D1) — also window the columns horizontally, for very wide (100+ column) grids. Sub-toggle of `enableVirtualization` (needs it on). Falls back to rendering all columns when column pinning, `fitColumns`, grouped headers or cell spanning is active. Default false.",
+    "related": [
+      "enableColumnVirtualization"
+    ],
+    "requirements": [
+      "D1"
+    ],
+    "since": "0.33.0"
   },
   {
     "flag": "useBstInfiniteDataSource",
@@ -633,7 +1152,16 @@
     "kind": "prop",
     "type": "hook + () => void callback",
     "default": "— (opt-in)",
-    "status": "✅ done"
+    "status": "✅ done",
+    "mapsTo": "fetch-on-scroll append over a DataSource: accumulates windows, resets on sort/filter change, exposes fetchNextPage/hasNextPage/isFetchingNextPage/rows/totalCount + tableProps (manual mode). onReachEnd fires once as the virtualized body nears its tail. Pair with enableVirtualization + pagination={false}. Not a settings toggle (a hook + callback, like the server DataSource)",
+    "related": [
+      "useBstInfiniteDataSource",
+      "endReachedThreshold"
+    ],
+    "requirements": [
+      "A2"
+    ],
+    "since": "0.33.0"
   },
   {
     "flag": "DataSource",
@@ -642,7 +1170,18 @@
     "kind": "prop",
     "type": "optional DataSource methods + bridge helper",
     "default": "— (opt-in)",
-    "status": "✅ done"
+    "status": "✅ done",
+    "mapsTo": "formal server file contract (Plan.md §2.2): uploadFile(file, ctx?)→BstFileRef, deleteFile(ref, ctx?), getFileUrl(ref, ctx?)→short-lived view URL (so B5 thumbnails never bake a permanent URL into row data). createFileHandlers(source, ctx?) bridges them to the files cell's cellMeta.onUpload/onDelete; complements the cell-level upload/delete. Not a settings toggle (a DataSource API)",
+    "related": [
+      "deleteFile",
+      "getFileUrl",
+      "createFileHandlers"
+    ],
+    "requirements": [
+      "B5",
+      "I3"
+    ],
+    "since": "0.28.0"
   },
   {
     "flag": "getGridState",
@@ -651,7 +1190,19 @@
     "kind": "note",
     "type": "functions + hook · BstGridStateOptions",
     "default": "— (opt-in)",
-    "status": "✅ done"
+    "status": "✅ done",
+    "mapsTo": "serializable view-state snapshot (BstGridState: sort · filter · globalFilter · column order/size/visibility/pinning · grouping · expanded · rowPinning · rowSelection · pagination) for per-user views that survive reloads. v9 reads table.store.state, restores via per-slice setters; applyGridState drops stale column ids so a snapshot survives a column-set change. include/exclude narrow the slices; version-stamped (BSTGRIDSTATEVERSION) so incompatible blobs are ignored on load. Adapters' one-line gridState={{ key }} seeds initialState from storage + persists changes (a null-rendering child, so non-users pay nothing). In manual mode (persist: false + showSettings), the adapters also surface Save view / Reset view buttons in the settings-sheet footer (Save shown only when persist:false; Reset whenever gridState is set) under a \"Saved view\" section heading — no new flag, chrome only. Two stores: the sheet's feature toggles persist automatically to bst-table:settings:<key>, the view to bst-table:state:<key>; Save view does not capture feature toggles and each half has its own Reset (the captions say which is which). Distinct from showSettings (which toggles features). Not a settings-sheet toggle (an API + hook + config prop, like the server DataSource)",
+    "related": [
+      "getGridState",
+      "applyGridState",
+      "resetGridState",
+      "loadGridState",
+      "saveGridState",
+      "clearGridState",
+      "useBstGridState"
+    ],
+    "requirements": [],
+    "since": "0.37.0"
   },
   {
     "flag": "showColumnEditToggle",
@@ -660,7 +1211,15 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "false",
-    "status": "✅ done"
+    "status": "✅ done",
+    "mapsTo": "adapter Columns-menu lock/unlock (✏️) per editable column → engine runtime.setColumnEditable overrides meta.editable at runtime (store columnEdit). Requires enableEditing. Not a BstTableEngineToggles flag (no settings-sheet entry)",
+    "related": [
+      "showColumnEditToggle"
+    ],
+    "requirements": [
+      "F3"
+    ],
+    "since": "0.27.0"
   },
   {
     "flag": "enableEditing",
@@ -669,8 +1228,19 @@
     "kind": "toggle",
     "type": "EditingOptions + callback",
     "default": "— (opt-in)",
+    "status": "✅ done",
+    "mapsTo": "third editing mode: EVERY edit/paste stays an unsaved draft; runtime.getChangeSet() (old→new + formatted text), revertCell/revertRow, formatValue. onSave(event) fires once per save action (commitAll/commitRowSession) with { changes, rows[].patch, next } — ONE batched API call, never per cell/row/column; a rejected onSave keeps every draft. Mode is settings-toggleable via enableBatchEditing (next rows)",
     "group": "Editing",
-    "status": "✅ done"
+    "doc": "Inline editing feature. `boolean | EditingOptions`. Default: false (opt-in).",
+    "related": [
+      "onSave"
+    ],
+    "requirements": [
+      "C2",
+      "I2",
+      "I4"
+    ],
+    "since": "0.2.0"
   },
   {
     "flag": "showChangesSheet",
@@ -679,7 +1249,14 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "follows mode: 'batch'",
-    "status": "✅ done"
+    "status": "✅ done",
+    "mapsTo": "adapter \"{n} unsaved\" chip + Review & save → right sheet (MUI Drawer / shadcn slide-over) listing each edit (row · column · old → new) with per-change/per-row revert + the final Save confirmation (runtime.commitAll() → one onSave); failed save keeps drafts + shows the error. Replaces the plain save bar while on. Like showSaveBar, not a settings-sheet entry",
+    "related": [
+      "showChangesSheet",
+      "changesRowLabel"
+    ],
+    "requirements": [],
+    "since": "0.30.0"
   },
   {
     "flag": "enableBatchEditing",
@@ -688,8 +1265,33 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "— (follows enableEditing.mode)",
+    "status": "✅ done",
+    "mapsTo": "overrides the editing mode at runtime: true forces 'batch', false forces a batch grid back to per-cell; unset follows enableEditing.mode. In the settings sheet (\"Editing\", alwaysShow) via the new SETTINGSMETA.getBase hook, so the switch truthfully reflects a { mode: 'batch' } grid as ON; adapters' review-sheet chrome follows it.",
     "group": "Editing",
-    "status": "✅ done"
+    "doc": "Batch editing (runtime switch for `enableEditing.mode: 'batch'`). When set it OVERRIDES the configured editing mode: `true` forces batch mode (every edit stays an unsaved draft until the explicit Review & save), `false` forces a batch-configured grid back to per-cell commits. Leave unset to follow `enableEditing.mode`. Needs `enableEditing`; this is the flag the settings sheet toggles (\"Editing\" group), so end-users can switch batch mode per table.",
+    "related": [
+      "enableBatchEditing"
+    ],
+    "requirements": [],
+    "since": "0.32.0"
+  },
+  {
+    "flag": "enableEditLog",
+    "feature": "Log committed cell edits (debug)",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "false",
+    "status": "✅ done",
+    "mapsTo": "custom — a debug companion to the onCellCommit(change) callback (itself the inline counterpart to onSave). onCellCommit fires once per committed cell the moment an edit writes through (Enter/blur in 'cell' mode, or per pasted cell) with the single BstCellEdit (rowId · columnId · field · old→new value + formatted text · row); emitted from persist() downstream of commitCell, so it also covers Enter/Tab commit-and-move + paste, while deferred 'row'/'batch' modes still batch through onSave. When enableEditLog is on and no handler is set, each commit is console.logged instead (handler wins — no double signal). In settings (\"Editing\", always shown; needs enableEditing). Both forward through the adapters (...rest)",
+    "group": "Editing",
+    "doc": "Log committed cell edits — a debug aid (the \"Both\"-mode companion to `onCellCommit`). When `true`, every cell commit that writes through — an inline edit saved on Enter/blur, or each cell of a paste — is `console.log`ged as a `BstCellEdit` (old → new, formatted text, the row). If an `onCellCommit` handler is supplied it takes precedence and this stays quiet, so you never get a double signal. Needs `enableEditing`. Default: false (opt-in).",
+    "related": [
+      "enableEditLog",
+      "onCellCommit"
+    ],
+    "requirements": [],
+    "since": "0.42.0"
   },
   {
     "flag": "enableExport",
@@ -698,8 +1300,15 @@
     "kind": "toggle",
     "type": "boolean | BstExportOptions",
     "default": "false",
+    "status": "✅ done",
+    "mapsTo": "custom — dep-free toCsv / toXlsx (store-only ZIP + OOXML, no exceljs) / buildPrintHtml; runtime.exportCsv/exportExcel/printTable. Scope defaults to all pages (pre-pagination); values formatted per cell type (match copy). In settings (\"Export\", always shown)",
     "group": "Export",
-    "status": "✅ done"
+    "doc": "Export (Phase 5, X1–X3) — download the grid as **CSV** / **Excel** (`.xlsx`) or open a **print** view. `true` enables all three; pass a {@link BstExportOptions} object to choose formats and set the file name / row scope (an object implies enabled, §12). Opt-in. Default false. Adapters render an \"Export\" toolbar menu (`showExport`); drive it programmatically via `runtime.exportCsv()` / `runtime.exportExcel()` / `runtime.printTable()`. **Dependency-free** — the `.xlsx` is a hand-built OOXML package, no `exceljs`.",
+    "related": [
+      "enableExport"
+    ],
+    "requirements": [],
+    "since": "0.34.0"
   },
   {
     "flag": "enableCsvExport",
@@ -708,8 +1317,15 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "true",
+    "status": "✅ done",
+    "mapsTo": "custom — sub-toggle of enableExport; gates runtime.exportCsv + the CSV menu item (RFC-4180, UTF-8 BOM). In settings (\"Export\", always shown)",
     "group": "Export",
-    "status": "✅ done"
+    "doc": "CSV export sub-toggle (X1). `false` hides the CSV menu item and makes `runtime.exportCsv()` a no-op, while keeping Excel/Print. Needs `enableExport`. Default: true.",
+    "related": [
+      "enableCsvExport"
+    ],
+    "requirements": [],
+    "since": "0.34.0"
   },
   {
     "flag": "enableExcelExport",
@@ -718,8 +1334,15 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "true",
+    "status": "✅ done",
+    "mapsTo": "custom — sub-toggle; gates runtime.exportExcel + the Excel item; a real .xlsx (hand-built store-only ZIP + SpreadsheetML, numeric cells typed). In settings (\"Export\", always shown)",
     "group": "Export",
-    "status": "✅ done"
+    "doc": "Excel `.xlsx` export sub-toggle (X2). `false` hides the Excel menu item and makes `runtime.exportExcel()` a no-op. Needs `enableExport`. Default: true.",
+    "related": [
+      "enableExcelExport"
+    ],
+    "requirements": [],
+    "since": "0.34.0"
   },
   {
     "flag": "enablePrint",
@@ -728,8 +1351,15 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "true",
+    "status": "✅ done",
+    "mapsTo": "custom — sub-toggle; gates runtime.printTable + the Print item; opens a print-friendly window (hidden-iframe fallback). In settings (\"Export\", always shown)",
     "group": "Export",
-    "status": "✅ done"
+    "doc": "Print sub-toggle (X3). `false` hides the Print menu item and makes `runtime.printTable()` a no-op. Needs `enableExport`. Default: true.",
+    "related": [
+      "enablePrint"
+    ],
+    "requirements": [],
+    "since": "0.34.0"
   },
   {
     "flag": "showExport",
@@ -738,7 +1368,13 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "follows enableExport",
-    "status": "✅ done"
+    "status": "✅ done",
+    "mapsTo": "adapter toolbar Export button → menu (CSV/Excel/Print, filtered by the sub-toggles); MUI Menu, shadcn Radix DropdownMenu",
+    "related": [
+      "showExport"
+    ],
+    "requirements": [],
+    "since": "0.34.0"
   },
   {
     "flag": "enableSetFilter",
@@ -747,8 +1383,15 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "false",
+    "status": "✅ done",
+    "mapsTo": "custom — Excel-style checklist of distinct values per column in the filter row (BstSetFilter: search · select-all/clear · counts · (Blanks)). Writes an {op:'set'} condition through the bstCondition filterFn. Categorical columns (select/multiSelect/radio/boolean) auto-eligible; meta.filter: 'set'/'condition' forces/opts out. Needs enableColumnFilters + enableColumnFilterRow. In settings (\"Data operations\", always shown)",
     "group": "Data operations",
-    "status": "✅ done"
+    "doc": "Set Filter (X4) — an Excel-style **checklist of distinct values** per column, rendered in the per-column filter row. When on, categorical columns (`singleSelect` / `multiSelect` / `radio` / `boolean`) use the checklist; any column can force it via `meta.filter: 'set'` or opt out via `meta.filter: 'condition'`. Needs `enableColumnFilters` + the filter row (`enableColumnFilterRow`) to be visible. Default: false.",
+    "related": [
+      "enableSetFilter"
+    ],
+    "requirements": [],
+    "since": "0.35.0"
   },
   {
     "flag": "enableMultiFilter",
@@ -757,8 +1400,15 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "false",
+    "status": "✅ done",
+    "mapsTo": "custom — stack several filter types on one column. A column opts in with an array meta.filter (e.g. ['condition','set']), rendered stacked in its filter row; a row must satisfy all parts (AND). Stores a compound {op:'and',conditions} value the bstCondition filterFn understands (combineFilterConditions; FilterConditionGroup); BstSetFilter + the condition input each drive a positional slot. Needs enableColumnFilters + enableColumnFilterRow (a 'set' part needs enableSetFilter); when off, an array meta.filter falls back to its first entry. In settings (\"Data operations\", always shown). Both skins inherit it",
     "group": "Data operations",
-    "status": "✅ done"
+    "doc": "Multi-filter (X11) — **stack several filter types on one column**. A column opts in with `meta.filter` as an array (e.g. `['condition', 'set']`), which renders the listed filters **stacked** in its filter row; a row must satisfy **all** of them (AND). Needs `enableColumnFilters` + `enableColumnFilterRow` (and `enableSetFilter` for a `'set'` part). Default: false.",
+    "related": [
+      "enableMultiFilter"
+    ],
+    "requirements": [],
+    "since": "0.39.0"
   },
   {
     "flag": "showStatusBar",
@@ -767,8 +1417,14 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "false",
+    "status": "✅ done",
+    "mapsTo": "adapter footer — total / filtered row count + runtime.getSelectionStats() (sum·avg·min·max·count of the selected range). Selection aggregates need enableCellSelection. In settings (\"Display\")",
     "group": "Display",
-    "status": "✅ done"
+    "related": [
+      "showStatusBar"
+    ],
+    "requirements": [],
+    "since": "0.35.0"
   },
   {
     "flag": "showShortcuts",
@@ -777,7 +1433,15 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "false",
-    "status": "✅ done"
+    "status": "✅ done",
+    "mapsTo": "adapter toolbar \"?\" button + a dep-free, theme-aware overlay listing the keyboard shortcuts ACTIVE on this grid (grouped · searchable · platform-aware ⌘/Ctrl), also opens on the ? key. Headless BSTSHORTCUTSREGISTRY + pure resolveActiveShortcuts(flags, query) filter by enableCellSelection/enableClipboard/enableEditing/enableUndoRedo/enableCopyColumn/enableCopyRow (mirrors the onKeyDown handler, guarded by shortcuts.test.tsx). Not a settings-sheet toggle",
+    "related": [
+      "showShortcuts",
+      "BstShortcuts",
+      "BST_SHORTCUTS_REGISTRY"
+    ],
+    "requirements": [],
+    "since": "0.36.0"
   },
   {
     "flag": "enableContextMenu",
@@ -786,8 +1450,52 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "false",
+    "status": "✅ done",
+    "mapsTo": "custom — dep-free right-click popup at the cursor (event-delegated on the scroll box via data-bst-rowid/-colid). Default items: Copy / Copy row / Copy column (with clipboard), Export CSV / Excel (with export), Autosize column; reshape via getContextMenuItems(ctx) → BstContextMenuItem[] (spread ctx.defaultItems). Right-click selects the cell. In settings (\"Selection & clipboard\", always shown). Both skins inherit it",
     "group": "Selection & clipboard",
-    "status": "✅ done"
+    "doc": "Right-click context menu (X6) — a menu at the cursor with default actions (Copy · Copy row · Copy column while clipboard is on; Export CSV / Excel while export is on; Autosize column) plus any items returned by `getContextMenuItems`. If the resolved item list is empty the native browser menu is left alone. Default: false.",
+    "related": [
+      "enableContextMenu",
+      "getContextMenuItems"
+    ],
+    "requirements": [],
+    "since": "0.36.0"
+  },
+  {
+    "flag": "enableFind",
+    "feature": "Find (X8)",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean | BstFindOptions",
+    "default": "false",
+    "status": "✅ done",
+    "mapsTo": "custom — dep-free in-grid find bar that HIGHLIGHTS matches and jumps between them (Next/Prev · \"n of m\") without hiding rows (distinct from enableGlobalFilter, which removes non-matches). Matches computed over the visible cell text (cellClipboardText = formatValue ∘ draftAwareValue), held in the interaction store, painted per-cell via CellSlice (findRanges/isCurrentFind) so only matched cells repaint; plain-text cells get in-place <mark>s, any cell gets a bst-find-hit/-current tint. ⌘/Ctrl+F opens (independent of enableCellSelection), Enter/Shift+Enter cycle in the box, F3/Shift+F3 cycle, Esc closes; current match scrolls into view (virtualized scrollToIndex + scrollIntoView). enableFind object form = { caseSensitive?, scope?: 'view'|'all' }. Adapters add a toolbar Find button (showFind). In settings (\"Data operations\", always shown). Both skins inherit it",
+    "group": "Data operations",
+    "doc": "Find (X8) — an in-grid search box that **highlights matches and jumps between them** (Next / Prev) WITHOUT hiding rows — distinct from the global search (`enableGlobalFilter`), which removes non-matching rows. Open with ⌘/Ctrl+F, cycle with Enter / F3 (Shift for previous), close with Esc. Pass an object (`{ caseSensitive?, scope? }`) to configure; an object implies enabled (§12). Default: false.",
+    "related": [
+      "enableFind",
+      "BstFindOptions",
+      "showFind"
+    ],
+    "requirements": [
+      "F3"
+    ],
+    "since": "0.42.0"
+  },
+  {
+    "flag": "showFind",
+    "feature": "Find button (X8)",
+    "layer": "chrome",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "follows enableFind",
+    "status": "✅ done",
+    "mapsTo": "adapter toolbar Find button that opens the in-grid find bar; a no-op without enableFind (chrome follows behaviour). Like showUndoRedo, not a settings-sheet entry",
+    "related": [
+      "showFind"
+    ],
+    "requirements": [],
+    "since": "0.42.0"
   },
   {
     "flag": "enableRowNumbers",
@@ -796,8 +1504,16 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "false",
+    "status": "✅ done",
+    "mapsTo": "custom — a leading, non-interactive # column numbering the current view (continuous across pages; reflects sort + filter). Injected as a real leaf column with an id under the reserved bst prefix, so it stays out of sorting, the filter row, the columns menu and export by construction. Pinned to the start (sticky-left) by default — useBstTable seeds columnPinning.start with the row-number id (even over a consumer initialState/gridState), so it stays the leftmost data column ahead of any user-pinned column and sticks on horizontal scroll. The number is read from the live painted row model (cached per model, O(n)). Header defaults to # (rowNumberHeader overrides). In settings (\"Columns\", always shown). Both skins inherit it",
     "group": "Columns",
-    "status": "✅ done"
+    "doc": "Row-number column (X9) — a leading, non-interactive `#` column showing each row's 1-based position in the **current view** (continuous across pages; reflects sort + filter). It never sorts, filters, hides, resizes, reorders or pins, and stays out of the columns menu / filter row / export. Header defaults to `#` — override with `rowNumberHeader`. Default: false.",
+    "related": [
+      "enableRowNumbers",
+      "rowNumberHeader"
+    ],
+    "requirements": [],
+    "since": "0.40.0"
   },
   {
     "flag": "enableAutoColumns",
@@ -806,8 +1522,16 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "false",
+    "status": "✅ done",
+    "mapsTo": "custom — when no columns are supplied (empty array), infer one column per key found across a sample of rows (first-seen order) with a guessed cell type (number / boolean / date, else text) + humanized header; ignored the moment columns is non-empty (explicit columns win). Tune via autoColumns (sampleRows / include / exclude / header / inferType); helper autoGenerateColumns(data, opts) exported. In settings (\"Columns\")",
     "group": "Columns",
-    "status": "✅ done"
+    "doc": "Auto-generate columns from data (X27) — when **no `columns` are supplied** (an empty array), infer them from the row data: one column per key found in a sample of rows, with the cell type guessed from the value (number / boolean / date / text) and a humanized header. Ignored the moment `columns` is non-empty, so explicit columns always win. Tune via `autoColumns`. Default: false.",
+    "related": [
+      "enableAutoColumns",
+      "autoColumns"
+    ],
+    "requirements": [],
+    "since": "0.40.0"
   },
   {
     "flag": "enableOverlays",
@@ -816,7 +1540,19 @@
     "kind": "toggle",
     "type": "boolean",
     "default": "true",
+    "status": "✅ done",
+    "mapsTo": "custom — a formal overlay over the grid while loading is true or when error is set (error wins), instead of a blank / stale body. On by default: useBstDataSource / useBstInfiniteDataSource tableProps carry loading + error, so a server-wired grid shows them for free. Default content = spinner + \"Loading…\" / the error message; fully replaceable via the render props. In settings (\"Display\", always shown). Both skins inherit it",
     "group": "Display",
-    "status": "✅ done"
+    "doc": "Loading / error overlays (X23) — render a formal overlay over the grid while `loading` is true or when `error` is set, instead of leaving the body blank or stale. On by default so a grid wired to a server `DataSource` (`useBstDataSource`, which reports `loading`/`error`) shows them for free; set `false` to suppress the overlays and manage those states yourself. Feed the state via `loading` / `error`; customize via `overlayText`, `renderLoadingOverlay`, `renderErrorOverlay`. Default: true.",
+    "related": [
+      "enableOverlays",
+      "loading",
+      "error",
+      "overlayText",
+      "renderLoadingOverlay",
+      "renderErrorOverlay"
+    ],
+    "requirements": [],
+    "since": "0.40.0"
   }
 ]

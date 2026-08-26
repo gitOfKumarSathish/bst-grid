@@ -37,8 +37,12 @@ so both skins get it with no extra chrome.
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `boolean` |
 | Default | `false` |
+| Maps to | custom feature |
 | Status | ✅ done (Phase 3) |
+| Since | v0.3.0 |
 | Settings sheet | Selection & clipboard |
+
+Cell / range selection + keyboard navigation (Phase 3). Click / Shift-click to select a range; Arrow / Shift+Arrow / Tab / Home / End / Ctrl+A to move the active cell; Enter / F2 to edit. Default: false (opt-in).
 
 ## Enable it
 
@@ -51,3 +55,7 @@ so both skins get it with no extra chrome.
 ```
 
 > Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Spec coverage
+
+- **F2 · Disable row** — ✅ built. P2 — rowDisabled

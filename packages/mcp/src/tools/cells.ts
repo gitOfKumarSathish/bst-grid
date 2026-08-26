@@ -12,6 +12,22 @@ const inputSchema = {
   response_format: ResponseFormat,
 }
 
+/** Declared shape of `structuredContent`; `.passthrough()` keeps `cellMetaDetail`. */
+const outputSchema = {
+  count: z.number().describe('Number of cell types returned (1 for a single lookup)'),
+  cellTypes: z.array(
+    z
+      .object({
+        type: z.string().describe('The `meta.type` value'),
+        renders: z.string(),
+        valueShape: z.string().describe('Expected cell value type'),
+        editable: z.string(),
+        cellMeta: z.string(),
+      })
+      .passthrough(),
+  ),
+}
+
 /**
  * Cell types are where generated column definitions most often go wrong: the
  * renderer is picked by a string (`meta.type`) and each type expects a specific
@@ -47,6 +63,7 @@ Examples:
 Error handling:
   - An unknown type lists the valid ones instead of guessing.`,
       inputSchema,
+      outputSchema,
       annotations: {
         readOnlyHint: true,
         destructiveHint: false,

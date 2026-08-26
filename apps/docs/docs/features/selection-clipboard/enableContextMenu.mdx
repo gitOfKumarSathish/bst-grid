@@ -39,8 +39,12 @@ getContextMenuItems={(ctx) => [...ctx.defaultItems, { label: 'Flag row', onSelec
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `boolean` |
 | Default | `false` |
+| Maps to | custom — dep-free right-click popup at the cursor (event-delegated on the scroll box via data-bst-rowid/-colid). Default items: Copy / Copy row / Copy column (with clipboard), Export CSV / Excel (with export), Autosize column; reshape via getContextMenuItems(ctx) → BstContextMenuItem[] (spread ctx.defaultItems). Right-click selects the cell. In settings ("Selection & clipboard", always shown). Both skins inherit it |
 | Status | ✅ done |
+| Since | v0.36.0 |
 | Settings sheet | Selection & clipboard |
+
+Right-click context menu (X6) — a menu at the cursor with default actions (Copy · Copy row · Copy column while clipboard is on; Export CSV / Excel while export is on; Autosize column) plus any items returned by `getContextMenuItems`. If the resolved item list is empty the native browser menu is left alone. Default: false.
 
 ## Enable it
 
@@ -53,6 +57,12 @@ getContextMenuItems={(ctx) => [...ctx.defaultItems, { label: 'Flag row', onSelec
 ```
 
 > Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Options
+
+| Option | Notes |
+| --- | --- |
+| `getContextMenuItems` | Related prop for this feature. |
 
 ## Behavior & interactions
 

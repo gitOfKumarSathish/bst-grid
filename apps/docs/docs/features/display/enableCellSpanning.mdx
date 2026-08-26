@@ -33,8 +33,12 @@ to span contiguous equal values in a column. Covered cells are skipped in render
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `boolean` |
 | Default | `false` |
+| Maps to | custom render feature — colSpan and rowSpan; covered cells skipped (Plan.md §2.7a; no v9 feature in 9.1.2) |
 | Status | ✅ done |
+| Since | v0.12.0 |
 | Settings sheet | Display |
+
+Cell spanning (A5) — merge body cells across columns and/or rows. Opt-in. Default false. Declare spans via `meta.rowSpan: 'group'` (auto-merge equal values in a column) and/or the `getCellSpan` callback below.
 
 ## Enable it
 
@@ -52,4 +56,9 @@ to span contiguous equal values in a column. Covered cells are skipped in render
 
 | Option | Notes |
 | --- | --- |
+| `getCellSpan` | Related prop for this feature. |
 | `getCellSpan or meta.rowSpan` | spanning is opt-in per cell; without either nothing merges |
+
+## Spec coverage
+
+- **A5 · Inline charts / cell spanning** — ✅ built. v0.12.0 spanning (enableCellSpanning, col+row) · charts = M1

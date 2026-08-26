@@ -29,6 +29,23 @@ const inputSchema = {
   response_format: ResponseFormat,
 }
 
+/** Declared shape of `structuredContent`, so clients can validate and rely on it. */
+const outputSchema = {
+  query: z.string().describe('The query that was searched'),
+  count: z.number().describe('Number of hits returned'),
+  hits: z
+    .array(
+      z.object({
+        kind: z.string().describe("Record kind: 'doc' | 'feature' | 'cellType' | 'requirement' | 'api' | 'example'"),
+        title: z.string(),
+        source: z.string().describe('Repo-relative source path (with heading anchor for docs)'),
+        score: z.number().describe('BM25 relevance score'),
+        body: z.string(),
+      }),
+    )
+    .describe('Ranked matches, best first'),
+}
+
 /**
  * Registers the free-text entry point. This is the tool an agent reaches for
  * first when it doesn't yet know which flag or cell type it needs.
@@ -62,6 +79,7 @@ Examples:
 Error handling:
   - Returns "No matches" with suggested broader terms when the query hits nothing.`,
       inputSchema,
+      outputSchema,
       annotations: {
         readOnlyHint: true,
         destructiveHint: false,

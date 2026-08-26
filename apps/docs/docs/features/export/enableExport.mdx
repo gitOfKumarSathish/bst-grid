@@ -38,8 +38,12 @@ matches the screen.
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `boolean \| BstExportOptions` |
 | Default | `false` |
+| Maps to | custom — dep-free toCsv / toXlsx (store-only ZIP + OOXML, no exceljs) / buildPrintHtml; runtime.exportCsv/exportExcel/printTable. Scope defaults to all pages (pre-pagination); values formatted per cell type (match copy). In settings ("Export", always shown) |
 | Status | ✅ done |
+| Since | v0.34.0 |
 | Settings sheet | Export |
+
+Export (Phase 5, X1–X3) — download the grid as **CSV** / **Excel** (`.xlsx`) or open a **print** view. `true` enables all three; pass a &#123;@link BstExportOptions&#125; object to choose formats and set the file name / row scope (an object implies enabled, §12). Opt-in. Default false. Adapters render an "Export" toolbar menu (`showExport`); drive it programmatically via `runtime.exportCsv()` / `runtime.exportExcel()` / `runtime.printTable()`. **Dependency-free** — the `.xlsx` is a hand-built OOXML package, no `exceljs`.
 
 ## Enable it
 

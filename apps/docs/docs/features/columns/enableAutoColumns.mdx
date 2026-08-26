@@ -40,8 +40,12 @@ Tune it with the `autoColumns` option (`sampleRows`, `include`, `exclude`, `head
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `boolean` |
 | Default | `false` |
+| Maps to | custom — when no columns are supplied (empty array), infer one column per key found across a sample of rows (first-seen order) with a guessed cell type (number / boolean / date, else text) + humanized header; ignored the moment columns is non-empty (explicit columns win). Tune via autoColumns (sampleRows / include / exclude / header / inferType); helper autoGenerateColumns(data, opts) exported. In settings ("Columns") |
 | Status | ✅ done |
+| Since | v0.40.0 |
 | Settings sheet | Columns |
+
+Auto-generate columns from data (X27) — when **no `columns` are supplied** (an empty array), infer them from the row data: one column per key found in a sample of rows, with the cell type guessed from the value (number / boolean / date / text) and a humanized header. Ignored the moment `columns` is non-empty, so explicit columns always win. Tune via `autoColumns`. Default: false.
 
 ## Enable it
 
@@ -54,6 +58,12 @@ Tune it with the `autoColumns` option (`sampleRows`, `include`, `exclude`, `head
 ```
 
 > Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Options
+
+| Option | Notes |
+| --- | --- |
+| `autoColumns` | Related prop for this feature. |
 
 ## Behavior & interactions
 

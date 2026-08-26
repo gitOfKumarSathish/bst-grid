@@ -10,7 +10,9 @@ this project uses [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
-### Added — MCP server (`@bloomskill/table-mcp`): structured output + argument completions
+## [0.43.0] — 2026-08-26
+
+### Added — MCP server (`@bloomskill/table-mcp`): structured output, completions & version-awareness
 - **`outputSchema` on all 8 tools** — each tool already returned `structuredContent`; that payload is
   now validated against a declared output schema and advertised in `tools/list`, so an MCP client can
   consume results as typed, machine-readable data instead of re-parsing prose. Shared
@@ -23,10 +25,43 @@ this project uses [Semantic Versioning](https://semver.org).
   variable now autocomplete to real names via MCP's completions capability, so a name is picked from
   the corpus rather than guessed. `bst-migrate`'s `from` is intentionally left free-text (naming
   guard: no competitor product names anywhere in the tree).
-- No grid engine/adapter code or capability changed; corpus, tools, resources and prompts are
-  otherwise unchanged. Verified with `npm run mcp` (build + parity guards + stdio smoke + 28-component
-  scaffold typecheck) plus a direct check of both no-arg listing paths and all three completions
-  against the built server.
+- **Version-awareness** — each feature now carries a `since` version, extracted at build time from
+  the earliest `CHANGELOG.md` section that names the flag in code formatting (`src/generate/since.ts`;
+  release discipline §13 makes this a faithful "first shipped in"). `bst_get_feature` renders a
+  **Since** row and accepts a new `installedVersion` argument: given a project's version (from
+  `bst_detect_version`), it states plainly whether a flag exists there — **⚠️ NOT available** with the
+  version to upgrade to, **✅ available**, or ℹ️ "predates the tracked changelog" for the oldest
+  defaults (which fail safe: no `since` → never a false "unavailable"). `bst_detect_version` now nudges
+  the agent to pass `installedVersion`. `CHANGELOG.md` joined the corpus's freshness-tracked sources.
+  New unit tests cover the extractor and a numeric `compareSemver`.
+- No grid engine/adapter code or capability changed; the corpus gains a `since` field but tools,
+  resources and prompts are otherwise behaviour-compatible. Verified with `npm run mcp` (build +
+  parity guards + stdio smoke + 28-component scaffold typecheck) plus direct checks of both no-arg
+  listing paths, all three completions, and the availability verdict (old vs new version) against the
+  built server.
+
+### Changed — Docs generate from the corpus (no more hand-frozen snapshots) + coverage enforcement
+- **The missing corpus→docs bridge.** `apps/docs/scripts/{features,cells,requirements,rules}.json`
+  were static, hand-frozen snapshots that no script regenerated — so a new feature never reached the
+  docs until someone re-dumped them by hand (the root cause of docs drift). New
+  `apps/docs/scripts/dump-corpus.mjs` regenerates all four from `packages/mcp/dist/corpus.json` (+ the
+  built `RULES`); `gen:docs` runs it first, so the chain is engine → MCP corpus → JSON → MDX with no
+  hand-maintained middle. Feature pages now also carry richer generated content (maps-to, TSDoc,
+  related props, spec coverage) and a **Since** version row.
+- **`npm run docs:build`** now rebuilds the engine + MCP corpus, extracts the API, dumps the corpus,
+  regenerates every MDX page and runs the coverage gate; `version:*` runs it on release.
+- **Enforced, not convention.** New `npm run docs:verify` regenerates the docs and fails if the
+  committed output is stale — dependency-free (no docusaurus / TS5 install), wired into CI
+  (`.github/workflows/verify.yml`). CLAUDE.md §13 DoD gains a required "regenerate the generated docs"
+  step. Regenerated the whole site from the corpus (72 files); Docusaurus builds clean.
+- **MCP coverage cross-check.** New `npm run verify:mcp` (`scripts/verify-mcp-coverage.mjs`, in
+  `npm run mcp` + CI) asserts the corpus covers every engine capability — cell types, settings
+  toggles, validation rules (both directions), **every `enable*`/`show*` flag declared anywhere in the
+  engine + both adapters** (the adapter-prop surface the compile-time settings guard doesn't reach,
+  with a documented allowlist for TanStack per-column option names), and the full agent surface
+  (coverage matrix, API, examples, install guide, per-flag `since`). It caught **`showFind`**: a shipped chrome flag with a
+  validation rule but no §12 registry row, so `bst_get_feature` couldn't resolve it — now added as a
+  first-class row.
 
 ### Added — Documentation site (`apps/docs`)
 - **Docusaurus documentation site** under `apps/docs` — the generated reference for Bst-Table:

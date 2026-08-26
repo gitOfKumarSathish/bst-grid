@@ -33,8 +33,12 @@ makes the rules **inert without dropping them** — a clean way to toggle format
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `boolean` |
 | Default | `true` |
+| Maps to | gates conditionalFormats at the useBstTable choke point — false makes the rules inert without dropping them. In settings ("Display", always shown; no-op on grids without rules) |
 | Status | ✅ done |
+| Since | v0.29.0 |
 | Settings sheet | Display |
+
+Conditional formatting (K3) — whether the `conditionalFormats` rules are applied. The rules themselves stay on `conditionalFormats` (presence is the developer opt-in); this flag lets the applied styling be switched off/on at runtime — e.g. from the settings sheet — without dropping the rules. Default: true.
 
 ## Enable it
 
@@ -57,3 +61,7 @@ makes the rules **inert without dropping them** — a clean way to toggle format
 ## Behavior & interactions
 
 - Defaults to ON — it is the runtime off-switch for rules already passed, not the opt-in.
+
+## Spec coverage
+
+- **K3 · Conditional formatting** — ✅ built. v0.18.0 — rule engine + &lt;BstConditionalFormatBuilder&gt;

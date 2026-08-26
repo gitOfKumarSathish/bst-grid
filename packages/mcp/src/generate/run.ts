@@ -24,6 +24,7 @@ import { extractFeatures } from './features.js'
 const STRUCTURED_SOURCE_FILES = [
   'CLAUDE.md',
   'COVERAGE.md',
+  'CHANGELOG.md',
   'packages/engine/src/types.ts',
   'packages/engine/dist/settings.js',
   'packages/engine/dist/index.d.ts',
@@ -57,6 +58,7 @@ export async function generateCorpus(repoRoot: string): Promise<BstCorpus> {
     sources: [
       'CLAUDE.md (§12 feature toggle registry)',
       'COVERAGE.md (58-leaf status matrix)',
+      'CHANGELOG.md (per-flag "since" versions)',
       'packages/engine/dist/settings.js (BST_SETTINGS_REGISTRY)',
       'packages/engine/src/types.ts (TSDoc)',
       'packages/engine/dist/index.d.ts (API signatures)',

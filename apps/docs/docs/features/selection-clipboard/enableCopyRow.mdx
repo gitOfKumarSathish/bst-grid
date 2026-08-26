@@ -30,8 +30,12 @@ A **sub-toggle of clipboard** (on by default) gating `selectRow` / `copyRow`.
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `boolean` |
 | Default | `true` |
+| Maps to | custom — sub-toggle of clipboard; gates selectRow/copyRow (Shift+Space). In settings ("Selection & clipboard", always shown) |
 | Status | ✅ done |
+| Since | v0.27.0 |
 | Settings sheet | Selection & clipboard |
+
+Copy a whole **row** (H2) — the Shift+Space gesture / `runtime.copyRow`. A sub-toggle of clipboard; set `false` to disable row-copy. Default: true.
 
 ## Enable it
 
@@ -49,3 +53,7 @@ A **sub-toggle of clipboard** (on by default) gating `selectRow` / `copyRow`.
 
 - **Requires** `enableClipboard` to be on — this flag is a no-op otherwise.
 - Defaults to ON — set false to disable Shift+Space row copy while keeping the rest of the clipboard.
+
+## Spec coverage
+
+- **H2 · Copy row** — ✅ built. P3

@@ -43,8 +43,12 @@ It also bounds the scroll box, so `enableStickyHeader` isn't needed alongside it
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `boolean \| {overscan,estimateRowSize,estimateColumnSize}` |
 | Default | `false` |
+| Maps to | custom render feature — @tanstack/react-virtual; paints only rows in the viewport (resolveVirtualization pure helper, useVirtualizer in BstTable). Yields to (renders un-windowed under) master-detail / grouping / cell spanning / row pinning — see virtualizationBypassReason. In settings ("Performance", always shown so an end-user can switch it on for a large grid) |
 | Status | ✅ done |
+| Since | v0.33.0 |
 | Settings sheet | Performance |
+
+Row virtualization (D1) — render only the rows inside the scroll viewport (plus overscan), so a 10k / 1M-row grid stays fast with a bounded DOM. Pass `true`, or an object to tune it (`{ overscan, estimateRowSize, estimateColumnSize }` — an object implies enabled, §12). Opt-in. Default false. The scroll box needs a bounded height — one is applied by default and can be overridden via `styles.root`. **Yields to** master-detail, grouping, cell spanning and row pinning (the grid renders un-windowed when one of those is on). Built on `@tanstack/react-virtual`.
 
 ## Enable it
 
@@ -58,6 +62,12 @@ It also bounds the scroll box, so `enableStickyHeader` isn't needed alongside it
 
 > Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
 
+## Options
+
+| Option | Notes |
+| --- | --- |
+| `VirtualizationOptions` | Related prop for this feature. |
+
 ## Behavior & interactions
 
 - **Conflicts with** `enableExpanding` — the grid renders un-windowed (yields) while master-detail is on.
@@ -65,3 +75,7 @@ It also bounds the scroll box, so `enableStickyHeader` isn't needed alongside it
 - **Conflicts with** `enableCellSpanning` — the grid renders un-windowed (yields) while cell spanning is on.
 - **Conflicts with** `enableRowPinning` — the grid renders un-windowed (yields) while row pinning is on.
 - Paints only the visible rows for large datasets. Object form tunes `overscan` / `estimateRowSize` / `estimateColumnSize`. Needs a bounded scroll-box height (applied by default; override via `styles.root`).
+
+## Spec coverage
+
+- **D1 · Row & column virtualization** — ✅ built. enableVirtualization (+ enableColumnVirtualization) on @tanstack/react-virtual — windowed rows (dynamic measure) + columns, sticky header, bounded DOM; yields to master-detail / grouping / cell spanning / row pinning. Tested (virtualization.test.tsx)

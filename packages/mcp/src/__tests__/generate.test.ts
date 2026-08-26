@@ -6,8 +6,10 @@ import { findRepoRoot } from '../constants.js'
 import { classifyFlag, extractTsDoc, primaryFlag, requirementIdsFrom } from '../generate/features.js'
 import { docSources } from '../generate/docs.js'
 import { findStaleSources } from '../generate/freshness.js'
+import { buildShipVersionLookup } from '../generate/since.js'
 import { codeSpans, parseTable, sections, slugify, stripMd } from '../generate/md.js'
 import { buildSearchIndex } from '../search/index.js'
+import { compareSemver } from '../semver.js'
 import type { BstCorpus } from '../types.js'
 
 const repoRoot = findRepoRoot(process.cwd())
@@ -85,6 +87,15 @@ describe('feature-row parsing', () => {
   })
 })
 
+describe('semver compare', () => {
+  it('orders x.y.z versions numerically, not lexically', () => {
+    expect(compareSemver('0.30.0', '0.42.0')).toBeLessThan(0)
+    expect(compareSemver('0.9.0', '0.10.0')).toBeLessThan(0) // lexical would get this wrong
+    expect(compareSemver('0.42.0', '0.42.0')).toBe(0)
+    expect(compareSemver('1.0.0', '0.99.0')).toBeGreaterThan(0)
+  })
+})
+
 describeCorpus('generated corpus', () => {
   const c = corpus as BstCorpus
 
@@ -118,6 +129,26 @@ describeCorpus('generated corpus', () => {
       group: 'Data operations',
     })
     expect(sorting?.doc).toBeTruthy()
+  })
+
+  /**
+   * Version-awareness: recent flags carry the version they shipped in, so
+   * `bst_get_feature({ installedVersion })` can tell an agent a feature postdates
+   * the version its project has installed. Extracted from CHANGELOG.md.
+   */
+  it('stamps recently-added flags with the version they shipped in (since)', () => {
+    const find = c.features.find((f) => f.flag === 'enableFind')
+    expect(find?.since).toMatch(/^\d+\.\d+\.\d+$/)
+    // Foundational defaults predate the tracked changelog — an absent `since` is
+    // correct there (they exist in every version, so nothing to warn about).
+    const sorting = c.features.find((f) => f.flag === 'enableSorting')
+    expect(sorting?.since === undefined || /^\d+\.\d+\.\d+$/.test(sorting.since)).toBe(true)
+  })
+
+  it('resolves `since` from the changelog, and returns undefined for unknown flags', () => {
+    const sinceOf = buildShipVersionLookup(repoRoot as string)
+    expect(sinceOf('enableFind')).toMatch(/^\d+\.\d+\.\d+$/)
+    expect(sinceOf('__not_a_real_flag__')).toBeUndefined()
   })
 
   /**

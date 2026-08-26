@@ -32,7 +32,9 @@ Combine it with `enableColumnFilterRow` for a second, inline per-column row.
 | Layer | `show*` (chrome, resolved in the adapter) |
 | Type | `boolean` |
 | Default | `false` |
+| Maps to | adapter panel hosting BstFilterBuilder |
 | Status | ✅ done (Phase 3) |
+| Since | v0.9.0 |
 | Settings sheet | Display |
 
 ## Enable it
@@ -51,3 +53,7 @@ Combine it with `enableColumnFilterRow` for a second, inline per-column row.
 ## Behavior & interactions
 
 - **Requires** `enableColumnFilters` to be on — this flag is a no-op otherwise.
+
+## Spec coverage
+
+- **E3 · Advanced filtering** — ✅ built. P3 — filter builder + bstCondition

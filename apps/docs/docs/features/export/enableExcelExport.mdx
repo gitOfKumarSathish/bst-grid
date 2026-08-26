@@ -32,8 +32,12 @@ item; produces a real `.xlsx` (hand-built store-only ZIP + SpreadsheetML, numeri
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `boolean` |
 | Default | `true` |
+| Maps to | custom — sub-toggle; gates runtime.exportExcel + the Excel item; a real .xlsx (hand-built store-only ZIP + SpreadsheetML, numeric cells typed). In settings ("Export", always shown) |
 | Status | ✅ done |
+| Since | v0.34.0 |
 | Settings sheet | Export |
+
+Excel `.xlsx` export sub-toggle (X2). `false` hides the Excel menu item and makes `runtime.exportExcel()` a no-op. Needs `enableExport`. Default: true.
 
 ## Enable it
 

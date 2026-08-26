@@ -42,12 +42,6 @@
     "notes": "P2 · QR + barcode v0.23.0 (dep-free inline-SVG; QR verified bit-for-bit vs qrcode) · ERP field formats (cellMeta.pattern: PAN/GSTIN/IFSC/IBAN/SWIFT/email/…)"
   },
   {
-    "id": "B10",
-    "title": "Action column",
-    "status": "built",
-    "notes": "P2; \"floating\" variant open (Q5)"
-  },
-  {
     "id": "B2",
     "title": "Number (currency/precision/formats)",
     "status": "built",
@@ -94,6 +88,12 @@
     "title": "Hyperlink",
     "status": "built",
     "notes": "P2"
+  },
+  {
+    "id": "B10",
+    "title": "Action column",
+    "status": "built",
+    "notes": "P2; \"floating\" variant open (Q5)"
   },
   {
     "id": "C1",

@@ -33,8 +33,12 @@ force or opt out with `meta.filter: 'set'` / `'condition'`.
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `boolean` |
 | Default | `false` |
+| Maps to | custom — Excel-style checklist of distinct values per column in the filter row (BstSetFilter: search · select-all/clear · counts · (Blanks)). Writes an &#123;op:'set'&#125; condition through the bstCondition filterFn. Categorical columns (select/multiSelect/radio/boolean) auto-eligible; meta.filter: 'set'/'condition' forces/opts out. Needs enableColumnFilters + enableColumnFilterRow. In settings ("Data operations", always shown) |
 | Status | ✅ done |
+| Since | v0.35.0 |
 | Settings sheet | Data operations |
+
+Set Filter (X4) — an Excel-style **checklist of distinct values** per column, rendered in the per-column filter row. When on, categorical columns (`singleSelect` / `multiSelect` / `radio` / `boolean`) use the checklist; any column can force it via `meta.filter: 'set'` or opt out via `meta.filter: 'condition'`. Needs `enableColumnFilters` + the filter row (`enableColumnFilterRow`) to be visible. Default: false.
 
 ## Enable it
 

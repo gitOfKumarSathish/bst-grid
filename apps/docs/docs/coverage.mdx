@@ -14,45 +14,45 @@ Requirement-by-requirement status across 58 spec leaves: **55 built**, **2 parti
 | Leaf | Requirement | Status | Notes | Flags |
 | --- | --- | --- | --- | --- |
 | A1 | Inline editing | ✅ built | P2 — enableEditing | — |
-| A2 | Infinite / virtual scroll | ✅ built | virtual scroll = D1 (enableVirtualization); infinite = useBstInfiniteDataSource (fetch-on-scroll append + onReachEnd) over the server DataSource | — |
+| A2 | Infinite / virtual scroll | ✅ built | virtual scroll = D1 (enableVirtualization); infinite = useBstInfiniteDataSource (fetch-on-scroll append + onReachEnd) over the server DataSource | `useBstInfiniteDataSource` |
 | A3 | Pagination (client/server) | ✅ built | client + server (manual mode) v0.28.0 — useBstDataSource / DataSource (manual sort/filter/paginate passthrough) | — |
-| A4 | Nested / master-detail | ✅ built | v0.13.0 — enableExpanding + renderDetail | — |
-| A5 | Inline charts / cell spanning | ✅ built | v0.12.0 spanning (enableCellSpanning, col+row) · charts = M1 | — |
+| A4 | Nested / master-detail | ✅ built | v0.13.0 — enableExpanding + renderDetail | `enableExpanding` |
+| A5 | Inline charts / cell spanning | ✅ built | v0.12.0 spanning (enableCellSpanning, col+row) · charts = M1 | `enableCellSpanning` |
 | A6 | High-perf at 3 scales | 🟡 partial | workflow tier ✅; 10k client-virtual now ✅ (D1); server tier reachable v0.28.0 + infinite scroll (A2); 1M migration tier still to prove end-to-end | — |
 
 ## B
 
 | Leaf | Requirement | Status | Notes | Flags |
 | --- | --- | --- | --- | --- |
-| B1 | Text / long text | ✅ built | P2 · QR + barcode v0.23.0 (dep-free inline-SVG; QR verified bit-for-bit vs qrcode) · ERP field formats (cellMeta.pattern: PAN/GSTIN/IFSC/IBAN/SWIFT/email/…) | — |
-| B2 | Number (currency/precision/formats) | ✅ built | P2 — Intl formats · ERP field formats (cellMeta.pattern: Aadhaar/Verhoeff, PIN, card/Luhn) | — |
+| B1 | Text / long text | ✅ built | P2 · QR + barcode v0.23.0 (dep-free inline-SVG; QR verified bit-for-bit vs qrcode) · ERP field formats (cellMeta.pattern: PAN/GSTIN/IFSC/IBAN/SWIFT/email/…) | `meta.type`, `cellMeta` |
+| B2 | Number (currency/precision/formats) | ✅ built | P2 — Intl formats · ERP field formats (cellMeta.pattern: Aadhaar/Verhoeff, PIN, card/Luhn) | `cellMeta` |
 | B3 | Date / time | ✅ built | P2 | — |
 | B4 | Boolean | ✅ built | P2 (now an injectable check icon) | — |
-| B5 | Files & attachments | ✅ built | file cell + image thumbnails + file-type icons + in-cell PDF thumbnail (cellMeta.pdfThumbnail — page 1 rendered by pdf.js to an &lt;img&gt;; engine stays dep-free, app injects createPdfjsThumbnailer(pdfjs) via &lt;BstPdfThumbnailerProvider&gt;) + click-to-preview (BstFilePreview: image inline · PDF native iframe, data:→blob:) + configurable upload/delete (cellMeta.onUpload/onDelete); a server raster (thumbnailUrl) wins when present | — |
+| B5 | Files & attachments | ✅ built | file cell + image thumbnails + file-type icons + in-cell PDF thumbnail (cellMeta.pdfThumbnail — page 1 rendered by pdf.js to an &lt;img&gt;; engine stays dep-free, app injects createPdfjsThumbnailer(pdfjs) via &lt;BstPdfThumbnailerProvider&gt;) + click-to-preview (BstFilePreview: image inline · PDF native iframe, data:→blob:) + configurable upload/delete (cellMeta.onUpload/onDelete); a server raster (thumbnailUrl) wins when present | `files`, `cellMeta`, `DataSource` |
 | B6 | Single select | ✅ built | P2 (inline overlay editor) | — |
-| B7 | Multi select (chips/overflow) | ✅ built | P2 · width-aware chips (cellMeta.fitChips — fit to column width) | — |
+| B7 | Multi select (chips/overflow) | ✅ built | P2 · width-aware chips (cellMeta.fitChips — fit to column width) | `cellMeta` |
 | B8 | Radio group | ✅ built | P2 | — |
 | B9 | Hyperlink | ✅ built | P2 | — |
-| B10 | Action column | ✅ built | P2; "floating" variant open (Q5) | — |
+| B10 | Action column | ✅ built | P2; "floating" variant open (Q5) | `meta.type` |
 
 ## C
 
 | Leaf | Requirement | Status | Notes | Flags |
 | --- | --- | --- | --- | --- |
 | C1 | Editing modes | ✅ built | P2 — cell + row-session | — |
-| C2 | Save on Enter/Blur/Explicit | ✅ built | P2 | — |
+| C2 | Save on Enter/Blur/Explicit | ✅ built | P2 | `enableEditing` |
 | C3 | Cell/row/cross-col/async validation | ✅ built | P2 — enableValidation | — |
 | C4 | Inline validation feedback | ✅ built | P2 | — |
-| C5 | Shortcuts (arrows/undo-redo) | ✅ built | P3 — nav + enableUndoRedo | — |
-| C6 | Tab nav (skip/wrap) | ✅ built | P3 | — |
+| C5 | Shortcuts (arrows/undo-redo) | ✅ built | P3 — nav + enableUndoRedo | `enableTypeToEdit`, `enableUndoRedo` |
+| C6 | Tab nav (skip/wrap) | ✅ built | P3 | `enableTypeToEdit` |
 
 ## D
 
 | Leaf | Requirement | Status | Notes | Flags |
 | --- | --- | --- | --- | --- |
-| D1 | Row & column virtualization | ✅ built | enableVirtualization (+ enableColumnVirtualization) on @tanstack/react-virtual — windowed rows (dynamic measure) + columns, sticky header, bounded DOM; yields to master-detail / grouping / cell spanning / row pinning. Tested (virtualization.test.tsx) | — |
+| D1 | Row & column virtualization | ✅ built | enableVirtualization (+ enableColumnVirtualization) on @tanstack/react-virtual — windowed rows (dynamic measure) + columns, sticky header, bounded DOM; yields to master-detail / grouping / cell spanning / row pinning. Tested (virtualization.test.tsx) | `enableVirtualization`, `enableColumnVirtualization` |
 | D2 | Lightweight cell renderers | ✅ built | P2 — memoized hot-path | — |
-| D3 | Smart column auto-size | ✅ built | v0.22.0 — double-click resizer → sampled canvas.measureText fit | — |
+| D3 | Smart column auto-size | ✅ built | v0.22.0 — double-click resizer → sampled canvas.measureText fit | `computeAutoWidth` |
 | D4 | Partial / dirty-cell render | ✅ built | P2–3 — draft overlay, paint-time | — |
 
 ## E
@@ -61,45 +61,45 @@ Requirement-by-requirement status across 58 spec leaves: **55 built**, **2 parti
 | --- | --- | --- | --- | --- |
 | E1 | Sorting | ✅ built | P1 | — |
 | E2 | Column & global search | ✅ built | P1 global + P3 per-column filter row | — |
-| E3 | Advanced filtering | ✅ built | P3 — filter builder + bstCondition | — |
-| E4 | Multi-column grouping | ✅ built | v0.15.0 — enableGrouping + aggregates + group toggle | — |
+| E3 | Advanced filtering | ✅ built | P3 — filter builder + bstCondition | `enableColumnFilters`, `showFilterBuilder`, `conditionalFormats` |
+| E4 | Multi-column grouping | ✅ built | v0.15.0 — enableGrouping + aggregates + group toggle | `enableGrouping` |
 
 ## F
 
 | Leaf | Requirement | Status | Notes | Flags |
 | --- | --- | --- | --- | --- |
-| F1 | Disable grid | ✅ built | P2 — disabled | — |
-| F2 | Disable row | ✅ built | P2 — rowDisabled | — |
-| F3 | Disable column | ✅ built | P3 — meta.disabled | — |
-| F4 | Disable cell | ✅ built | P3 — meta.disabled fn + cellDisabled | — |
-| F5 | Conditional visibility/render | ✅ built | v0.18.0 — conditionalFormats (hideContent + rule styling) | — |
+| F1 | Disable grid | ✅ built | P2 — disabled | `disabled` |
+| F2 | Disable row | ✅ built | P2 — rowDisabled | `enableCellSelection`, `rowDisabled` |
+| F3 | Disable column | ✅ built | P3 — meta.disabled | `meta.disabled`, `showColumnEditToggle`, `enableFind` |
+| F4 | Disable cell | ✅ built | P3 — meta.disabled fn + cellDisabled | `meta.disabled`, `cellDisabled` |
+| F5 | Conditional visibility/render | ✅ built | v0.18.0 — conditionalFormats (hideContent + rule styling) | `conditionalFormats` |
 
 ## G
 
 | Leaf | Requirement | Status | Notes | Flags |
 | --- | --- | --- | --- | --- |
-| G1 | Freeze / pin rows & columns | ✅ built | column pin P3 + row pin v0.14.0 (enableRowPinning) | — |
-| G2 | Row & column resizing | ✅ built | column resize (P3) + row resize v0.25.0 (enableRowResize — drag a row edge to set its height, double-click to reset) | — |
-| G3 | Auto layout | ✅ built | fixed layout + total-size + fitColumns fit-to-viewport | — |
-| G4 | Responsive | ✅ built | v0.22.0 — enableResponsive + meta.responsivePriority (hide low-priority when narrow) | — |
+| G1 | Freeze / pin rows & columns | ✅ built | column pin P3 + row pin v0.14.0 (enableRowPinning) | `enableRowPinning` |
+| G2 | Row & column resizing | ✅ built | column resize (P3) + row resize v0.25.0 (enableRowResize — drag a row edge to set its height, double-click to reset) | `enableRowResize` |
+| G3 | Auto layout | ✅ built | fixed layout + total-size + fitColumns fit-to-viewport | `fitColumns`, `enableStickyHeader` |
+| G4 | Responsive | ✅ built | v0.22.0 — enableResponsive + meta.responsivePriority (hide low-priority when narrow) | `enableResponsive`, `enableStickyHeader` |
 
 ## H
 
 | Leaf | Requirement | Status | Notes | Flags |
 | --- | --- | --- | --- | --- |
-| H1 | Copy cell | ✅ built | P3 | — |
-| H2 | Copy row | ✅ built | P3 | — |
-| H3 | Copy column | ✅ built | fixed — runtime.copyColumn / Ctrl+Space selects the whole column and copies all pages (pre-pagination, filter+sort order); copyRow/Shift+Space too. Server-tier export rides the Phase-4 foundation | — |
-| H4 | Paste | ✅ built | P3 — needs enableEditing | — |
+| H1 | Copy cell | ✅ built | P3 | `enableClipboard` |
+| H2 | Copy row | ✅ built | P3 | `enableClipboard`, `enableCopyRow` |
+| H3 | Copy column | ✅ built | fixed — runtime.copyColumn / Ctrl+Space selects the whole column and copies all pages (pre-pagination, filter+sort order); copyRow/Shift+Space too. Server-tier export rides the Phase-4 foundation | `enableClipboard`, `enableCopyColumn` |
+| H4 | Paste | ✅ built | P3 — needs enableEditing | `enableClipboard` |
 
 ## I
 
 | Leaf | Requirement | Status | Notes | Flags |
 | --- | --- | --- | --- | --- |
 | I1 | Row lifecycle events | ✅ built | P2 — enableRowActions + onDataChange | — |
-| I2 | Cell events + deferred save | ✅ built | P2 (C2≡I2) | — |
-| I3 | File ops (upload/view/delete) | ✅ built | view + preview (BstFilePreview) + upload/delete via cellMeta.onUpload/onDelete (busy state; local object-URL fallback), now also formal DataSource verbs uploadFile/deleteFile/getFileUrl + createFileHandlers(source) bridge (Plan.md §2.2) | — |
-| I4 | Backend updates → cells/rows/grid | 🟡 partial | change-set half done v0.30.0 — batch mode's runtime.getChangeSet() + one onSave(&#123; changes, rows[].patch, next &#125;) per save action, with a rejected save keeping every draft; reconciling the backend's response back into cells/rows (server-authoritative values, partial failures) not built | — |
+| I2 | Cell events + deferred save | ✅ built | P2 (C2≡I2) | `enableEditing` |
+| I3 | File ops (upload/view/delete) | ✅ built | view + preview (BstFilePreview) + upload/delete via cellMeta.onUpload/onDelete (busy state; local object-URL fallback), now also formal DataSource verbs uploadFile/deleteFile/getFileUrl + createFileHandlers(source) bridge (Plan.md §2.2) | `files`, `DataSource` |
+| I4 | Backend updates → cells/rows/grid | 🟡 partial | change-set half done v0.30.0 — batch mode's runtime.getChangeSet() + one onSave(&#123; changes, rows[].patch, next &#125;) per save action, with a rejected save keeping every draft; reconciling the backend's response back into cells/rows (server-authoritative values, partial failures) not built | `enableEditing` |
 | I5 | External updates (parent/WS) | ❌ not built | WebSocket / live merge not built | — |
 
 ## J
@@ -107,15 +107,15 @@ Requirement-by-requirement status across 58 spec leaves: **55 built**, **2 parti
 | Leaf | Requirement | Status | Notes | Flags |
 | --- | --- | --- | --- | --- |
 | J1 | Popup form editors | ✅ built | P2 — Dialog / modal popups | — |
-| J2 | Rich / custom React editors | ✅ built | custom React ✅ · rich-text v0.23.0 (dep-free sanitized-HTML cell + popup editor; not Lexical) | — |
+| J2 | Rich / custom React editors | ✅ built | custom React ✅ · rich-text v0.23.0 (dep-free sanitized-HTML cell + popup editor; not Lexical) | `meta.type` |
 
 ## K
 
 | Leaf | Requirement | Status | Notes | Flags |
 | --- | --- | --- | --- | --- |
-| K1 | Dynamic cell styling | ✅ built | v0.10.0 slots + v0.18.0 conditionalFormats | — |
-| K2 | Dynamic row styling | ✅ built | slots (classNames.row/styles.row) + row-scope rules | — |
-| K3 | Conditional formatting | ✅ built | v0.18.0 — rule engine + &lt;BstConditionalFormatBuilder&gt; | — |
+| K1 | Dynamic cell styling | ✅ built | v0.10.0 slots + v0.18.0 conditionalFormats | `enableSorting`, `classNames` |
+| K2 | Dynamic row styling | ✅ built | slots (classNames.row/styles.row) + row-scope rules | `enableSorting`, `classNames` |
+| K3 | Conditional formatting | ✅ built | v0.18.0 — rule engine + &lt;BstConditionalFormatBuilder&gt; | `showFormatBuilder`, `conditionalFormats`, `enableConditionalFormatting` |
 
 ## L
 
@@ -129,7 +129,7 @@ Requirement-by-requirement status across 58 spec leaves: **55 built**, **2 parti
 
 | Leaf | Requirement | Status | Notes | Flags |
 | --- | --- | --- | --- | --- |
-| M1 | In-cell charts | ✅ built | v0.19.0 — sparkline cell type (line/area/bar) | — |
-| M2 | KPI cells | ✅ built | v0.19.0 — kpi cell type (value + delta + mini-spark) | — |
+| M1 | In-cell charts | ✅ built | v0.19.0 — sparkline cell type (line/area/bar) | `meta.type` |
+| M2 | KPI cells | ✅ built | v0.19.0 — kpi cell type (value + delta + mini-spark) | `meta.type` |
 
 _Generated from the corpus coverage matrix._

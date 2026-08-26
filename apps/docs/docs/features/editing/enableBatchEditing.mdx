@@ -56,8 +56,12 @@ and revert individually before committing.
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `boolean` |
 | Default | `— (follows enableEditing.mode)` |
+| Maps to | overrides the editing mode at runtime: true forces 'batch', false forces a batch grid back to per-cell; unset follows enableEditing.mode. In the settings sheet ("Editing", alwaysShow) via the new SETTINGSMETA.getBase hook, so the switch truthfully reflects a &#123; mode: 'batch' &#125; grid as ON; adapters' review-sheet chrome follows it. |
 | Status | ✅ done |
+| Since | v0.32.0 |
 | Settings sheet | Editing |
+
+Batch editing (runtime switch for `enableEditing.mode: 'batch'`). When set it OVERRIDES the configured editing mode: `true` forces batch mode (every edit stays an unsaved draft until the explicit Review & save), `false` forces a batch-configured grid back to per-cell commits. Leave unset to follow `enableEditing.mode`. Needs `enableEditing`; this is the flag the settings sheet toggles ("Editing" group), so end-users can switch batch mode per table.
 
 ## Enable it
 

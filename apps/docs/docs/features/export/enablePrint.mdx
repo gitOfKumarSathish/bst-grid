@@ -31,8 +31,12 @@ opens a print-friendly window (with a hidden-iframe fallback).
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `boolean` |
 | Default | `true` |
+| Maps to | custom — sub-toggle; gates runtime.printTable + the Print item; opens a print-friendly window (hidden-iframe fallback). In settings ("Export", always shown) |
 | Status | ✅ done |
+| Since | v0.34.0 |
 | Settings sheet | Export |
+
+Print sub-toggle (X3). `false` hides the Print menu item and makes `runtime.printTable()` a no-op. Needs `enableExport`. Default: true.
 
 ## Enable it
 

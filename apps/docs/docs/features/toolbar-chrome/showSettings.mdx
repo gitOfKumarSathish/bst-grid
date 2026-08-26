@@ -41,7 +41,9 @@ from `BST_SETTINGS_REGISTRY`. Choices save to `localStorage`. `boolean | BstSett
 | Layer | `show*` (chrome, resolved in the adapter) |
 | Type | `boolean \| BstSettingsOptions` |
 | Default | `false` |
+| Maps to | adapter gear → sheet (MUI Drawer / shadcn slide-over); engine useBstSettings resolves overrides → per-table enable/show, persisted to localStorage. Covers every instance-level boolean toggle via BSTSETTINGSREGISTRY (grouped: Data ops · Columns · Rows · Editing · Selection & clipboard · Display) — keep in sync per "settings-sheet parity" above. Sheet chrome: highlighted header band, divider-separated sections with prominent uppercase headings, and a search box (BstSettingsOptions.search, auto for 30+ lists) filtering by label/hint/group via the shared pure helpers filterSettingsGroups / shouldShowSettingsSearch. Dependency cascade: a toggle whose prerequisite is off renders disabled ("Needs \&lt;parent\&gt;"), transitive + reversible — via requires edges on the registry (mirror packages/mcp/src/rules.ts) resolved by the pure export isSettingActive; in-section parent→child pairs also draw a dotted branch connector (git-graph style) via parentKey/lastChild on BstSettingsItem |
 | Status | ✅ done |
+| Since | v0.11.0 |
 
 ## Enable it
 

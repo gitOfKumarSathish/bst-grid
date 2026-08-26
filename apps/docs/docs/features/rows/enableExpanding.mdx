@@ -33,8 +33,12 @@ expanded one. Control which rows can open with `getRowCanExpand`.
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `boolean` |
 | Default | `false` |
+| Maps to | v9 rowExpandingFeature — leading expander column + full-width detail panel row |
 | Status | ✅ done |
+| Since | v0.13.0 |
 | Settings sheet | Rows |
+
+Master-detail (A4) — a leading expander column; clicking it reveals a detail panel row rendered by `renderDetail`. Opt-in. Default false. Built on v9's `rowExpandingFeature`.
 
 ## Enable it
 
@@ -52,8 +56,14 @@ expanded one. Control which rows can open with `getRowCanExpand`.
 
 | Option | Notes |
 | --- | --- |
+| `renderDetail` | Related prop for this feature. |
+| `getRowCanExpand` | Related prop for this feature. |
 | `renderDetail` | without it an expanded row shows an empty detail panel |
 
 ## Behavior & interactions
 
 - Optionally narrow which rows expand with `getRowCanExpand`.
+
+## Spec coverage
+
+- **A4 · Nested / master-detail** — ✅ built. v0.13.0 — enableExpanding + renderDetail

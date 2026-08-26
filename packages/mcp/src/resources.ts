@@ -102,6 +102,13 @@ export function registerResources(server: McpServer, corpus: BstCorpus): void {
           mimeType: 'text/markdown',
         })),
       }),
+      // Autocomplete the {name} variable to real example names.
+      complete: {
+        name: (value: string) => {
+          const q = value.toLowerCase()
+          return corpus.examples.map((e) => e.name).filter((n) => n.toLowerCase().includes(q))
+        },
+      },
     }),
     {
       title: 'Bst-Table runnable example',

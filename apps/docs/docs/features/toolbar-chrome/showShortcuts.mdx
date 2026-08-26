@@ -33,7 +33,9 @@ only what's on (selection / clipboard / editing / undo / …). Force the platfor
 | Layer | `show*` (chrome, resolved in the adapter) |
 | Type | `boolean` |
 | Default | `false` |
+| Maps to | adapter toolbar "?" button + a dep-free, theme-aware overlay listing the keyboard shortcuts ACTIVE on this grid (grouped · searchable · platform-aware ⌘/Ctrl), also opens on the ? key. Headless BSTSHORTCUTSREGISTRY + pure resolveActiveShortcuts(flags, query) filter by enableCellSelection/enableClipboard/enableEditing/enableUndoRedo/enableCopyColumn/enableCopyRow (mirrors the onKeyDown handler, guarded by shortcuts.test.tsx). Not a settings-sheet toggle |
 | Status | ✅ done |
+| Since | v0.36.0 |
 
 ## Enable it
 
@@ -46,6 +48,13 @@ only what's on (selection / clipboard / editing / undo / …). Force the platfor
 ```
 
 > Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Options
+
+| Option | Notes |
+| --- | --- |
+| `BstShortcuts` | Related prop for this feature. |
+| `BST_SHORTCUTS_REGISTRY` | Related prop for this feature. |
 
 ## Behavior & interactions
 

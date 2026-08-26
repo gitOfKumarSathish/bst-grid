@@ -1,6 +1,7 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { z } from 'zod'
 import { findFeature, findRequirement, suggestFeatures } from '../corpus.js'
+import { compareSemver } from '../semver.js'
 import type { BstCorpus, FeatureEntry } from '../types.js'
 import { ResponseFormat, fail, ok, renderFeature, statusLabel } from './shared.js'
 
@@ -25,7 +26,53 @@ const inputSchema = {
     .enum(['toggle', 'prop', 'meta', 'note'])
     .optional()
     .describe("Filter the listing: 'toggle' = boolean feature flags only"),
+  installedVersion: z
+    .string()
+    .optional()
+    .describe(
+      "The project's installed Bst-Table version (from bst_detect_version), e.g. '0.30.0'. When set with a `flag`, the answer states plainly whether that flag exists in that version, using the version it shipped in.",
+    ),
   response_format: ResponseFormat,
+}
+
+/**
+ * This tool answers three questions with three payload shapes — a single flag,
+ * a spec requirement, or a filtered listing — so every field is optional and the
+ * object branches carry `.passthrough()` to keep the richer flag/requirement
+ * fields (`doc`, `requirements`, `related`, …) the listing view omits.
+ */
+const outputSchema = {
+  count: z.number().optional().describe('Present on listing responses: number of features returned'),
+  features: z
+    .array(
+      z
+        .object({
+          flag: z.string(),
+          feature: z.string(),
+          layer: z.string(),
+          kind: z.string(),
+          type: z.string(),
+          default: z.string(),
+          since: z.string().optional().describe('Version the flag first shipped in, when known'),
+        })
+        .passthrough(),
+    )
+    .optional()
+    .describe('Present when a flag or a listing is requested'),
+  requirement: z
+    .object({ id: z.string(), title: z.string(), status: z.string(), notes: z.string() })
+    .passthrough()
+    .optional()
+    .describe('Present when a spec requirement id is requested'),
+  implementedBy: z.array(z.string()).optional().describe('Flags implementing the requested requirement'),
+  availability: z
+    .object({
+      installedVersion: z.string(),
+      since: z.string().optional().describe('Version the flag shipped in; absent if it predates the tracked changelog'),
+      available: z.boolean().describe('Whether the flag exists in installedVersion'),
+    })
+    .optional()
+    .describe('Present when `installedVersion` was supplied alongside a `flag`'),
 }
 
 /**
@@ -51,21 +98,24 @@ Args (all optional — with none, returns the full registry):
   - group (string): filter the listing by settings-sheet group
   - layer ('engine' | 'chrome'): filter the listing by layer
   - kind ('toggle' | 'prop' | 'meta' | 'note'): filter the listing; 'toggle' = boolean flags only
+  - installedVersion (string): the project's installed version (from bst_detect_version); with a flag, states whether that flag exists in that version
   - response_format ('markdown' | 'json'): output format (default: 'markdown')
 
 Returns:
-  For a flag — layer, type, default, what it maps to, ship status, settings-sheet group, related props, TSDoc and the spec leaves it implements.
+  For a flag — layer, type, default, what it maps to, ship status, the version it shipped in (\`since\`), settings-sheet group, related props, TSDoc and the spec leaves it implements. With installedVersion, a leading verdict: ✅ available / ⚠️ NOT available in that version.
   For a requirement — ✅ built / 🟡 partial / ❌ NOT BUILT plus the documented workaround.
   For a listing — { "count": number, "features": [...] } (JSON) or a grouped table (markdown).
 
 Examples:
   - flag="enableClipboard" -> the toggle, and that it implies enableCellSelection while paste needs enableEditing
+  - flag="enableFind", installedVersion="0.30.0" -> ⚠️ NOT available: Find ships in 0.42.0, project is on 0.30.0
   - requirement="I5" -> ❌ NOT BUILT, with the replace-the-data-prop workaround
   - kind="toggle", layer="engine" -> every engine behaviour flag
 
 Error handling:
   - An unknown flag returns near-miss suggestions rather than an empty result.`,
       inputSchema,
+      outputSchema,
       annotations: {
         readOnlyHint: true,
         destructiveHint: false,
@@ -73,9 +123,9 @@ Error handling:
         openWorldHint: false,
       },
     },
-    async ({ flag, requirement, group, layer, kind, response_format }) => {
+    async ({ flag, requirement, group, layer, kind, installedVersion, response_format }) => {
       if (requirement) return describeRequirement(corpus, requirement, response_format)
-      if (flag) return describeFlag(corpus, flag, response_format)
+      if (flag) return describeFlag(corpus, flag, response_format, installedVersion)
       return listFeatures(corpus, { group, layer, kind }, response_format)
     },
   )
@@ -114,7 +164,7 @@ function describeRequirement(corpus: BstCorpus, id: string, format: 'markdown' |
   return ok(lines.join('\n'), structured)
 }
 
-function describeFlag(corpus: BstCorpus, flag: string, format: 'markdown' | 'json') {
+function describeFlag(corpus: BstCorpus, flag: string, format: 'markdown' | 'json', installedVersion?: string) {
   const exact = findFeature(corpus, flag)
   if (!exact) {
     const near = suggestFeatures(corpus, flag)
@@ -128,9 +178,46 @@ function describeFlag(corpus: BstCorpus, flag: string, format: 'markdown' | 'jso
 
   // A few names legitimately head more than one row (`meta.type`, `icons`).
   const all = corpus.features.filter((f) => f.flag === exact.flag)
-  const structured = { features: all }
+  const availability = installedVersion ? availabilityOf(all, installedVersion) : undefined
+  const structured = { features: all, ...(availability ? { availability } : {}) }
   if (format === 'json') return ok(JSON.stringify(structured, null, 2), structured)
-  return ok(all.map((f) => renderFeature(f, corpus.requirements)).join('\n\n---\n\n'), structured)
+
+  const detail = all.map((f) => renderFeature(f, corpus.requirements)).join('\n\n---\n\n')
+  const banner = availability ? availabilityBanner(exact.flag, availability) : undefined
+  return ok(banner ? `${banner}\n\n${detail}` : detail, structured)
+}
+
+/** The availability verdict as structured data (no prose) — safe to put in `structuredContent`. */
+interface Availability {
+  installedVersion: string
+  since?: string
+  available: boolean
+}
+
+/**
+ * Decides whether `flag` exists in `installedVersion`. Uses the **most
+ * restrictive** (highest) `since` among the rows a flag name heads, and fails
+ * safe: a flag with no recorded `since` predates the tracked changelog, so it is
+ * treated as present in every version rather than warned about.
+ */
+function availabilityOf(features: FeatureEntry[], installedVersion: string): Availability {
+  const since = features
+    .map((f) => f.since)
+    .filter((v): v is string => Boolean(v))
+    .sort(compareSemver)
+    .at(-1)
+  const available = since ? compareSemver(installedVersion, since) >= 0 : true
+  return { installedVersion, ...(since ? { since } : {}), available }
+}
+
+/** Renders {@link availabilityOf}'s verdict as the banner line shown above the flag detail. */
+function availabilityBanner(flag: string, a: Availability): string {
+  if (!a.since) {
+    return `> ℹ️ \`${flag}\` is available in your version (v${a.installedVersion}) — it predates the tracked changelog, so it exists in every release.`
+  }
+  return a.available
+    ? `> ✅ \`${flag}\` **is available** in your version — it ships in v${a.since}, and this project is on v${a.installedVersion}.`
+    : `> ⚠️ \`${flag}\` is **NOT available** in your version — it ships in **v${a.since}**, but this project is on **v${a.installedVersion}**. Upgrade \`@bloomskill/table-*\` to ≥ v${a.since}, or use the documented workaround instead of this flag.`
 }
 
 function listFeatures(
@@ -164,6 +251,7 @@ function listFeatures(
       default: f.default,
       group: f.group,
       status: f.status,
+      since: f.since,
     })),
   }
   if (format === 'json') return ok(JSON.stringify(structured, null, 2), structured)

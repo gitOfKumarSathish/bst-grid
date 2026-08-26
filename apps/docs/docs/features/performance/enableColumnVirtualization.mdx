@@ -33,8 +33,12 @@ via spacer cells as columns scroll in and out.
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `boolean` |
 | Default | `false` |
+| Maps to | sub-toggle of enableVirtualization (needs it on) — also windows columns horizontally for very wide grids (header + filter row + body kept aligned via spacer cells); falls back to all-columns under column pinning / fitColumns / grouped headers / cell spanning. In settings ("Performance", always shown) |
 | Status | ✅ done |
+| Since | v0.33.0 |
 | Settings sheet | Performance |
+
+Column virtualization (D1) — also window the columns horizontally, for very wide (100+ column) grids. Sub-toggle of `enableVirtualization` (needs it on). Falls back to rendering all columns when column pinning, `fitColumns`, grouped headers or cell spanning is active. Default false.
 
 ## Enable it
 
@@ -52,3 +56,7 @@ via spacer cells as columns scroll in and out.
 
 - **Requires** `enableVirtualization` to be on — this flag is a no-op otherwise.
 - Also windows columns horizontally, for very wide grids. Falls back to all-columns under column pinning, `fitColumns`, grouped headers or cell spanning.
+
+## Spec coverage
+
+- **D1 · Row & column virtualization** — ✅ built. enableVirtualization (+ enableColumnVirtualization) on @tanstack/react-virtual — windowed rows (dynamic measure) + columns, sticky header, bounded DOM; yields to master-detail / grouping / cell spanning / row pinning. Tested (virtualization.test.tsx)

@@ -116,6 +116,19 @@ renderer/editor) · `bst-migrate` (port a table over from another grid library).
 
 **Resources** — `bst://coverage` · `bst://features` · `bst://cell-types` · `bst://example/{name}`.
 
+**Structured output** — every tool returns machine-readable `structuredContent` validated against a
+declared `outputSchema` (advertised in `tools/list`), so a client can consume a result as typed data,
+not just prose. **Argument completions** — `bst-quick-start`'s `adapter`, `bst-add-feature`'s
+`feature`, and the `bst://example/{name}` resource autocomplete to **real** adapter / flag / example
+names in clients that support MCP completions, so a name is picked from the registry rather than
+guessed.
+
+**Version-awareness** — every flag carries the version it shipped in (`since`, extracted from the
+changelog). Pass a project's installed version to `bst_get_feature` as `installedVersion` (get it
+from `bst_detect_version`) and it says plainly whether a flag exists there — **⚠️ NOT available** in
+your version, with the version to upgrade to, or **✅ available** — so an agent never wires up a flag
+the installed release doesn't have.
+
 ### The 17 cell types it knows
 
 `text` · `longText` · `number` · `dateTime` · `boolean` · `singleSelect` · `multiSelect` · `radio` ·

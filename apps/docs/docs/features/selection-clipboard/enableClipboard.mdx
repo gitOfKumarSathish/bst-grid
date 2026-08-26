@@ -34,8 +34,12 @@ writes through the edit session.
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `boolean` |
 | Default | `false` |
+| Maps to | custom feature (implies enableCellSelection; paste needs enableEditing). Copy-column (H3): Ctrl+Space / copyColumn copies the whole column across ALL pages (pre-pagination); Shift+Space / copyRow for rows |
 | Status | ✅ done (Phase 3; copy-column all-pages v0.24.0) |
+| Since | v0.3.0 |
 | Settings sheet | Selection & clipboard |
+
+Clipboard copy / paste (Phase 3, H1–H4). Copy the selection as TSV (Ctrl/Cmd+C); paste TSV from the active cell (Ctrl/Cmd+V) honouring editability + validation. Implies `enableCellSelection`; paste additionally requires `enableEditing`. Default: false (opt-in).
 
 ## Enable it
 
@@ -53,3 +57,10 @@ writes through the edit session.
 
 - **Implies** `enableCellSelection` (turned on for you).
 - Copy works read-only; PASTE additionally requires `enableEditing`.
+
+## Spec coverage
+
+- **H1 · Copy cell** — ✅ built. P3
+- **H2 · Copy row** — ✅ built. P3
+- **H3 · Copy column** — ✅ built. fixed — runtime.copyColumn / Ctrl+Space selects the whole column and copies all pages (pre-pagination, filter+sort order); copyRow/Shift+Space too. Server-tier export rides the Phase-4 foundation
+- **H4 · Paste** — ✅ built. P3 — needs enableEditing

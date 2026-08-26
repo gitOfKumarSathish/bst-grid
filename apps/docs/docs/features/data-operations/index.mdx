@@ -8,6 +8,8 @@ sidebar_label: Overview
 
 Sorting, filtering, search, pagination and grouping.
 
+![Sorting, search and pagination in a Bst-Table grid](/img/data-operations.png)
+
 These are the flags the TanStack engine powers directly, so most default **on** — a zero-config
 grid already sorts, filters and paginates. Turn them off to slim the grid down, or reach for the
 advanced pieces (`enableSetFilter`, `enableMultiFilter`, `enableGrouping`) when a plain filter box
@@ -17,11 +19,13 @@ same, only the data source changes.
 | Feature | Flag | Default |
 | --- | --- | --- |
 | [Column filters](./enableColumnFilters) | `enableColumnFilters` | `true` |
+| [Find (X8)](./enableFind) | `enableFind` | `false` |
 | [Global filter](./enableGlobalFilter) | `enableGlobalFilter` | `true` |
 | [Grouping (E4)](./enableGrouping) | `enableGrouping` | `false` |
 | [Multi-filter (X11)](./enableMultiFilter) | `enableMultiFilter` | `false` |
 | [Set Filter (X4)](./enableSetFilter) | `enableSetFilter` | `false` |
 | [Sorting](./enableSorting) | `enableSorting` | `true` |
 | [Pagination (logic)](./pagination) | `pagination` | `true` |
+| [Find button (X8)](./showFind) | `showFind` | `follows enableFind` |
 | [Pagination bar](./showPagination) | `showPagination` | `true` |
 | [Global search box](./showSearch) | `showSearch` | `true` |

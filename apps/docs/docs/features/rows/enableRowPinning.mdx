@@ -32,8 +32,12 @@ of the normal flow.
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `boolean` |
 | Default | `false` |
+| Maps to | v9 rowPinningFeature — leading pin column; frozen top/bottom rows (sticky) |
 | Status | ✅ done |
+| Since | v0.14.0 |
 | Settings sheet | Rows |
+
+Row pinning (G1) — freeze rows to the top/bottom of the grid via a leading pin column; pinned rows stay put across sort/filter/pagination and stick while the body scrolls. Opt-in. Default false. Maps to v9 `enableRowPinning`.
 
 ## Enable it
 
@@ -46,3 +50,7 @@ of the normal flow.
 ```
 
 > Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Spec coverage
+
+- **G1 · Freeze / pin rows & columns** — ✅ built. column pin P3 + row pin v0.14.0 (enableRowPinning)

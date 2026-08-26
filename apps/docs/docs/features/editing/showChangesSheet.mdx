@@ -35,7 +35,9 @@ save bar while on.
 | Layer | `show*` (chrome, resolved in the adapter) |
 | Type | `boolean` |
 | Default | `follows mode: 'batch'` |
+| Maps to | adapter "&#123;n&#125; unsaved" chip + Review & save → right sheet (MUI Drawer / shadcn slide-over) listing each edit (row · column · old → new) with per-change/per-row revert + the final Save confirmation (runtime.commitAll() → one onSave); failed save keeps drafts + shows the error. Replaces the plain save bar while on. Like showSaveBar, not a settings-sheet entry |
 | Status | ✅ done |
+| Since | v0.30.0 |
 
 ## Enable it
 
@@ -49,6 +51,12 @@ save bar while on.
 ```
 
 > Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Options
+
+| Option | Notes |
+| --- | --- |
+| `changesRowLabel` | Related prop for this feature. |
 
 ## Behavior & interactions
 

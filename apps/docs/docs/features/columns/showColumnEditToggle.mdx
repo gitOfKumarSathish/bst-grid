@@ -31,7 +31,9 @@ Adds a per-column **lock / unlock** (✏️) control to the columns menu that ov
 | Layer | `show*` (chrome, resolved in the adapter) |
 | Type | `boolean` |
 | Default | `false` |
+| Maps to | adapter Columns-menu lock/unlock (✏️) per editable column → engine runtime.setColumnEditable overrides meta.editable at runtime (store columnEdit). Requires enableEditing. Not a BstTableEngineToggles flag (no settings-sheet entry) |
 | Status | ✅ done |
+| Since | v0.27.0 |
 
 ## Enable it
 
@@ -49,3 +51,7 @@ Adds a per-column **lock / unlock** (✏️) control to the columns menu that ov
 ## Behavior & interactions
 
 - **Requires** `enableEditing` to be on — this flag is a no-op otherwise.
+
+## Spec coverage
+
+- **F3 · Disable column** — ✅ built. P3 — meta.disabled

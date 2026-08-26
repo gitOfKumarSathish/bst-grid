@@ -34,8 +34,12 @@ Dependency-free and browser-measured: body cells switch to `white-space: normal`
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `boolean` |
 | Default | `false` |
+| Maps to | custom — browser-measured, dep-free: body cells white-space: normal so each row grows to fit wrapped content (root class bst-auto-rowheight; per-column meta.wrapText → bst-wrap). Keeps overflow:hidden, so a manually-resized row still clips to its set height. In settings ("Rows", always shown) |
 | Status | ✅ done |
+| Since | v0.35.0 |
 | Settings sheet | Rows |
+
+Auto row height (X26) — rows grow to fit **wrapped** content instead of truncating each cell to one line; the browser measures the content, so no JS measurement is needed. Every body cell wraps; opt individual columns in (or out) with `meta.wrapText`. Composes with manual row resize (a resized row keeps its explicit height and clips the wrapped content). Default: false.
 
 ## Enable it
 

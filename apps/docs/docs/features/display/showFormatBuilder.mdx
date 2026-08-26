@@ -32,7 +32,9 @@ Users add / edit / delete `conditionalFormats` rules (uncontrolled local state b
 | Layer | `show*` (chrome, resolved in the adapter) |
 | Type | `boolean` |
 | Default | `false` |
+| Maps to | adapter toolbar "Formats" button + panel hosting BstConditionalFormatBuilder — end-users build conditionalFormats rules at runtime (uncontrolled local state, or controlled via the callback). Builder columns auto-derived from the grid's columns. Needs enableConditionalFormatting. In settings ("Display", always shown). shadcn: new format icon slot (palette) |
 | Status | ✅ done |
+| Since | v0.31.0 |
 | Settings sheet | Display |
 
 ## Enable it
@@ -48,6 +50,16 @@ Users add / edit / delete `conditionalFormats` rules (uncontrolled local state b
 
 > Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
 
+## Options
+
+| Option | Notes |
+| --- | --- |
+| `onConditionalFormatsChange` | Related prop for this feature. |
+
 ## Behavior & interactions
 
 - **Requires** `enableConditionalFormatting` to be on — this flag is a no-op otherwise.
+
+## Spec coverage
+
+- **K3 · Conditional formatting** — ✅ built. v0.18.0 — rule engine + &lt;BstConditionalFormatBuilder&gt;

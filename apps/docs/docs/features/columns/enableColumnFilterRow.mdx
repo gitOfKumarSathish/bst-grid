@@ -33,8 +33,12 @@ types) render into this row.
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `boolean` |
 | Default | `false` |
+| Maps to | engine header row (needs enableColumnFilters). Always shown in the settings sheet ("Columns", alwaysShow) so end-users can switch it on themselves |
 | Status | ✅ done (Phase 3; always-in-settings v0.29.0) |
+| Since | v0.9.0 |
 | Settings sheet | Columns |
+
+Render a per-column filter row under the header (the "dual filter" — works alongside the filter-builder panel; both drive `columnFilters`). Each column gets a type-appropriate control (text/number/date input, select dropdown, boolean tri-state). Needs `enableColumnFilters`. Default: false.
 
 ## Enable it
 

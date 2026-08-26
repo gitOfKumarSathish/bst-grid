@@ -31,8 +31,12 @@ output is RFC-4180 with a UTF-8 BOM (so Excel opens it cleanly).
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `boolean` |
 | Default | `true` |
+| Maps to | custom — sub-toggle of enableExport; gates runtime.exportCsv + the CSV menu item (RFC-4180, UTF-8 BOM). In settings ("Export", always shown) |
 | Status | ✅ done |
+| Since | v0.34.0 |
 | Settings sheet | Export |
+
+CSV export sub-toggle (X1). `false` hides the CSV menu item and makes `runtime.exportCsv()` a no-op, while keeping Excel/Print. Needs `enableExport`. Default: true.
 
 ## Enable it
 

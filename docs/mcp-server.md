@@ -362,12 +362,16 @@ npx @modelcontextprotocol/inspector node /abs/path/packages/mcp/dist/cli.js
 
 ## 6. The tools
 
-All tools are read-only and take a `response_format` of `markdown` (default) or `json`.
+All tools are read-only and take a `response_format` of `markdown` (default) or `json`. Each also
+declares an `outputSchema` and returns `structuredContent` validated against it, so a client that
+consumes structured output gets typed data without re-parsing the prose. Every flag also carries the
+version it shipped in (`since`); pass a project's installed version to `bst_get_feature` as
+`installedVersion` and it says plainly whether that flag exists in that version.
 
 | Tool | Use it to… | Example arguments |
 | --- | --- | --- |
 | `bst_search_docs` | Search everything (READMEs, features, cell types, coverage, API, examples). **Start here.** | `{ "query": "save all edits in one call" }` |
-| `bst_get_feature` | Look up one flag, check a spec requirement, or list the registry. | `{ "flag": "enableClipboard" }` · `{ "requirement": "D1" }` |
+| `bst_get_feature` | Look up one flag, check a spec requirement, or ask if it exists in your version. | `{ "flag": "enableFind", "installedVersion": "0.30.0" }` |
 | `bst_get_cell_type` | Get a `meta.type` renderer's value shape + `cellMeta`, or list all 17. | `{ "type": "singleSelect" }` |
 | `bst_get_api` | Exact signature of a `@bloomskill/table-engine` export from its built `.d.ts`. | `{ "symbol": "useBstTable" }` |
 | `bst_get_example` | Full source of a runnable example app. | `{ "name": "editing" }` |
@@ -393,6 +397,11 @@ and `show*` (adapter chrome) — fail **silently**, not loudly:
 
 Prompts appear in the client as reusable actions (in Claude Code, as slash-command-style entries).
 Each one hands the agent the right tool order so it doesn't fall back on another library's API.
+
+In clients that support MCP completions, prompt arguments autocomplete to real names —
+`bst-quick-start`'s `adapter` to the three skins, `bst-add-feature`'s `feature` to the actual flag
+registry — as does the `bst://example/{name}` resource. (`bst-migrate`'s `from` is left free-text by
+design — the naming guard keeps competitor product names out of the tree.)
 
 | Prompt | Does |
 | --- | --- |

@@ -32,8 +32,12 @@ It's a pure render overlay — it never mutates your column-sizing model.
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `boolean` |
 | Default | `false` |
+| Maps to | custom render measure — sizes visible columns to the scroll box (utility columns fixed) so there is no horizontal scroll; overflow-x:hidden + resizers suppressed while on. Pure render overlay via distributeFitWidths (no model mutation) |
 | Status | ✅ done |
+| Since | v0.20.0 |
 | Settings sheet | Columns |
+
+Fit-to-viewport layout (G3) — size columns to the container so there is **no horizontal scroll**. The data columns share the available width in proportion to their own sizes (utility columns stay fixed); manual column resizing is suppressed while this is on. Default: false.
 
 ## Enable it
 
@@ -51,3 +55,7 @@ It's a pure render overlay — it never mutates your column-sizing model.
 
 - **Conflicts with** `enableColumnResizing` — `fitColumns` suppresses the resizers.
 - **Conflicts with** `enableResponsive` — responsive hiding is a no-op under `fitColumns`.
+
+## Spec coverage
+
+- **G3 · Auto layout** — ✅ built. fixed layout + total-size + fitColumns fit-to-viewport

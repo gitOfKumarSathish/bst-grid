@@ -8,6 +8,8 @@ sidebar_label: Overview
 
 Inline, row and batch editing, validation and undo/redo.
 
+![Inline cell editing in a Bst-Table grid](/img/editing.png)
+
 Bst-Table's editing is **opt-in and layered**: turn on `enableEditing` for the core edit
 session, then add `enableValidation`, `enableUndoRedo` or `enableRowActions` as you need them.
 Every edit routes through **one** callback — `onDataChange` (inline) or `onSave` (batch) — so your
@@ -28,7 +30,9 @@ result. Start with `enableEditing`, then layer the rest.
 | [Batch-editing runtime switch](./enableBatchEditing) | `enableBatchEditing` | `— (follows enableEditing.mode)` |
 | [Inline editing](./enableEditing) | `enableEditing` | `false` |
 | [Batch editing + single-call save (C2/I2/I4)](./enableEditing) | `enableEditing` | `— (opt-in)` |
+| [Log committed cell edits (debug)](./enableEditLog) | `enableEditLog` | `false` |
 | [Row add/delete/duplicate](./enableRowActions) | `enableRowActions` | `false` |
+| [Type-to-edit (C5/C6)](./enableTypeToEdit) | `enableTypeToEdit` | `false` |
 | [Undo/redo (C5)](./enableUndoRedo) | `enableUndoRedo` | `false` |
 | [Validation](./enableValidation) | `enableValidation` | `false` |
 | [Add-row button](./showAddRow) | `showAddRow` | `follows enableRowActions` |

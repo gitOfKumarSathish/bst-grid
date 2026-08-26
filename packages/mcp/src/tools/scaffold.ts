@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { SCAFFOLD_FEATURES, scaffoldGrid } from '../scaffold.js'
 import type { BstCorpus } from '../types.js'
 import { validateConfig } from '../validate.js'
-import { ResponseFormat, ok } from './shared.js'
+import { ResponseFormat, ValidationReportSchema, ok } from './shared.js'
 
 const inputSchema = {
   adapter: z
@@ -26,6 +26,17 @@ const inputSchema = {
     .describe('The columns to generate'),
   rowTypeName: z.string().optional().describe("Name for the generated row interface (default: 'Row')"),
   response_format: ResponseFormat,
+}
+
+/**
+ * Declared shape of `structuredContent`: the generated component plus the
+ * validator's verdict on it, so a client sees the same self-check the tool ran.
+ */
+const outputSchema = {
+  code: z.string().describe('The generated .tsx component source'),
+  install: z.string().describe('The install command for the packages it imports'),
+  notes: z.array(z.string()).describe('Capability notes worth surfacing alongside the code'),
+  validation: ValidationReportSchema.describe('The validator run against the generated code'),
 }
 
 /**
@@ -60,6 +71,7 @@ Examples:
 Error handling:
   - An unknown cell type still generates, with the column typed as string; call \`bst_get_cell_type()\` for valid types.`,
       inputSchema,
+      outputSchema,
       annotations: {
         readOnlyHint: true,
         destructiveHint: false,

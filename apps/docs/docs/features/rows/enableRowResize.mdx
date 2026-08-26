@@ -34,8 +34,12 @@ end-user can switch it on without developer wiring.
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `boolean` |
 | Default | `false` |
+| Maps to | custom — per-cell bottom drag handle → per-row height (local state); double-click resets; always shown in the settings sheet ("Rows", alwaysShow) so an end-user can switch it on without developer wiring (like row/column virtualization) |
 | Status | ✅ done |
+| Since | v0.25.0 |
 | Settings sheet | Rows |
+
+Row resizing (G2) — drag the bottom edge of any row to set its height; the whole row's cells grow/shrink and content is clipped when shorter. Per-row heights are local UI state (double-click a row's handle to reset it). Opt-in. Default false. Column resize is separate (`enableColumnResizing`).
 
 ## Enable it
 
@@ -48,3 +52,7 @@ end-user can switch it on without developer wiring.
 ```
 
 > Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Spec coverage
+
+- **G2 · Row & column resizing** — ✅ built. column resize (P3) + row resize v0.25.0 (enableRowResize — drag a row edge to set its height, double-click to reset)

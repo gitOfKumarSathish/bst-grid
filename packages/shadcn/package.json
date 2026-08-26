@@ -1,6 +1,6 @@
 {
   "name": "@bloomskill/table-shadcn",
-  "version": "0.42.0",
+  "version": "0.43.0",
   "description": "Bst-Table shadcn/Radix style adapter — Radix primitives + shadcn-style CSS around the @bloomskill/table-engine grid body.",
   "keywords": [
     "react",
@@ -64,7 +64,7 @@
     "build": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && tsc -p tsconfig.json"
   },
   "peerDependencies": {
-    "@bloomskill/table-engine": "^0.42.0",
+    "@bloomskill/table-engine": "^0.43.0",
     "@hugeicons/core-free-icons": "*",
     "@hugeicons/react": "*",
     "@phosphor-icons/react": "*",
@@ -96,7 +96,7 @@
     }
   },
   "devDependencies": {
-    "@bloomskill/table-engine": "^0.42.0",
+    "@bloomskill/table-engine": "^0.43.0",
     "@hugeicons/core-free-icons": "^4.2.3",
     "@hugeicons/react": "^1.1.9",
     "@phosphor-icons/react": "^2.1.10",

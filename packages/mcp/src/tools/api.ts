@@ -12,6 +12,25 @@ const inputSchema = {
 }
 
 /**
+ * Declared shape of `structuredContent`. A single-symbol lookup carries the full
+ * `signature`/`doc`; the no-arg listing carries just `symbol`/`kind`, so those
+ * two are optional.
+ */
+const outputSchema = {
+  count: z.number(),
+  api: z.array(
+    z
+      .object({
+        symbol: z.string(),
+        kind: z.string().describe("'function' | 'const' | 'type' | 'interface' | 'class' | 'unknown'"),
+        signature: z.string().optional().describe('Present on a single-symbol lookup'),
+        doc: z.string().optional(),
+      })
+      .passthrough(),
+  ),
+}
+
+/**
  * Signatures come straight from the built `.d.ts`, so what an agent is told
  * matches what the consumer's editor will accept — no paraphrase to drift.
  */
@@ -39,6 +58,7 @@ Examples:
 Error handling:
   - An unknown symbol returns close matches from the export list.`,
       inputSchema,
+      outputSchema,
       annotations: {
         readOnlyHint: true,
         destructiveHint: false,

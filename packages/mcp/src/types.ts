@@ -46,6 +46,15 @@ export interface FeatureEntry {
   mapsTo?: string
   /** Ship status from §12, e.g. "✅ done (Phase 3)". */
   status?: string
+  /**
+   * The earliest released version whose `CHANGELOG.md` section names this flag —
+   * a faithful "first shipped in" version, since release discipline (§13) adds a
+   * changelog bullet per new flag. Absent for the oldest defaults that predate the
+   * tracked changelog (`enableSorting`, `pagination`), which exist in every
+   * version anyway. Lets `bst_get_feature` and `bst_detect_version` tell an agent
+   * a feature postdates the version the project actually has installed.
+   */
+  since?: string
   /** Settings-sheet group ("Data operations", "Columns", …) when it appears there. */
   group?: string
   /** Shown in the settings sheet even while off (default-on features). */

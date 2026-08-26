@@ -48,8 +48,12 @@ Add `showUndoRedo` for toolbar buttons alongside the keyboard shortcuts.
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `boolean` |
 | Default | `false` |
+| Maps to | custom feature (needs onDataChange) |
 | Status | ✅ done (Phase 3) |
+| Since | v0.6.0 |
 | Settings sheet | Editing |
+
+Undo / redo of committed data changes (Phase 3, C5) — cell edits, paste, and row add/delete/duplicate. Ctrl/Cmd+Z undoes, Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y redoes; adapters also render Undo/Redo buttons. Snapshot-based, so it needs `onDataChange`. Default: false (opt-in).
 
 ## Enable it
 
@@ -68,3 +72,7 @@ Add `showUndoRedo` for toolbar buttons alongside the keyboard shortcuts.
 | Option | Notes |
 | --- | --- |
 | `onDataChange` | undo/redo is snapshot-based and replays through your data setter |
+
+## Spec coverage
+
+- **C5 · Shortcuts (arrows/undo-redo)** — ✅ built. P3 — nav + enableUndoRedo

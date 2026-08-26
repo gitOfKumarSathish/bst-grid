@@ -47,6 +47,7 @@ const POS = Object.fromEntries(GROUPS.map(([name], i) => [name, i + 1]))
 // The 13 chrome (show*) toggles that carry no settings-sheet group of their own.
 const SHOW_GROUP = {
   showSearch: 'Data operations',
+  showFind: 'Data operations',
   showPagination: 'Data operations',
   showColumnsMenu: 'Columns',
   showColumnEditToggle: 'Columns',
@@ -118,6 +119,7 @@ function renderPage(f) {
   L.push(`| Default | ${codeCell(f.default)} |`)
   if (f.mapsTo) L.push(`| Maps to | ${mdxSafe(f.mapsTo, { inTableCell: true })} |`)
   if (f.status) L.push(`| Status | ${mdxSafe(f.status, { inTableCell: true })} |`)
+  if (f.since) L.push(`| Since | v${f.since} |`)
   if (f.group) L.push(`| Settings sheet | ${f.group} |`)
   L.push('')
   if (f.doc) { L.push(mdxSafe(f.doc)); L.push('') }

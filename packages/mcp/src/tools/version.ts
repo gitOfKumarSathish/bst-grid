@@ -13,6 +13,23 @@ const inputSchema = {
     .describe("Absolute path to the project directory or its package.json. Defaults to the server's working directory."),
 }
 
+/** Declared shape of `structuredContent` — the same object on both the found and no-dependency paths. */
+const outputSchema = {
+  packageJson: z.string().describe('The package.json path actually read'),
+  corpusVersion: z.string().describe('The Bst-Table version this server documents'),
+  installed: z
+    .array(
+      z.object({
+        name: z.string(),
+        range: z.string().describe('The declared semver range'),
+        field: z.string().describe("'dependencies' | 'devDependencies' | 'peerDependencies'"),
+      }),
+    )
+    .describe('One entry per @bloomskill/table-* dependency found'),
+  matchesCorpus: z.boolean().describe('Whether every installed range admits corpusVersion'),
+  notes: z.string(),
+}
+
 /** A dependency field a Bst-Table package may be declared in. */
 const DEP_FIELDS = ['dependencies', 'devDependencies', 'peerDependencies'] as const
 
@@ -29,7 +46,7 @@ export function registerVersionTool(server: McpServer, corpus: BstCorpus): void 
       title: 'Detect the installed Bst-Table version',
       description: `Read a project's package.json and report which \`@bloomskill/table-*\` packages it depends on, comparing them against this server's knowledge base (v${corpus.version}).
 
-Run this once at the start of any Bst-Table task. This server documents v${corpus.version}; if the project is on an older version, features added later will not exist there, and \`bst_get_feature\` status notes ("✅ done (v0.30.0)") tell you which.
+Run this once at the start of any Bst-Table task. This server documents v${corpus.version}; if the project is on an older version, features added later will not exist there. Pass the version it reports to \`bst_get_feature\` as \`installedVersion\` and each flag is marked ✅ available / ⚠️ NOT available in that version, using the version it shipped in.
 
 Args:
   - path (string, optional): absolute path to the project directory or its package.json. Defaults to the server's working directory.
@@ -53,6 +70,7 @@ Examples:
 Error handling:
   - Returns a clear message with the path tried when no package.json is found, or when it is not valid JSON.`,
       inputSchema,
+      outputSchema,
       annotations: {
         readOnlyHint: true,
         destructiveHint: false,
@@ -110,9 +128,13 @@ Error handling:
       // Cheap, honest comparison: exact-version-in-range rather than a semver
       // implementation, so we never claim more precision than we have.
       const matchesCorpus = installed.every(({ range }) => rangeAllows(range, corpus.version))
+      const installedForFeatureCheck = installed[0]?.range.replace(/^[\^~>=<\s]+/, '')
       const notes = matchesCorpus
         ? `Project matches this server's knowledge base (v${corpus.version}).`
-        : `Project may be on a different version than this server documents (v${corpus.version}). Feature status notes in \`bst_get_feature\` cite the version each feature shipped in — check them before using a recent feature.`
+        : `Project may be on a different version than this server documents (v${corpus.version}). ` +
+          `Before using a recent feature, pass this project's version to \`bst_get_feature\` as \`installedVersion\`` +
+          `${installedForFeatureCheck ? ` (e.g. \`installedVersion: "${installedForFeatureCheck}"\`)` : ''} — ` +
+          `it will say plainly whether a flag exists in that version.`
 
       const structured = { packageJson: pkgPath, corpusVersion: corpus.version, installed, matchesCorpus, notes }
       return ok(

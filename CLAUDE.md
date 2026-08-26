@@ -655,12 +655,13 @@ pure interactions with no flag (double-click auto-size).
 | Keyboard-shortcuts overlay | `showShortcuts` (+ `BstShortcuts` / `BST_SHORTCUTS_REGISTRY`) | chrome | boolean | false | adapter toolbar **"?" button** + a dep-free, theme-aware overlay listing the keyboard shortcuts **ACTIVE on this grid** (grouped · searchable · platform-aware ⌘/Ctrl), also opens on the **`?`** key. Headless `BST_SHORTCUTS_REGISTRY` + pure `resolveActiveShortcuts(flags, query)` filter by `enableCellSelection`/`enableClipboard`/`enableEditing`/`enableUndoRedo`/`enableCopyColumn`/`enableCopyRow` (mirrors the `onKeyDown` handler, guarded by `shortcuts.test.tsx`). Not a settings-sheet toggle | ✅ done |
 | Context menu (X6) | `enableContextMenu` (+ `getContextMenuItems`) | engine | boolean | false | custom — dep-free right-click popup at the cursor (event-delegated on the scroll box via `data-bst-rowid`/`-colid`). Default items: Copy / Copy row / Copy column (with clipboard), Export CSV / Excel (with export), Autosize column; reshape via `getContextMenuItems(ctx)` → `BstContextMenuItem[]` (spread `ctx.defaultItems`). Right-click selects the cell. In settings ("Selection & clipboard", always shown). Both skins inherit it | ✅ done |
 | Find (X8) | `enableFind` (+ `BstFindOptions`) · chrome `showFind` | engine | boolean \| `BstFindOptions` | false | custom — dep-free in-grid **find bar that HIGHLIGHTS matches and jumps between them** (Next/Prev · "n of m") **without hiding rows** (distinct from `enableGlobalFilter`, which removes non-matches). Matches computed over the visible cell text (`cellClipboardText` = `formatValue` ∘ `draftAwareValue`), held in the interaction store, painted per-cell via `CellSlice` (`findRanges`/`isCurrentFind`) so only matched cells repaint; plain-text cells get in-place `<mark>`s, any cell gets a `bst-find-hit`/`-current` tint. ⌘/Ctrl+F opens (independent of `enableCellSelection`), Enter/Shift+Enter cycle in the box, F3/Shift+F3 cycle, Esc closes; current match scrolls into view (virtualized `scrollToIndex` + `scrollIntoView`). `enableFind` object form = `{ caseSensitive?, scope?: 'view'\|'all' }`. Adapters add a toolbar **Find** button (`showFind`). In settings ("Data operations", always shown). Both skins inherit it | ✅ done |
+| Find button (X8) | `showFind` | chrome | boolean | follows `enableFind` | adapter toolbar **Find** button that opens the in-grid find bar; a no-op without `enableFind` (chrome follows behaviour). Like `showUndoRedo`, not a settings-sheet entry | ✅ done |
 | Row-number column (X9) | `enableRowNumbers` (+ `rowNumberHeader`) | engine | boolean | false | custom — a leading, non-interactive `#` column numbering the **current view** (continuous across pages; reflects sort + filter). Injected as a real leaf column with an id under the reserved `__bst` prefix, so it stays out of sorting, the filter row, the columns menu and export **by construction**. **Pinned to the start (sticky-left) by default** — `useBstTable` seeds `columnPinning.start` with the row-number id (even over a consumer `initialState`/`gridState`), so it stays the leftmost data column ahead of any user-pinned column and sticks on horizontal scroll. The number is read from the live painted row model (cached per model, O(n)). Header defaults to `#` (`rowNumberHeader` overrides). In settings ("Columns", always shown). Both skins inherit it | ✅ done |
 | Row-number column (X9) | `enableRowNumbers` (+ `rowNumberHeader`) | engine | boolean | false | custom — a leading, non-interactive `#` column numbering the **current view** (continuous across pages; reflects sort + filter). Injected as a real leaf column with an id under the reserved `__bst` prefix, so it stays out of sorting, the filter row, the columns menu and export **by construction**. **Pinned to the start (sticky-left) by default** — `useBstTable` seeds `columnPinning.start` with the row-number id (even over a consumer `initialState`/`gridState`), so it stays the leftmost data column ahead of any user-pinned column and sticks on horizontal scroll. The number is read from the live painted row model (cached per model, O(n)). Header defaults to `#` (`rowNumberHeader` overrides). In settings ("Columns", always shown). Both skins inherit it | ✅ done |
 | Auto-generate columns (X27) | `enableAutoColumns` (+ `autoColumns`) | engine | boolean | false | custom — when **no `columns`** are supplied (empty array), infer one column per key found across a sample of rows (first-seen order) with a guessed cell type (number / boolean / date, else text) + humanized header; ignored the moment `columns` is non-empty (explicit columns win). Tune via `autoColumns` (`sampleRows` / `include` / `exclude` / `header` / `inferType`); helper `autoGenerateColumns(data, opts)` exported. In settings ("Columns") | ✅ done |
 | Loading / error overlays (X23) | `enableOverlays` (+ `loading` / `error` / `overlayText` / `renderLoadingOverlay` / `renderErrorOverlay`) | engine | boolean | true | custom — a formal overlay over the grid while `loading` is true or when `error` is set (error wins), instead of a blank / stale body. On by default: `useBstDataSource` / `useBstInfiniteDataSource` `tableProps` carry `loading` + `error`, so a server-wired grid shows them for free. Default content = spinner + "Loading…" / the error message; fully replaceable via the render props. In settings ("Display", always shown). Both skins inherit it | ✅ done |
 
-| MCP server for AI agents | `@bloomskill/table-mcp` | tooling | MCP stdio server | — (separate package) | `npx -y @bloomskill/table-mcp` — 8 tools (`bst_search_docs` · `bst_get_feature` · `bst_get_cell_type` · `bst_get_api` · `bst_get_example` · `bst_scaffold_grid` · `bst_validate_config` · `bst_detect_version`), 4 prompts, `bst://` resources. Corpus **generated from source** at build time; `src/rules.ts` holds the hand-authored flag-dependency table (parity-tested) | ✅ done |
+| MCP server for AI agents | `@bloomskill/table-mcp` | tooling | MCP stdio server | — (separate package) | `npx -y @bloomskill/table-mcp` — 8 tools (`bst_search_docs` · `bst_get_feature` · `bst_get_cell_type` · `bst_get_api` · `bst_get_example` · `bst_scaffold_grid` · `bst_validate_config` · `bst_detect_version`), 4 prompts, `bst://` resources. Each tool declares an `outputSchema` (validated structured output); prompt/resource args autocomplete to real names (MCP completions); every flag carries a `since` version and `bst_get_feature` takes `installedVersion` to say if a flag exists in a project's version. Corpus **generated from source** at build time; `src/rules.ts` holds the hand-authored flag-dependency table (parity-tested); **`npm run verify:mcp`** cross-checks the corpus covers every engine capability | ✅ done |
 
 Add a row here — in this exact shape — whenever a feature is introduced.
 
@@ -690,10 +691,12 @@ needs a version bump.)
 > - **Affected package README(s)** — Features list, Props/Options table, examples ([mapping below](#which-readme-to-update)).
 > - **`CHANGELOG.md`** — a bullet under `[Unreleased]` (or the version heading being cut).
 > - **`docs/capability-roadmap.md`, `Plan.md`** — if the roadmap/phase status moved.
+> - **Generated docs site (`apps/docs`)** — regenerate from the corpus with **`npm run docs:build`**;
+>   never hand-edit `apps/docs/docs/**` or the dumped `apps/docs/scripts/{features,cells,requirements,rules}.json`.
 > - Anything else the change logically implies (settings parity, MCP `rules.ts`, the demo).
 >
-> Then run the gates (`npm test` · `npm run build` · `npm run verify:naming`) and only commit once
-> they pass. A "commit" that leaves the docs stale is a **bug**, not a shortcut. If a doc genuinely
+> Then run the gates (`npm test` · `npm run build` · `npm run mcp` · `npm run docs:verify` ·
+> `npm run verify:naming`) and only commit once they pass. A "commit" that leaves the docs stale is a **bug**, not a shortcut. If a doc genuinely
 > doesn't apply, say so in the reply — don't silently skip it.
 
 ### Definition of Done for any feature / flag
@@ -705,9 +708,16 @@ needs a version bump.)
    actually *uses* the feature. A feature the demo can't show isn't done.
 4. **README(s)** — update the affected package README's **Features** list, **Props/Options
    table**, and **example** (if the API surface changed). Mapping below.
-5. **CHANGELOG.md** — add a bullet under the new version heading.
-6. **Version bump** — bump the affected package `version` (semver).
-7. **Neutral naming** — `npm run verify:naming` green. Bst-Table describes its own capabilities in
+5. **Regenerate the generated docs** — the `apps/docs` site (feature guides, cell types, coverage)
+   is generated from the MCP corpus, so a new flag needs no hand-written page: run **`npm run
+   docs:build`** — it rebuilds the corpus, dumps it to `apps/docs/scripts/*.json`, regenerates the
+   MDX and runs the coverage gate. **Never hand-edit** `apps/docs/docs/**` or
+   `apps/docs/scripts/{features,cells,requirements,rules}.json` — they are build artifacts
+   (`dump-corpus.mjs` overwrites them). Enforced by `npm run docs:verify` (CI) and the MCP-coverage
+   guard `npm run verify:mcp` (part of `npm run mcp`), so an undocumented feature fails the build.
+6. **CHANGELOG.md** — add a bullet under the new version heading.
+7. **Version bump** — bump the affected package `version` (semver).
+8. **Neutral naming** — `npm run verify:naming` green. Bst-Table describes its own capabilities in
    its own words: **never name a third-party grid product** (or its licensing tiers) anywhere in the
    tree — docs, code comments, settings hints, MCP prompts included. Roadmap IDs are the `X1–X29`
    scheme in `COVERAGE.md`; positioning is stated positively ("MIT/Apache only, no per-seat

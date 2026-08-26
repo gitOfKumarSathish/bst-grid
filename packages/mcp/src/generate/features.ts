@@ -3,6 +3,7 @@ import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import type { FeatureEntry, FeatureKind } from '../types.js'
 import { codeSpans, isIdentifier, parseTable, stripMd } from './md.js'
+import { buildShipVersionLookup } from './since.js'
 
 /** One entry of the engine's runtime settings registry (see `engine/src/settings.ts`). */
 interface SettingsRegistryEntry {
@@ -133,6 +134,7 @@ export async function extractFeatures(repoRoot: string): Promise<FeatureEntry[]>
   if (!table) throw new Error('Could not find the CLAUDE.md §12 "Feature toggle registry" table')
 
   const tsdoc = extractTsDoc(readFileSync(join(repoRoot, 'packages/engine/src/types.ts'), 'utf8'))
+  const sinceOf = buildShipVersionLookup(repoRoot)
 
   const features: FeatureEntry[] = []
   const seen = new Set<string>()
@@ -155,6 +157,7 @@ export async function extractFeatures(repoRoot: string): Promise<FeatureEntry[]>
 
     const mapsTo = stripMd(mapsToCell)
     const doc = tsdoc[primary]
+    const since = sinceOf(primary)
 
     features.push({
       flag: primary,
@@ -168,6 +171,7 @@ export async function extractFeatures(repoRoot: string): Promise<FeatureEntry[]>
       default: stripMd(defaultCell) || '—',
       ...(mapsTo ? { mapsTo } : {}),
       ...(stripMd(statusCell) ? { status: stripMd(statusCell) } : {}),
+      ...(since ? { since } : {}),
       ...(setting ? { group: setting.group, alwaysShow: setting.alwaysShow } : {}),
       ...(setting?.hint ? { hint: setting.hint } : {}),
       inSettingsSheet: Boolean(setting),

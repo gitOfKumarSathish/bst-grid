@@ -1,6 +1,19 @@
+import { completable } from '@modelcontextprotocol/sdk/server/completable.js'
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { z } from 'zod'
 import type { BstCorpus } from './types.js'
+
+/** The three skins a grid can be scaffolded against. */
+const ADAPTERS = ['mui', 'shadcn', 'engine'] as const
+
+/** Case-insensitive prefix/substring filter for argument completion. */
+function matches(candidates: readonly string[], value: string | undefined, limit = 50): string[] {
+  const q = (value ?? '').toLowerCase()
+  if (!q) return [...candidates].slice(0, limit)
+  const starts = candidates.filter((c) => c.toLowerCase().startsWith(q))
+  const contains = candidates.filter((c) => !c.toLowerCase().startsWith(q) && c.toLowerCase().includes(q))
+  return [...starts, ...contains].slice(0, limit)
+}
 
 /**
  * Guided workflows. Each encodes the tool ORDER that produces correct
@@ -14,6 +27,10 @@ export function registerPrompts(server: McpServer, corpus: BstCorpus): void {
     `It is not any other grid library — do not use APIs from other grids. ` +
     `Every capability is a per-instance flag: \`enable*\` = engine behaviour, \`show*\` = adapter chrome, and chrome is a no-op without its behaviour flag.`
 
+  // Real flag names, so `bst-add-feature`'s argument autocompletes to props that
+  // actually exist rather than a guess from another grid library.
+  const flagNames = [...new Set(corpus.features.map((f) => f.flag))].sort()
+
   server.registerPrompt(
     'bst-quick-start',
     {
@@ -21,7 +38,10 @@ export function registerPrompts(server: McpServer, corpus: BstCorpus): void {
       description: 'Build a new grid from a description of what it should do.',
       argsSchema: {
         requirements: z.string().describe('What the grid needs to do, in plain language'),
-        adapter: z.string().optional().describe("Preferred skin: 'mui', 'shadcn' or 'engine' (headless)"),
+        adapter: completable(
+          z.string().optional().describe("Preferred skin: 'mui', 'shadcn' or 'engine' (headless)"),
+          (value) => matches(ADAPTERS, value),
+        ),
       },
     },
     ({ requirements, adapter }) => ({
@@ -58,7 +78,10 @@ export function registerPrompts(server: McpServer, corpus: BstCorpus): void {
       title: 'Add a feature to an existing Bst-Table grid',
       description: 'Switch on a capability with every dependency it needs.',
       argsSchema: {
-        feature: z.string().describe('The capability to add, e.g. "batch save", "copy/paste", "master detail"'),
+        feature: completable(
+          z.string().describe('The capability to add, e.g. "batch save", "copy/paste", "master detail"'),
+          (value) => matches(flagNames, value),
+        ),
         code: z.string().optional().describe('The existing grid code, if you have it'),
       },
     },

@@ -53,8 +53,12 @@ your handler. Choose the granularity with the `mode` option:
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `EditingOptions + callback` |
 | Default | `— (opt-in)` |
+| Maps to | third editing mode: EVERY edit/paste stays an unsaved draft; runtime.getChangeSet() (old→new + formatted text), revertCell/revertRow, formatValue. onSave(event) fires once per save action (commitAll/commitRowSession) with &#123; changes, rows[].patch, next &#125; — ONE batched API call, never per cell/row/column; a rejected onSave keeps every draft. Mode is settings-toggleable via enableBatchEditing (next rows) |
 | Status | ✅ done |
+| Since | v0.2.0 |
 | Settings sheet | Editing |
+
+Inline editing feature. `boolean | EditingOptions`. Default: false (opt-in).
 
 ## Enable it
 
@@ -72,9 +76,16 @@ your handler. Choose the granularity with the `mode` option:
 
 | Option | Notes |
 | --- | --- |
+| `onSave` | Related prop for this feature. |
 | `getRowId` | edits target rows by id, never by index |
 | `onDataChange` | without it committed edits have nowhere to go |
 
 ## Behavior & interactions
 
 - Modes: 'cell' (default, commit per cell) · 'row' (deferred row session) · 'batch' (every edit stays a draft until an explicit save).
+
+## Spec coverage
+
+- **C2 · Save on Enter/Blur/Explicit** — ✅ built. P2
+- **I2 · Cell events + deferred save** — ✅ built. P2 (C2≡I2)
+- **I4 · Backend updates → cells/rows/grid** — 🟡 partial. change-set half done v0.30.0 — batch mode's runtime.getChangeSet() + one onSave(&#123; changes, rows[].patch, next &#125;) per save action, with a rejected save keeping every draft; reconciling the backend's response back into cells/rows (server-authoritative values, partial failures) not built

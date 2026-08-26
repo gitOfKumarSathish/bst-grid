@@ -30,6 +30,9 @@ function mdxSafe(s, { inTableCell = false } = {}) {
 const code = (s) => '`' + s + '`'
 const codeCell = (s) => '`' + String(s).replace(/\|/g, '\\|') + '`' // pipe-safe inside tables
 const cleanDoc = (s) => String(s || '').replace(/\{@link(?:code)?\s+([^}|]+?)(?:\s*\|\s*([^}]+))?\}/g, (_, a, b) => '`' + (b || a).trim() + '`')
+// Prose pulled from a README may link to a heading anchor that exists there but
+// NOT on the generated page — drop the dangling `[text](#anchor)`, keep the text.
+const dropSelfAnchors = (s) => String(s || '').replace(/\[([^\]]*)\]\(#[^)]*\)/g, '$1')
 // Render a JSDoc string: prose escaped for MDX, embedded ```code``` re-emitted as real fenced blocks.
 function renderDoc(doc) {
   if (!doc) return ''
@@ -61,7 +64,10 @@ function genCells() {
     '---', 'id: index', 'title: Cell Types', 'sidebar_label: Overview', 'slug: /cell-types', '---', '',
     '# Cell Types', '',
     `A column's renderer + editor is chosen by \`meta.type\`. ${CELLS.length} built-in types ship, all dependency-free inline SVG, extensible via the cell-type registry.`,
-    '', '| Type | Renders | Editable |', '| --- | --- | --- |', ...rows, '',
+    '', '![Bst-Table cell types — sparkline, KPI, coloured status badges, multi-select chips and a boolean check](/img/cells-showcase.png)', '',
+    'Try it live — edit the code and the grid updates:', '',
+    '<BstSandbox example="showcase" />', '',
+    '| Type | Renders | Editable |', '| --- | --- | --- |', ...rows, '',
     '_Generated from the `@bloomskill/table-mcp` corpus._', '',
   ].join('\n'))
 
@@ -77,7 +83,7 @@ function genCells() {
       'const columns: BstTableColumn<Row>[] = [',
       `  { id: 'x', accessorKey: 'x', header: 'X', meta: { type: '${c.type}'${c.cellMeta && c.cellMeta !== '—' ? ', /* cellMeta below */' : ''} } },`,
       ']', '```', '']
-    if (c.cellMetaDetail) { L.push('## `cellMeta` options', '', mdxSafe(c.cellMetaDetail), '') }
+    if (c.cellMetaDetail) { L.push('## `cellMeta` options', '', mdxSafe(dropSelfAnchors(c.cellMetaDetail)), '') }
     writeFileSync(join(dir, `${c.type}.mdx`), L.join('\n'))
   }
   return CELLS.length

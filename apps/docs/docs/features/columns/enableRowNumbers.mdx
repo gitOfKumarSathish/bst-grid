@@ -34,8 +34,12 @@ order.
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `boolean` |
 | Default | `false` |
+| Maps to | custom — a leading, non-interactive # column numbering the current view (continuous across pages; reflects sort + filter). Injected as a real leaf column with an id under the reserved bst prefix, so it stays out of sorting, the filter row, the columns menu and export by construction. Pinned to the start (sticky-left) by default — useBstTable seeds columnPinning.start with the row-number id (even over a consumer initialState/gridState), so it stays the leftmost data column ahead of any user-pinned column and sticks on horizontal scroll. The number is read from the live painted row model (cached per model, O(n)). Header defaults to # (rowNumberHeader overrides). In settings ("Columns", always shown). Both skins inherit it |
 | Status | ✅ done |
+| Since | v0.40.0 |
 | Settings sheet | Columns |
+
+Row-number column (X9) — a leading, non-interactive `#` column showing each row's 1-based position in the **current view** (continuous across pages; reflects sort + filter). It never sorts, filters, hides, resizes, reorders or pins, and stays out of the columns menu / filter row / export. Header defaults to `#` — override with `rowNumberHeader`. Default: false.
 
 ## Enable it
 
@@ -48,6 +52,12 @@ order.
 ```
 
 > Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Options
+
+| Option | Notes |
+| --- | --- |
+| `rowNumberHeader` | Related prop for this feature. |
 
 ## Behavior & interactions
 

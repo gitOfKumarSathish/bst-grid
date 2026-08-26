@@ -10,6 +10,26 @@ export const ResponseFormat = z
   .default('markdown')
   .describe("Output format: 'markdown' for human-readable prose, 'json' for machine-readable data")
 
+/**
+ * One validator finding, as an output-schema fragment. Shared by
+ * `bst_validate_config` and the self-check baked into `bst_scaffold_grid` so a
+ * finding has one declared shape wherever it surfaces — the structured-output
+ * counterpart of {@link renderFeature} for prose.
+ */
+export const FindingSchema = z.object({
+  level: z.enum(['error', 'warning', 'info']),
+  subject: z.string(),
+  message: z.string(),
+  fix: z.string(),
+})
+
+/** The `validateConfig` verdict, as a reusable output-schema object. */
+export const ValidationReportSchema = z.object({
+  ok: z.boolean(),
+  detected: z.array(z.string()),
+  findings: z.array(FindingSchema),
+})
+
 /** The MCP tool-result shape both success and error paths return. */
 export type ToolResult = CallToolResult
 
@@ -55,6 +75,7 @@ export function renderFeature(feature: FeatureEntry, requirements: RequirementEn
   ]
   if (feature.mapsTo) lines.push(`| **Maps to** | ${feature.mapsTo} |`)
   if (feature.status) lines.push(`| **Status** | ${feature.status} |`)
+  if (feature.since) lines.push(`| **Since** | v${feature.since} |`)
   if (feature.group) {
     lines.push(`| **Settings sheet** | ${feature.group}${feature.alwaysShow ? ' (always shown)' : ''} |`)
   }

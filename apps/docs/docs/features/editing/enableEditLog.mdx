@@ -1,0 +1,65 @@
+---
+id: enableEditLog
+title: Log committed cell edits (debug)
+sidebar_label: enableEditLog
+---
+
+# Log committed cell edits (debug)
+
+Prop `enableEditLog` — engine behaviour, default `false`.
+
+## Guide
+
+### When to use it
+
+Debugging edits — see every committed cell change in the console without wiring a handler.
+
+### How it works
+
+A debug companion to the **`onCellCommit`** callback. With `enableEditLog` on and no handler
+supplied, every cell commit that writes through — an inline edit saved on Enter / blur, or each cell
+of a paste — is `console.log`ged as a `BstCellEdit` (old → new, formatted text, the row).
+
+### Gotchas
+
+- Needs `enableEditing`.
+- An `onCellCommit` handler **takes precedence** and silences the log, so you never get a double
+  signal — for production, wire `onCellCommit` instead of relying on the log.
+- Deferred `row` / `batch` modes still batch through `onSave`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean` |
+| Default | `false` |
+| Maps to | custom — a debug companion to the onCellCommit(change) callback (itself the inline counterpart to onSave). onCellCommit fires once per committed cell the moment an edit writes through (Enter/blur in 'cell' mode, or per pasted cell) with the single BstCellEdit (rowId · columnId · field · old→new value + formatted text · row); emitted from persist() downstream of commitCell, so it also covers Enter/Tab commit-and-move + paste, while deferred 'row'/'batch' modes still batch through onSave. When enableEditLog is on and no handler is set, each commit is console.logged instead (handler wins — no double signal). In settings ("Editing", always shown; needs enableEditing). Both forward through the adapters (...rest) |
+| Status | ✅ done |
+| Since | v0.42.0 |
+| Settings sheet | Editing |
+
+Log committed cell edits — a debug aid (the "Both"-mode companion to `onCellCommit`). When `true`, every cell commit that writes through — an inline edit saved on Enter/blur, or each cell of a paste — is `console.log`ged as a `BstCellEdit` (old → new, formatted text, the row). If an `onCellCommit` handler is supplied it takes precedence and this stays quiet, so you never get a double signal. Needs `enableEditing`. Default: false (opt-in).
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableEditLog
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Options
+
+| Option | Notes |
+| --- | --- |
+| `onCellCommit` | Related prop for this feature. |
+
+## Behavior & interactions
+
+- **Requires** `enableEditing` to be on — this flag is a no-op otherwise.
+- Debug aid: console.logs each committed cell edit (old → new). If you pass an `onCellCommit` handler it takes precedence and this flag stays quiet — no double signal.

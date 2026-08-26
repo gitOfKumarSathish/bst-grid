@@ -12,6 +12,26 @@ const inputSchema = {
 }
 
 /**
+ * Declared shape of `structuredContent`. A single-example lookup returns each
+ * file's full source (`{ path, code }`); the listing returns only the file
+ * paths (`string`), so `files` is a union of the two.
+ */
+const outputSchema = {
+  count: z.number(),
+  examples: z.array(
+    z
+      .object({
+        name: z.string(),
+        description: z.string(),
+        files: z
+          .array(z.union([z.string(), z.object({ path: z.string(), code: z.string() }).passthrough()]))
+          .describe('Full `{ path, code }` on a single-example lookup; just the path strings on a listing'),
+      })
+      .passthrough(),
+  ),
+}
+
+/**
  * The examples are complete, compiling apps that import the published packages
  * exactly as a consumer's project would — the strongest grounding available for
  * "write me a grid that…", because the agent copies working code instead of
@@ -43,6 +63,7 @@ Examples:
 Error handling:
   - An unknown name lists the valid ones.`,
       inputSchema,
+      outputSchema,
       annotations: {
         readOnlyHint: true,
         destructiveHint: false,

@@ -2,7 +2,7 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { z } from 'zod'
 import type { BstCorpus } from '../types.js'
 import { validateConfig } from '../validate.js'
-import { ResponseFormat, fail, ok } from './shared.js'
+import { ResponseFormat, ValidationReportSchema, fail, ok } from './shared.js'
 
 const inputSchema = {
   code: z
@@ -16,6 +16,9 @@ const inputSchema = {
     .describe('An already-parsed props object, as an alternative to `code`'),
   response_format: ResponseFormat,
 }
+
+/** Declared shape of `structuredContent` — the `validateConfig` verdict. */
+const outputSchema = ValidationReportSchema.shape
 
 /**
  * The highest-value tool in the server. Bst-Table has two flag layers with
@@ -56,6 +59,7 @@ Error handling:
   - Returns an error when neither \`code\` nor \`config\` is supplied.
   - Detection is lexical, so a value it cannot read confidently (\`enableEditing={someVar}\`) is reported as a warning rather than asserted either way.`,
       inputSchema,
+      outputSchema,
       annotations: {
         readOnlyHint: true,
         destructiveHint: false,

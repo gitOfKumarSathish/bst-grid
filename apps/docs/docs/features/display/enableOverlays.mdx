@@ -34,8 +34,12 @@ server-wired grid gets this for free. Replace the content with `renderLoadingOve
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `boolean` |
 | Default | `true` |
+| Maps to | custom — a formal overlay over the grid while loading is true or when error is set (error wins), instead of a blank / stale body. On by default: useBstDataSource / useBstInfiniteDataSource tableProps carry loading + error, so a server-wired grid shows them for free. Default content = spinner + "Loading…" / the error message; fully replaceable via the render props. In settings ("Display", always shown). Both skins inherit it |
 | Status | ✅ done |
+| Since | v0.40.0 |
 | Settings sheet | Display |
+
+Loading / error overlays (X23) — render a formal overlay over the grid while `loading` is true or when `error` is set, instead of leaving the body blank or stale. On by default so a grid wired to a server `DataSource` (`useBstDataSource`, which reports `loading`/`error`) shows them for free; set `false` to suppress the overlays and manage those states yourself. Feed the state via `loading` / `error`; customize via `overlayText`, `renderLoadingOverlay`, `renderErrorOverlay`. Default: true.
 
 ## Enable it
 
@@ -48,6 +52,16 @@ server-wired grid gets this for free. Replace the content with `renderLoadingOve
 ```
 
 > Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Options
+
+| Option | Notes |
+| --- | --- |
+| `loading` | Related prop for this feature. |
+| `error` | Related prop for this feature. |
+| `overlayText` | Related prop for this feature. |
+| `renderLoadingOverlay` | Related prop for this feature. |
+| `renderErrorOverlay` | Related prop for this feature. |
 
 ## Behavior & interactions
 

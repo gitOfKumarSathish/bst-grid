@@ -1,0 +1,82 @@
+---
+id: enableFind
+title: Find (X8)
+sidebar_label: enableFind
+---
+
+# Find (X8)
+
+Prop `enableFind` — engine behaviour, default `false`.
+
+## Guide
+
+### When to use it
+
+Let users **find and jump between matches** inside the grid (⌘/Ctrl+F) — like the browser's find —
+**without removing any rows**. Reach for it when the surrounding rows still matter and filtering them
+away would lose context.
+
+### How it works
+
+`enableFind` adds an in-grid find bar that **highlights every match and steps between them**
+(Next / Prev, "n of m"). ⌘/Ctrl+F opens it; Enter / F3 cycle forward, Shift reverses; Esc closes.
+Pass an object to configure it:
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  getRowId={(r) => r.id}
+  enableFind={{ caseSensitive: false, scope: 'view' }}
+  showFind
+/>
+```
+
+An object implies enabled. Add `showFind` for a toolbar button — the shortcut works either way.
+
+### Gotchas
+
+- **Distinct from global search** (`enableGlobalFilter`): Find **hides nothing** — it highlights and
+  jumps; global search *removes* non-matching rows.
+- Matching runs over the visible cell text; `scope: 'all'` looks beyond the current page.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean \| BstFindOptions` |
+| Default | `false` |
+| Maps to | custom — dep-free in-grid find bar that HIGHLIGHTS matches and jumps between them (Next/Prev · "n of m") without hiding rows (distinct from enableGlobalFilter, which removes non-matches). Matches computed over the visible cell text (cellClipboardText = formatValue ∘ draftAwareValue), held in the interaction store, painted per-cell via CellSlice (findRanges/isCurrentFind) so only matched cells repaint; plain-text cells get in-place &lt;mark&gt;s, any cell gets a bst-find-hit/-current tint. ⌘/Ctrl+F opens (independent of enableCellSelection), Enter/Shift+Enter cycle in the box, F3/Shift+F3 cycle, Esc closes; current match scrolls into view (virtualized scrollToIndex + scrollIntoView). enableFind object form = &#123; caseSensitive?, scope?: 'view'\|'all' &#125;. Adapters add a toolbar Find button (showFind). In settings ("Data operations", always shown). Both skins inherit it |
+| Status | ✅ done |
+| Since | v0.42.0 |
+| Settings sheet | Data operations |
+
+Find (X8) — an in-grid search box that **highlights matches and jumps between them** (Next / Prev) WITHOUT hiding rows — distinct from the global search (`enableGlobalFilter`), which removes non-matching rows. Open with ⌘/Ctrl+F, cycle with Enter / F3 (Shift for previous), close with Esc. Pass an object (`{ caseSensitive?, scope? }`) to configure; an object implies enabled (§12). Default: false.
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableFind={/* boolean | BstFindOptions */}
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Options
+
+| Option | Notes |
+| --- | --- |
+| `BstFindOptions` | Related prop for this feature. |
+| `showFind` | Related prop for this feature. |
+
+## Behavior & interactions
+
+- Find (X8) — a search box that HIGHLIGHTS matches and jumps between them (Next / Prev, "n of m") WITHOUT hiding rows — distinct from `enableGlobalFilter`, which removes non-matching rows. Open with ⌘/Ctrl+F, cycle with Enter / F3 (Shift for previous), close with Esc. Pass `{ caseSensitive?, scope? }` to configure (an object implies enabled). Off by default. Adapters expose a toolbar "Find" button via `showFind`.
+
+## Spec coverage
+
+- **F3 · Disable column** — ✅ built. P3 — meta.disabled

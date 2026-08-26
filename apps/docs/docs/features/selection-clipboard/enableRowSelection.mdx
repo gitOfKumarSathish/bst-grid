@@ -33,8 +33,12 @@ selected-count chip and Clear.
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `boolean` |
 | Default | `false` |
+| Maps to | v9 enableRowSelection |
 | Status | ✅ done (Phase 3) |
+| Since | v0.5.0 |
 | Settings sheet | Selection & clipboard |
+
+Row selection (Phase 3) — a leading checkbox column with header "select all" (indeterminate when partial) and per-row checkboxes. Maps to v9 `enableRowSelection`; state lives in `table.state.rowSelection`, keyed by `getRowId`. Read it via `table.getSelectedRowModel()`. Default: false (opt-in).
 
 ## Enable it
 

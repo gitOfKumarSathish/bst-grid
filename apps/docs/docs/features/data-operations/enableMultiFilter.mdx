@@ -34,8 +34,12 @@ stacked in the filter row and a row must satisfy **all** of them (AND). It store
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `boolean` |
 | Default | `false` |
+| Maps to | custom — stack several filter types on one column. A column opts in with an array meta.filter (e.g. ['condition','set']), rendered stacked in its filter row; a row must satisfy all parts (AND). Stores a compound &#123;op:'and',conditions&#125; value the bstCondition filterFn understands (combineFilterConditions; FilterConditionGroup); BstSetFilter + the condition input each drive a positional slot. Needs enableColumnFilters + enableColumnFilterRow (a 'set' part needs enableSetFilter); when off, an array meta.filter falls back to its first entry. In settings ("Data operations", always shown). Both skins inherit it |
 | Status | ✅ done |
+| Since | v0.39.0 |
 | Settings sheet | Data operations |
+
+Multi-filter (X11) — **stack several filter types on one column**. A column opts in with `meta.filter` as an array (e.g. `['condition', 'set']`), which renders the listed filters **stacked** in its filter row; a row must satisfy **all** of them (AND). Needs `enableColumnFilters` + `enableColumnFilterRow` (and `enableSetFilter` for a `'set'` part). Default: false.
 
 ## Enable it
 

@@ -23,3 +23,7 @@ jobs:
       - run: npm run verify:naming
       - run: npm test
       - run: npm run mcp
+      # Docs are generated from the MCP corpus (features/cell-types/coverage) — a
+      # feature added without regenerating them fails here. Runs after the build
+      # so the corpus is fresh; dependency-free (no docusaurus/TS5 install needed).
+      - run: npm run docs:verify

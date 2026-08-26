@@ -38,8 +38,12 @@ Height is `--bst-max-height` (default 440px), or set it: `boolean | { maxHeight,
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `boolean \| {maxHeight,maxRows}` |
 | Default | `false` |
+| Maps to | custom render — caps the scroll box to a bounded height (--bst-max-height; default 440px, or maxHeight px/CSS length, or maxRows × row estimate) so the body scrolls under a sticky header + filter row instead of the table growing taller as the page size grows (resolveStickyHeader pure helper; class bst-sticky-header). Row virtualization already does this, so the standalone class is skipped when enableVirtualization is on (the two never stack). In settings ("Rows", always shown so an end-user can switch it on) |
 | Status | ✅ done |
+| Since | v0.40.0 |
 | Settings sheet | Rows |
+
+Sticky-header viewport (G3/G4) — cap the scrollable body to a bounded height so the rows scroll **inside** the grid under a header (and per-column filter row) that stays pinned, instead of the whole table growing taller as the page size grows. `true` uses a default height (440px); pass an object to size it by pixels (`{ maxHeight }`) or by a number of visible rows (`{ maxRows }`). An object implies enabled (§12). Opt-in. Default: false. Row virtualization (`enableVirtualization`) already includes this behaviour — it also caps the body and sticks the header — so this is the same viewport **without** row windowing, for small / medium grids. The height is overridable via `styles.root`.
 
 ## Enable it
 
@@ -56,3 +60,8 @@ Height is `--bst-max-height` (default 440px), or set it: `boolean | { maxHeight,
 ## Behavior & interactions
 
 - Caps the scroll box to a bounded height (default 440px; size it with `{ maxHeight }` or `{ maxRows }`) so the body scrolls under a pinned header + filter row, instead of the table growing taller with the page size. Row virtualization already does this, so the engine skips the standalone class when `enableVirtualization` is on — the two never stack.
+
+## Spec coverage
+
+- **G3 · Auto layout** — ✅ built. fixed layout + total-size + fitColumns fit-to-viewport
+- **G4 · Responsive** — ✅ built. v0.22.0 — enableResponsive + meta.responsivePriority (hide low-priority when narrow)
