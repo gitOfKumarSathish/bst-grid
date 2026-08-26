@@ -278,8 +278,8 @@
   {
     "id": "I4",
     "title": "Backend updates → cells/rows/grid",
-    "status": "partial",
-    "notes": "change-set half done v0.30.0 — batch mode's runtime.getChangeSet() + one onSave({ changes, rows[].patch, next }) per save action, with a rejected save keeping every draft; reconciling the backend's response back into cells/rows (server-authoritative values, partial failures) not built"
+    "status": "built",
+    "notes": "both halves done. Send: batch mode's runtime.getChangeSet() + one onSave({ changes, rows[].patch, next }) per save action (v0.30.0), a rejected save keeping every draft. Reconcile: onSave may RETURN a BstSaveResult — applied rows adopt the server's authoritative values (IDs, timestamps, normalised/recomputed fields), failed rows/cells keep their draft + show the error (partial success); returning nothing commits every draft as typed"
   },
   {
     "id": "I5",

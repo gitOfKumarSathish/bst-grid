@@ -390,6 +390,12 @@
     "doc": "The payload of ONE save action (I2/I4). Handed to `onSave` exactly once per confirm — never per cell/row/column — so the backend call stays a single batched request whichever granularity the API wants: `changes` (cell-wise), `rows[].patch` (row-wise), or `next` (whole grid)."
   },
   {
+    "symbol": "BstSaveResult",
+    "kind": "interface",
+    "signature": "export interface BstSaveResult<TData> {\n    /**\n     * Rows the server accepted, each with the server's official values (a full or\n     * PARTIAL row) merged onto the grid row — so IDs, timestamps, recomputed or\n     * normalised fields display what was actually stored. These rows' drafts clear.\n     * Key by the same `rowId` the save event used (a new row's temporary id maps to\n     * the server row here, so its real id lands in `values`).\n     */\n    applied?: Array<{\n        rowId: string;\n        values: Partial<TData>;\n    }>;\n    /**\n     * Rows/cells the server rejected. Their drafts are KEPT and the `error` is shown\n     * on the cell(s) (reusing the validation-error UI). Omit `columnId` for a\n     * whole-row failure — the error then flags every edited cell in that row.\n     */\n    failed?: Array<{\n        rowId: string;\n        columnId?: string;\n        error: string;\n    }>;\n}",
+    "doc": "What an `onSave` handler may RETURN to reconcile the backend's response back into the grid (I4). It is the resolved *value* of the save promise — think `Promise.allSettled`, not resolve-vs-reject: **throwing** still aborts the whole save and keeps every draft, while **returning** this settles each row/cell. - Return **nothing** → today's behaviour: every draft commits with the typed values. - Return a result → `applied` rows adopt the server's authoritative values and their drafts clear; `failed` rows/cells keep their draft and show an error; every other changed row commits with its local value."
+  },
+  {
     "symbol": "BstSelectionStats",
     "kind": "interface",
     "signature": "export interface BstSelectionStats {\n    /** Total selected cells (real data rows only). */\n    count: number;\n    /** How many of the selected cells hold a numeric value. */\n    numericCount: number;\n    /** Sum of the numeric cells. */\n    sum: number;\n    /** Mean of the numeric cells (0 when none). */\n    avg: number;\n    /** Min of the numeric cells (0 when none). */\n    min: number;\n    /** Max of the numeric cells (0 when none). */\n    max: number;\n}",

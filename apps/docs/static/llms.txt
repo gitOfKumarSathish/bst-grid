@@ -112,7 +112,7 @@ This is the AI-readable index. Full plain-text docs: https://gitofkumarsathish.g
 
 ## API Reference
 
-- [API Reference](https://gitofkumarsathish.github.io/bst-grid/docs/api): Every public export of @bloomskill/table-engine (262 symbols), with signatures read from the built .d.ts — so they match what the compiler accepts.
+- [API Reference](https://gitofkumarsathish.github.io/bst-grid/docs/api): Every public export of @bloomskill/table-engine (263 symbols), with signatures read from the built .d.ts — so they match what the compiler accepts.
 - [Constants](https://gitofkumarsathish.github.io/bst-grid/docs/api/constants): Exported constants and registries.
 - [Functions](https://gitofkumarsathish.github.io/bst-grid/docs/api/functions): Standalone helpers and factories.
 - [Hooks](https://gitofkumarsathish.github.io/bst-grid/docs/api/hooks): React hooks — the engine entry points.
@@ -122,4 +122,4 @@ This is the AI-readable index. Full plain-text docs: https://gitofkumarsathish.g
 
 ## Reference
 
-- [Feature Coverage & Roadmap](https://gitofkumarsathish.github.io/bst-grid/docs/coverage): Requirement-by-requirement status across 58 spec leaves: 55 built, 2 partial, 1 not built. Honest status, straight from the spec matrix.
+- [Feature Coverage & Roadmap](https://gitofkumarsathish.github.io/bst-grid/docs/coverage): Requirement-by-requirement status across 58 spec leaves: 56 built, 1 partial, 1 not built. Honest status, straight from the spec matrix.

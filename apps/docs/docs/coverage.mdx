@@ -7,7 +7,7 @@ sidebar_position: 9
 
 # Feature Coverage & Roadmap
 
-Requirement-by-requirement status across 58 spec leaves: **55 built**, **2 partial**, **1 not built**. Honest status, straight from the spec matrix.
+Requirement-by-requirement status across 58 spec leaves: **56 built**, **1 partial**, **1 not built**. Honest status, straight from the spec matrix.
 
 ## A
 
@@ -99,7 +99,7 @@ Requirement-by-requirement status across 58 spec leaves: **55 built**, **2 parti
 | I1 | Row lifecycle events | ✅ built | P2 — enableRowActions + onDataChange | — |
 | I2 | Cell events + deferred save | ✅ built | P2 (C2≡I2) | `enableEditing` |
 | I3 | File ops (upload/view/delete) | ✅ built | view + preview (BstFilePreview) + upload/delete via cellMeta.onUpload/onDelete (busy state; local object-URL fallback), now also formal DataSource verbs uploadFile/deleteFile/getFileUrl + createFileHandlers(source) bridge (Plan.md §2.2) | `files`, `DataSource` |
-| I4 | Backend updates → cells/rows/grid | 🟡 partial | change-set half done v0.30.0 — batch mode's runtime.getChangeSet() + one onSave(&#123; changes, rows[].patch, next &#125;) per save action, with a rejected save keeping every draft; reconciling the backend's response back into cells/rows (server-authoritative values, partial failures) not built | `enableEditing` |
+| I4 | Backend updates → cells/rows/grid | ✅ built | both halves done. Send: batch mode's runtime.getChangeSet() + one onSave(&#123; changes, rows[].patch, next &#125;) per save action (v0.30.0), a rejected save keeping every draft. Reconcile: onSave may RETURN a BstSaveResult — applied rows adopt the server's authoritative values (IDs, timestamps, normalised/recomputed fields), failed rows/cells keep their draft + show the error (partial success); returning nothing commits every draft as typed | `enableEditing` |
 | I5 | External updates (parent/WS) | ❌ not built | WebSocket / live merge not built | — |
 
 ## J

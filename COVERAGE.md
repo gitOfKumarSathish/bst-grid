@@ -13,7 +13,7 @@ engine + adapter source. Re-run when a version ships._
 > pick-up order: [`docs/backlog.md`](docs/backlog.md). This matrix stays the status source of truth.
 
 **Legend:** ✅ built · 🟡 partial · ❌ missing (needs the Phase-4 foundation / a new dep) · ⏭️ deliberately skipped · ⚪ optional / out of scope (kept, not scheduled)
-**Tally:** ✅ 55 built · 🟡 2 partial · ❌ 1 missing (of 58). _(**B5 now ✅** — in-cell **PDF thumbnail** (`cellMeta.pdfThumbnail`, rendered by **pdf.js** via an injected renderer — engine stays dep-free), the last B5 gap; I3 file ops ✅ — formal `DataSource.uploadFile`/`deleteFile`/`getFileUrl` verbs + `createFileHandlers` bridge on top of the cell-level upload/delete; D1 row/column virtualization + A2 infinite scroll shipped on `@tanstack/react-virtual` → both ✅, leaving I5 the only ❌; v0.30.0 — batch editing + `getChangeSet` + single-call `onSave` → I4 now partial; v0.28.0 server DataSource foundation → A3 server pagination done; v0.25.0 G2 row resize; v0.23.0 B1 QR/barcode + J2 rich-text)_
+**Tally:** ✅ 56 built · 🟡 1 partial · ❌ 1 missing (of 58). _(**I4 now ✅** — `onSave` may RETURN a `BstSaveResult` to apply the server's authoritative values (`applied`) and flag partial failures (`failed`) back into the grid, closing the reconcile half; **B5 now ✅** — in-cell **PDF thumbnail** (`cellMeta.pdfThumbnail`, rendered by **pdf.js** via an injected renderer — engine stays dep-free), the last B5 gap; I3 file ops ✅ — formal `DataSource.uploadFile`/`deleteFile`/`getFileUrl` verbs + `createFileHandlers` bridge on top of the cell-level upload/delete; D1 row/column virtualization + A2 infinite scroll shipped on `@tanstack/react-virtual` → both ✅, leaving I5 the only ❌; v0.30.0 — batch editing + `getChangeSet` + single-call `onSave` → I4 now partial; v0.28.0 server DataSource foundation → A3 server pagination done; v0.25.0 G2 row resize; v0.23.0 B1 QR/barcode + J2 rich-text)_
 
 | ID | Requirement | Status | Where / why |
 |---|---|---|---|
@@ -63,7 +63,7 @@ engine + adapter source. Re-run when a version ships._
 | I1 | Row lifecycle events | ✅ | P2 — `enableRowActions` + `onDataChange` |
 | I2 | Cell events + deferred save | ✅ | P2 (C2≡I2) |
 | I3 | File ops (upload/view/delete) | ✅ | view + **preview** (`BstFilePreview`) + **upload/delete** via `cellMeta.onUpload`/`onDelete` (busy state; local object-URL fallback), now also **formal `DataSource` verbs** `uploadFile`/`deleteFile`/`getFileUrl` + `createFileHandlers(source)` bridge (Plan.md §2.2) |
-| I4 | Backend updates → cells/rows/grid | 🟡 | **change-set half done v0.30.0** — batch mode's `runtime.getChangeSet()` + one `onSave({ changes, rows[].patch, next })` per save action, with a rejected save keeping every draft; **reconciling the backend's response back into cells/rows** (server-authoritative values, partial failures) not built |
+| I4 | Backend updates → cells/rows/grid | ✅ | **both halves done.** Send: batch mode's `runtime.getChangeSet()` + one `onSave({ changes, rows[].patch, next })` per save action (v0.30.0), a rejected save keeping every draft. Reconcile: `onSave` may RETURN a `BstSaveResult` — `applied` rows adopt the server's authoritative values (IDs, timestamps, normalised/recomputed fields), `failed` rows/cells keep their draft + show the error (partial success); returning nothing commits every draft as typed |
 | I5 | External updates (parent/WS) | ❌ | WebSocket / live merge not built |
 | J1 | Popup form editors | ✅ | P2 — Dialog / modal popups |
 | J2 | Rich / custom React editors | ✅ | custom React ✅ · rich-text **v0.23.0** (dep-free sanitized-HTML cell + popup editor; not Lexical) |
@@ -92,9 +92,9 @@ stays accurate for agents automatically).
 `enableColumnVirtualization` window rows/columns on `@tanstack/react-virtual`, and
 `useBstInfiniteDataSource` + `<BstTable onReachEnd>` append on scroll over the server `DataSource`.
 This closes A2 and the client-side 10k tier of A6. What still builds on the server foundation:
-I4 **backend reconcile** (the change-set + single-call `onSave` half landed in v0.30.0; applying the
-server's response back into cells/rows is what remains) · I5 live/WebSocket merge · the 1M migration
-tier proven end-to-end (A6).
+I5 live/WebSocket merge · the 1M migration tier proven end-to-end (A6). **I4 backend reconcile is now
+done** — `onSave` returns a `BstSaveResult` to apply the server's authoritative values and flag partial
+failures back into the grid (the send half — change-set + single-call `onSave` — landed in v0.30.0).
 **B5 — done:** the in-cell PDF **thumbnail** renders page 1 via **pdf.js** (`cellMeta.pdfThumbnail` + an injected renderer — `createPdfjsThumbnailer` / `<BstPdfThumbnailerProvider>`; the engine itself never imports pdf.js), joining click-to-preview + upload/delete (`BstFilePreview` + `cellMeta.onUpload`/`onDelete` + the formal `DataSource` file verbs). A server raster (`thumbnailUrl`) still wins when present.
 
 ---

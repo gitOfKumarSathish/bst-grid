@@ -794,6 +794,36 @@ interface BstSaveEvent<TData> {
 }
 ```
 
+## BstSaveResult
+
+What an `onSave` handler may RETURN to reconcile the backend's response back into the grid (I4). It is the resolved *value* of the save promise — think `Promise.allSettled`, not resolve-vs-reject: **throwing** still aborts the whole save and keeps every draft, while **returning** this settles each row/cell. - Return **nothing** → today's behaviour: every draft commits with the typed values. - Return a result → `applied` rows adopt the server's authoritative values and their drafts clear; `failed` rows/cells keep their draft and show an error; every other changed row commits with its local value.
+
+```ts
+interface BstSaveResult<TData> {
+    /**
+     * Rows the server accepted, each with the server's official values (a full or
+     * PARTIAL row) merged onto the grid row — so IDs, timestamps, recomputed or
+     * normalised fields display what was actually stored. These rows' drafts clear.
+     * Key by the same `rowId` the save event used (a new row's temporary id maps to
+     * the server row here, so its real id lands in `values`).
+     */
+    applied?: Array<{
+        rowId: string;
+        values: Partial<TData>;
+    }>;
+    /**
+     * Rows/cells the server rejected. Their drafts are KEPT and the `error` is shown
+     * on the cell(s) (reusing the validation-error UI). Omit `columnId` for a
+     * whole-row failure — the error then flags every edited cell in that row.
+     */
+    failed?: Array<{
+        rowId: string;
+        columnId?: string;
+        error: string;
+    }>;
+}
+```
+
 ## BstSelectionStats
 
 Aggregate of the current cell selection — shown in the status bar (X5).
