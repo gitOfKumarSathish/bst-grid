@@ -26,6 +26,71 @@ only what's on (selection / clipboard / editing / undo / …). Force the platfor
 - The list is derived from the active flags, so it never advertises a shortcut the grid can't do.
 - Chrome — needs `showToolbar` for the button (the `?` key works regardless).
 
+### Live example
+
+![Keyboard-shortcuts overlay — the shortcuts active on this grid](/img/feat-shortcuts.png)
+
+<BstSandbox example="feat-shortcuts" />
+
+### All keyboard shortcuts
+
+Every shortcut Bst-Table supports, with both **Mac** and **Windows / Linux** keys. The in-grid
+overlay shows only the shortcuts active on a given grid; this reference lists them all. Each needs
+the flag(s) in **Requires** to be on.
+
+#### Navigate
+
+| Action | Mac | Windows / Linux | Requires |
+| --- | --- | --- | --- |
+| Move active cell | ↑ ↓ ← → | ↑ ↓ ← → | `enableCellSelection` |
+| Extend selection | ⇧ + arrows | Shift + arrows | `enableCellSelection` |
+| Jump to edge | ⌘ + arrows | Ctrl + arrows | `enableCellSelection` |
+| Next cell (wraps rows) | Tab | Tab | `enableCellSelection` |
+| Previous cell | ⇧ + Tab | Shift + Tab | `enableCellSelection` |
+| Row start / Row end | Home / End | Home / End | `enableCellSelection` |
+| Grid start | ⌘ + Home | Ctrl + Home | `enableCellSelection` |
+| Grid end | ⌘ + End | Ctrl + End | `enableCellSelection` |
+| Select all | ⌘ + A | Ctrl + A | `enableCellSelection` |
+
+#### Find
+
+| Action | Mac | Windows / Linux | Requires |
+| --- | --- | --- | --- |
+| Open find | ⌘ + F | Ctrl + F | `enableFind` |
+| Next match | F3 | F3 | `enableFind` |
+| Previous match | ⇧ + F3 | Shift + F3 | `enableFind` |
+| Next / previous (in find box) | Enter / ⇧ + Enter | Enter / Shift + Enter | `enableFind` |
+| Close find | Esc | Esc | `enableFind` |
+
+#### Edit
+
+| Action | Mac | Windows / Linux | Requires |
+| --- | --- | --- | --- |
+| Edit cell (or move down) | Enter | Enter | `enableCellSelection` + `enableEditing` |
+| Edit cell in place | F2 | F2 | `enableEditing` |
+| Cancel edit / clear selection | Esc | Esc | `enableCellSelection` |
+| Type to overwrite the cell | any A–Z / 0–9 | any A–Z / 0–9 | `enableTypeToEdit` |
+| Commit & move down (⇧ = up) | Enter | Enter | `enableTypeToEdit` |
+| Commit & move right (⇧ = left) | Tab | Tab | `enableTypeToEdit` |
+
+#### Clipboard
+
+| Action | Mac | Windows / Linux | Requires |
+| --- | --- | --- | --- |
+| Copy selection | ⌘ + C | Ctrl + C | `enableClipboard` |
+| Paste | ⌘ + V | Ctrl + V | `enableClipboard` + `enableEditing` |
+| Select whole column | ⌘ + Space | Ctrl + Space | `enableCopyColumn` |
+| Select whole row | ⇧ + Space | Shift + Space | `enableCopyRow` |
+
+#### History
+
+| Action | Mac | Windows / Linux | Requires |
+| --- | --- | --- | --- |
+| Undo | ⌘ + Z | Ctrl + Z | `enableUndoRedo` |
+| Redo | ⌘ + ⇧ + Z | Ctrl + Shift + Z | `enableUndoRedo` |
+| Redo (alternate) | — | Ctrl + Y | `enableUndoRedo` |
+| Open this shortcuts overlay | ? | ? | `showShortcuts` |
+
 ## Overview
 
 | | |

@@ -304,7 +304,7 @@ EXAMPLES['feat-master'] = FEAT_HEAD + `export default function App() {
       enableExpanding getRowCanExpand={() => true}
       renderDetail={(row) => (
         <div style={{ padding: 14, background: '#f8fafc' }}>
-          Detail for <b>{row.original.name}</b> — {row.original.role} on the {row.original.team} team, score {row.original.score}.
+          Detail for <b>{row.name}</b> — {row.role} on the {row.team} team, score {row.score}.
         </div>
       )} />
   )
@@ -364,6 +364,348 @@ export default function App() {
   return (
     <BstTableMui data={rows} columns={withMenuCol} getRowId={(r) => r.id}
       enableEditing enableRowActions onDataChange={setRows} pagination={false} />
+  )
+}
+`
+
+// ---- distinct-feature demos (batch 2) --------------------------------------
+// Prop shapes verified against apps/demo/src/App.tsx (compiles vs current source).
+
+// Layout / freeze --------------------------------------------------------------
+EXAMPLES['feat-colpin'] = FEAT_HEAD + `const wide: BstTableColumn<Row>[] = [
+  ...columns,
+  { id: 'c5', accessorKey: 'role', header: 'Department' },
+  { id: 'c6', accessorKey: 'team', header: 'Division' },
+  { id: 'c7', accessorKey: 'role', header: 'Title' },
+  { id: 'c8', accessorKey: 'team', header: 'Location' },
+  { id: 'c9', accessorKey: 'role', header: 'Level' },
+]
+export default function App() {
+  return (
+    <BstTableMui data={seed} columns={wide} getRowId={(r) => r.id}
+      enableColumnPinning initialState={{ columnPinning: { start: ['name'], end: [] } }} />
+  )
+}
+`
+
+EXAMPLES['feat-rowpin'] = FEAT_HEAD + `export default function App() {
+  return (
+    <BstTableMui data={seed} columns={columns} getRowId={(r) => r.id}
+      enableRowPinning initialState={{ rowPinning: { top: ['1'], bottom: ['5'] } }}
+      styles={{ root: { maxHeight: 210 } }} pagination={false} showToolbar={false} />
+  )
+}
+`
+
+EXAMPLES['feat-sticky'] = FEAT_HEAD + `const many: Row[] = Array.from({ length: 24 }, (_, i) => ({ ...seed[i % 5], id: String(i + 1) }))
+export default function App() {
+  return (
+    <BstTableMui data={many} columns={columns} getRowId={(r) => r.id}
+      enableStickyHeader={{ maxRows: 7 }} pagination={false} />
+  )
+}
+`
+
+// Selection --------------------------------------------------------------------
+EXAMPLES['feat-rowselect'] = FEAT_HEAD + `export default function App() {
+  return (
+    <BstTableMui data={seed} columns={columns} getRowId={(r) => r.id}
+      enableRowSelection showSelectionInfo
+      initialState={{ rowSelection: { '1': true, '3': true } }} />
+  )
+}
+`
+
+EXAMPLES['feat-cellselect'] = FEAT_HEAD + `export default function App() {
+  return (
+    <BstTableMui data={seed} columns={columns} getRowId={(r) => r.id}
+      enableCellSelection enableClipboard />
+  )
+}
+`
+
+// Filtering UI -----------------------------------------------------------------
+EXAMPLES['feat-setfilter'] = FEAT_HEAD + `const cols: BstTableColumn<Row>[] = columns.map((c) =>
+  c.id === 'team' || c.id === 'role' ? { ...c, meta: { type: 'text', filter: 'set' } } : c)
+export default function App() {
+  return (
+    <BstTableMui data={seed} columns={cols} getRowId={(r) => r.id}
+      enableColumnFilters enableColumnFilterRow enableSetFilter showSearch={false} />
+  )
+}
+`
+
+EXAMPLES['feat-multifilter'] = FEAT_HEAD + `const cols: BstTableColumn<Row>[] = columns.map((c) =>
+  c.id === 'name' ? { ...c, meta: { type: 'text', filter: ['condition', 'set'] } } : c)
+export default function App() {
+  return (
+    <BstTableMui data={seed} columns={cols} getRowId={(r) => r.id}
+      enableColumnFilterRow enableSetFilter enableMultiFilter showSearch={false} />
+  )
+}
+`
+
+EXAMPLES['feat-filterrow'] = FEAT_HEAD + `export default function App() {
+  return (
+    <BstTableMui data={seed} columns={columns} getRowId={(r) => r.id}
+      enableColumnFilters enableColumnFilterRow showSearch={false} />
+  )
+}
+`
+
+// Footer / chrome --------------------------------------------------------------
+EXAMPLES['feat-statusbar'] = FEAT_HEAD + `export default function App() {
+  return (
+    <BstTableMui data={seed} columns={columns} getRowId={(r) => r.id}
+      enableCellSelection showStatusBar />
+  )
+}
+`
+
+EXAMPLES['feat-find'] = FEAT_HEAD + `export default function App() {
+  return (
+    <BstTableMui data={seed} columns={columns} getRowId={(r) => r.id}
+      enableFind showFind />
+  )
+}
+`
+
+EXAMPLES['feat-rownumbers'] = FEAT_HEAD + `export default function App() {
+  return (
+    <BstTableMui data={seed} columns={columns} getRowId={(r) => r.id}
+      enableRowNumbers />
+  )
+}
+`
+
+EXAMPLES['feat-pagination'] = FEAT_HEAD + `const many: Row[] = Array.from({ length: 23 }, (_, i) => ({ ...seed[i % 5], id: String(i + 1) }))
+export default function App() {
+  return (
+    <BstTableMui data={many} columns={columns} getRowId={(r) => r.id}
+      pagination={{ pageSize: 5 }} showPagination pageSizeOptions={[5, 10, 'all']} />
+  )
+}
+`
+
+// Density / sizing -------------------------------------------------------------
+EXAMPLES['feat-density'] = FEAT_HEAD + `export default function App() {
+  return (
+    <BstTableMui data={seed} columns={columns} getRowId={(r) => r.id}
+      showDensityToggle />
+  )
+}
+`
+
+EXAMPLES['feat-autoheight'] = `import React from 'react'
+import { BstTableMui } from '@bloomskill/table-mui'
+import type { BstTableColumn } from '@bloomskill/table-engine'
+import '@bloomskill/table-engine/styles.css'
+type Row = { id: string; name: string; note: string }
+const rows: Row[] = [
+  { id: '1', name: 'Ada Lovelace', note: 'Wrote the first algorithm intended for a machine; her notes on the Analytical Engine ran longer than the paper they annotated.' },
+  { id: '2', name: 'Alan Turing', note: 'Formalised computation and helped break wartime ciphers; the halting problem he described still bites every scheduler.' },
+  { id: '3', name: 'Grace Hopper', note: 'Built the first compiler and championed machine-independent languages; popularised "debugging" after a literal moth.' },
+]
+const columns: BstTableColumn<Row>[] = [
+  { id: 'name', accessorKey: 'name', header: 'Name' },
+  { id: 'note', accessorKey: 'note', header: 'Note', meta: { type: 'longText', wrapText: true } },
+]
+export default function App() {
+  return (
+    <BstTableMui data={rows} columns={columns} getRowId={(r) => r.id}
+      enableAutoRowHeight pagination={false} showSearch={false} />
+  )
+}
+`
+
+EXAMPLES['feat-rowresize'] = FEAT_HEAD + `export default function App() {
+  return (
+    <BstTableMui data={seed} columns={columns} getRowId={(r) => r.id}
+      enableRowResize pagination={false} showToolbar={false} />
+  )
+}
+`
+
+EXAMPLES['feat-fitcolumns'] = FEAT_HEAD + `export default function App() {
+  return (
+    <BstTableMui data={seed} columns={columns} getRowId={(r) => r.id}
+      fitColumns />
+  )
+}
+`
+
+// Overlays / popups ------------------------------------------------------------
+EXAMPLES['feat-contextmenu'] = FEAT_HEAD + `export default function App() {
+  return (
+    <BstTableMui data={seed} columns={columns} getRowId={(r) => r.id}
+      enableCellSelection enableClipboard enableContextMenu enableExport />
+  )
+}
+`
+
+EXAMPLES['feat-settings'] = FEAT_HEAD + `export default function App() {
+  return (
+    <BstTableMui data={seed} columns={columns} getRowId={(r) => r.id}
+      showSettings enableColumnPinning enableRowSelection enableCellSelection />
+  )
+}
+`
+
+EXAMPLES['feat-exportmenu'] = FEAT_HEAD + `export default function App() {
+  return (
+    <BstTableMui data={seed} columns={columns} getRowId={(r) => r.id}
+      enableExport showExport />
+  )
+}
+`
+
+EXAMPLES['feat-formatbuilder'] = FEAT_HEAD + `export default function App() {
+  const [rules, setRules] = React.useState([
+    { columnId: 'score', when: { op: 'gte', value: 90 }, style: { background: '#dcfce7', color: '#166534' } },
+  ])
+  return (
+    <BstTableMui data={seed} columns={columns} getRowId={(r) => r.id}
+      showFormatBuilder conditionalFormats={rules} onConditionalFormatsChange={setRules} />
+  )
+}
+`
+
+EXAMPLES['feat-shortcuts'] = FEAT_HEAD + `export default function App() {
+  return (
+    <BstTableMui data={seed} columns={columns} getRowId={(r) => r.id}
+      enableCellSelection enableClipboard enableEditing showShortcuts />
+  )
+}
+`
+
+EXAMPLES['feat-overlays'] = FEAT_HEAD + `export default function App() {
+  return (
+    <BstTableMui data={seed} columns={columns} getRowId={(r) => r.id}
+      enableOverlays loading pagination={false} showSearch={false} />
+  )
+}
+`
+
+// Structural / editing ---------------------------------------------------------
+EXAMPLES['feat-spanning'] = `import React from 'react'
+import { BstTableMui } from '@bloomskill/table-mui'
+import type { BstTableColumn } from '@bloomskill/table-engine'
+import '@bloomskill/table-engine/styles.css'
+type Row = { id: string; region: string; rep: string; quarter: string; deals: number }
+const data: Row[] = [
+  { id: 'a', region: 'North', rep: 'Ada', quarter: 'Q1', deals: 12 },
+  { id: 'b', region: 'North', rep: 'Ada', quarter: 'Q2', deals: 9 },
+  { id: 'c', region: 'North', rep: 'Bo',  quarter: 'Q1', deals: 7 },
+  { id: 'd', region: 'South', rep: 'Cy',  quarter: 'Q1', deals: 15 },
+  { id: 'e', region: 'South', rep: 'Cy',  quarter: 'Q2', deals: 4 },
+]
+const columns: BstTableColumn<Row>[] = [
+  { id: 'region', accessorKey: 'region', header: 'Region', meta: { type: 'text', rowSpan: 'group' } },
+  { id: 'rep', accessorKey: 'rep', header: 'Rep', meta: { type: 'text', rowSpan: 'group' } },
+  { id: 'quarter', accessorKey: 'quarter', header: 'Quarter', meta: { type: 'text' } },
+  { id: 'deals', accessorKey: 'deals', header: 'Deals', meta: { type: 'number' } },
+]
+export default function App() {
+  return (
+    <BstTableMui data={data} columns={columns} getRowId={(r) => r.id}
+      enableCellSpanning showToolbar={false} pagination={false} />
+  )
+}
+`
+
+EXAMPLES['feat-batch'] = FEAT_HEAD + `const editable: BstTableColumn<Row>[] = columns.map((c) =>
+  c.id === 'name' || c.id === 'score'
+    ? { ...c, meta: { type: c.id === 'score' ? 'number' : 'text', editable: true } }
+    : c)
+export default function App() {
+  const [rows, setRows] = React.useState(seed)
+  return (
+    <BstTableMui data={rows} columns={editable} getRowId={(r) => r.id}
+      enableEditing={{ mode: 'batch' }} showChangesSheet onDataChange={setRows}
+      onSave={({ rows }) => alert(rows.length + ' row(s) saved')} />
+  )
+}
+`
+
+// ---- gap-fill demos (complete the feature-page live-example coverage) -------
+EXAMPLES['feat-colvirt'] = `import React from 'react'
+import { BstTableMui } from '@bloomskill/table-mui'
+import type { BstTableColumn } from '@bloomskill/table-engine'
+import '@bloomskill/table-engine/styles.css'
+const cols: BstTableColumn<any>[] = Array.from({ length: 30 }, (_, i) => ({ id: 'c' + i, accessorKey: 'c' + i, header: 'Column ' + (i + 1), size: 130 }))
+const rows = Array.from({ length: 300 }, (_, r) => { const o = { id: String(r) }; for (let i = 0; i < 30; i++) o['c' + i] = 'r' + (r + 1) + '·c' + (i + 1); return o })
+export default function App() {
+  return <BstTableMui data={rows} columns={cols} getRowId={(r) => r.id}
+    enableVirtualization enableColumnVirtualization pagination={false} />
+}
+`
+EXAMPLES['feat-autocolumns'] = FEAT_HEAD + `export default function App() {
+  // No columns passed — Bst-Table infers one column per key from the data.
+  return <BstTableMui data={seed} columns={[]} getRowId={(r) => r.id} enableAutoColumns />
+}
+`
+EXAMPLES['feat-responsive'] = `import React from 'react'
+import { BstTableMui } from '@bloomskill/table-mui'
+import type { BstTableColumn } from '@bloomskill/table-engine'
+import '@bloomskill/table-engine/styles.css'
+type Row = { id: string; name: string; team: string; role: string; score: number }
+const seed: Row[] = [
+  { id: '1', name: 'Ada Lovelace', team: 'Platform', role: 'Engineer', score: 92 },
+  { id: '2', name: 'Grace Hopper', team: 'Platform', role: 'Engineer', score: 95 },
+  { id: '3', name: 'Alan Turing', team: 'Research', role: 'Scientist', score: 88 },
+]
+const columns: BstTableColumn<Row>[] = [
+  { id: 'name', accessorKey: 'name', header: 'Name', meta: { responsivePriority: 1 } },
+  { id: 'score', accessorKey: 'score', header: 'Score', meta: { responsivePriority: 2 } },
+  { id: 'role', accessorKey: 'role', header: 'Role', meta: { responsivePriority: 4 } },
+  { id: 'team', accessorKey: 'team', header: 'Team', meta: { responsivePriority: 5 } },
+]
+export default function App() {
+  // Narrow preview — lowest-priority columns drop out as it gets tighter.
+  return <div style={{ maxWidth: 360 }}><BstTableMui data={seed} columns={columns} getRowId={(r) => r.id} enableResponsive /></div>
+}
+`
+EXAMPLES['feat-typetoedit'] = FEAT_HEAD + `const editable: BstTableColumn<Row>[] = columns.map((c) =>
+  c.id === 'name' || c.id === 'score'
+    ? { ...c, meta: { type: c.id === 'score' ? 'number' : 'text', editable: true } }
+    : c,
+)
+export default function App() {
+  const [rows, setRows] = React.useState(seed)
+  // Click a cell, then just start typing to overwrite it (spreadsheet-style).
+  return (
+    <BstTableMui data={rows} columns={editable} getRowId={(r) => r.id}
+      enableCellSelection enableEditing enableTypeToEdit onDataChange={setRows} />
+  )
+}
+`
+EXAMPLES['feat-validation'] = FEAT_HEAD + `const editable: BstTableColumn<Row>[] = columns.map((c) =>
+  c.id === 'name'
+    ? { ...c, meta: { type: 'text', editable: true, cellMeta: { required: true } } }
+    : c.id === 'score'
+      ? { ...c, meta: { type: 'number', editable: true, cellMeta: { required: true } } }
+      : c,
+)
+export default function App() {
+  const [rows, setRows] = React.useState(seed)
+  // Edit a cell and clear it — the required field is flagged.
+  return (
+    <BstTableMui data={rows} columns={editable} getRowId={(r) => r.id}
+      enableEditing enableValidation onDataChange={setRows} />
+  )
+}
+`
+EXAMPLES['feat-coleditlock'] = FEAT_HEAD + `const editable: BstTableColumn<Row>[] = columns.map((c) =>
+  c.id === 'name' || c.id === 'score'
+    ? { ...c, meta: { type: c.id === 'score' ? 'number' : 'text', editable: true } }
+    : c,
+)
+export default function App() {
+  const [rows, setRows] = React.useState(seed)
+  // Open the Columns menu → lock / unlock a column's editability at runtime.
+  return (
+    <BstTableMui data={rows} columns={editable} getRowId={(r) => r.id}
+      enableEditing showColumnEditToggle showColumnsMenu onDataChange={setRows} />
   )
 }
 `

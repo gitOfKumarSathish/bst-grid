@@ -14,3 +14,7 @@ of a paste — is `console.log`ged as a `BstCellEdit` (old → new, formatted te
 - An `onCellCommit` handler **takes precedence** and silences the log, so you never get a double
   signal — for production, wire `onCellCommit` instead of relying on the log.
 - Deferred `row` / `batch` modes still batch through `onSave`.
+
+### Live example
+
+<BstSandbox example="editing" />
