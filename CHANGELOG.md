@@ -27,6 +27,12 @@ this project uses [Semantic Versioning](https://semver.org).
   `docusaurus.config.js` pointed at `bst-grid.pages.dev`; an `apps/docs/README.md` with run /
   regenerate / Cloudflare Pages deploy steps; and a docs link in the root README. The full site
   builds clean (0 broken links / anchors); actual Cloudflare deploy still needs the account.
+- **Reproducible corpus + release wiring** — `extract-api.mjs` now resolves the engine `.d.ts` from
+  the workspace (via a pinned **typescript@5** devDep, since the repo's root TypeScript is v7 whose
+  compiler API it can't use); `api-sigs.json` was re-extracted from the live engine, which surfaced
+  the previously-missing `BstFindOptions` (now **262** exports). Root `docs:sync` / `docs:build`
+  orchestrate regeneration, and `version:patch|minor|major` **auto-run `docs:sync`**, so the docs
+  regenerate and the coverage gate runs on every bump — they can't drift from the code.
 
 ## [0.42.0] — 2026-08-24
 

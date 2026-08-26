@@ -26,16 +26,29 @@ npm run start                 # dev server at http://localhost:3000
 
 ## Regenerate
 
+From **this package**:
+
 ```bash
+npm run gen:api       # re-extract api-sigs.json from the engine's built .d.ts (needs the engine built)
 npm run gen:docs      # features + cell-types + api + coverage, from scripts/*.json
 npm run check:docs    # coverage gate — fails if any flag / cell type / export is undocumented
 ```
 
-`gen:reference` reads `api-sigs.json`, extracted from the engine `.d.ts` by `extract-api.mjs`. That
-step needs **typescript@5** (the repo pins v7), so when the engine API changes, install it isolated
-first: `npm i -D typescript@5 --no-workspaces`, then `node scripts/extract-api.mjs`. Snapshots must
-use the current `X#` roadmap scheme (not the retired `AG#`) or the repo's neutral-naming guard
-rejects them.
+`gen:api` uses the pinned **typescript@5** devDependency (the repo's root TypeScript is v7, whose
+rewritten compiler API `extract-api.mjs` can't use). Build the engine first
+(`npm run build -w @bloomskill/table-engine`) so `packages/engine/dist/*.d.ts` exist —
+`extract-api.mjs` finds them automatically.
+
+From the **repo root** the pipeline is wired up:
+
+```bash
+npm run docs:build    # full: re-extract API -> regenerate -> gate
+npm run docs:sync     # regenerate + gate (no API re-extract)
+```
+
+`version:patch` / `:minor` / `:major` **auto-run `docs:sync`**, so a version bump regenerates the
+docs and fails if any flag / cell type / export is undocumented — the docs can't drift from the
+code. (Run `docs:api` / `docs:build` after building the engine to also refresh the API signatures.)
 
 ## Deploy (Cloudflare Pages)
 

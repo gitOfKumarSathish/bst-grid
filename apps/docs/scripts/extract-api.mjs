@@ -3,9 +3,24 @@
 import { createRequire } from 'module'
 const require = createRequire(import.meta.url)
 const ts = require('typescript')
-import { writeFileSync } from 'node:fs'
+import { writeFileSync, existsSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
+import { dirname, join, resolve } from 'node:path'
 
-const entry = 'node_modules/@bloomskill/table-engine/dist/index.d.ts'
+const HERE = dirname(fileURLToPath(import.meta.url))
+// The engine's built .d.ts: a CLI arg wins, else the workspace-linked package,
+// else the monorepo's packages/engine. Build the engine first
+// (npm run build -w @bloomskill/table-engine) so dist/*.d.ts exist.
+const entry = [
+  process.argv[2],
+  'node_modules/@bloomskill/table-engine/dist/index.d.ts',
+  resolve(HERE, '../../../node_modules/@bloomskill/table-engine/dist/index.d.ts'),
+  resolve(HERE, '../../../packages/engine/dist/index.d.ts'),
+].filter(Boolean).find((p) => existsSync(p))
+if (!entry) {
+  console.error('extract-api: engine .d.ts not found — build the engine or pass a path arg.')
+  process.exit(1)
+}
 const program = ts.createProgram([entry], {
   target: ts.ScriptTarget.ESNext,
   module: ts.ModuleKind.ESNext,
@@ -72,7 +87,7 @@ for (const sym of exports) {
 }
 
 out.sort((a, b) => a.symbol.localeCompare(b.symbol))
-writeFileSync('../api-sigs.json', JSON.stringify(out, null, 2))
+writeFileSync(join(HERE, 'api-sigs.json'), JSON.stringify(out, null, 2))
 const k = {}
 let withSig = 0, withDoc = 0
 for (const e of out) { k[e.kind] = (k[e.kind] || 0) + 1; if (e.signature) withSig++; if (e.doc) withDoc++ }

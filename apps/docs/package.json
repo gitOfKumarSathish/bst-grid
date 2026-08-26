@@ -10,6 +10,7 @@
     "gen:features": "cd scripts && node gen-features.mjs ../docs",
     "gen:reference": "cd scripts && node gen-reference.mjs ../docs",
     "gen:docs": "npm run gen:features && npm run gen:reference",
+    "gen:api": "cd scripts && node extract-api.mjs",
     "check:docs": "cd scripts && node check-docs-coverage.mjs ../docs"
   },
   "dependencies": {
@@ -21,8 +22,20 @@
     "react-dom": "^18.3.1"
   },
   "browserslist": {
-    "production": [">0.5%", "not dead", "not op_mini all"],
-    "development": ["last 1 chrome version", "last 1 firefox version"]
+    "production": [
+      ">0.5%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version"
+    ]
   },
-  "engines": { "node": ">=18.0" }
+  "engines": {
+    "node": ">=18.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
 }

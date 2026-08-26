@@ -177,7 +177,7 @@ interface BstColumnMeta<TData extends RowData = any, TValue = any> {
      * unset, categorical columns (`singleSelect` / `multiSelect` / `radio` /
      * `boolean`) use the Set Filter and the rest use the condition input.
      *
-     * **Multi-filter (X11):** an **array** (e.g. `['condition', 'set']`) 
+     * **Multi-filter (X11):** an **array** (e.g. `['condition', 'set']`) **s
   // …truncated
 ```
 
@@ -332,6 +332,23 @@ interface BstFileRef {
     contentType?: string;
     /** Size in bytes, when known. */
     size?: number;
+}
+```
+
+## BstFindOptions
+
+Configuration for Find (X8) — the object form of `enableFind`.
+
+```ts
+interface BstFindOptions {
+    /** Match case. Default: false (case-insensitive). */
+    caseSensitive?: boolean;
+    /**
+     * Which rows Find searches: `'view'` = the rows currently in the view (the
+     * active page / virtual window), `'all'` = every row across all pages
+     * (pre-pagination). Default: `'view'`.
+     */
+    scope?: 'view' | 'all';
 }
 ```
 
@@ -687,38 +704,39 @@ interface BstRowContext<TData extends RowData = any> {
 
 ## BstRuntime
 
-Resolved save triggers (`enter`/`blur`/`explicit`). The inline editor consults these before auto-committing on Enter or blur.
+Open the find bar (highlights matches; never hides rows).
 
 ```ts
 interface BstRuntime<TData extends RowData> {
     store: InteractionStore;
     updateCtx: (ctx: RuntimeCtx<TData>) => void;
     reset: () => void;
+    /** Open the find bar (highlights matches; never hides rows). */
+    openFind: () => void;
+    /** Close the find bar and clear all match highlights. */
+    closeFind: () => void;
+    /** Set the query and recompute matches (the cursor resets to the first match). */
+    setFindQuery: (query: string) => void;
+    /** Recompute matches for the current query after a view / data change, keeping
+     *  the cursor on the same cell when it survives (else clamping to the first). */
+    refreshFind: () => void;
+    /** Advance the cursor to the next match (wraps). */
+    findNext: () => void;
+    /** Move the cursor to the previous match (wraps). */
+    findPrev: () => void;
     /** Resolved save triggers (`enter`/`blur`/`explicit`). The inline editor
      *  consults these before auto-committing on Enter or blur. */
     saveOn: SaveTrigger[];
-    startEditing: (rowId: string, columnId: string) => void;
+    /** Open the inline editor. `seed` (type-to-edit) is the opening draft so the
+     *  first keystroke overwrites the value; omit for a plain edit on the value. */
+    startEditing: (rowId: string, columnId: string, seed?: unknown) => void;
     cancelEditing: () => void;
     setDraft: (rowId: string, columnId: string, value: unknown) => void;
     commitCell: (rowId: string, columnId: string, value: unknown) => void;
     beginRowSession: (rowId: string) => void;
     commitRowSession: (rowId: string) => Promise<boolean>;
     cancelRowSession: () => void;
-    /** Persist every outstanding draft across all rows in one write (bulk save). */
-    commitAll: () => Promise<boolean>;
-    /** Discard every outstanding draft across all rows. */
-    cancelAll: () => void;
-    getDirtyChanges: () => Array<CellChange<TData>>;
-    /** Every unsaved edit as old → new (+ formatted display strings) — what the
-     *  review-changes sheet lists. Ordered by first-edit time. */
-    getChangeSet: () => Array<BstCellEdit<TData>>;
-    /** Discard ONE unsaved edit — the cell reverts to its upstream value. */
-    revertCell: (rowId: string, columnId: string) => void;
-    /** Discard every unsaved edit in a row. */
-    revertRow: (rowId: string) => void;
-    /** Format a value for display using the column's cell type (`format`). */
-    formatValue: (columnId: string, value: unknown) => string;
-    /** Revert the last committed data change (`onDataChange`). *
+    /** Persist every outstandin
   // …truncated
 ```
 
@@ -746,6 +764,10 @@ interface BstRuntimeHandle<TData extends RowData> {
     enableMultiFilter: boolean;
     /** Cell/range selection + keyboard nav is active (Phase 3). */
     enableCellSelection: boolean;
+    /** Type-to-edit — spreadsheet-style entry (type to overwrite; Enter/Tab
+     *  commit-and-move). True only when editing + cell selection are also on.
+     *  Read by the keydown handler and the shortcuts overlay (`<BstShortcuts>`). */
+    enableTypeToEdit: boolean;
     /** Clipboard copy/paste is active (Phase 3). */
     enableClipboard: boolean;
     /** Undo/redo is active (Phase 3, C5). */
@@ -753,12 +775,7 @@ interface BstRuntimeHandle<TData extends RowData> {
     /** Inline editing is active — read by the shortcuts overlay (`<BstShortcuts>`). */
     enableEditing: boolean;
     /** Whole-column copy gesture is active (clipboard on + not opted out). */
-    enableCopyColumn: boolean;
-    /** Whole-row copy gesture is active (clipboard on + not opted out). */
-    enableCopyRow: boolean;
-    /**
-     * Column ids the caller supplied an explicit `columnDef.cell` for. v9 always
-     * populates a *default* `cell`, so this is how
+    en
   // …truncated
 ```
 
@@ -1095,7 +1112,7 @@ interface BstTableEngineToggles {
     /** Column show/hide behaviour. Maps to v9 `enableHiding`. Default: true. */
     enableHiding?: boolean;
     /** Column resizing. Maps to v9 `enableColumnResizing`. Default: true. */
-    enableColumnResizing?: boole
+    enableColumnResizing?: boolean
   // …truncated
 ```
 
@@ -1511,6 +1528,17 @@ interface InteractionState {
         rowId: string;
         columnId: string;
     } | null;
+    /**
+     * Initial draft for a *type-to-edit* session (`enableTypeToEdit`) — set when a
+     * printable keystroke opens the editor so the first character overwrites the
+     * old value (Excel-style). The editor host reads it once at mount, only for the
+     * matching cell (single-cell edits, never a row session). `null` = no seed.
+     */
+    editSeed: {
+        rowId: string;
+        columnId: string;
+        value: unknown;
+    } | null;
     /** The row currently in a deferred row-edit session, or `null` (C2 ≡ I2). */
     rowSession: string | null;
     /**
@@ -1532,17 +1560,7 @@ interface InteractionState {
      * selection change.
      */
     wholeSelect: {
-        type: 'column' | 'row';
-        id: string;
-    } | null;
-    /**
-     * Runtime per-column editability override, keyed by columnId. A column absent
-     * here uses its `meta.editable` default; `false` locks the whole column
-     * (read-only) and `true` unlocks it — an end-user control surfaced in the
-     * Columns menu. Consulted by `isCellEditable`; empty by default (no effect).
-     */
-    columnEdit: Record<string, boolean>;
-    /** Draft values
+        type:
   // …truncated
 ```
 
@@ -1684,9 +1702,10 @@ interface RuntimeCtx<TData extends RowData> {
     /** Row-copy (H2) enabled. `false` disables `selectRow`/`copyRow`. Default: true. */
     enableCopyRow?: boolean;
     enableUndoRedo: boolean;
-    /** Export capability on. `false` makes every `export*` method a no-op. */
-    enableExport?: boolean;
-    /** CSV export enabled (sub-toggle of `enableE
+    /** Find is enabled (search box + highlight + jump). */
+    enableFind?: boolean;
+    /** Find matches case-sensitively. Default: false. */
+    findCaseS
   // …truncated
 ```
 
