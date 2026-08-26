@@ -328,6 +328,13 @@ export interface BstTableEngineToggles {
    */
   enableAutoColumns?: boolean
   /**
+   * Cell notes / comments — attach annotations to individual cells without
+   * mutating row data. Cells with notes display a corner marker; hovering
+   * opens a popover; Shift+F2 or the context menu opens the resizable editor.
+   * Default: false.
+   */
+  enableNotes?: boolean | BstNotesOptions
+  /**
    * Loading / error overlays (X23) — render a formal overlay over the grid while
    * `loading` is true or when `error` is set, instead of leaving the body blank or
    * stale. On by default so a grid wired to a server `DataSource`
@@ -338,6 +345,23 @@ export interface BstTableEngineToggles {
    */
   enableOverlays?: boolean
 }
+
+/** Options for cell notes / comments (`enableNotes`). */
+export interface BstNotesOptions {
+  /** Optional placeholder for the note editor. */
+  placeholder?: string
+  /** Whether notes can be edited on a given cell. Defaults to true. */
+  canEditNote?: (rowId: string, columnId: string, currentNote?: string) => boolean
+}
+
+/** Event payload emitted on note save/delete. */
+export interface BstNoteSaveEvent {
+  rowId: string
+  columnId: string
+  note: string | undefined
+  prevNote: string | undefined
+}
+
 
 /** Configuration for Find (X8) — the object form of `enableFind`. */
 export interface BstFindOptions {
@@ -384,6 +408,12 @@ export interface UseBstTableOptions<TData extends RowData> extends BstTableEngin
   getRowId?: (row: TData, index: number) => string
   /** Extra initial state merged over engine defaults (sorting, filters, …). */
   initialState?: Record<string, unknown>
+  /** Initial or controlled cell notes map, keyed by cell key (`${rowId}:${columnId}`). */
+  notes?: Record<string, string>
+  /** Fired whenever the cell notes collection changes. */
+  onNotesChange?: (notes: Record<string, string>) => void
+  /** Fired when an individual cell note is saved or deleted. */
+  onNoteSave?: (event: BstNoteSaveEvent) => void
 
   // ---- Server mode (manual sort / filter / paginate — Plan.md §5). Usually
   // supplied by `useBstDataSource(source).tableProps`; the grid then renders the

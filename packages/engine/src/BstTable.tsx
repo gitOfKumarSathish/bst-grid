@@ -3,6 +3,7 @@ import { flexRender } from '@tanstack/react-table'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { virtualizationBypassReason } from './virtualization.js'
 import { BstSetFilter } from './BstSetFilter.js'
+import { BstNoteEditor, BstNotePopover } from './BstNoteEditor.js'
 import { combineFilterConditions } from './filtering.js'
 import type { FilterCondition, FilterConditionGroup } from './filtering.js'
 import { getBstRuntime } from './useBstTable.js'
@@ -372,7 +373,11 @@ export function BstTable({
       case 'F2':
         if (active) {
           e.preventDefault()
-          runtime.startEditing(active.rowId, active.columnId)
+          if (shift && handle.enableNotes) {
+            runtime.openNoteEditor(active.rowId, active.columnId)
+          } else {
+            runtime.startEditing(active.rowId, active.columnId)
+          }
         }
         break
       case 'Escape':
@@ -712,6 +717,27 @@ export function BstTable({
     }
     if (defaultItems.length) defaultItems.push({ separator: true })
     defaultItems.push({ key: 'autosize', label: 'Autosize column', onSelect: () => autoSizeColumn(columnId) })
+    if (handle.enableNotes && runtime.isNoteAllowed(rowId, columnId)) {
+      if (defaultItems.length) defaultItems.push({ separator: true })
+      if (runtime.hasNote(rowId, columnId)) {
+        defaultItems.push({
+          key: 'editNote',
+          label: 'Edit note',
+          onSelect: () => runtime.openNoteEditor(rowId, columnId),
+        })
+        defaultItems.push({
+          key: 'deleteNote',
+          label: 'Delete note',
+          onSelect: () => runtime.deleteNote(rowId, columnId),
+        })
+      } else {
+        defaultItems.push({
+          key: 'addNote',
+          label: 'Add note',
+          onSelect: () => runtime.openNoteEditor(rowId, columnId),
+        })
+      }
+    }
     let row: unknown
     try {
       row = (table.getRow?.(rowId, true) as { original?: unknown } | undefined)?.original
@@ -772,6 +798,53 @@ export function BstTable({
   // standalone class when windowing is off (avoids a double max-height rule).
   const stickyActive = handle.stickyHeader.enabled && !rowVirtActive
 
+  const [hoveredNote, setHoveredNote] = React.useState<{
+    rowId: string
+    columnId: string
+    note: string
+    rect: DOMRect | null
+  } | null>(null)
+
+  const editingNote = useStoreSelector(runtime.store, (s) => s.editingNote)
+
+  const onTableMouseOver = (e: React.MouseEvent) => {
+    if (!handle.enableNotes) return
+    const td = (e.target as HTMLElement).closest?.('td[data-bst-rowid]') as HTMLElement | null
+    if (!td) {
+      if (hoveredNote) setHoveredNote(null)
+      return
+    }
+    const rId = td.getAttribute('data-bst-rowid')
+    const cId = td.getAttribute('data-bst-colid')
+    if (rId && cId) {
+      const note = runtime.getNote(rId, cId)
+      if (note) {
+        if (hoveredNote?.rowId !== rId || hoveredNote?.columnId !== cId || hoveredNote?.note !== note) {
+          setHoveredNote({
+            rowId: rId,
+            columnId: cId,
+            note,
+            rect: td.getBoundingClientRect?.() ?? null,
+          })
+        }
+        return
+      }
+    }
+    if (hoveredNote) setHoveredNote(null)
+  }
+
+  const onTableMouseLeave = () => {
+    if (hoveredNote) setHoveredNote(null)
+  }
+
+  const editingAnchorRect = React.useMemo(() => {
+    if (!editingNote || typeof document === 'undefined') return null
+    const td = document.querySelector(
+      `td[data-bst-rowid="${editingNote.rowId}"][data-bst-colid="${editingNote.columnId}"]`,
+    )
+    return td?.getBoundingClientRect?.() ?? null
+  }, [editingNote])
+
   return (
     <BstIconsContext.Provider value={I}>
     <div className="bst-table-viewport" style={{ position: 'relative' }}>
@@ -793,7 +866,9 @@ export function BstTable({
           : null),
         ...styles?.root,
       }}
-      onContextMenu={handle.enableContextMenu ? onCellContextMenu : undefined}
+      onContextMenu={handle.enableContextMenu || handle.enableNotes ? onCellContextMenu : undefined}
+      onMouseOver={handle.enableNotes ? onTableMouseOver : undefined}
+      onMouseLeave={handle.enableNotes ? onTableMouseLeave : undefined}
     >
       <table
         className={cx('bst-table-table', classNames?.table)}
@@ -1302,6 +1377,31 @@ export function BstTable({
         )}
       </div>
     ) : null}
+    {handle.enableNotes && editingNote ? (
+      <BstNoteEditor
+        rowId={editingNote.rowId}
+        columnId={editingNote.columnId}
+        initialText={runtime.getNote(editingNote.rowId, editingNote.columnId) ?? ''}
+        anchorRect={editingAnchorRect}
+        placeholder={handle.notesOptions?.placeholder}
+        onSave={(text) => {
+          runtime.setNote(editingNote.rowId, editingNote.columnId, text)
+          runtime.closeNoteEditor()
+        }}
+        onDelete={() => {
+          runtime.deleteNote(editingNote.rowId, editingNote.columnId)
+          runtime.closeNoteEditor()
+        }}
+        onClose={() => runtime.closeNoteEditor()}
+      />
+    ) : null}
+    {handle.enableNotes && hoveredNote && !editingNote ? (
+      <BstNotePopover
+        note={hoveredNote.note}
+        anchorRect={hoveredNote.rect}
+        onEdit={() => runtime.openNoteEditor(hoveredNote.rowId, hoveredNote.columnId)}
+      />
+    ) : null}
     </BstIconsContext.Provider>
   )
 }
@@ -1689,6 +1789,8 @@ interface CellSlice {
   findRanges: FindRange[] | null
   /** This cell is the current (focused) find match. */
   isCurrentFind: boolean
+  /** Cell note text, or undefined if none. */
+  note: string | undefined
 }
 
 function sliceEqual(a: CellSlice, b: CellSlice): boolean {
@@ -1703,7 +1805,8 @@ function sliceEqual(a: CellSlice, b: CellSlice): boolean {
     a.isSelected === b.isSelected &&
     a.editOverride === b.editOverride &&
     a.findRanges === b.findRanges &&
-    a.isCurrentFind === b.isCurrentFind
+    a.isCurrentFind === b.isCurrentFind &&
+    a.note === b.note
   )
 }
 
@@ -1774,6 +1877,7 @@ const GridCell = React.memo(function GridCell({
         editOverride: s.columnEdit[columnId],
         findRanges: s.find.matchRanges.get(key) ?? null,
         isCurrentFind: s.find.currentKey === key,
+        note: s.notes[key],
       }
     },
     [rowId, columnId, key, runtime],
@@ -1931,9 +2035,20 @@ const GridCell = React.memo(function GridCell({
       data-dirty={slice.isDirty ? '' : undefined}
       data-active={slice.isActive ? '' : undefined}
       data-error={level === 'error' ? '' : undefined}
-      data-bst-rowid={handle.enableContextMenu ? rowId : undefined}
-      data-bst-colid={handle.enableContextMenu ? columnId : undefined}
+      data-has-note={slice.note ? '' : undefined}
+      data-bst-rowid={handle.enableContextMenu || handle.enableNotes ? rowId : undefined}
+      data-bst-colid={handle.enableContextMenu || handle.enableNotes ? columnId : undefined}
     >
+      {slice.note ? (
+        <span
+          className="bst-cell-note-marker"
+          aria-label="Cell note"
+          onClick={(e) => {
+            e.stopPropagation()
+            runtime.openNoteEditor(rowId, columnId)
+          }}
+        />
+      ) : null}
       {cellFmt?.hideContent ? null : content}
       {level && slice.errors[0] ? (
         <span className="bst-cell-error-msg" role="alert">

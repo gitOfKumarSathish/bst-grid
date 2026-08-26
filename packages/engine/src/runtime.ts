@@ -34,6 +34,7 @@ import type {
   BstExportRunOptions,
   BstExportScope,
 } from './export.js'
+import type { BstNotesOptions, BstNoteSaveEvent } from './types.js'
 
 export type SaveTrigger = 'enter' | 'blur' | 'explicit'
 export type CommitPolicy = 'blockCommitOnError' | 'commitButFlag'
@@ -229,6 +230,12 @@ export interface RuntimeCtx<TData extends RowData> {
   enableEditLog?: boolean
   createRow?: () => Partial<TData>
   tempIdPrefix: string
+  // ---- notes / comments ----
+  enableNotes?: boolean
+  notesOptions?: BstNotesOptions
+  notes?: Record<string, string>
+  onNotesChange?: (notes: Record<string, string>) => void
+  onNoteSave?: (event: BstNoteSaveEvent) => void
 }
 
 /** Resolved access for a cell (F1–F4 cascade). */
@@ -243,6 +250,22 @@ export interface BstRuntime<TData extends RowData> {
   store: InteractionStore
   updateCtx: (ctx: RuntimeCtx<TData>) => void
   reset: () => void
+
+  // ---- notes / comments ----
+  /** Get the note text for a cell, or undefined if no note exists. */
+  getNote: (rowId: string, columnId: string) => string | undefined
+  /** Set or delete a cell's note. */
+  setNote: (rowId: string, columnId: string, note: string | undefined) => void
+  /** Delete a cell's note. */
+  deleteNote: (rowId: string, columnId: string) => void
+  /** Open the note editor popover for a cell. */
+  openNoteEditor: (rowId: string, columnId: string) => void
+  /** Close the note editor popover. */
+  closeNoteEditor: () => void
+  /** Check if a cell has a non-empty note. */
+  hasNote: (rowId: string, columnId: string) => boolean
+  /** Check if notes are allowed on a cell. */
+  isNoteAllowed: (rowId: string, columnId: string) => boolean
 
   // ---- find (X8) ----
   /** Open the find bar (highlights matches; never hides rows). */
@@ -1673,12 +1696,92 @@ export function createRuntime<TData extends RowData>(
     errors: snapshot.errors,
   })
 
+  /* ------------------------------------------------------------- notes / comments */
+
+  if (initialCtx.notes) {
+    set((s) => ({ ...s, notes: { ...initialCtx.notes } }))
+  }
+
+  const isNoteAllowed = (rowId: string, columnId: string): boolean => {
+    if (!ctx.enableNotes) return false
+    const meta = metaOf(columnId)
+    if (meta.notesAllowed === false) return false
+    if (ctx.notesOptions?.canEditNote) {
+      const curr = getNote(rowId, columnId)
+      return ctx.notesOptions.canEditNote(rowId, columnId, curr)
+    }
+    return true
+  }
+
+  const getNote = (rowId: string, columnId: string): string | undefined => {
+    const s = store.getState()
+    const key = cellKey(rowId, columnId)
+    return s.notes[key]
+  }
+
+  const hasNote = (rowId: string, columnId: string): boolean => {
+    const n = getNote(rowId, columnId)
+    return n != null && n.trim().length > 0
+  }
+
+  const setNote = (rowId: string, columnId: string, noteText: string | undefined): void => {
+    const key = cellKey(rowId, columnId)
+    const prev = store.getState().notes[key]
+    const cleaned = noteText != null && noteText.trim().length > 0 ? noteText.trim() : undefined
+
+    set((s) => {
+      const nextNotes = { ...s.notes }
+      if (cleaned == null) {
+        delete nextNotes[key]
+      } else {
+        nextNotes[key] = cleaned
+      }
+      return {
+        ...s,
+        notes: nextNotes,
+        editingNote:
+          s.editingNote?.rowId === rowId && s.editingNote?.columnId === columnId ? null : s.editingNote,
+      }
+    })
+
+    if (prev !== cleaned) {
+      const nextNotes = store.getState().notes
+      ctx.onNotesChange?.(nextNotes)
+      ctx.onNoteSave?.({ rowId, columnId, note: cleaned, prevNote: prev })
+    }
+  }
+
+  const deleteNote = (rowId: string, columnId: string): void => {
+    setNote(rowId, columnId, undefined)
+  }
+
+  const openNoteEditor = (rowId: string, columnId: string): void => {
+    if (!isNoteAllowed(rowId, columnId)) return
+    set((s) => ({ ...s, editingNote: { rowId, columnId } }))
+  }
+
+  const closeNoteEditor = (): void => {
+    set((s) => ({ ...s, editingNote: null }))
+  }
+
   return {
     store,
     updateCtx: (next) => {
+      const prevNotes = ctx.notes
       ctx = next
+      if (next.notes && next.notes !== prevNotes) {
+        set((s) => ({ ...s, notes: { ...next.notes } }))
+      }
     },
     reset: () => store.setState(initialInteractionState),
+    // notes
+    getNote,
+    setNote,
+    deleteNote,
+    openNoteEditor,
+    closeNoteEditor,
+    hasNote,
+    isNoteAllowed,
     openFind,
     closeFind,
     setFindQuery,

@@ -59,6 +59,8 @@ export interface BstColumnMeta<TData extends RowData = any, TValue = any> {
    * Selection + copy still work on a disabled cell.
    */
   disabled?: boolean | ((row: TData) => boolean)
+  /** Whether notes / comments are allowed on this column. Defaults to true when enableNotes is on. */
+  notesAllowed?: boolean
   /** Options for option-based cells (singleSelect / multiSelect / radio). */
   options?: BstOption[]
   /**

@@ -125,7 +125,7 @@ ships **free** (MIT/Apache)._
 | X15 | Integrated charts (range → chart) | ❌ | P7 |
 | X16 | Advanced server-side row model (server group/pivot/tree, lazy expand) | 🟡 | P7 |
 | X17 | Calculated / formula columns | 🟡 | P7 |
-| X18 | Cell notes / comments | ⚪ | **Optional — out of scope** (see below) |
+| X18 | Cell notes / comments | ✅ | **`enableNotes`** (+ `BstNotesOptions` / `notes` / `onNotesChange` / `onNoteSave`) — corner dog-ear marker, hover preview popover, Shift+F2 shortcut, context menu Add/Edit/Delete, resizable editor dialog |
 | X19 | Localization / i18n (localeText) | ⚪ | **Optional — out of scope** (see below) |
 | X20 | Accessibility / ARIA grid audit | 🟡 | P4 |
 | X21 | Grid-state save/restore API | ✅ | P4 — `getGridState`/`applyGridState`/`loadGridState`/`useBstGridState` (+ adapters' one-line `gridState={{ key }}`); full view snapshot, stale-column-safe |
@@ -138,15 +138,15 @@ ships **free** (MIT/Apache)._
 | X28 | Cell flashing on data change | ❌ | P8 |
 | X29 | Aligned grids (shared column state) | ❌ | P8 |
 
-**Tally:** 29 extended capabilities — ✅ 13 built · 🟡 3 partial (X16 SSRM · X17 formula cols · X20 a11y) ·
-❌ 5 missing · ⏭️ 1 skipped (X7 sidebar) · ⚪ 7 optional/out-of-scope (X10 · X12 · X13 · X14 · X18 · X19 · X24).
-**12 of the 29 are paid-tier capabilities in commercial grids** — they ship free here. _(v0.40.0 added **X9** row-number
-column, **X23** loading/error overlays, **X27** auto-generate columns; and moved **X18/X19/X24** to
-Optional below. **2026-08-24:** moved **X13** tree data, **X14** pivoting, **X12** fill handle and **X10** managed row dragging to Optional too — closing the interaction tail / Phase 6.)_
+**Tally:** 29 extended capabilities — ✅ 14 built · 🟡 3 partial (X16 SSRM · X17 formula cols · X20 a11y) ·
+❌ 5 missing · ⏭️ 1 skipped (X7 sidebar) · ⚪ 6 optional/out-of-scope (X10 · X12 · X13 · X14 · X19 · X24).
+**13 of the 29 are paid-tier capabilities in commercial grids** — they ship free here. _(v0.40.0 added **X9** row-number
+column, **X23** loading/error overlays, **X27** auto-generate columns; and moved **X19/X24** to
+Optional below. **X18** cell notes / comments shipped with corner marker, hover tooltip, Shift+F2 shortcut and resizable editor.)_
 
 **Already matched (paid-tier elsewhere, shipped free):** cell/range selection · clipboard
 copy/paste · batch editing · row grouping + aggregation · master-detail · sparklines · advanced-filter
-builder · server row model. See "Built beyond the original spec" above and `CLAUDE.md` §12.
+builder · server row model · cell notes. See "Built beyond the original spec" above and `CLAUDE.md` §12.
 
 ### Optional — kept but out of scope (not scheduled)
 
@@ -160,6 +160,5 @@ remain documented here for completeness and can be picked up later, but no phase
 | X12 | Fill handle (drag-to-fill / increment a range) | Range selection + clipboard copy/paste across a selection (H1–H4) already cover bulk-fill needs; the spreadsheet drag-to-fill / increment gesture is M-effort and no consuming app requires it yet. Revisit if one does. |
 | X13 | Tree data (self-referencing hierarchy) | Master-detail (A4) + multi-column grouping (E4) cover the hierarchical needs of the target apps; recursive self-referencing tree data (BOM/org/folder) is L-effort and no consuming app requires it yet. Revisit if one does. |
 | X14 | Pivoting | The heavyweight cross-tab reporting feature (L-effort); grouping + aggregation cover current reporting needs and no target app requires pivot/reshape. Revisit if one does. |
-| X18 | Cell notes / comments | Collaboration/annotation feature outside the current grid scope; no consuming app needs it yet. |
 | X19 | Localization / i18n (`localeText`) | The grid's few built-in strings are overridable at the call site (e.g. `overlayText`, headers, labels); a full `localeText` catalog isn't required for the target apps. |
 | X24 | RTL support | No RTL-locale app currently consumes the grid; revisit if/when one does. |

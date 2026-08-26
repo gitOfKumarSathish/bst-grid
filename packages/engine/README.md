@@ -833,6 +833,12 @@ const table = useBstTable<Task>({
   listing the shortcuts **active on this grid** (also opens on `?`). Headless: `<BstShortcuts table={table} />`
   + `BST_SHORTCUTS_REGISTRY` + the pure `resolveActiveShortcuts(flags, query)` / `formatShortcutToken`.
 
+- **Cell notes / comments (`enableNotes`)** — attach annotations to individual cells without mutating row data.
+  Cells with notes display a red corner dog-ear marker; hovering over the cell opens a preview popover.
+  Press **Shift+F2** (or click the marker / right-click context menu "Add note" / "Edit note") to open the
+  built-in resizable note editor. Supports `notes` (initial or controlled map), `onNotesChange(notes)`,
+  `onNoteSave({ rowId, columnId, note, prevNote })`, and column-level `meta: { notesAllowed: false }`.
+
 > Selection lives in the interaction store (not `table.setState`) and is materialised at paint from the
 > active/anchor cell ids — moving the cursor re-renders only the cells whose state changed, never the
 > whole grid.

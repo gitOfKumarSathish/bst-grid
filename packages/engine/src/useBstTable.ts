@@ -7,6 +7,7 @@ import type {
   BstStyles,
   BstContextMenuContext,
   BstContextMenuItem,
+  BstNotesOptions,
   EditingOptions,
   UseBstTableOptions,
   ValidationOptions,
@@ -89,6 +90,10 @@ export interface BstRuntimeHandle<TData extends RowData> {
   enableAutoRowHeight: boolean
   /** Right-click context menu (X6). */
   enableContextMenu: boolean
+  /** Cell notes / comments are active. */
+  enableNotes: boolean
+  /** Cell notes options. */
+  notesOptions?: BstNotesOptions
   /** Builds the context-menu items for the clicked cell (given the defaults). */
   getContextMenuItems?: (ctx: BstContextMenuContext<TData>) => BstContextMenuItem[]
   /** Find (X8) — the in-grid search box (highlight + jump) is active. */
@@ -326,6 +331,12 @@ function buildCtx<TData extends RowData>(
     gridDisabled: !!opts.disabled,
     rowDisabled: opts.rowDisabled,
     cellDisabled: opts.cellDisabled,
+    enableNotes: !!opts.enableNotes,
+    notesOptions:
+      typeof opts.enableNotes === 'object' && opts.enableNotes !== null ? opts.enableNotes : undefined,
+    notes: opts.notes,
+    onNotesChange: opts.onNotesChange,
+    onNoteSave: opts.onNoteSave,
     onDataChange: opts.onDataChange,
     onSave: opts.onSave,
     onCellCommit: opts.onCellCommit,
@@ -504,6 +515,9 @@ export function useBstTable<TData extends RowData>(opts: UseBstTableOptions<TDat
     enableAutoRowHeight: !!opts.enableAutoRowHeight,
     enableContextMenu: !!opts.enableContextMenu,
     getContextMenuItems: opts.getContextMenuItems,
+    enableNotes: !!opts.enableNotes,
+    notesOptions:
+      typeof opts.enableNotes === 'object' && opts.enableNotes !== null ? opts.enableNotes : undefined,
     enableFind: !!ctx.enableFind,
     findCaseSensitive: !!ctx.findCaseSensitive,
     enableGrouping: !!opts.enableGrouping,

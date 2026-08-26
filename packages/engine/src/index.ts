@@ -102,7 +102,13 @@ export type {
   BstContextMenuContext,
   AutoColumnsOptions,
   BstFindOptions,
+  BstNotesOptions,
+  BstNoteSaveEvent,
 } from './types.js'
+
+// ---- cell notes / comments (enableNotes) ----
+export { BstNoteEditor, BstNotePopover } from './BstNoteEditor.js'
+export type { BstNoteEditorProps, BstNotePopoverProps } from './BstNoteEditor.js'
 
 // ---- column helpers: auto-generate (X27) + row-number (X9) ----
 export {

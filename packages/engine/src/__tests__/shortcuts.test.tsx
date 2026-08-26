@@ -21,6 +21,7 @@ const KNOWN_FLAGS = [
   'enableCopyRow',
   'enableFind',
   'enableTypeToEdit',
+  'enableNotes',
 ]
 
 const ALL_ON = Object.fromEntries(KNOWN_FLAGS.map((f) => [f, true]))

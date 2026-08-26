@@ -95,6 +95,10 @@ export interface InteractionState {
   redoDepth: number
   /** Find (X8) — the search box + match cursor (highlights, never hides rows). */
   find: FindState
+  /** Cell notes / comments keyed by `cellKey(rowId, columnId)`. */
+  notes: Record<string, string>
+  /** The cell whose note editor is currently open, or `null`. */
+  editingNote: { rowId: string; columnId: string } | null
 }
 
 export const initialInteractionState: InteractionState = {
@@ -114,6 +118,8 @@ export const initialInteractionState: InteractionState = {
   undoDepth: 0,
   redoDepth: 0,
   find: { open: false, query: '', matches: [], matchRanges: new Map(), currentKey: null, current: -1 },
+  notes: {},
+  editingNote: null,
 }
 
 /** Composite key for a cell (`rowId` first so a row's cells sort together). */
