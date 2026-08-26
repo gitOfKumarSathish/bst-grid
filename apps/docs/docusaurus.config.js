@@ -20,8 +20,11 @@ const NPM = 'https://www.npmjs.com/package'
 module.exports = {
   title: 'Bst-Table Docs',
   tagline: 'Feature Guides',
-  url: 'https://bst-grid.pages.dev',
-  baseUrl: '/',
+  url: 'https://gitofkumarsathish.github.io',
+  baseUrl: '/bst-grid/',
+  organizationName: 'gitOfKumarSathish', // GitHub user/org that owns the repo
+  projectName: 'bst-grid', // repo name
+  deploymentBranch: 'gh-pages', // branch the built static site is pushed to
   onBrokenLinks: 'warn',
   markdown: { hooks: { onBrokenMarkdownLinks: 'warn', onBrokenMarkdownImages: 'warn' } },
   presets: [

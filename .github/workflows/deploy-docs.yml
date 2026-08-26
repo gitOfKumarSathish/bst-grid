@@ -1,0 +1,66 @@
+name: deploy-docs
+
+on:
+  # Publish the Docusaurus site on every push to main…
+  push:
+    branches: [main]
+    # …but only when something that actually affects the site changed. The docs
+    # markdown is generated from the engine/MCP corpus and committed under
+    # apps/docs (see `docs:build`), so any content change lands here. version.ini
+    # feeds the navbar/footer version label. Delete this `paths:` block to deploy
+    # on every push to main regardless of what changed.
+    paths:
+      - 'apps/docs/**'
+      - 'version.ini'
+      - '.github/workflows/deploy-docs.yml'
+  # Let you trigger a deploy by hand from the Actions tab.
+  workflow_dispatch:
+
+# Least-privilege token scopes the Pages deployment needs.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One live deployment at a time. Don't cancel an in-flight run — let it finish so
+# a half-published site is never left behind; queue this run behind it instead.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/docs # docs are a standalone app, not an npm workspace
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: apps/docs/.node-version # currently Node 20
+          cache: npm
+          cache-dependency-path: apps/docs/package-lock.json
+
+      # apps/docs has its own lockfile, so `npm ci` here installs only the docs
+      # deps — no root/workspace build required. The committed docs are already
+      # kept fresh by the `docs:verify` gate in verify.yml.
+      - run: npm ci
+
+      - run: npm run build # docusaurus build → apps/docs/build
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          # Path is relative to the repo root, not to working-directory.
+          path: apps/docs/build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
