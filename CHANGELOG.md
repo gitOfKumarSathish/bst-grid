@@ -21,6 +21,11 @@ this project uses [Semantic Versioning](https://semver.org).
   install (`npx @bloomskill/table-mcp@<version>`). Brings the tool count to 9; smoke + the two parity
   tests updated accordingly.
 
+### Fixed — MCP doc counts pinned to the corpus
+- Corrected stale counts in `packages/mcp/README.md` and `docs/mcp-server.md` (API exports 150 → 262,
+  example apps six → seven, indexed READMEs five → six) and added a `generate.test.ts` parity guard
+  that pins every quoted count to the generated corpus, so the prose can't drift again.
+
 ## [0.43.0] — 2026-08-26
 
 ### Added — MCP server (`@bloomskill/table-mcp`): structured output, completions & version-awareness

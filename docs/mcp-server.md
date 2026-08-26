@@ -307,7 +307,7 @@ Two things to know:
   alone as above (its version is free because the *name* has never been published), or
   `npm run version:patch` first and release all four together.
 - **Publishing is public and irreversible.** The corpus contains every package README, the §12
-  toggle registry, `COVERAGE.md` and all six examples. The three grid packages are already public
+  toggle registry, `COVERAGE.md` and all seven examples. The three grid packages are already public
   on npm so this is consistent with them — but if Bst-Table is meant to stay internal, publish to a
   private registry / scope instead and have teammates `npm login` once. The client config is
   unchanged either way.

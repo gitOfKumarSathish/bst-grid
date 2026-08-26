@@ -104,8 +104,8 @@ live / WebSocket merge (I5) isn't built.
 | `bst_search_docs` | Free-text search across every README, feature, cell type, coverage row, API signature and example. **Start here when unsure.** |
 | `bst_get_feature` | One flag (layer · type · default · maps-to · status · **dependencies**), one spec leaf (`I5` → ❌ NOT BUILT + workaround), or the whole flag registry. |
 | `bst_get_cell_type` | A `meta.type` renderer: value shape, editability, `cellMeta` fields. Or all 17. |
-| `bst_get_api` | The exact signature of any `@bloomskill/table-engine` export, read from the built `.d.ts` (150 entries). |
-| `bst_get_example` | Full source of one of the six runnable example apps. |
+| `bst_get_api` | The exact signature of any `@bloomskill/table-engine` export, read from the built `.d.ts` (262 entries). |
+| `bst_get_example` | Full source of one of the seven runnable example apps. |
 | `bst_scaffold_grid` | A complete, compiling component from a feature list + column list. |
 | `bst_validate_config` | Lints a config for unknown props, unmet dependencies, inert options and capabilities that don't exist. |
 | `bst_detect_version` | Which `@bloomskill/table-*` versions a project has, vs. what this server documents. |
@@ -162,7 +162,7 @@ assumes otherwise. The exact split is read live from `COVERAGE.md`, so it never 
 
 The knowledge base is **generated from source at build time** — the engine's runtime toggle registry
 (`BST_SETTINGS_REGISTRY`), the `CLAUDE.md` §12 feature table, the `COVERAGE.md` status matrix,
-`types.ts` TSDoc, the built `.d.ts`, all five READMEs and all six example apps. Ship a Bst-Table
+`types.ts` TSDoc, the built `.d.ts`, all six READMEs and all seven example apps. Ship a Bst-Table
 feature and the server knows it; there is no second place to update and nothing to drift.
 
 Two guards **fail the build** if that slips: corpus generation errors when a toggle has no §12 row,

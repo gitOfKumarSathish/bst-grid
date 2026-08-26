@@ -260,6 +260,42 @@ describeCorpus('generated corpus', () => {
   })
 
   /**
+   * Doc counts must match the corpus. Prose numbers ("262 entries", "seven example
+   * apps") drift silently as the corpus grows; this pins each to the generated
+   * value so the README / setup guide can never quote a stale count.
+   */
+  it('quotes corpus counts consistently in the README and setup guide', () => {
+    const WORDS: Record<string, number> = {
+      zero: 0, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7,
+      eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12, thirteen: 13, fourteen: 14,
+      fifteen: 15, sixteen: 16, seventeen: 17, eighteen: 18, nineteen: 19, twenty: 20,
+    }
+    const num = (token: string): number => WORDS[token.toLowerCase()] ?? Number(token)
+    const read = (rel: string) => readFileSync(join(repoRoot as string, rel), 'utf8')
+    const readme = read('packages/mcp/README.md')
+    const guide = read('docs/mcp-server.md')
+    const readmeCount = docSources(repoRoot as string).filter(
+      (s) => s.path.endsWith('README.md') && !s.path.startsWith('docs/'),
+    ).length
+    const checks: Array<{ what: string; text: string; re: RegExp; expected: number }> = [
+      { what: 'README API-export count', text: readme, re: /\((\d+) entries\)/g, expected: c.api.length },
+      { what: 'README example count (bst_get_example row)', text: readme, re: /one of the (\w+) runnable example apps/g, expected: c.examples.length },
+      { what: 'README indexed-README count', text: readme, re: /all (\w+) READMEs/g, expected: readmeCount },
+      { what: 'README example count (sources sentence)', text: readme, re: /all (\w+) example apps/g, expected: c.examples.length },
+      { what: 'README cell-type count', text: readme, re: /The (\w+) cell types it knows/g, expected: c.cellTypes.length },
+      { what: 'README requirement count', text: readme, re: /Of the (\w+) spec requirements/g, expected: c.requirements.length },
+      { what: 'setup-guide example count', text: guide, re: /all (\w+) examples\b/g, expected: c.examples.length },
+    ]
+    for (const { what, text, re, expected } of checks) {
+      const found = [...text.matchAll(re)].map((m) => num(m[1]))
+      expect(found.length, `no count matched for “${what}” — did the wording change?`).toBeGreaterThan(0)
+      for (const n of found) {
+        expect(n, `${what} is stale: doc says ${n}, corpus says ${expected}`).toBe(expected)
+      }
+    }
+  })
+
+  /**
    * The prose freshness guard. `sourceFiles` lists every concrete input; if any is
    * newer than `generatedAt`, the corpus has drifted from its sources. Softened to
    * a **warning** (was a hard failure) so editing a doc without rebuilding doesn't
