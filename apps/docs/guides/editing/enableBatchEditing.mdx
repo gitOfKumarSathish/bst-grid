@@ -1,9 +1,9 @@
-## When to use it
+### When to use it
 
 Reach for batch mode when users enter or correct **many** cells before saving — bulk data entry,
 reconciliation, spreadsheet-style workflows — and you want **one** backend write, not one per cell.
 
-## How it works
+### How it works
 
 `enableBatchEditing` flips the edit mode at runtime: `true` forces `batch`, `false` forces
 per-cell, and leaving it unset follows `enableEditing.mode`. In batch mode every edit and paste
@@ -27,8 +27,12 @@ once** with the whole change-set:
 Pair it with `showChangesSheet` so users can review every pending edit (row · column · old → new)
 and revert individually before committing.
 
-## Gotchas
+### Gotchas
 
 - Requires `enableEditing` — it's a switch **over** the edit session, not a replacement for it.
 - A rejected `onSave` keeps every draft intact; surface the error and let the user retry.
 - It appears in the settings sheet ("Editing"), so a `{ mode: 'batch' }` grid reads as ON there.
+
+### Live example
+
+<BstSandbox example="editing-batch" />

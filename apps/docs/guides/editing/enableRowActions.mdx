@@ -1,9 +1,9 @@
-## When to use it
+### When to use it
 
 Turn this on when users need to **add, delete or duplicate** rows — the structural edits that go
 beyond changing cell values.
 
-## How it works
+### How it works
 
 `enableRowActions` wires up row add / delete / duplicate, each routed through `onDataChange`. An
 optional `createRow` factory seeds a new row's defaults:
@@ -23,7 +23,7 @@ optional `createRow` factory seeds a new row's defaults:
 Add `showAddRow` for the toolbar "Add row" button; per-row delete / duplicate live in the row's
 action column or the `actionMenu` cell.
 
-## Gotchas
+### Gotchas
 
 - Needs `onDataChange` so the structural change reaches your state.
 - Without `createRow`, a new row starts empty — fine, but wire it up if columns have required

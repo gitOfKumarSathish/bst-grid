@@ -8,21 +8,13 @@ sidebar_label: pagination
 
 Prop `pagination` — engine behaviour, default `true`.
 
-## Overview
+## Guide
 
-| | |
-| --- | --- |
-| Layer | `enable*` (engine, resolved in `useBstTable`) |
-| Type | `boolean \| {pageSize}` |
-| Default | `true` |
-| Status | ✅ done |
-| Settings sheet | Data operations |
-
-## When to use it
+### When to use it
 
 On by default — page through rows instead of one long scroll. Pass an object to size the pages.
 
-## How it works
+### How it works
 
 `boolean | { pageSize }`. Client-side by default; switch to server paging with manual mode +
 `pageCount`. Page-size choices come from `pageSizeOptions` (numbers, or `'all'`).
@@ -32,12 +24,22 @@ On by default — page through rows instead of one long scroll. Pass an object t
   pagination={{ pageSize: 25 }} pageSizeOptions={[10, 25, 50, 'all']} />
 ```
 
-## Gotchas
+### Gotchas
 
 - The footer bar is `showPagination` (on by default) — turn that off to keep paging logic but hide
   the bar.
 - For infinite scroll instead of pages, use `enableVirtualization` + `useBstInfiniteDataSource` and
   set `pagination={false}`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean \| {pageSize}` |
+| Default | `true` |
+| Status | ✅ done |
+| Settings sheet | Data operations |
 
 ## Enable it
 

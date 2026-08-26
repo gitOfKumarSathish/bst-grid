@@ -101,6 +101,13 @@ function renderPage(f) {
     + `default \`${f.default}\`.`)
   L.push('')
 
+  // Human quality layer — the hand-written guide partial, injected under a "## Guide"
+  // heading BEFORE the generated reference. Lives in apps/docs/guides/<group>/<flag>.mdx
+  // (outside the generated tree) so it survives regeneration.
+  const gslug = SLUG[groupOf(f)]
+  const guide = gslug ? readGuide(join(gslug, `${f.flag}.mdx`)) : ''
+  if (guide) { L.push('## Guide', '', guide, '') }
+
   // Overview
   L.push('## Overview')
   L.push('')
@@ -114,11 +121,6 @@ function renderPage(f) {
   if (f.group) L.push(`| Settings sheet | ${f.group} |`)
   L.push('')
   if (f.doc) { L.push(mdxSafe(f.doc)); L.push('') }
-
-  // Human quality layer — injected verbatim from apps/docs/guides/<group>/<flag>.mdx
-  const gslug = SLUG[groupOf(f)]
-  const guide = gslug ? readGuide(join(gslug, `${f.flag}.mdx`)) : ''
-  if (guide) { L.push(guide); L.push('') }
 
   // Enable it
   L.push('## Enable it')

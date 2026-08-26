@@ -8,6 +8,23 @@ sidebar_label: showExport
 
 Prop `showExport` — adapter chrome, default `follows enableExport`.
 
+## Guide
+
+### When to use it
+
+The toolbar **Export** button and its menu.
+
+### How it works
+
+Renders the Export dropdown (MUI `Menu` / Radix `DropdownMenu`) with CSV / Excel / Print entries,
+filtered by the per-format sub-toggles. Follows `enableExport`.
+
+### Gotchas
+
+- No-op without `enableExport`.
+- Needs `showToolbar` to be visible; the same export actions are also on the right-click menu
+  (`enableContextMenu`).
+
 ## Overview
 
 | | |
@@ -16,21 +33,6 @@ Prop `showExport` — adapter chrome, default `follows enableExport`.
 | Type | `boolean` |
 | Default | `follows enableExport` |
 | Status | ✅ done |
-
-## When to use it
-
-The toolbar **Export** button and its menu.
-
-## How it works
-
-Renders the Export dropdown (MUI `Menu` / Radix `DropdownMenu`) with CSV / Excel / Print entries,
-filtered by the per-format sub-toggles. Follows `enableExport`.
-
-## Gotchas
-
-- No-op without `enableExport`.
-- Needs `showToolbar` to be visible; the same export actions are also on the right-click menu
-  (`enableContextMenu`).
 
 ## Enable it
 

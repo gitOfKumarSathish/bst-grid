@@ -1,14 +1,14 @@
-## When to use it
+### When to use it
 
 Keep (or drop) the **Excel** (`.xlsx`) option in the export menu.
 
-## How it works
+### How it works
 
 A **sub-toggle of `enableExport`** (on by default). Gates `runtime.exportExcel` and the Excel menu
 item; produces a real `.xlsx` (hand-built store-only ZIP + SpreadsheetML, numeric cells typed) with
 **no** third-party spreadsheet library.
 
-## Gotchas
+### Gotchas
 
 - Only takes effect when `enableExport` is on.
 - Numbers export as typed cells (not text), so downstream formulas work.

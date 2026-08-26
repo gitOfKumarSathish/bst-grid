@@ -1,13 +1,13 @@
-## When to use it
+### When to use it
 
 Keep (or drop) the **CSV** option in the export menu.
 
-## How it works
+### How it works
 
 A **sub-toggle of `enableExport`** (on by default). Gates `runtime.exportCsv` and the CSV menu item;
 output is RFC-4180 with a UTF-8 BOM (so Excel opens it cleanly).
 
-## Gotchas
+### Gotchas
 
 - Only takes effect when `enableExport` is on.
 - Set it `false` to offer Excel / Print but not raw CSV.

@@ -1,15 +1,15 @@
-## When to use it
+### When to use it
 
 Give users a stable, spreadsheet-style row index that stays continuous across pages and reflects
 the current sort and filter.
 
-## How it works
+### How it works
 
 Injects a leading, non-interactive `#` column, **pinned to the start** by default so it stays put on
 horizontal scroll. The number tracks the current view (sort · filter · page), not the raw data
 order.
 
-## Gotchas
+### Gotchas
 
 - It's a reserved column: out of sorting, the filter row, the columns menu and export **by
   construction** — you don't configure those.

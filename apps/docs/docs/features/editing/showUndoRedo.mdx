@@ -8,6 +8,22 @@ sidebar_label: showUndoRedo
 
 Prop `showUndoRedo` — adapter chrome, default `follows enableUndoRedo`.
 
+## Guide
+
+### When to use it
+
+Add visible **Undo / Redo** buttons to the toolbar for users who don't reach for Ctrl+Z.
+
+### How it works
+
+`showUndoRedo` renders the two buttons and follows `enableUndoRedo`; the keyboard shortcuts work
+whether or not the buttons are shown.
+
+### Gotchas
+
+- No-op without `enableUndoRedo`.
+- The buttons disable themselves at the ends of the history stack.
+
 ## Overview
 
 | | |
@@ -16,20 +32,6 @@ Prop `showUndoRedo` — adapter chrome, default `follows enableUndoRedo`.
 | Type | `boolean` |
 | Default | `follows enableUndoRedo` |
 | Status | ✅ done (Phase 3) |
-
-## When to use it
-
-Add visible **Undo / Redo** buttons to the toolbar for users who don't reach for Ctrl+Z.
-
-## How it works
-
-`showUndoRedo` renders the two buttons and follows `enableUndoRedo`; the keyboard shortcuts work
-whether or not the buttons are shown.
-
-## Gotchas
-
-- No-op without `enableUndoRedo`.
-- The buttons disable themselves at the ends of the history stack.
 
 ## Enable it
 

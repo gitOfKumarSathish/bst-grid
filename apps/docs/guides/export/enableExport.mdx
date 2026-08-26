@@ -1,16 +1,20 @@
-## When to use it
+### When to use it
 
 Let users take the data out — CSV, Excel or print. The master switch for all three.
 
-## How it works
+### How it works
 
 **Dependency-free**: the engine ships its own `toCsv` / `toXlsx` (a real `.xlsx` — store-only ZIP +
 OOXML, no `exceljs`) / `buildPrintHtml`, exposed as `runtime.exportCsv` / `exportExcel` /
 `printTable`. Output covers **all pages** (pre-pagination) and is formatted per cell type, so it
 matches the screen.
 
-## Gotchas
+### Gotchas
 
 - Turn on the toolbar menu with `showExport`.
 - Narrow the formats with the sub-toggles `enableCsvExport` / `enableExcelExport` / `enablePrint`.
 - Always shown in the settings sheet ("Export").
+
+### Live example
+
+<BstSandbox example="export" />

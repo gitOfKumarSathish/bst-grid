@@ -1,9 +1,9 @@
-## When to use it
+### When to use it
 
 Add validation whenever bad input must be caught before it reaches your data — required fields,
 number ranges, cross-column rules, or an async check against the server.
 
-## How it works
+### How it works
 
 `enableValidation` runs your column / row validators on every edit and surfaces failures inline (an
 error ring + message on the cell). The `policy` option decides what a failure does:
@@ -25,7 +25,7 @@ error ring + message on the cell). The `policy` option decides what a failure do
 Validators live on the column (`meta`) and can be sync or async; cross-column rules see the whole
 row.
 
-## Gotchas
+### Gotchas
 
 - Requires `enableEditing` — there's nothing to validate without an edit session.
 - Async validators race: the engine keeps the latest result, but debounce server checks so you

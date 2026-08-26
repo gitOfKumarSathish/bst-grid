@@ -33,6 +33,11 @@ this project uses [Semantic Versioning](https://semver.org).
   the previously-missing `BstFindOptions` (now **262** exports). Root `docs:sync` / `docs:build`
   orchestrate regeneration, and `version:patch|minor|major` **auto-run `docs:sync`**, so the docs
   regenerate and the coverage gate runs on every bump — they can't drift from the code.
+- **Live examples (Sandpack)** — a `<BstSandbox>` component renders **editable, runnable** Bst-Table
+  grids inside the guides, loaded from the published `@bloomskill` packages via the npm CDN
+  (SSR-safe via `BrowserOnly`). At least one per feature group + both editing modes (10 total).
+- **Guide placement** — the hand-written partials now inject under a `## Guide` heading **before**
+  the generated reference tables (was after), with `###` sub-sections — matching the docs spec.
 
 ## [0.42.0] — 2026-08-24
 

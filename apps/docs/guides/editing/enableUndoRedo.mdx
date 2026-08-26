@@ -1,9 +1,9 @@
-## When to use it
+### When to use it
 
 Give data-entry users a safety net — Ctrl+Z / Ctrl+Y across their edits — without tracking history
 yourself.
 
-## How it works
+### How it works
 
 `enableUndoRedo` snapshots the data on each committed change and replays through the **same**
 `onDataChange` path when the user undoes or redoes, so your state stays the single source of truth:
@@ -22,7 +22,7 @@ yourself.
 
 Add `showUndoRedo` for toolbar buttons alongside the keyboard shortcuts.
 
-## Gotchas
+### Gotchas
 
 - Needs `onDataChange` — undo / redo works by re-applying snapshots through it.
 - History is per grid instance and resets on unmount; it isn't persisted.

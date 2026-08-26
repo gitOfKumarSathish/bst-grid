@@ -1,15 +1,15 @@
-## When to use it
+### When to use it
 
 Narrow and mobile layouts — drop the least important columns automatically as the grid gets
 narrower, and bring them back as it widens.
 
-## How it works
+### How it works
 
 Give columns a `meta.responsivePriority`; a `ResizeObserver` hides the lowest-priority columns when
 space runs out and restores them when it returns. Only columns it auto-hid are restored, so a
 user's manual hides are respected.
 
-## Gotchas
+### Gotchas
 
 - **No-op under `fitColumns`** (which instead shrinks every column to fit).
 - Without `meta.responsivePriority` on your columns there's nothing to prioritize — set it where it

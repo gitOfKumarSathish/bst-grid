@@ -8,6 +8,23 @@ sidebar_label: showAddRow
 
 Prop `showAddRow` — adapter chrome, default `follows enableRowActions`.
 
+## Guide
+
+### When to use it
+
+Surface an **Add row** button in the toolbar so users can append rows without a keyboard shortcut
+or a custom control.
+
+### How it works
+
+`showAddRow` is pure chrome — it renders the toolbar button and calls the row-add action. It
+follows `enableRowActions`: if that behaviour is off, the button doesn't appear.
+
+### Gotchas
+
+- It's a no-op without `enableRowActions` — chrome never turns on behaviour, it only exposes it.
+- Same button in both skins; swap `BstTableMui` for `BstTableShadcn` and it renders in that style.
+
 ## Overview
 
 | | |
@@ -16,21 +33,6 @@ Prop `showAddRow` — adapter chrome, default `follows enableRowActions`.
 | Type | `boolean` |
 | Default | `follows enableRowActions` |
 | Status | ✅ done (Phase 2) |
-
-## When to use it
-
-Surface an **Add row** button in the toolbar so users can append rows without a keyboard shortcut
-or a custom control.
-
-## How it works
-
-`showAddRow` is pure chrome — it renders the toolbar button and calls the row-add action. It
-follows `enableRowActions`: if that behaviour is off, the button doesn't appear.
-
-## Gotchas
-
-- It's a no-op without `enableRowActions` — chrome never turns on behaviour, it only exposes it.
-- Same button in both skins; swap `BstTableMui` for `BstTableShadcn` and it renders in that style.
 
 ## Enable it
 

@@ -8,22 +8,14 @@ sidebar_label: enableStickyHeader
 
 Prop `enableStickyHeader` — engine behaviour, default `false`.
 
-## Overview
+## Guide
 
-| | |
-| --- | --- |
-| Layer | `enable*` (engine, resolved in `useBstTable`) |
-| Type | `boolean \| {maxHeight,maxRows}` |
-| Default | `false` |
-| Status | ✅ done |
-| Settings sheet | Rows |
-
-## When to use it
+### When to use it
 
 Keep the header (and filter row) visible while the body scrolls — without the table growing taller
 and taller as the page size grows.
 
-## How it works
+### How it works
 
 Caps the scroll box to a bounded height and scrolls the body under a **sticky header + filter row**.
 Height is `--bst-max-height` (default 440px), or set it: `boolean | { maxHeight, maxRows }`.
@@ -33,11 +25,21 @@ Height is `--bst-max-height` (default 440px), or set it: `boolean | { maxHeight,
   enableStickyHeader={{ maxRows: 12 }} />
 ```
 
-## Gotchas
+### Gotchas
 
 - **Skipped when `enableVirtualization` is on** — virtualization already bounds the scroll box, so
   the two never stack.
 - Always available in the settings sheet ("Rows") for end-users to switch on.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean \| {maxHeight,maxRows}` |
+| Default | `false` |
+| Status | ✅ done |
+| Settings sheet | Rows |
 
 ## Enable it
 

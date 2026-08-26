@@ -8,22 +8,14 @@ sidebar_label: enableUndoRedo
 
 Prop `enableUndoRedo` — engine behaviour, default `false`.
 
-## Overview
+## Guide
 
-| | |
-| --- | --- |
-| Layer | `enable*` (engine, resolved in `useBstTable`) |
-| Type | `boolean` |
-| Default | `false` |
-| Status | ✅ done (Phase 3) |
-| Settings sheet | Editing |
-
-## When to use it
+### When to use it
 
 Give data-entry users a safety net — Ctrl+Z / Ctrl+Y across their edits — without tracking history
 yourself.
 
-## How it works
+### How it works
 
 `enableUndoRedo` snapshots the data on each committed change and replays through the **same**
 `onDataChange` path when the user undoes or redoes, so your state stays the single source of truth:
@@ -42,12 +34,22 @@ yourself.
 
 Add `showUndoRedo` for toolbar buttons alongside the keyboard shortcuts.
 
-## Gotchas
+### Gotchas
 
 - Needs `onDataChange` — undo / redo works by re-applying snapshots through it.
 - History is per grid instance and resets on unmount; it isn't persisted.
 - Snapshot-based: very large datasets with deep histories cost memory — bound it if you edit
   thousands of rows in one session.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean` |
+| Default | `false` |
+| Status | ✅ done (Phase 3) |
+| Settings sheet | Editing |
 
 ## Enable it
 

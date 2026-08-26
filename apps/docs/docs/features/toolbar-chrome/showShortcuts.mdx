@@ -8,6 +8,24 @@ sidebar_label: showShortcuts
 
 Prop `showShortcuts` — adapter chrome, default `false`.
 
+## Guide
+
+### When to use it
+
+Show users the keyboard shortcuts **active on this grid** — a discoverability aid for power features.
+
+### How it works
+
+Adds a **"?"** button (also opens on the `?` key) → a theme-aware overlay listing the shortcuts that
+are actually wired (grouped · searchable · ⌘/Ctrl-aware). It reads the live flag set, so it shows
+only what's on (selection / clipboard / editing / undo / …). Force the platform with
+`showShortcuts={{ platform: 'mac' }}`.
+
+### Gotchas
+
+- The list is derived from the active flags, so it never advertises a shortcut the grid can't do.
+- Chrome — needs `showToolbar` for the button (the `?` key works regardless).
+
 ## Overview
 
 | | |
@@ -16,22 +34,6 @@ Prop `showShortcuts` — adapter chrome, default `false`.
 | Type | `boolean` |
 | Default | `false` |
 | Status | ✅ done |
-
-## When to use it
-
-Show users the keyboard shortcuts **active on this grid** — a discoverability aid for power features.
-
-## How it works
-
-Adds a **"?"** button (also opens on the `?` key) → a theme-aware overlay listing the shortcuts that
-are actually wired (grouped · searchable · ⌘/Ctrl-aware). It reads the live flag set, so it shows
-only what's on (selection / clipboard / editing / undo / …). Force the platform with
-`showShortcuts={{ platform: 'mac' }}`.
-
-## Gotchas
-
-- The list is derived from the active flags, so it never advertises a shortcut the grid can't do.
-- Chrome — needs `showToolbar` for the button (the `?` key works regardless).
 
 ## Enable it
 

@@ -1,14 +1,14 @@
-## When to use it
+### When to use it
 
 Let **end-users** build conditional-formatting rules at runtime — no code, no redeploy.
 
-## How it works
+### How it works
 
 Adds a "Formats (n)" toolbar button opening a panel that hosts `<BstConditionalFormatBuilder>`.
 Users add / edit / delete `conditionalFormats` rules (uncontrolled local state by default; pass
 `onConditionalFormatsChange` to own them).
 
-## Gotchas
+### Gotchas
 
 - **Hidden while `enableConditionalFormatting` is off** — the builder has nothing to drive.
 - The builder's columns are auto-derived from the grid's columns.

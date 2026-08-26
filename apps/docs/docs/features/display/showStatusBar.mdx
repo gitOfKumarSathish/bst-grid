@@ -8,6 +8,27 @@ sidebar_label: showStatusBar
 
 Prop `showStatusBar` — adapter chrome, default `false`.
 
+## Guide
+
+### When to use it
+
+A footer that shows total / filtered row counts and, when a range is selected, live aggregates of
+the selected numbers.
+
+### How it works
+
+Renders total and filtered counts always; with a cell range selected it adds
+`runtime.getSelectionStats()` — **sum · avg · min · max · count**.
+
+### Gotchas
+
+- The selection aggregates need **`enableCellSelection`** (row/filtered counts show regardless).
+- Chrome — appears in the settings sheet ("Display").
+
+### Live example
+
+<BstSandbox example="display" />
+
 ## Overview
 
 | | |
@@ -17,21 +38,6 @@ Prop `showStatusBar` — adapter chrome, default `false`.
 | Default | `false` |
 | Status | ✅ done |
 | Settings sheet | Display |
-
-## When to use it
-
-A footer that shows total / filtered row counts and, when a range is selected, live aggregates of
-the selected numbers.
-
-## How it works
-
-Renders total and filtered counts always; with a cell range selected it adds
-`runtime.getSelectionStats()` — **sum · avg · min · max · count**.
-
-## Gotchas
-
-- The selection aggregates need **`enableCellSelection`** (row/filtered counts show regardless).
-- Chrome — appears in the settings sheet ("Display").
 
 ## Enable it
 

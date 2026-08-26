@@ -8,6 +8,23 @@ sidebar_label: showSaveBar
 
 Prop `showSaveBar` — adapter chrome, default `follows enableEditing`.
 
+## Guide
+
+### When to use it
+
+Show an explicit **Save / Discard** bar for row and deferred editing, so users commit a set of
+edits on purpose rather than on blur.
+
+### How it works
+
+`showSaveBar` renders the bar whenever there are pending edits and follows `enableEditing`. In
+`batch` mode, prefer `showChangesSheet` — a richer review panel that replaces the plain bar.
+
+### Gotchas
+
+- No-op without `enableEditing`.
+- Redundant with `showChangesSheet`: use the save bar for `row` mode, the changes sheet for `batch`.
+
 ## Overview
 
 | | |
@@ -16,21 +33,6 @@ Prop `showSaveBar` — adapter chrome, default `follows enableEditing`.
 | Type | `boolean` |
 | Default | `follows enableEditing` |
 | Status | ✅ done (Phase 2) |
-
-## When to use it
-
-Show an explicit **Save / Discard** bar for row and deferred editing, so users commit a set of
-edits on purpose rather than on blur.
-
-## How it works
-
-`showSaveBar` renders the bar whenever there are pending edits and follows `enableEditing`. In
-`batch` mode, prefer `showChangesSheet` — a richer review panel that replaces the plain bar.
-
-## Gotchas
-
-- No-op without `enableEditing`.
-- Redundant with `showChangesSheet`: use the save bar for `row` mode, the changes sheet for `batch`.
 
 ## Enable it
 

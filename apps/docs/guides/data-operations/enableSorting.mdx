@@ -1,14 +1,18 @@
-## When to use it
+### When to use it
 
 On by default — click a header to sort, shift-click to add a secondary sort. Turn it off for grids
 where order is fixed (a ledger, a ranked list).
 
-## How it works
+### How it works
 
 Wraps the engine's sorting with multi-column support and per-column sort functions
 (`column.sortFn`: `'alphanumeric'`, `'basic'`, `'datetime'`, or your own).
 
-## Gotchas
+### Gotchas
 
 - The row-number column (`enableRowNumbers`) never sorts — it always numbers the current view.
 - At the million-row tier, sort **server-side** via manual mode; the flag stays the same.
+
+### Live example
+
+<BstSandbox example="data-operations" />

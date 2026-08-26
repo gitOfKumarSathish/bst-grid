@@ -8,6 +8,24 @@ sidebar_label: enableSetFilter
 
 Prop `enableSetFilter` — engine behaviour, default `false`.
 
+## Guide
+
+### When to use it
+
+Filtering categorical columns (status, type, owner) — a spreadsheet-style **checklist of the
+distinct values** instead of typing a condition.
+
+### How it works
+
+Adds a checklist to the column's filter row: search, select-all / clear, per-value counts, and a
+`(Blanks)` option. Categorical columns (select / multiSelect / radio / boolean) are auto-eligible;
+force or opt out with `meta.filter: 'set'` / `'condition'`.
+
+### Gotchas
+
+- **Requires `enableColumnFilters` + `enableColumnFilterRow`** (it lives in that row).
+- Distinct values come from the loaded data — in server mode, provide the facet list yourself.
+
 ## Overview
 
 | | |
@@ -17,22 +35,6 @@ Prop `enableSetFilter` — engine behaviour, default `false`.
 | Default | `false` |
 | Status | ✅ done |
 | Settings sheet | Data operations |
-
-## When to use it
-
-Filtering categorical columns (status, type, owner) — a spreadsheet-style **checklist of the
-distinct values** instead of typing a condition.
-
-## How it works
-
-Adds a checklist to the column's filter row: search, select-all / clear, per-value counts, and a
-`(Blanks)` option. Categorical columns (select / multiSelect / radio / boolean) are auto-eligible;
-force or opt out with `meta.filter: 'set'` / `'condition'`.
-
-## Gotchas
-
-- **Requires `enableColumnFilters` + `enableColumnFilterRow`** (it lives in that row).
-- Distinct values come from the loaded data — in server mode, provide the facet list yourself.
 
 ## Enable it
 

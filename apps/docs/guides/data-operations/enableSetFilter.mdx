@@ -1,15 +1,15 @@
-## When to use it
+### When to use it
 
 Filtering categorical columns (status, type, owner) — a spreadsheet-style **checklist of the
 distinct values** instead of typing a condition.
 
-## How it works
+### How it works
 
 Adds a checklist to the column's filter row: search, select-all / clear, per-value counts, and a
 `(Blanks)` option. Categorical columns (select / multiSelect / radio / boolean) are auto-eligible;
 force or opt out with `meta.filter: 'set'` / `'condition'`.
 
-## Gotchas
+### Gotchas
 
 - **Requires `enableColumnFilters` + `enableColumnFilterRow`** (it lives in that row).
 - Distinct values come from the loaded data — in server mode, provide the facet list yourself.

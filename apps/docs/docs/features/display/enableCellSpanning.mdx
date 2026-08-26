@@ -8,6 +8,24 @@ sidebar_label: enableCellSpanning
 
 Prop `enableCellSpanning` — engine behaviour, default `false`.
 
+## Guide
+
+### When to use it
+
+Merge cells that share a value — a spanning header down a category column, or a wide cell across
+columns — like merged cells in a spreadsheet.
+
+### How it works
+
+Supports both `colSpan` and `rowSpan`. Drive it with `getCellSpan`, or set `meta.rowSpan: 'group'`
+to span contiguous equal values in a column. Covered cells are skipped in render.
+
+### Gotchas
+
+- Row virtualization **yields** to spanning (`rowSpan` needs contiguous real rows), so spanned grids
+  render un-windowed.
+- `rowSpan` groups collapse automatically when a sort / filter breaks the contiguity.
+
 ## Overview
 
 | | |
@@ -17,22 +35,6 @@ Prop `enableCellSpanning` — engine behaviour, default `false`.
 | Default | `false` |
 | Status | ✅ done |
 | Settings sheet | Display |
-
-## When to use it
-
-Merge cells that share a value — a spanning header down a category column, or a wide cell across
-columns — like merged cells in a spreadsheet.
-
-## How it works
-
-Supports both `colSpan` and `rowSpan`. Drive it with `getCellSpan`, or set `meta.rowSpan: 'group'`
-to span contiguous equal values in a column. Covered cells are skipped in render.
-
-## Gotchas
-
-- Row virtualization **yields** to spanning (`rowSpan` needs contiguous real rows), so spanned grids
-  render un-windowed.
-- `rowSpan` groups collapse automatically when a sort / filter breaks the contiguity.
 
 ## Enable it
 

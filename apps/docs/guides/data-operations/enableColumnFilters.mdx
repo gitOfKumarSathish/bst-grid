@@ -1,14 +1,14 @@
-## When to use it
+### When to use it
 
 On by default — per-column filtering (operator-aware: contains, equals, ranges, …), for narrowing
 by a specific column rather than a global search.
 
-## How it works
+### How it works
 
 The engine matches through a `bstCondition` filter function. Surface the UI with
 `enableColumnFilterRow` (an inline filter row) or `showFilterBuilder` (a panel of condition rows).
 
-## Gotchas
+### Gotchas
 
 - It's the base other filters build on: `enableSetFilter` and `enableMultiFilter` both require it
   **plus** `enableColumnFilterRow`.

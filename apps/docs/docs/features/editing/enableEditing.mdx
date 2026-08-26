@@ -8,22 +8,14 @@ sidebar_label: enableEditing
 
 Prop `enableEditing` — engine behaviour, default `— (opt-in)`.
 
-## Overview
+## Guide
 
-| | |
-| --- | --- |
-| Layer | `enable*` (engine, resolved in `useBstTable`) |
-| Type | `EditingOptions + callback` |
-| Default | `— (opt-in)` |
-| Status | ✅ done |
-| Settings sheet | Editing |
-
-## When to use it
+### When to use it
 
 Turn this on whenever cells should be editable in place. It's the foundation of the whole editing
 layer — validation, undo/redo, row actions and the batch review sheet all build on it.
 
-## How it works
+### How it works
 
 `enableEditing` opens an **edit session** on a cell (or row) and writes the result back through
 your handler. Choose the granularity with the `mode` option:
@@ -42,13 +34,27 @@ your handler. Choose the granularity with the `mode` option:
   edit as a draft until an explicit save (see `enableBatchEditing`).
 - Editability is per column via `meta.editable`; a column with no editor stays read-only.
 
-## Gotchas
+### Gotchas
 
 - **Always pass `getRowId`.** Edits target rows by id — without it, a sort or filter can send a
   commit to the wrong row.
 - Committed edits need somewhere to go: `onDataChange` (inline modes) or `onSave` (batch). Without
   a handler the edit has nowhere to land.
 - `enableEditing` alone doesn't validate. Add `enableValidation` to block or flag bad input.
+
+### Live example
+
+<BstSandbox example="editing" />
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `EditingOptions + callback` |
+| Default | `— (opt-in)` |
+| Status | ✅ done |
+| Settings sheet | Editing |
 
 ## Enable it
 

@@ -8,6 +8,22 @@ sidebar_label: showColumnEditToggle
 
 Prop `showColumnEditToggle` — adapter chrome, default `false`.
 
+## Guide
+
+### When to use it
+
+Let an end-user make an editable column read-only at runtime — no code change, no redeploy.
+
+### How it works
+
+Adds a per-column **lock / unlock** (✏️) control to the columns menu that overrides the column's
+`meta.editable` at runtime via `runtime.setColumnEditable`.
+
+### Gotchas
+
+- **Requires `enableEditing`** — there's nothing to lock without an edit session.
+- It's an adapter control, not a settings-sheet toggle.
+
 ## Overview
 
 | | |
@@ -16,20 +32,6 @@ Prop `showColumnEditToggle` — adapter chrome, default `false`.
 | Type | `boolean` |
 | Default | `false` |
 | Status | ✅ done |
-
-## When to use it
-
-Let an end-user make an editable column read-only at runtime — no code change, no redeploy.
-
-## How it works
-
-Adds a per-column **lock / unlock** (✏️) control to the columns menu that overrides the column's
-`meta.editable` at runtime via `runtime.setColumnEditable`.
-
-## Gotchas
-
-- **Requires `enableEditing`** — there's nothing to lock without an edit session.
-- It's an adapter control, not a settings-sheet toggle.
 
 ## Enable it
 

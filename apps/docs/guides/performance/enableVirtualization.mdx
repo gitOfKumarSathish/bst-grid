@@ -1,9 +1,9 @@
-## When to use it
+### When to use it
 
 Large grids — thousands of rows — that must stay at 60fps. Virtualization paints only the rows in
 the viewport (plus a small overscan), keeping the DOM bounded no matter the row count.
 
-## How it works
+### How it works
 
 Backed by `@tanstack/react-virtual`. `boolean | { overscan, estimateRowSize, estimateColumnSize }`.
 It also bounds the scroll box, so `enableStickyHeader` isn't needed alongside it.
@@ -13,9 +13,13 @@ It also bounds the scroll box, so `enableStickyHeader` isn't needed alongside it
   enableVirtualization={{ overscan: 8 }} />
 ```
 
-## Gotchas
+### Gotchas
 
 - It **yields** to master-detail, grouping, cell spanning and row pinning — those render un-windowed
   because they need full DOM.
 - Give `estimateRowSize` a realistic value for smooth scrollbars with variable row heights.
 - Always shown in the settings sheet ("Performance") so an end-user can switch it on for a big grid.
+
+### Live example
+
+<BstSandbox example="performance" />

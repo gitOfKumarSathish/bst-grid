@@ -1,13 +1,13 @@
-## When to use it
+### When to use it
 
 On by default — users drag a column's border to resize it, or double-click the border to auto-fit.
 
-## How it works
+### How it works
 
 Drag the header edge to set a width; **double-click** the resize handle to auto-size to the
 column's content (sampled `canvas.measureText`, clamped to `minSize` / `maxSize`).
 
-## Gotchas
+### Gotchas
 
 - `fitColumns` suppresses the resize handles — it owns column widths while on.
 - Set it `false` to lock widths (users can't resize).

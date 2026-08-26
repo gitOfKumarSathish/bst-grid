@@ -1,14 +1,18 @@
-## When to use it
+### When to use it
 
 A footer that shows total / filtered row counts and, when a range is selected, live aggregates of
 the selected numbers.
 
-## How it works
+### How it works
 
 Renders total and filtered counts always; with a cell range selected it adds
 `runtime.getSelectionStats()` — **sum · avg · min · max · count**.
 
-## Gotchas
+### Gotchas
 
 - The selection aggregates need **`enableCellSelection`** (row/filtered counts show regardless).
 - Chrome — appears in the settings sheet ("Display").
+
+### Live example
+
+<BstSandbox example="display" />

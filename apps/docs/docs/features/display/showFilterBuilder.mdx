@@ -8,6 +8,23 @@ sidebar_label: showFilterBuilder
 
 Prop `showFilterBuilder` — adapter chrome, default `false`.
 
+## Guide
+
+### When to use it
+
+Give users a **panel** to build column filters with explicit operator rows — richer than the inline
+filter row for complex, multi-column filtering.
+
+### How it works
+
+Adds a "Filters (n)" toolbar button that opens a panel of per-column, operator-aware condition rows.
+Combine it with `enableColumnFilterRow` for a second, inline per-column row.
+
+### Gotchas
+
+- Backed by `enableColumnFilters` (the engine behaviour it drives).
+- Chrome — it needs `showToolbar` to surface the button.
+
 ## Overview
 
 | | |
@@ -17,21 +34,6 @@ Prop `showFilterBuilder` — adapter chrome, default `false`.
 | Default | `false` |
 | Status | ✅ done (Phase 3) |
 | Settings sheet | Display |
-
-## When to use it
-
-Give users a **panel** to build column filters with explicit operator rows — richer than the inline
-filter row for complex, multi-column filtering.
-
-## How it works
-
-Adds a "Filters (n)" toolbar button that opens a panel of per-column, operator-aware condition rows.
-Combine it with `enableColumnFilterRow` for a second, inline per-column row.
-
-## Gotchas
-
-- Backed by `enableColumnFilters` (the engine behaviour it drives).
-- Chrome — it needs `showToolbar` to surface the button.
 
 ## Enable it
 

@@ -1,14 +1,14 @@
-## When to use it
+### When to use it
 
 **Very wide** grids — hundreds of columns — where even a windowed set of rows renders too many
 cells. Adds horizontal windowing on top of row virtualization.
 
-## How it works
+### How it works
 
 A **sub-toggle of `enableVirtualization`** (needs it on). Header, filter row and body stay aligned
 via spacer cells as columns scroll in and out.
 
-## Gotchas
+### Gotchas
 
 - No-op without `enableVirtualization`.
 - Falls back to all-columns under column pinning, `fitColumns`, grouped headers or cell spanning.

@@ -8,6 +8,25 @@ sidebar_label: enableClipboard
 
 Prop `enableClipboard` — engine behaviour, default `false`.
 
+## Guide
+
+### When to use it
+
+Excel-like **copy / paste** — copy a range (or whole column / row) as TSV, paste tabular data back
+into editable cells.
+
+### How it works
+
+`enableClipboard` **implies `enableCellSelection`**. Copy the range with Ctrl/Cmd+C; copy a whole
+column with Ctrl/Cmd+Space (across **all pages**, pre-pagination) and a row with Shift+Space. Paste
+writes through the edit session.
+
+### Gotchas
+
+- **Paste needs `enableEditing`** — there's nowhere to write without an edit session.
+- Whole-column / whole-row copy are gated by the `enableCopyColumn` / `enableCopyRow` sub-toggles
+  (both on by default).
+
 ## Overview
 
 | | |
@@ -17,23 +36,6 @@ Prop `enableClipboard` — engine behaviour, default `false`.
 | Default | `false` |
 | Status | ✅ done (Phase 3; copy-column all-pages v0.24.0) |
 | Settings sheet | Selection & clipboard |
-
-## When to use it
-
-Excel-like **copy / paste** — copy a range (or whole column / row) as TSV, paste tabular data back
-into editable cells.
-
-## How it works
-
-`enableClipboard` **implies `enableCellSelection`**. Copy the range with Ctrl/Cmd+C; copy a whole
-column with Ctrl/Cmd+Space (across **all pages**, pre-pagination) and a row with Shift+Space. Paste
-writes through the edit session.
-
-## Gotchas
-
-- **Paste needs `enableEditing`** — there's nowhere to write without an edit session.
-- Whole-column / whole-row copy are gated by the `enableCopyColumn` / `enableCopyRow` sub-toggles
-  (both on by default).
 
 ## Enable it
 

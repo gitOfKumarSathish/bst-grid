@@ -8,6 +8,28 @@ sidebar_label: enableCellSelection
 
 Prop `enableCellSelection` — engine behaviour, default `false`.
 
+## Guide
+
+### When to use it
+
+Spreadsheet-style **cell and range selection** with keyboard navigation — the foundation for
+clipboard, the status-bar aggregates, and range-aware actions.
+
+### How it works
+
+Click-drag or Shift+Arrow to select a range; Arrow / Tab / Home / End navigate. It's engine-level,
+so both skins get it with no extra chrome.
+
+### Gotchas
+
+- Required (directly or implied) by `enableClipboard`, and by `showStatusBar`'s sum / avg / min /
+  max aggregates.
+- Distinct from **row** selection (`enableRowSelection`), which is checkbox-based, not range-based.
+
+### Live example
+
+<BstSandbox example="selection-clipboard" />
+
 ## Overview
 
 | | |
@@ -17,22 +39,6 @@ Prop `enableCellSelection` — engine behaviour, default `false`.
 | Default | `false` |
 | Status | ✅ done (Phase 3) |
 | Settings sheet | Selection & clipboard |
-
-## When to use it
-
-Spreadsheet-style **cell and range selection** with keyboard navigation — the foundation for
-clipboard, the status-bar aggregates, and range-aware actions.
-
-## How it works
-
-Click-drag or Shift+Arrow to select a range; Arrow / Tab / Home / End navigate. It's engine-level,
-so both skins get it with no extra chrome.
-
-## Gotchas
-
-- Required (directly or implied) by `enableClipboard`, and by `showStatusBar`'s sum / avg / min /
-  max aggregates.
-- Distinct from **row** selection (`enableRowSelection`), which is checkbox-based, not range-based.
 
 ## Enable it
 

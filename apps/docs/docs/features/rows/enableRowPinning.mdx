@@ -8,6 +8,23 @@ sidebar_label: enableRowPinning
 
 Prop `enableRowPinning` — engine behaviour, default `false`.
 
+## Guide
+
+### When to use it
+
+Keep specific rows in view while the rest scroll — a totals row at the bottom, a highlighted record
+at the top.
+
+### How it works
+
+Adds a leading pin control; pinned rows freeze to the top or bottom of the scroll area (sticky), out
+of the normal flow.
+
+### Gotchas
+
+- Row virtualization yields to row pinning (pinned rows render outside the window).
+- Pinning is view state — persist it with `gridState` if it should survive reloads.
+
 ## Overview
 
 | | |
@@ -17,21 +34,6 @@ Prop `enableRowPinning` — engine behaviour, default `false`.
 | Default | `false` |
 | Status | ✅ done |
 | Settings sheet | Rows |
-
-## When to use it
-
-Keep specific rows in view while the rest scroll — a totals row at the bottom, a highlighted record
-at the top.
-
-## How it works
-
-Adds a leading pin control; pinned rows freeze to the top or bottom of the scroll area (sticky), out
-of the normal flow.
-
-## Gotchas
-
-- Row virtualization yields to row pinning (pinned rows render outside the window).
-- Pinning is view state — persist it with `gridState` if it should survive reloads.
 
 ## Enable it
 

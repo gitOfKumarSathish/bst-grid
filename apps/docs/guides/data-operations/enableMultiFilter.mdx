@@ -1,15 +1,15 @@
-## When to use it
+### When to use it
 
 When one column needs **more than one kind of filter at once** — say a text condition *and* a value
 checklist.
 
-## How it works
+### How it works
 
 A column opts in with an **array** `meta.filter` (e.g. `['condition', 'set']`); the parts render
 stacked in the filter row and a row must satisfy **all** of them (AND). It stores a compound
 `{ op: 'and', conditions }` value.
 
-## Gotchas
+### Gotchas
 
 - **Requires `enableColumnFilters` + `enableColumnFilterRow`**; a `'set'` part also needs
   `enableSetFilter`.

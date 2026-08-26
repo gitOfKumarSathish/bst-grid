@@ -8,6 +8,25 @@ sidebar_label: enableOverlays
 
 Prop `enableOverlays` — engine behaviour, default `true`.
 
+## Guide
+
+### When to use it
+
+On by default — show a proper **loading** spinner and **error** state over the grid instead of a
+blank or stale body.
+
+### How it works
+
+While `loading` is true (or `error` is set — error wins) the grid draws an overlay.
+`useBstDataSource` / `useBstInfiniteDataSource` supply `loading` + `error` via `tableProps`, so a
+server-wired grid gets this for free. Replace the content with `renderLoadingOverlay` /
+`renderErrorOverlay`, or set `overlayText`.
+
+### Gotchas
+
+- On by default — pass `loading` / `error` (directly or from a data source) for it to show anything.
+- Always available in the settings sheet ("Display").
+
 ## Overview
 
 | | |
@@ -17,23 +36,6 @@ Prop `enableOverlays` — engine behaviour, default `true`.
 | Default | `true` |
 | Status | ✅ done |
 | Settings sheet | Display |
-
-## When to use it
-
-On by default — show a proper **loading** spinner and **error** state over the grid instead of a
-blank or stale body.
-
-## How it works
-
-While `loading` is true (or `error` is set — error wins) the grid draws an overlay.
-`useBstDataSource` / `useBstInfiniteDataSource` supply `loading` + `error` via `tableProps`, so a
-server-wired grid gets this for free. Replace the content with `renderLoadingOverlay` /
-`renderErrorOverlay`, or set `overlayText`.
-
-## Gotchas
-
-- On by default — pass `loading` / `error` (directly or from a data source) for it to show anything.
-- Always available in the settings sheet ("Display").
 
 ## Enable it
 
