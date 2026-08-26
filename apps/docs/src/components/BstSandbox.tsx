@@ -1,7 +1,6 @@
 import React from 'react'
 import BrowserOnly from '@docusaurus/BrowserOnly'
 import CodeBlock from '@theme/CodeBlock'
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
 import { EXAMPLES } from '@site/src/examples'
 
 type Props = { example?: string; code?: string; height?: number }
@@ -14,11 +13,10 @@ type Props = { example?: string; code?: string; height?: number }
 // default (the live editor below shows the same code), but it is always in the HTML.
 export default function BstSandbox({ example, code, height = 460 }: Props) {
   const source = (code ?? (example ? EXAMPLES[example] : '') ?? '').trim()
-  const { siteConfig } = useDocusaurusContext()
-  // Pin driven by version.ini (the workspace release version) via docusaurus.config's
-  // customFields, so a release can't leave this stale. Sandpack resolves from the npm
-  // CDN, so this version must be PUBLISHED for the live demo to load.
-  const pin = `^${(siteConfig.customFields?.bstVersion as string) || '0.44.0'}`
+  // The docs can be deployed after a version bump but before that version is published.
+  // Use npm's dist-tag "latest" so Sandpack never requests an unpublished workspace
+  // version (its resolver otherwise reports the opaque "null.match" dependency error).
+  const publishedVersion = 'latest'
   return (
     <>
       {source ? (
@@ -44,9 +42,9 @@ export default function BstSandbox({ example, code, height = 460 }: Props) {
               }}
               customSetup={{
                 dependencies: {
-                  '@bloomskill/table-engine': pin,
-                  '@bloomskill/table-mui': pin,
-                  '@bloomskill/table-shadcn': pin,
+                  '@bloomskill/table-engine': publishedVersion,
+                  '@bloomskill/table-mui': publishedVersion,
+                  '@bloomskill/table-shadcn': publishedVersion,
                   '@mui/material': '^6.1.0',
                   '@mui/icons-material': '^6.1.0',
                   '@emotion/react': '^11.13.0',
