@@ -8,6 +8,8 @@ import type {
   BstContextMenuContext,
   BstContextMenuItem,
   BstNotesOptions,
+  BstFloatingActionBarOptions,
+  BstFloatingActionsContext,
   EditingOptions,
   UseBstTableOptions,
   ValidationOptions,
@@ -141,6 +143,14 @@ export interface BstRuntimeHandle<TData extends RowData> {
   renderLoadingOverlay?: () => React.ReactNode
   /** Custom error overlay (X23). */
   renderErrorOverlay?: (error: unknown) => React.ReactNode
+  /** Floating Selection Action Bar is active. */
+  enableFloatingActionBar: boolean
+  /** Floating Selection Action Bar options. */
+  floatingActionBarOptions?: BstFloatingActionBarOptions
+  /** Custom renderer for Floating Selection Action Bar. */
+  renderFloatingActions?: (ctx: BstFloatingActionsContext<TData>) => React.ReactNode
+  /** Floating Row Quick-Actions overlay is active. */
+  enableFloatingRowActions: boolean
 }
 
 /** Column ids whose column def carries a user-authored `cell` renderer. */
@@ -544,6 +554,13 @@ export function useBstTable<TData extends RowData>(opts: UseBstTableOptions<TDat
     overlayText: opts.overlayText,
     renderLoadingOverlay: opts.renderLoadingOverlay,
     renderErrorOverlay: opts.renderErrorOverlay,
+    enableFloatingActionBar: !!opts.enableFloatingActionBar,
+    floatingActionBarOptions:
+      typeof opts.enableFloatingActionBar === 'object' && opts.enableFloatingActionBar !== null
+        ? opts.enableFloatingActionBar
+        : undefined,
+    renderFloatingActions: opts.renderFloatingActions,
+    enableFloatingRowActions: !!opts.enableFloatingRowActions,
   }
   ;(table as unknown as Record<symbol, unknown>)[BST_RUNTIME] = handle
 

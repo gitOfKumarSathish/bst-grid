@@ -344,6 +344,39 @@ export interface BstTableEngineToggles {
    * `renderLoadingOverlay`, `renderErrorOverlay`. Default: true.
    */
   enableOverlays?: boolean
+  /**
+   * Floating Selection Action Bar — renders a floating action bar at the
+   * bottom-center of the viewport whenever rows are selected (Copy, Delete, Export,
+   * Deselect, + custom actions). Default: false.
+   */
+  enableFloatingActionBar?: boolean | BstFloatingActionBarOptions
+  /**
+   * Floating Row Quick-Actions — renders a floating quick-action pill on row hover
+   * with actions to edit, duplicate, delete, or annotate. Default: false.
+   */
+  enableFloatingRowActions?: boolean
+}
+
+/** Options for Floating Selection Action Bar (`enableFloatingActionBar`). */
+export interface BstFloatingActionBarOptions {
+  /** Optional custom position: 'bottom-center' | 'bottom-right' | 'top-center'. Default: 'bottom-center'. */
+  position?: 'bottom-center' | 'bottom-right' | 'top-center'
+}
+
+/** Context handed to `renderFloatingActions`. */
+export interface BstFloatingActionsContext<TData extends RowData = any> {
+  /** Selected row models. */
+  selectedRows: Array<{ id: string; original: TData }>
+  /** Count of selected rows. */
+  count: number
+  /** Clear current selection. */
+  clearSelection: () => void
+  /** Copy selected rows to clipboard as TSV. */
+  copySelected: () => void
+  /** Delete selected rows (if row actions enabled). */
+  deleteSelected?: () => void
+  /** Export selected rows (if export enabled). */
+  exportSelected?: () => void
 }
 
 /** Options for cell notes / comments (`enableNotes`). */
@@ -603,6 +636,8 @@ export interface UseBstTableOptions<TData extends RowData> extends BstTableEngin
   renderLoadingOverlay?: () => React.ReactNode
   /** Fully custom error overlay (X23) — receives the `error` value. */
   renderErrorOverlay?: (error: unknown) => React.ReactNode
+  /** Custom renderer for Floating Selection Action Bar. */
+  renderFloatingActions?: (ctx: BstFloatingActionsContext<TData>) => React.ReactNode
 }
 
 /** Tuning for auto-generated columns (X27). All optional. */

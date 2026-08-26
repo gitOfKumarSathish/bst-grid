@@ -845,6 +845,42 @@ export function BstTable({
     return td?.getBoundingClientRect?.() ?? null
   }, [editingNote])
 
+  const selectedRows = React.useMemo(() => {
+    try {
+      return (table.getSelectedRowModel?.()?.rows ?? []).map((r: any) => ({
+        id: r.id as string,
+        original: r.original as any,
+      }))
+    } catch {
+      return []
+    }
+  }, [table])
+
+  const selectedRowCount = selectedRows.length
+
+  const copySelectedRows = async () => {
+    if (!selectedRowCount) return
+    const lines = selectedRows.map((r: { id: string }) => {
+      return (table.getVisibleLeafColumns?.() ?? [])
+        .map((c: any) => String(runtime.sourceValue(r.id, c.id) ?? ''))
+        .join('\t')
+    })
+    const text = lines.join('\n')
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      await navigator.clipboard.writeText(text)
+    }
+  }
+
+  const deleteSelectedRows = () => {
+    if (!selectedRowCount) return
+    selectedRows.forEach((r: { id: string }) => runtime.deleteRow(r.id))
+    table.resetRowSelection?.()
+  }
+
+  const exportSelectedRows = async () => {
+    await runtime.exportCsv?.()
+  }
+
   return (
     <BstIconsContext.Provider value={I}>
     <div className="bst-table-viewport" style={{ position: 'relative' }}>
@@ -932,6 +968,7 @@ export function BstTable({
                     className={cx(
                       'bst-table-th',
                       pinnedLeft && 'bst-pinned-left',
+                      col.getIsFiltered?.() && 'bst-th-filtered',
                       slot(classNames?.headerCell, { columnId: col.id }),
                       colMeta.headerClassName,
                     )}
@@ -1266,6 +1303,7 @@ export function BstTable({
                       spanWidth={spanWidth}
                       rowFmtClass={rowFmt?.className}
                       rowFmtStyle={rowFmt?.style}
+                      hasFloatingRowActions={handle.enableFloatingRowActions && cellIdx === cells.length - 1}
                       onRowResizeStart={handle.enableRowResize ? onRowResizeStart : undefined}
                       onRowResizeReset={handle.enableRowResize ? onRowResizeReset : undefined}
                     />
@@ -1401,6 +1439,66 @@ export function BstTable({
         anchorRect={hoveredNote.rect}
         onEdit={() => runtime.openNoteEditor(hoveredNote.rowId, hoveredNote.columnId)}
       />
+    ) : null}
+    {handle.enableFloatingActionBar && selectedRowCount > 0 ? (
+      handle.renderFloatingActions ? (
+        handle.renderFloatingActions({
+          selectedRows,
+          count: selectedRowCount,
+          clearSelection: () => table.resetRowSelection?.(),
+          copySelected: () => void copySelectedRows(),
+          deleteSelected: handle.enableRowActions ? () => void deleteSelectedRows() : undefined,
+          exportSelected: handle.enableExport ? () => void exportSelectedRows() : undefined,
+        })
+      ) : (
+        <div
+          className={cx(
+            'bst-floating-bar',
+            handle.floatingActionBarOptions?.position && `bst-pos-${handle.floatingActionBarOptions.position}`,
+          )}
+          role="toolbar"
+          aria-label="Selected rows actions"
+        >
+          <span className="bst-floating-count">{selectedRowCount} selected</span>
+          <button
+            type="button"
+            className="bst-floating-btn"
+            onClick={() => void copySelectedRows()}
+            title="Copy selected rows"
+          >
+            <span>📋 Copy</span>
+          </button>
+          {handle.enableExport ? (
+            <button
+              type="button"
+              className="bst-floating-btn"
+              onClick={() => void exportSelectedRows()}
+              title="Export selected rows"
+            >
+              <span>Export</span>
+            </button>
+          ) : null}
+          {handle.enableRowActions ? (
+            <button
+              type="button"
+              className="bst-floating-btn bst-floating-btn-delete"
+              onClick={() => void deleteSelectedRows()}
+              title="Delete selected rows"
+            >
+              <span>Delete</span>
+            </button>
+          ) : null}
+          <div className="bst-floating-sep" />
+          <button
+            type="button"
+            className="bst-floating-btn"
+            onClick={() => table.resetRowSelection?.()}
+            title="Clear selection"
+          >
+            <span>✕ Deselect</span>
+          </button>
+        </div>
+      )
     ) : null}
     </BstIconsContext.Provider>
   )
@@ -1822,6 +1920,7 @@ const GridCell = React.memo(function GridCell({
   spanWidth,
   rowFmtClass,
   rowFmtStyle,
+  hasFloatingRowActions = false,
   onRowResizeStart,
   onRowResizeReset,
 }: {
@@ -1836,6 +1935,7 @@ const GridCell = React.memo(function GridCell({
   spanWidth?: number
   rowFmtClass?: string
   rowFmtStyle?: React.CSSProperties
+  hasFloatingRowActions?: boolean
   onRowResizeStart?: (rowId: string, e: React.MouseEvent) => void
   onRowResizeReset?: (rowId: string) => void
 }) {
@@ -2069,6 +2169,36 @@ const GridCell = React.memo(function GridCell({
             onRowResizeReset?.(rowId)
           }}
         />
+      ) : null}
+      {hasFloatingRowActions ? (
+        <div className="bst-row-floating-actions" role="toolbar" aria-label="Row quick actions">
+          {handle.enableNotes && (
+            <button
+              type="button"
+              className="bst-row-action-btn"
+              title="Add note"
+              onClick={(e) => {
+                e.stopPropagation()
+                runtime.openNoteEditor(rowId, columnId)
+              }}
+            >
+              💬
+            </button>
+          )}
+          {handle.enableRowActions && (
+            <button
+              type="button"
+              className="bst-row-action-btn"
+              title="Delete row"
+              onClick={(e) => {
+                e.stopPropagation()
+                runtime.deleteRow(rowId)
+              }}
+            >
+              🗑
+            </button>
+          )}
+        </div>
       ) : null}
     </td>
   )

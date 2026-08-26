@@ -104,6 +104,8 @@ export type {
   BstFindOptions,
   BstNotesOptions,
   BstNoteSaveEvent,
+  BstFloatingActionBarOptions,
+  BstFloatingActionsContext,
 } from './types.js'
 
 // ---- cell notes / comments (enableNotes) ----

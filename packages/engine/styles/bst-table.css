@@ -123,17 +123,32 @@
 
 .bst-table-resizer {
   position: absolute;
-  right: 0;
+  right: -4px;
   top: 0;
   height: 100%;
-  width: 5px;
+  width: 8px;
   cursor: col-resize;
   user-select: none;
   touch-action: none;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.bst-table-resizer:hover,
-.bst-table-resizer.bst-table-resizing {
-  background: var(--bst-table-accent);
+.bst-table-resizer::after {
+  content: "";
+  width: 3px;
+  height: 45%;
+  min-height: 14px;
+  border-radius: 999px;
+  background: transparent;
+  transition: background-color 0.15s ease, height 0.15s ease, box-shadow 0.15s ease;
+}
+.bst-table-resizer:hover::after,
+.bst-table-resizer.bst-table-resizing::after {
+  background: var(--bst-table-accent, #3b82f6);
+  height: 75%;
+  box-shadow: 0 0 6px rgba(59, 130, 246, 0.45);
 }
 
 /* Row resize (G2) — a thin drag zone along each data cell's bottom edge; tiled
@@ -143,8 +158,8 @@
   position: absolute;
   left: 0;
   right: 0;
-  bottom: -3px;
-  height: 6px;
+  bottom: -4px;
+  height: 8px;
   cursor: row-resize;
   user-select: none;
   touch-action: none;
@@ -157,12 +172,13 @@
   right: 0;
   bottom: 3px;
   height: 2px;
-  background: var(--bst-table-accent);
+  background: var(--bst-table-accent, #3b82f6);
   opacity: 0;
-  transition: opacity 0.1s;
+  transition: opacity 0.12s ease;
 }
 .bst-table-tr:hover .bst-rowresize-handle:hover::after {
-  opacity: 0.6;
+  opacity: 0.85;
+  box-shadow: 0 1px 4px rgba(59, 130, 246, 0.35);
 }
 /* A resized row clips content that overflows its set height, top-aligned. */
 .bst-row-resized > .bst-table-td {
@@ -212,7 +228,18 @@
   line-height: 1;
   padding: 6px;
   border-radius: 4px;
-  transition: color 0.12s, background 0.12s;
+  transition: color 0.12s, background 0.12s, transform 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.bst-expander-btn svg,
+.bst-expander-btn span {
+  transition: transform 0.15s ease;
+}
+.bst-table-tr.bst-row-expanded .bst-expander-btn svg,
+.bst-table-tr.bst-row-expanded .bst-expander-btn span {
+  transform: rotate(90deg);
 }
 .bst-expander-btn:hover {
   color: var(--bst-table-fg);
@@ -222,12 +249,18 @@
 .bst-table-tr.bst-row-expanded > .bst-expander-td {
   background: var(--bst-table-row-hover);
 }
+.bst-table-tr.bst-row-expanded > .bst-table-td:first-child,
+.bst-table-tr.bst-row-expanded > .bst-expander-td:first-child {
+  border-left: 3px solid var(--bst-table-accent, #3b82f6);
+}
 .bst-detail-tr > .bst-detail-td {
-  padding: 12px 16px;
-  background: var(--bst-table-header-bg);
+  padding: 14px 18px;
+  background: color-mix(in srgb, var(--bst-table-header-bg) 70%, var(--bst-table-bg));
   border-bottom: 1px solid var(--bst-table-border);
+  border-left: 3px solid var(--bst-table-accent, #3b82f6);
   font-size: 13px;
   color: var(--bst-table-fg);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.04);
 }
 
 /* Row pinning (G1) — pin column + frozen top/bottom rows. */
@@ -1777,4 +1810,131 @@
 }
 .bst-note-btn-delete:hover {
   background: rgba(239, 68, 68, 0.1);
+}
+
+/* ---- Active Filter Indicators on Header ---- */
+.bst-th-filtered .bst-header-title {
+  color: var(--bst-table-accent, #3b82f6);
+  font-weight: 600;
+}
+.bst-th-filtered .bst-header-title::after {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-left: 6px;
+  border-radius: 50%;
+  background: var(--bst-table-accent, #3b82f6);
+  vertical-align: middle;
+}
+
+/* ---- Floating Selection Action Bar ---- */
+.bst-floating-bar {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: var(--bst-table-bg, #ffffff);
+  color: var(--bst-table-fg, #1e293b);
+  border: 1px solid var(--bst-table-border, #e2e8f0);
+  border-radius: 999px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.18), 0 8px 10px -6px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(8px);
+  animation: bst-float-in 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes bst-float-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+.bst-floating-count {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bst-table-accent, #3b82f6) 15%, transparent);
+  color: var(--bst-table-accent, #3b82f6);
+}
+.bst-floating-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--bst-table-fg);
+  cursor: pointer;
+  transition: background-color 0.1s;
+}
+.bst-floating-btn:hover {
+  background: var(--bst-table-row-hover, #f1f5f9);
+}
+.bst-floating-btn-delete {
+  color: #ef4444;
+}
+.bst-floating-btn-delete:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+.bst-floating-sep {
+  width: 1px;
+  height: 16px;
+  background: var(--bst-table-border, #e2e8f0);
+}
+
+/* ---- Floating Row Quick-Actions Pill ---- */
+.bst-table-tr {
+  position: relative;
+}
+.bst-row-floating-actions {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 4px;
+  background: var(--bst-table-bg, #ffffff);
+  border: 1px solid var(--bst-table-border, #e2e8f0);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}
+.bst-table-tr:hover .bst-row-floating-actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+.bst-row-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--bst-table-muted, #64748b);
+  cursor: pointer;
+  font-size: 12px;
+}
+.bst-row-action-btn:hover {
+  color: var(--bst-table-fg, #0f172a);
+  background: var(--bst-table-row-hover, #f1f5f9);
 }

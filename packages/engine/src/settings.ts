@@ -155,6 +155,19 @@ const SETTINGS_META: Record<BstSettingKey, SettingMeta> = {
     label: 'Cell notes',
     hint: 'Attach annotations to cells · Shift+F2 to open/create',
   },
+  enableFloatingActionBar: {
+    group: 'Selection & clipboard',
+    default: false,
+    label: 'Floating action bar',
+    hint: 'Floating toolbar at bottom when rows are selected (Copy, Delete, Export)',
+    requires: ['enableRowSelection'],
+  },
+  enableFloatingRowActions: {
+    group: 'Editing',
+    default: false,
+    label: 'Floating row actions',
+    hint: 'Hover pill with quick actions (Edit, Duplicate, Delete)',
+  },
   // Display
   enableCellSpanning: { group: 'Display', default: false, label: 'Cell spanning', hint: 'Merge repeated cells (A5)' },
   enableConditionalFormatting: {
