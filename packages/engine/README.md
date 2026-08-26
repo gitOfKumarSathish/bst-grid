@@ -25,6 +25,8 @@ Full guides, a complete API reference and **live, editable demos** are on the do
 | [Installation](https://gitofkumarsathish.github.io/bst-grid/docs/installation) | [Cell Types](https://gitofkumarsathish.github.io/bst-grid/docs/cell-types) | [AI Agents & MCP](https://gitofkumarsathish.github.io/bst-grid/docs/ai-agents) |
 | [Recipes](https://gitofkumarsathish.github.io/bst-grid/docs/recipes) | [API Reference](https://gitofkumarsathish.github.io/bst-grid/docs/api) | [Coverage & Roadmap](https://gitofkumarsathish.github.io/bst-grid/docs/coverage) |
 
+> The docs are **generated from the library's source and refreshed on every release**, so they track the code and stay accurate as the API grows — an actively maintained reference, not a one-off snapshot.
+
 ---
 
 ## Contents
@@ -146,75 +148,75 @@ settings (e.g. `pagination={{ pageSize: 25 }}`). Follow a link for the full guid
 
 | Feature | Turn on with | Default |
 | --- | --- | --- |
-| [Sorting](#sorting) | `enableSorting` | `true` |
-| [Global search](#filtering) | `enableGlobalFilter` | `true` |
-| [Find (highlight + jump)](#find) | `enableFind` | `false` |
-| [Column filters](#filtering) | `enableColumnFilters` | `true` |
-| [Filter builder UI](#filtering) | `<BstFilterBuilder>` / `enableColumnFilterRow` | `false` |
-| [Pagination](#pagination) | `pagination` | `true` |
-| [Grouping + aggregates](#grouping-and-aggregation) | `enableGrouping` | `false` |
+| [Sorting](https://gitofkumarsathish.github.io/bst-grid/docs/features/data-operations/enableSorting) | `enableSorting` | `true` |
+| [Global search](https://gitofkumarsathish.github.io/bst-grid/docs/features/data-operations/enableGlobalFilter) | `enableGlobalFilter` | `true` |
+| [Find (highlight + jump)](https://gitofkumarsathish.github.io/bst-grid/docs/features/data-operations/enableFind) | `enableFind` | `false` |
+| [Column filters](https://gitofkumarsathish.github.io/bst-grid/docs/features/data-operations/enableColumnFilters) | `enableColumnFilters` | `true` |
+| [Filter builder UI](https://gitofkumarsathish.github.io/bst-grid/docs/features/columns/enableColumnFilterRow) | `<BstFilterBuilder>` / `enableColumnFilterRow` | `false` |
+| [Pagination](https://gitofkumarsathish.github.io/bst-grid/docs/features/data-operations/pagination) | `pagination` | `true` |
+| [Grouping + aggregates](https://gitofkumarsathish.github.io/bst-grid/docs/features/data-operations/enableGrouping) | `enableGrouping` | `false` |
 
 #### 🧱 Columns & layout
 
 | Feature | Turn on with | Default |
 | --- | --- | --- |
-| [Show / hide columns](#column-layout) | `enableHiding` | `true` |
-| [Column resizing](#column-layout) | `enableColumnResizing` | `true` |
+| [Show / hide columns](https://gitofkumarsathish.github.io/bst-grid/docs/features/columns/enableHiding) | `enableHiding` | `true` |
+| [Column resizing](https://gitofkumarsathish.github.io/bst-grid/docs/features/columns/enableColumnResizing) | `enableColumnResizing` | `true` |
 | [Auto-size to content](#column-layout) | double-click the resize handle | — |
-| [Column pinning](#column-layout) | `enableColumnPinning` | `false` |
-| [Column reordering](#column-layout) | `enableColumnOrdering` | `false` |
-| [Fit to viewport (no h-scroll)](#column-layout) | `fitColumns` | `false` |
-| [Responsive hiding](#column-layout) | `enableResponsive` + `meta.responsivePriority` | `false` |
-| [Sticky-header viewport](#row-layout) | `enableStickyHeader` | `false` |
-| [Per-column filter row](#filtering) | `enableColumnFilterRow` | `false` |
+| [Column pinning](https://gitofkumarsathish.github.io/bst-grid/docs/features/columns/enableColumnPinning) | `enableColumnPinning` | `false` |
+| [Column reordering](https://gitofkumarsathish.github.io/bst-grid/docs/features/columns/enableColumnOrdering) | `enableColumnOrdering` | `false` |
+| [Fit to viewport (no h-scroll)](https://gitofkumarsathish.github.io/bst-grid/docs/features/columns/fitColumns) | `fitColumns` | `false` |
+| [Responsive hiding](https://gitofkumarsathish.github.io/bst-grid/docs/features/columns/enableResponsive) | `enableResponsive` + `meta.responsivePriority` | `false` |
+| [Sticky-header viewport](https://gitofkumarsathish.github.io/bst-grid/docs/features/rows/enableStickyHeader) | `enableStickyHeader` | `false` |
+| [Per-column filter row](https://gitofkumarsathish.github.io/bst-grid/docs/features/columns/enableColumnFilterRow) | `enableColumnFilterRow` | `false` |
 
 #### 📋 Rows
 
 | Feature | Turn on with | Default |
 | --- | --- | --- |
-| [Row selection (checkboxes)](#row-selection) | `enableRowSelection` | `false` |
-| [Add / delete / duplicate](#editing-and-validation) | `enableRowActions` | `false` |
-| [Master-detail panel](#row-layout) | `enableExpanding` + `renderDetail` | `false` |
-| [Row pinning (freeze top/bottom)](#row-layout) | `enableRowPinning` | `false` |
-| [Row resizing (drag height)](#row-layout) | `enableRowResize` | `false` |
-| [Virtualization (row/column)](#virtualization-d1) | `enableVirtualization` (+ `enableColumnVirtualization`) | `false` |
+| [Row selection (checkboxes)](https://gitofkumarsathish.github.io/bst-grid/docs/features/selection-clipboard/enableRowSelection) | `enableRowSelection` | `false` |
+| [Add / delete / duplicate](https://gitofkumarsathish.github.io/bst-grid/docs/features/editing/enableRowActions) | `enableRowActions` | `false` |
+| [Master-detail panel](https://gitofkumarsathish.github.io/bst-grid/docs/features/rows/enableExpanding) | `enableExpanding` + `renderDetail` | `false` |
+| [Row pinning (freeze top/bottom)](https://gitofkumarsathish.github.io/bst-grid/docs/features/rows/enableRowPinning) | `enableRowPinning` | `false` |
+| [Row resizing (drag height)](https://gitofkumarsathish.github.io/bst-grid/docs/features/rows/enableRowResize) | `enableRowResize` | `false` |
+| [Virtualization (row/column)](https://gitofkumarsathish.github.io/bst-grid/docs/features/performance/enableVirtualization) | `enableVirtualization` (+ `enableColumnVirtualization`) | `false` |
 
 #### ✏️ Editing
 
 | Feature | Turn on with | Default |
 | --- | --- | --- |
-| [Inline editing](#editing-and-validation) | `enableEditing` | `false` |
-| [Batch editing + one `onSave`](#batch-editing-and-single-call-save) | `enableEditing: { mode: 'batch' }` | `false` |
-| [Validation (sync / async / cross-column)](#editing-and-validation) | `enableValidation` | `false` |
-| [Undo / redo](#undo-and-redo) | `enableUndoRedo` | `false` |
-| [Type-to-edit (spreadsheet entry)](#editing-and-validation) | `enableTypeToEdit` | `false` |
+| [Inline editing](https://gitofkumarsathish.github.io/bst-grid/docs/features/editing/enableEditing) | `enableEditing` | `false` |
+| [Batch editing + one `onSave`](https://gitofkumarsathish.github.io/bst-grid/docs/features/editing/enableBatchEditing) | `enableEditing: { mode: 'batch' }` | `false` |
+| [Validation (sync / async / cross-column)](https://gitofkumarsathish.github.io/bst-grid/docs/features/editing/enableValidation) | `enableValidation` | `false` |
+| [Undo / redo](https://gitofkumarsathish.github.io/bst-grid/docs/features/editing/enableUndoRedo) | `enableUndoRedo` | `false` |
+| [Type-to-edit (spreadsheet entry)](https://gitofkumarsathish.github.io/bst-grid/docs/features/editing/enableTypeToEdit) | `enableTypeToEdit` | `false` |
 
 #### ⌨️ Selection & clipboard
 
 | Feature | Turn on with | Default |
 | --- | --- | --- |
-| [Cell / range selection + keyboard nav](#selection-keyboard-and-clipboard) | `enableCellSelection` | `false` |
-| [Copy / paste (TSV)](#selection-keyboard-and-clipboard) | `enableClipboard` | `false` |
-| [Copy whole column / row](#selection-keyboard-and-clipboard) | `enableCopyColumn` / `enableCopyRow` | `true` |
+| [Cell / range selection + keyboard nav](https://gitofkumarsathish.github.io/bst-grid/docs/features/selection-clipboard/enableCellSelection) | `enableCellSelection` | `false` |
+| [Copy / paste (TSV)](https://gitofkumarsathish.github.io/bst-grid/docs/features/selection-clipboard/enableClipboard) | `enableClipboard` | `false` |
+| [Copy whole column / row](https://gitofkumarsathish.github.io/bst-grid/docs/features/selection-clipboard/enableCopyColumn) | `enableCopyColumn` / `enableCopyRow` | `true` |
 | [Access control (disable cascade)](#access-control) | `disabled` · `rowDisabled` · `meta.disabled` · `cellDisabled` | — |
 
 #### 🎨 Cells, styling & scale
 
 | Feature | Turn on with | Default |
 | --- | --- | --- |
-| [Cell-type registry (17 types)](#cell-types) | `meta.type` | `'text'` |
+| [Cell-type registry (17 types)](https://gitofkumarsathish.github.io/bst-grid/docs/cell-types) | `meta.type` | `'text'` |
 | [In-cell charts (sparkline / KPI)](#cell-types) | `meta.type: 'sparkline' \| 'kpi'` | — |
 | [QR · barcode · rich text](#cell-types) | `meta.type: 'qr' \| 'barcode' \| 'richText'` | — |
-| [ERP field formats (Aadhaar · PAN · GSTIN · IBAN · Luhn …)](#cellmeta-by-cell-type) | `cellMeta.pattern` on `text` / `number` | — |
-| [Width-aware chips (fit to column)](#cellmeta-by-cell-type) | `cellMeta.fitChips` on `multiSelect` | `false` |
-| [File preview + upload/delete (B5/I3)](#cellmeta-by-cell-type) | `meta.type: 'files'` + `cellMeta.onUpload`/`onDelete` · **PDF thumbnail** `cellMeta.pdfThumbnail` | click-to-preview on |
-| [Cell spanning (merge cells)](#cell-spanning) | `enableCellSpanning` | `false` |
+| [ERP field formats (Aadhaar · PAN · GSTIN · IBAN · Luhn …)](https://gitofkumarsathish.github.io/bst-grid/docs/cell-types) | `cellMeta.pattern` on `text` / `number` | — |
+| [Width-aware chips (fit to column)](https://gitofkumarsathish.github.io/bst-grid/docs/cell-types) | `cellMeta.fitChips` on `multiSelect` | `false` |
+| [File preview + upload/delete (B5/I3)](https://gitofkumarsathish.github.io/bst-grid/docs/cell-types) | `meta.type: 'files'` + `cellMeta.onUpload`/`onDelete` · **PDF thumbnail** `cellMeta.pdfThumbnail` | click-to-preview on |
+| [Cell spanning (merge cells)](https://gitofkumarsathish.github.io/bst-grid/docs/features/display/enableCellSpanning) | `enableCellSpanning` | `false` |
 | [Custom CSS slots](#custom-css) | `classNames` / `styles` | — |
-| [Conditional formatting](#conditional-formatting) | `conditionalFormats` + `enableConditionalFormatting` | on when rules present |
+| [Conditional formatting](https://gitofkumarsathish.github.io/bst-grid/docs/features/display/enableConditionalFormatting) | `conditionalFormats` + `enableConditionalFormatting` | on when rules present |
 | [Injectable body icons](#body-icons) | `icons` | built-in SVGs |
-| [Runtime settings sheet](#runtime-settings-sheet) | `useBstSettings` (`showSettings` in adapters) | `false` |
+| [Runtime settings sheet](https://gitofkumarsathish.github.io/bst-grid/docs/features/toolbar-chrome/showSettings) | `useBstSettings` (`showSettings` in adapters) | `false` |
 | [Grid state save/restore (X21)](#grid-state--save--restore-views-x21) | `useBstGridState` / `loadGridState` (`gridState={{ key }}` in adapters) | off (opt-in) |
-| [Server-side DataSource](#server-mode-datasource) | `useBstDataSource(source)` | client mode |
+| [Server-side DataSource](https://gitofkumarsathish.github.io/bst-grid/docs/recipes) | `useBstDataSource(source)` | client mode |
 
 ---
 

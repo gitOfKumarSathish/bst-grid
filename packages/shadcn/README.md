@@ -24,7 +24,11 @@ Full guides, a complete API reference and **live, editable demos** (this skin in
 | [Installation](https://gitofkumarsathish.github.io/bst-grid/docs/installation) | [Cell Types](https://gitofkumarsathish.github.io/bst-grid/docs/cell-types) | [AI Agents & MCP](https://gitofkumarsathish.github.io/bst-grid/docs/ai-agents) |
 | [Recipes](https://gitofkumarsathish.github.io/bst-grid/docs/recipes) | [API Reference](https://gitofkumarsathish.github.io/bst-grid/docs/api) | [Coverage & Roadmap](https://gitofkumarsathish.github.io/bst-grid/docs/coverage) |
 
+> The docs are **generated from the library's source and refreshed on every release**, so they track the code and stay accurate as the API grows — an actively maintained reference, not a one-off snapshot.
+
 ## Features
+
+> Every feature below has an in-depth guide **and a live demo** on the **[Feature Guides](https://gitofkumarsathish.github.io/bst-grid/docs/features)** — click through for props, gotchas and editable examples.
 
 - 🧱 **Drop-in shadcn-style grid** — one `<BstTableShadcn />` component.
 - 🎛 **Radix DropdownMenu** column-visibility menu; shadcn-style search & pagination.
