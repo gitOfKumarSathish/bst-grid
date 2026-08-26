@@ -17,6 +17,26 @@ Prop `showSettings` — adapter chrome, default `false`.
 | Default | `false` |
 | Status | ✅ done |
 
+## When to use it
+
+Let **end-users** turn this grid's features on and off themselves at runtime — no code, no redeploy —
+with the choice persisted per table.
+
+## How it works
+
+Adds a gear that opens a side sheet (MUI `Drawer` / shadcn slide-over) listing every instance-level
+boolean toggle, grouped (Data ops · Columns · Rows · Editing · Selection & clipboard · Display · …)
+from `BST_SETTINGS_REGISTRY`. Choices save to `localStorage`. `boolean | BstSettingsOptions` (e.g.
+`{ search: true }` for a filter box). A toggle whose prerequisite is off renders disabled ("Needs
+&lt;parent&gt;").
+
+## Gotchas
+
+- Only features you've **provisioned** appear — e.g. turn Copy & paste off to disable clipboard, no
+  code change.
+- It persists **feature toggles**; the separate `gridState` handles the saved **view** (sort /
+  filters / column layout).
+
 ## Enable it
 
 ```tsx

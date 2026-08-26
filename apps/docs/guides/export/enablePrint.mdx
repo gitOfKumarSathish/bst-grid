@@ -1,0 +1,13 @@
+## When to use it
+
+Keep (or drop) the **Print** option in the export menu.
+
+## How it works
+
+A **sub-toggle of `enableExport`** (on by default). Gates `runtime.printTable` and the Print item;
+opens a print-friendly window (with a hidden-iframe fallback).
+
+## Gotchas
+
+- Only takes effect when `enableExport` is on.
+- It prints the current view formatted per cell type, not the raw DOM.

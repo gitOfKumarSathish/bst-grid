@@ -17,6 +17,19 @@ Prop `showSelectionInfo` — adapter chrome, default `follows enableRowSelection
 | Default | `follows enableRowSelection` |
 | Status | ✅ done (Phase 3) |
 
+## When to use it
+
+Show how many rows are selected and offer a one-click Clear.
+
+## How it works
+
+Renders a `{n} selected` chip + **Clear** in the toolbar; it follows `enableRowSelection`.
+
+## Gotchas
+
+- No-op without `enableRowSelection`.
+- It reflects **row** selection, not cell-range selection (that count lives in `showStatusBar`).
+
 ## Enable it
 
 ```tsx

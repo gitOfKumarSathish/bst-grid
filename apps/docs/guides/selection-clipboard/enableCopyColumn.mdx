@@ -1,0 +1,14 @@
+## When to use it
+
+Keep (or remove) the "copy the whole column" affordance — Ctrl/Cmd+Space and the columns-menu copy
+button.
+
+## How it works
+
+A **sub-toggle of clipboard** (on by default). It gates `selectColumn` / `copyColumn` at the runtime
+choke point — the keyboard gesture **and** the menu button — copying the column across all pages.
+
+## Gotchas
+
+- Only relevant when `enableClipboard` is on.
+- Set it `false` to allow range/row copy but forbid whole-column copy (e.g. for very wide columns).

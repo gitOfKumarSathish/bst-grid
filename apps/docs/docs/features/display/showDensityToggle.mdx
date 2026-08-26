@@ -18,6 +18,20 @@ Prop `showDensityToggle` — adapter chrome, default `false`.
 | Status | ✅ done (Phase 3) |
 | Settings sheet | Display |
 
+## When to use it
+
+Let users trade whitespace for rows-on-screen — cycle compact / standard / comfortable row heights.
+
+## How it works
+
+A toolbar control that cycles a `data-bst-density` attribute the CSS reads; no data change.
+
+## Gotchas
+
+- It's chrome — lives under `showToolbar` (in the "⋯ More" menu).
+- Independent of `enableRowResize` / `enableAutoRowHeight` (those are per-row; this is the whole
+  grid).
+
 ## Enable it
 
 ```tsx

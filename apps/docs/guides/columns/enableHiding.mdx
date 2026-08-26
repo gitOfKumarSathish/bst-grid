@@ -1,0 +1,14 @@
+## When to use it
+
+On by default — let users show and hide columns without losing them.
+
+## How it works
+
+Each column gets an **eye / eye-off** toggle in the columns menu (`showColumnsMenu`). Hidden columns
+stay listed in the menu so they can be brought back, and the same control appears in the settings
+sheet as "Show / hide columns".
+
+## Gotchas
+
+- The behaviour is engine-level; the visible control needs `showColumnsMenu`.
+- Distinct from `enableResponsive`, which hides columns **automatically** by width.

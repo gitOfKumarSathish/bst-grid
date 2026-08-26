@@ -18,6 +18,22 @@ Prop `enableColumnPinning` — engine behaviour, default `false`.
 | Status | ✅ done (Phase 3) |
 | Settings sheet | Columns |
 
+## When to use it
+
+Keep key columns — an id, a name, an action column — visible while the rest scroll horizontally.
+
+## How it works
+
+Adds pin-left / pin-right controls to the columns menu; pinned columns become sticky at the edges
+of the scroll area. State is `{ start, end }` column-id lists.
+
+## Gotchas
+
+- Surface the control with `showColumnsMenu`.
+- Column virtualization falls back to rendering all columns while pinning is active (the two don't
+  stack).
+- The row-number column (`enableRowNumbers`) pins to the start ahead of user pins.
+
 ## Enable it
 
 ```tsx

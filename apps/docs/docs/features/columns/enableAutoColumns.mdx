@@ -18,6 +18,29 @@ Prop `enableAutoColumns` — engine behaviour, default `false`.
 | Status | ✅ done |
 | Settings sheet | Columns |
 
+## When to use it
+
+Prototyping, or rendering data whose shape you don't know ahead of time — get a working grid
+without hand-writing a single column definition.
+
+## How it works
+
+Pass `columns={[]}` and turn this on: the engine samples the first rows, infers one column per key
+(number / boolean / date, else text) and a humanized header. The moment you pass real `columns`,
+they win and this is ignored.
+
+```tsx
+<BstTableMui data={rows} columns={[]} getRowId={(r) => r.id} enableAutoColumns />
+```
+
+Tune it with the `autoColumns` option (`sampleRows`, `include`, `exclude`, `header`, `inferType`).
+
+## Gotchas
+
+- It's a **no-op** the instant `columns` is non-empty — explicit columns always take over.
+- Type inference is a best guess from a sample; declare real `columns` for production so formatting
+  and editors are exact.
+
 ## Enable it
 
 ```tsx

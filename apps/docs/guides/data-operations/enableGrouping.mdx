@@ -1,0 +1,15 @@
+## When to use it
+
+Roll rows up by a column value — orders by region, tasks by status — with collapsible group rows and
+aggregates.
+
+## How it works
+
+Enables multi-column grouping plus aggregation; set a column's `aggregationFn` for totals / averages
+in the group header. Both skins add a group toggle (▤) in the columns menu.
+
+## Gotchas
+
+- Row virtualization **yields** to grouping (grouped rows render un-windowed), so very large grouped
+  sets are heavier — group server-side at scale.
+- Off by default; it changes the row model, so turn it on only where you need it.

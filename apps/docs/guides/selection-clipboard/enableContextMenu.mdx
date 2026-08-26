@@ -1,0 +1,21 @@
+## When to use it
+
+Give users a right-click menu on cells — the fast path to copy, export and autosize where their
+cursor already is.
+
+## How it works
+
+A dependency-free popup at the cursor. Default items adapt to what's on: Copy / Copy row / Copy
+column (with clipboard), Export CSV / Excel (with export), Autosize column. Reshape it entirely with
+`getContextMenuItems(ctx)` (spread `ctx.defaultItems` to extend).
+
+```tsx
+enableContextMenu
+getContextMenuItems={(ctx) => [...ctx.defaultItems, { label: 'Flag row', onSelect: () => flag(ctx.row) }]}
+```
+
+## Gotchas
+
+- Right-clicking first selects the target cell.
+- Default copy / export items only appear when their features (`enableClipboard` / `enableExport`)
+  are on.

@@ -18,6 +18,21 @@ Prop `fitColumns` — engine behaviour, default `false`.
 | Status | ✅ done |
 | Settings sheet | Columns |
 
+## When to use it
+
+You want the table to always fill its container with **no horizontal scrollbar** — dashboards,
+fixed-width cards.
+
+## How it works
+
+Distributes the available width across the visible columns (utility columns keep their fixed size).
+It's a pure render overlay — it never mutates your column-sizing model.
+
+## Gotchas
+
+- While on, it **suppresses resize handles** and turns off column virtualization (it owns widths).
+- Mutually exclusive with horizontal scrolling and with `enableResponsive` (use one strategy).
+
 ## Enable it
 
 ```tsx

@@ -18,6 +18,22 @@ Prop `enableExpanding` — engine behaviour, default `false`.
 | Status | ✅ done |
 | Settings sheet | Rows |
 
+## When to use it
+
+Master-detail — click a row to reveal a full-width panel with more detail, sub-records, or a nested
+table.
+
+## How it works
+
+Adds a leading expander column and renders your `renderDetail(row)` as a full-width row beneath the
+expanded one. Control which rows can open with `getRowCanExpand`.
+
+## Gotchas
+
+- Row virtualization **yields** to expanding (detail rows need real DOM), so long lists with many
+  open panels are heavier.
+- The detail panel is your React — a nested `<BstTable>` is fine for a different column set.
+
 ## Enable it
 
 ```tsx

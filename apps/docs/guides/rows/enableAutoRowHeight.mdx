@@ -1,0 +1,16 @@
+## When to use it
+
+Let rows **grow to fit wrapped content** — long text, multi-line notes — instead of clipping to a
+fixed height.
+
+## How it works
+
+Dependency-free and browser-measured: body cells switch to `white-space: normal` (root class
+`bst-auto-rowheight`), so each row grows to its content. Scope wrapping to specific columns with
+`meta.wrapText`.
+
+## Gotchas
+
+- A **manually** resized row (`enableRowResize`) still clips to its set height — auto-height applies
+  to rows the user hasn't sized.
+- Variable row heights make virtualization estimates less exact; test scroll feel on large sets.

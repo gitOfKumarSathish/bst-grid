@@ -1,0 +1,15 @@
+## When to use it
+
+On by default — the master switch for data-driven cell / row styling defined by
+`conditionalFormats` rules (thresholds, status colors, blanking a cell).
+
+## How it works
+
+It gates the `conditionalFormats` rule array at the `useBstTable` choke point. Setting it `false`
+makes the rules **inert without dropping them** — a clean way to toggle formatting off and back on.
+
+## Gotchas
+
+- No-op on a grid that has no `conditionalFormats` rules.
+- Always shown in the settings sheet ("Display"); rules compose with the `classNames` / `styles`
+  CSS slots.

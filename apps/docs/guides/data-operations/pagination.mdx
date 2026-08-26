@@ -1,0 +1,20 @@
+## When to use it
+
+On by default — page through rows instead of one long scroll. Pass an object to size the pages.
+
+## How it works
+
+`boolean | { pageSize }`. Client-side by default; switch to server paging with manual mode +
+`pageCount`. Page-size choices come from `pageSizeOptions` (numbers, or `'all'`).
+
+```tsx
+<BstTableMui data={rows} columns={columns} getRowId={(r) => r.id}
+  pagination={{ pageSize: 25 }} pageSizeOptions={[10, 25, 50, 'all']} />
+```
+
+## Gotchas
+
+- The footer bar is `showPagination` (on by default) — turn that off to keep paging logic but hide
+  the bar.
+- For infinite scroll instead of pages, use `enableVirtualization` + `useBstInfiniteDataSource` and
+  set `pagination={false}`.

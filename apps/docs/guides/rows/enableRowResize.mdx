@@ -1,0 +1,16 @@
+## When to use it
+
+Let users set a row's height by dragging — handy for rows with images or wrapped text they want
+taller.
+
+## How it works
+
+Adds a drag handle on a row's bottom edge; dragging sets that row's height (kept in local state).
+**Double-click** the handle to reset. It's **always shown** in the settings sheet ("Rows"), so an
+end-user can switch it on without developer wiring.
+
+## Gotchas
+
+- Manual height clips overflow — pair with `enableAutoRowHeight` if you'd rather rows grow to fit
+  content automatically.
+- Heights are per grid instance and reset on unmount unless you persist them.

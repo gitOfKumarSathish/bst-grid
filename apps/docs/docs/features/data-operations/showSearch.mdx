@@ -17,6 +17,19 @@ Prop `showSearch` — adapter chrome, default `true`.
 | Default | `true` |
 | Status | ✅ done |
 
+## When to use it
+
+On by default — the global search box in the toolbar.
+
+## How it works
+
+Renders the search input and drives the engine's global filter.
+
+## Gotchas
+
+- **Requires `enableGlobalFilter`** (on by default) — the box is inert without it.
+- It's toolbar chrome, so it also needs `showToolbar` to be visible.
+
 ## Enable it
 
 ```tsx

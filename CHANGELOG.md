@@ -19,8 +19,9 @@ this project uses [Semantic Versioning](https://semver.org).
   flag / cell type / export is undocumented. No engine/adapter code or capability changed.
 - **Human quality layer (Phase 2)** — hand-written prose partials in `apps/docs/guides/` are
   **injected** into the generated feature pages by `gen-features.mjs` and survive regeneration: a
-  "when to use / how it works / gotchas" guide for every **Editing** flag, plus a group overview for
-  all 9 feature groups.
+  "when to use / how it works / gotchas" guide for **every one of the 58 feature flags** across all 9
+  groups, plus a per-group overview — each dependency-accurate (requires / implies / sub-toggle) from
+  the §12 registry.
 - **Authored pages + ship setup (Phase 3)** — hand-written **Getting Started**, **Styling &
   Theming**, **AI Agents & MCP**, and a vendor-neutral **Migration** guide; Coverage moved last;
   `docusaurus.config.js` pointed at `bst-grid.pages.dev`; an `apps/docs/README.md` with run /

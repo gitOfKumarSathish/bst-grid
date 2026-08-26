@@ -18,6 +18,19 @@ Prop `enableCopyRow` — engine behaviour, default `true`.
 | Status | ✅ done |
 | Settings sheet | Selection & clipboard |
 
+## When to use it
+
+Keep (or remove) the "copy the whole row" affordance — Shift+Space.
+
+## How it works
+
+A **sub-toggle of clipboard** (on by default) gating `selectRow` / `copyRow`.
+
+## Gotchas
+
+- Only relevant when `enableClipboard` is on.
+- Set it `false` to allow range/column copy but forbid whole-row copy.
+
 ## Enable it
 
 ```tsx
