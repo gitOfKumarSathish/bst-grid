@@ -1,10 +1,10 @@
 ---
 id: enableCopyRow
-title: Copy row (H2)
+title: Copy row
 sidebar_label: enableCopyRow
 ---
 
-# Copy row (H2)
+# Copy row
 
 Prop `enableCopyRow` — engine behaviour, default `true`.
 
@@ -39,11 +39,11 @@ A **sub-toggle of clipboard** (on by default) gating `selectRow` / `copyRow`.
 | Since | v0.27.0 |
 | Settings sheet | Selection & clipboard |
 
-Copy a whole **row** (H2) — the Shift+Space gesture / `runtime.copyRow`. A sub-toggle of clipboard; set `false` to disable row-copy. Default: true.
+Copy a whole **row** — the Shift+Space gesture / `runtime.copyRow`. A sub-toggle of clipboard; set `false` to disable row-copy. Default: true.
 
 ## Enable it
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}
@@ -59,5 +59,7 @@ Copy a whole **row** (H2) — the Shift+Space gesture / `runtime.copyRow`. A sub
 - Defaults to ON — set false to disable Shift+Space row copy while keeping the rest of the clipboard.
 
 ## Spec coverage
+
+> **Spec codes** (`A1`, `C2`, `X8`, …) are Bst-Table's internal requirement IDs from the capability matrix; `P0`–`P2` mark the delivery phase. They are traceability tags, not part of the public API.
 
 - **H2 · Copy row** — ✅ built. P3

@@ -19,7 +19,7 @@ On by default — page through rows instead of one long scroll. Pass an object t
 `boolean | { pageSize }`. Client-side by default; switch to server paging with manual mode +
 `pageCount`. Page-size choices come from `pageSizeOptions` (numbers, or `'all'`).
 
-```tsx
+```tsx no-check
 <BstTableMui data={rows} columns={columns} getRowId={(r) => r.id}
   pagination={{ pageSize: 25 }} pageSizeOptions={[10, 25, 50, 'all']} />
 ```
@@ -51,7 +51,7 @@ Pagination behaviour + initial page size. `false` shows all rows. Default: true.
 
 ## Enable it
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}

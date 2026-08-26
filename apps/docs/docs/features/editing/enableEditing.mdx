@@ -1,12 +1,12 @@
 ---
 id: enableEditing
-title: Batch editing + single-call save (C2/I2/I4)
+title: Inline editing
 sidebar_label: enableEditing
 ---
 
-# Batch editing + single-call save (C2/I2/I4)
+# Inline editing
 
-Prop `enableEditing` — engine behaviour, default `— (opt-in)`.
+Prop `enableEditing` — engine behaviour, default `false`.
 
 ## Guide
 
@@ -20,7 +20,7 @@ layer — validation, undo/redo, row actions and the batch review sheet all buil
 `enableEditing` opens an **edit session** on a cell (or row) and writes the result back through
 your handler. Choose the granularity with the `mode` option:
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}
@@ -51,10 +51,10 @@ your handler. Choose the granularity with the `mode` option:
 | | |
 | --- | --- |
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
-| Type | `EditingOptions + callback` |
-| Default | `— (opt-in)` |
-| Maps to | third editing mode: EVERY edit/paste stays an unsaved draft; runtime.getChangeSet() (old→new + formatted text), revertCell/revertRow, formatValue. onSave(event) fires once per save action (commitAll/commitRowSession) with &#123; changes, rows[].patch, next &#125; — ONE batched API call, never per cell/row/column; a rejected onSave keeps every draft. Mode is settings-toggleable via enableBatchEditing (next rows) |
-| Status | ✅ done |
+| Type | `boolean \| {mode,saveOn,policy}` |
+| Default | `false` |
+| Maps to | custom feature |
+| Status | ✅ done (Phase 2) |
 | Since | v0.2.0 |
 | Settings sheet | Editing |
 
@@ -62,11 +62,11 @@ Inline editing feature. `boolean | EditingOptions`. Default: false (opt-in).
 
 ## Enable it
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}
-  enableEditing={/* EditingOptions + callback */}
+  enableEditing={/* boolean | {mode,saveOn,policy} */}
 />
 ```
 
@@ -76,7 +76,6 @@ Inline editing feature. `boolean | EditingOptions`. Default: false (opt-in).
 
 | Option | Notes |
 | --- | --- |
-| `onSave` | Related prop for this feature. |
 | `getRowId` | edits target rows by id, never by index |
 | `onDataChange` | without it committed edits have nowhere to go |
 
@@ -85,6 +84,8 @@ Inline editing feature. `boolean | EditingOptions`. Default: false (opt-in).
 - Modes: 'cell' (default, commit per cell) · 'row' (deferred row session) · 'batch' (every edit stays a draft until an explicit save).
 
 ## Spec coverage
+
+> **Spec codes** (`A1`, `C2`, `X8`, …) are Bst-Table's internal requirement IDs from the capability matrix; `P0`–`P2` mark the delivery phase. They are traceability tags, not part of the public API.
 
 - **C2 · Save on Enter/Blur/Explicit** — ✅ built. P2
 - **I2 · Cell events + deferred save** — ✅ built. P2 (C2≡I2)

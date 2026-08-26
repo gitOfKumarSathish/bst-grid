@@ -1,10 +1,10 @@
 ---
 id: enableAutoRowHeight
-title: Auto row height (X26)
+title: Auto row height
 sidebar_label: enableAutoRowHeight
 ---
 
-# Auto row height (X26)
+# Auto row height
 
 Prop `enableAutoRowHeight` — engine behaviour, default `false`.
 
@@ -45,11 +45,11 @@ Dependency-free and browser-measured: body cells switch to `white-space: normal`
 | Since | v0.35.0 |
 | Settings sheet | Rows |
 
-Auto row height (X26) — rows grow to fit **wrapped** content instead of truncating each cell to one line; the browser measures the content, so no JS measurement is needed. Every body cell wraps; opt individual columns in (or out) with `meta.wrapText`. Composes with manual row resize (a resized row keeps its explicit height and clips the wrapped content). Default: false.
+Auto row height — rows grow to fit **wrapped** content instead of truncating each cell to one line; the browser measures the content, so no JS measurement is needed. Every body cell wraps; opt individual columns in (or out) with `meta.wrapText`. Composes with manual row resize (a resized row keeps its explicit height and clips the wrapped content). Default: false.
 
 ## Enable it
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}

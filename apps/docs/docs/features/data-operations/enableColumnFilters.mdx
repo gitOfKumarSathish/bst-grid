@@ -46,7 +46,7 @@ Per-column filtering behaviour (drives the E3 filter builder). Maps to v9 `enabl
 
 ## Enable it
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}
@@ -57,5 +57,7 @@ Per-column filtering behaviour (drives the E3 filter builder). Maps to v9 `enabl
 > Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
 
 ## Spec coverage
+
+> **Spec codes** (`A1`, `C2`, `X8`, …) are Bst-Table's internal requirement IDs from the capability matrix; `P0`–`P2` mark the delivery phase. They are traceability tags, not part of the public API.
 
 - **E3 · Advanced filtering** — ✅ built. P3 — filter builder + bstCondition

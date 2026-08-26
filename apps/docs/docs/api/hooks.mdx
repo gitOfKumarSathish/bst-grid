@@ -13,7 +13,7 @@ React hooks — the engine entry points.
 
 Drives a `DataSource` for server-side sort / filter / pagination and returns `tableProps` to spread into `useBstTable` (or an adapter). Manages the request lifecycle: **aborts** superseded requests, ignores **stale** responses, **debounces** filter/quick-filter changes (sort + paging are immediate), and **resets to page 0** exactly when the (debounced) result set changes — so a pagination inside the debounce window can't strand the grid on an empty page. The grid's existing chrome (sort headers, filter row, search box, pagination bar) drives it unchanged. **Grouping/expansion are not server-driven** — use those in client mode only.
 
-```tsx
+```tsx no-check
 const ds = useBstDataSource(source, { pageSize: 25 }) <BstTableShadcn columns={columns} getRowId={r => r.id} {...ds.tableProps} />
 ```
 
@@ -38,7 +38,7 @@ function useBstGrid<TData extends RowData>(opts: UseBstTableOptions<TData>): {
 
 Persist a grid's view state to storage and keep it in sync (X21). For a **flash-free restore**, feed `loadGridState(key)` into `useBstTable({ initialState })` so the grid mounts already arranged; this hook then writes later changes back (debounced).
 
-```tsx
+```tsx no-check
 const table = useBstTable({ data, columns, initialState: loadGridState('orders') }) const view = useBstGridState(table, { key: 'orders' }) // <button onClick={view.reset}>Reset view</button>
 ```
 

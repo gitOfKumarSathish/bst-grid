@@ -1,10 +1,10 @@
 ---
 id: enableUndoRedo
-title: Undo/redo (C5)
+title: Undo/redo
 sidebar_label: enableUndoRedo
 ---
 
-# Undo/redo (C5)
+# Undo/redo
 
 Prop `enableUndoRedo` — engine behaviour, default `false`.
 
@@ -20,7 +20,7 @@ yourself.
 `enableUndoRedo` snapshots the data on each committed change and replays through the **same**
 `onDataChange` path when the user undoes or redoes, so your state stays the single source of truth:
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}
@@ -59,11 +59,11 @@ Add `showUndoRedo` for toolbar buttons alongside the keyboard shortcuts.
 | Since | v0.6.0 |
 | Settings sheet | Editing |
 
-Undo / redo of committed data changes (Phase 3, C5) — cell edits, paste, and row add/delete/duplicate. Ctrl/Cmd+Z undoes, Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y redoes; adapters also render Undo/Redo buttons. Snapshot-based, so it needs `onDataChange`. Default: false (opt-in).
+Undo / redo of committed data changes — cell edits, paste, and row add/delete/duplicate. Ctrl/Cmd+Z undoes, Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y redoes; adapters also render Undo/Redo buttons. Snapshot-based, so it needs `onDataChange`. Default: false (opt-in).
 
 ## Enable it
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}
@@ -80,5 +80,7 @@ Undo / redo of committed data changes (Phase 3, C5) — cell edits, paste, and r
 | `onDataChange` | undo/redo is snapshot-based and replays through your data setter |
 
 ## Spec coverage
+
+> **Spec codes** (`A1`, `C2`, `X8`, …) are Bst-Table's internal requirement IDs from the capability matrix; `P0`–`P2` mark the delivery phase. They are traceability tags, not part of the public API.
 
 - **C5 · Shortcuts (arrows/undo-redo)** — ✅ built. P3 — nav + enableUndoRedo

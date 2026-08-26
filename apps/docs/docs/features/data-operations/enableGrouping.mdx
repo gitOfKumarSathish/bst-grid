@@ -1,10 +1,10 @@
 ---
 id: enableGrouping
-title: Grouping (E4)
+title: Grouping
 sidebar_label: enableGrouping
 ---
 
-# Grouping (E4)
+# Grouping
 
 Prop `enableGrouping` — engine behaviour, default `false`.
 
@@ -44,11 +44,11 @@ in the group header. Both skins add a group toggle (▤) in the columns menu.
 | Since | v0.15.0 |
 | Settings sheet | Data operations |
 
-Multi-column grouping (E4) — group rows by one or more columns, with collapsible group headers and per-column aggregates. Opt-in. Default false. Set which columns to group via `initialState.grouping` (or `table.setGrouping`); a column aggregates by declaring `aggregationFn` (`'sum' | 'count' | 'mean' | 'min' | 'max' | 'extent' | 'uniqueCount'`). Maps to v9 `enableGrouping` + `columnGroupingFeature`.
+Multi-column grouping — group rows by one or more columns, with collapsible group headers and per-column aggregates. Opt-in. Default false. Set which columns to group via `initialState.grouping` (or `table.setGrouping`); a column aggregates by declaring `aggregationFn` (`'sum' | 'count' | 'mean' | 'min' | 'max' | 'extent' | 'uniqueCount'`). Maps to v9 `enableGrouping` + `columnGroupingFeature`.
 
 ## Enable it
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}
@@ -69,5 +69,7 @@ Multi-column grouping (E4) — group rows by one or more columns, with collapsib
 - Set which columns to group via `initialState.grouping` (or `table.setGrouping`); a column aggregates by declaring `aggregationFn`.
 
 ## Spec coverage
+
+> **Spec codes** (`A1`, `C2`, `X8`, …) are Bst-Table's internal requirement IDs from the capability matrix; `P0`–`P2` mark the delivery phase. They are traceability tags, not part of the public API.
 
 - **E4 · Multi-column grouping** — ✅ built. v0.15.0 — enableGrouping + aggregates + group toggle

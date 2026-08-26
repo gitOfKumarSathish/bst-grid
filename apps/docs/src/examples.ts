@@ -211,6 +211,63 @@ export default function App() {
 `,
 }
 
+// ---- shadcn skin demos -----------------------------------------------------
+// The same engine, rendered by @bloomskill/table-shadcn. Needs BOTH stylesheets
+// (engine + shadcn). Mirrors the MUI examples so the two skins are directly
+// comparable; `dark` forces the self-contained zinc palette's dark mode.
+const SHADCN_HEAD = `import React from 'react'
+import { BstTableShadcn } from '@bloomskill/table-shadcn'
+import type { BstTableColumn } from '@bloomskill/table-engine'
+import '@bloomskill/table-engine/styles.css'
+import '@bloomskill/table-shadcn/styles.css'
+
+type Row = { id: string; name: string; team: string; role: string; score: number }
+const seed: Row[] = [
+  { id: '1', name: 'Ada Lovelace',   team: 'Platform', role: 'Engineer', score: 92 },
+  { id: '2', name: 'Alan Turing',    team: 'Research', role: 'Scientist', score: 88 },
+  { id: '3', name: 'Grace Hopper',   team: 'Platform', role: 'Engineer', score: 95 },
+  { id: '4', name: 'Katherine J.',   team: 'Research', role: 'Analyst',  score: 90 },
+  { id: '5', name: 'Edsger Dijkstra',team: 'Platform', role: 'Architect',score: 84 },
+]
+const columns: BstTableColumn<Row>[] = [
+  { id: 'name',  accessorKey: 'name',  header: 'Name' },
+  { id: 'team',  accessorKey: 'team',  header: 'Team' },
+  { id: 'role',  accessorKey: 'role',  header: 'Role' },
+  { id: 'score', accessorKey: 'score', header: 'Score', sortFn: 'basic' },
+]
+`
+
+EXAMPLES['shadcn-data-operations'] = SHADCN_HEAD + `export default function App() {
+  return (
+    <BstTableShadcn data={seed} columns={columns} getRowId={(r) => r.id}
+      pagination={{ pageSize: 5 }} />
+  )
+}
+`
+
+EXAMPLES['shadcn-editing'] = SHADCN_HEAD + `const editable: BstTableColumn<Row>[] = columns.map((c) =>
+  c.id === 'name' || c.id === 'score'
+    ? { ...c, meta: { type: c.id === 'score' ? 'number' : 'text', editable: true } }
+    : c,
+)
+export default function App() {
+  const [rows, setRows] = React.useState(seed)
+  return (
+    <BstTableShadcn data={rows} columns={editable} getRowId={(r) => r.id}
+      enableEditing={{ mode: 'cell' }} onDataChange={setRows} />
+  )
+}
+`
+
+EXAMPLES['shadcn-dark'] = SHADCN_HEAD + `export default function App() {
+  // The shadcn skin's self-contained zinc palette, forced into dark mode via \`dark\`.
+  return (
+    <BstTableShadcn data={seed} columns={columns} getRowId={(r) => r.id}
+      dark pagination={{ pageSize: 5 }} />
+  )
+}
+`
+
 // ---- per-cell-type demos — a small 2-column grid per cell type -------------
 // Each renders `Item` + one column of the given `meta.type` with correct data.
 const CELL_DEMO_DATA: Record<string, { rows: string; col: string }> = {

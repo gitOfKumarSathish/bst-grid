@@ -1,10 +1,10 @@
 ---
 id: enableConditionalFormatting
-title: Conditional formatting runtime toggle (K3)
+title: Conditional formatting runtime toggle
 sidebar_label: enableConditionalFormatting
 ---
 
-# Conditional formatting runtime toggle (K3)
+# Conditional formatting runtime toggle
 
 Prop `enableConditionalFormatting` — engine behaviour, default `true`.
 
@@ -44,11 +44,11 @@ makes the rules **inert without dropping them** — a clean way to toggle format
 | Since | v0.29.0 |
 | Settings sheet | Display |
 
-Conditional formatting (K3) — whether the `conditionalFormats` rules are applied. The rules themselves stay on `conditionalFormats` (presence is the developer opt-in); this flag lets the applied styling be switched off/on at runtime — e.g. from the settings sheet — without dropping the rules. Default: true.
+Conditional formatting — whether the `conditionalFormats` rules are applied. The rules themselves stay on `conditionalFormats` (presence is the developer opt-in); this flag lets the applied styling be switched off/on at runtime — e.g. from the settings sheet — without dropping the rules. Default: true.
 
 ## Enable it
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}
@@ -69,5 +69,7 @@ Conditional formatting (K3) — whether the `conditionalFormats` rules are appli
 - Defaults to ON — it is the runtime off-switch for rules already passed, not the opt-in.
 
 ## Spec coverage
+
+> **Spec codes** (`A1`, `C2`, `X8`, …) are Bst-Table's internal requirement IDs from the capability matrix; `P0`–`P2` mark the delivery phase. They are traceability tags, not part of the public API.
 
 - **K3 · Conditional formatting** — ✅ built. v0.18.0 — rule engine + &lt;BstConditionalFormatBuilder&gt;

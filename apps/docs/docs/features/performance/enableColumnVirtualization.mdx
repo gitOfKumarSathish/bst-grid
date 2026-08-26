@@ -1,10 +1,10 @@
 ---
 id: enableColumnVirtualization
-title: Column virtualization (D1)
+title: Column virtualization
 sidebar_label: enableColumnVirtualization
 ---
 
-# Column virtualization (D1)
+# Column virtualization
 
 Prop `enableColumnVirtualization` — engine behaviour, default `false`.
 
@@ -42,11 +42,11 @@ via spacer cells as columns scroll in and out.
 | Since | v0.33.0 |
 | Settings sheet | Performance |
 
-Column virtualization (D1) — also window the columns horizontally, for very wide (100+ column) grids. Sub-toggle of `enableVirtualization` (needs it on). Falls back to rendering all columns when column pinning, `fitColumns`, grouped headers or cell spanning is active. Default false.
+Column virtualization — also window the columns horizontally, for very wide (100+ column) grids. Sub-toggle of `enableVirtualization` (needs it on). Falls back to rendering all columns when column pinning, `fitColumns`, grouped headers or cell spanning is active. Default false.
 
 ## Enable it
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}
@@ -62,5 +62,7 @@ Column virtualization (D1) — also window the columns horizontally, for very wi
 - Also windows columns horizontally, for very wide grids. Falls back to all-columns under column pinning, `fitColumns`, grouped headers or cell spanning.
 
 ## Spec coverage
+
+> **Spec codes** (`A1`, `C2`, `X8`, …) are Bst-Table's internal requirement IDs from the capability matrix; `P0`–`P2` mark the delivery phase. They are traceability tags, not part of the public API.
 
 - **D1 · Row & column virtualization** — ✅ built. enableVirtualization (+ enableColumnVirtualization) on @tanstack/react-virtual — windowed rows (dynamic measure) + columns, sticky header, bounded DOM; yields to master-detail / grouping / cell spanning / row pinning. Tested (virtualization.test.tsx)

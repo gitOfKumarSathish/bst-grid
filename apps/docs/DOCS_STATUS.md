@@ -80,11 +80,20 @@ Coverage gate (`check-docs-coverage.mjs`) is **green** — every flag, cell and 
 2. **Animated hero GIF** — only a static hero exists. Needs a screen recording of the live grid.
 3. **Guides for any NEW flags** from future corpus re-dumps — the last re-dump grew the corpus to 90 and
    every toggle is now covered; a future flag needs a new `guides/<group>/<flag>.mdx` (the gate will flag it).
-4. **Sandpack dep pins** in `src/components/BstSandbox.tsx` load the **published 0.41.0**; features newer
-   than that (e.g. `enableFind`@0.42.0) can't render live until 0.42.0+ is published — bump the pins then.
-   (Their **screenshots** are already captured from `apps/demo`, so the pages aren't bare.)
+4. **Sandpack dep pins** in `src/components/BstSandbox.tsx` are now **driven by `version.ini`** (via a
+   `docusaurus.config` customField), so a release can't leave them stale. They currently resolve to
+   **0.44.0**, so the live demos need **0.44.0 published to npm** to render (npm latest is 0.41.0); until
+   then the static `<CodeBlock>` source (now in the server HTML) + screenshots keep the pages informative.
 
-**Recently completed** (was on this list): **deployed live on GitHub Pages**
+**Recently completed** (2026-08-26, "worth-it" docs pass): **compiler-checked snippets**
+(`docs:snippets` → `scripts/check-snippets.mjs`; 8 complete examples verified against the built
+packages, 115 intentional fragments tagged `no-check`) ✅ · **Installation** + **Recipes** pages ✅ ·
+**static SSR `<CodeBlock>` above every Sandpack** (example code now in the server-rendered HTML) ✅ ·
+**shadcn examples** in `examples.ts` (was 0) ✅ · **spec codes out of feature titles** + a Spec-coverage
+legend ✅ · **`enableEditing` page mis-map fixed** (dedupe in `dump-corpus` → "Inline editing") ✅ ·
+**real server-rendered landing page** (`src/pages/index.js`) ✅ · **Sandpack pin driven by `version.ini`** ✅.
+
+**Earlier** (was on this list): **deployed live on GitHub Pages**
 (`https://gitofkumarsathish.github.io/bst-grid/`) ✅ · **merged to `main`** + branch deleted ✅ ·
 `action`/`actionMenu` cell screenshots ✅ · the 24 distinct-feature screenshots (pinning, selection,
 filters, status bar, find, context menu, overlays, spanning, …) ✅ · a live demo on every feature page ✅ ·

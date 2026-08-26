@@ -1,10 +1,10 @@
 ---
 id: enablePrint
-title: Print (X3)
+title: Print
 sidebar_label: enablePrint
 ---
 
-# Print (X3)
+# Print
 
 Prop `enablePrint` — engine behaviour, default `true`.
 
@@ -40,11 +40,11 @@ opens a print-friendly window (with a hidden-iframe fallback).
 | Since | v0.34.0 |
 | Settings sheet | Export |
 
-Print sub-toggle (X3). `false` hides the Print menu item and makes `runtime.printTable()` a no-op. Needs `enableExport`. Default: true.
+Print sub-toggle. `false` hides the Print menu item and makes `runtime.printTable` a no-op. Needs `enableExport`. Default: true.
 
 ## Enable it
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}

@@ -1,0 +1,160 @@
+---
+id: installation
+title: Installation
+sidebar_label: Installation
+sidebar_position: 1.1
+slug: /installation
+---
+
+# Installation
+
+Bst-Table is a headless **engine** (`@bloomskill/table-engine`) plus a style **skin**. You install
+the engine, one skin, and that skin's peer libraries — then import the engine stylesheet. This page
+has the exact packages and imports for each skin and framework, and a troubleshooting section for
+the mistakes that bite first.
+
+## Supported React versions
+
+Both the engine and the skins declare a peer dependency of **`react` / `react-dom` `>=18`**, so
+Bst-Table runs on **React 18 and React 19**. There is no React 17 build.
+
+## Material UI skin
+
+Install the engine, the MUI skin, and MUI + Emotion (the skin's peers):
+
+```bash
+npm install @bloomskill/table-mui @bloomskill/table-engine \
+  @mui/material @mui/icons-material @emotion/react @emotion/styled \
+  react react-dom
+```
+
+Peer versions the MUI skin expects: `@mui/material` **>=6**, `@mui/icons-material` **>=6**,
+`@emotion/react` **>=11**, `@emotion/styled` **>=11**.
+
+Import the **engine stylesheet** (always required) and render the skin:
+
+```tsx
+import { BstTableMui } from '@bloomskill/table-mui'
+import type { BstTableColumn } from '@bloomskill/table-engine'
+import '@bloomskill/table-engine/styles.css'
+
+type Person = { id: string; name: string; role: string }
+
+const columns: BstTableColumn<Person>[] = [
+  { id: 'name', accessorKey: 'name', header: 'Name' },
+  { id: 'role', accessorKey: 'role', header: 'Role' },
+]
+
+export default function People({ rows }: { rows: Person[] }) {
+  return <BstTableMui data={rows} columns={columns} getRowId={(r) => r.id} />
+}
+```
+
+## shadcn / Radix skin
+
+The shadcn skin ships a self-contained **zinc** palette (no Tailwind build required) and uses Radix
+for its menus:
+
+```bash
+npm install @bloomskill/table-shadcn @bloomskill/table-engine \
+  @radix-ui/react-dropdown-menu react react-dom
+```
+
+Peer version: `@radix-ui/react-dropdown-menu` **>=2**. Icon packs
+(`lucide-react`, `@tabler/icons-react`, `@phosphor-icons/react`, …) are **optional** — the skin ships
+built-in SVGs and only pulls a pack in if you opt into one of the `@bloomskill/table-shadcn/icons/*`
+presets.
+
+The shadcn skin needs **two** stylesheets — the engine's, then its own:
+
+```tsx
+import { BstTableShadcn } from '@bloomskill/table-shadcn'
+import type { BstTableColumn } from '@bloomskill/table-engine'
+import '@bloomskill/table-engine/styles.css'
+import '@bloomskill/table-shadcn/styles.css' // shadcn skin needs both
+
+type Person = { id: string; name: string; role: string }
+
+const columns: BstTableColumn<Person>[] = [
+  { id: 'name', accessorKey: 'name', header: 'Name' },
+  { id: 'role', accessorKey: 'role', header: 'Role' },
+]
+
+export default function People({ rows }: { rows: Person[] }) {
+  return <BstTableShadcn data={rows} columns={columns} getRowId={(r) => r.id} dark />
+}
+```
+
+## Next.js (App Router)
+
+The grid is an **interactive client component** — it uses React state, effects and browser APIs — so
+the file that renders it must carry the `'use client'` directive at the very top. Import the
+stylesheet(s) from that same client module (or your root layout):
+
+```tsx
+'use client'
+
+import { BstTableMui } from '@bloomskill/table-mui'
+import type { BstTableColumn } from '@bloomskill/table-engine'
+import '@bloomskill/table-engine/styles.css'
+
+type Row = { id: string; name: string }
+
+const columns: BstTableColumn<Row>[] = [{ id: 'name', accessorKey: 'name', header: 'Name' }]
+
+export function DataGrid({ rows }: { rows: Row[] }) {
+  return <BstTableMui data={rows} columns={columns} getRowId={(r) => r.id} />
+}
+```
+
+You can still **fetch on the server**: keep your `page.tsx` a Server Component that loads the data,
+then pass it as props into this client `DataGrid`. Only the grid itself needs `'use client'`.
+
+## Vite / Create React App / plain React
+
+No framework-specific setup — install the packages above, import the engine stylesheet once (in your
+entry file or the component), and render the skin. The CSS is plain (no Tailwind/PostCSS step needed
+for either skin's default palette).
+
+## Troubleshooting
+
+### The grid renders unstyled (no borders, no spacing)
+
+You didn't import the **engine stylesheet**. `import '@bloomskill/table-engine/styles.css'` is
+required for **both** skins; the shadcn skin additionally needs
+`import '@bloomskill/table-shadcn/styles.css'`. Import them once, anywhere in your bundle.
+
+### Edits (or selection) land on the wrong row after sorting/filtering
+
+You didn't pass **`getRowId`**. Editing, selection and clipboard target rows **by id**; without
+`getRowId` the grid falls back to the row's position, so once the user sorts or filters, a change
+meant for one row lands on whichever row now sits at that index. Always pass a stable id:
+
+```tsx no-check
+<BstTableMui data={rows} columns={columns} getRowId={(r) => r.id} />
+```
+
+### The MUI skin ignores my theme (colors / dark mode)
+
+`@bloomskill/table-mui` reads your MUI theme through **`ThemeProvider`**. If the grid isn't rendered
+**inside** a `ThemeProvider` (or it sits above it in the tree), the grid falls back to MUI's default
+theme. Wrap the grid — or your app — in the provider. See [Styling & Theming](./theming.mdx).
+
+### `useState`/`useEffect`… only works in Client Components (Next.js / RSC)
+
+The grid is a Client Component but it's being rendered from a Server Component without the directive.
+Add **`'use client'`** to the top of the file that renders `<BstTableMui>` / `<BstTableShadcn>` (see
+[Next.js](#nextjs-app-router) above). Server Components can fetch the data and pass it in as props,
+but the grid element itself must live in a client module.
+
+### Type error: `Cannot find module '@bloomskill/table-engine/styles.css'`
+
+That import is a CSS **side effect**, not a type. Your bundler handles it at build time; if your
+TypeScript setup type-checks CSS imports, add a `declare module '*.css'` ambient declaration (most
+Next.js / Vite / CRA setups already ship one).
+
+## Next steps
+
+- [Recipes](./recipes.mdx) — complete, copy-pasteable apps: server data, save-to-API, custom cells.
+- [Getting Started](./getting-started.mdx) — the five-minute tour and skin comparison.
+- [Feature Guides](./features/index.mdx) — every `enable*` / `show*` flag.

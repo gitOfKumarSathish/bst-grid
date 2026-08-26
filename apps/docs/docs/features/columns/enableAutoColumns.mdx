@@ -1,10 +1,10 @@
 ---
 id: enableAutoColumns
-title: Auto-generate columns (X27)
+title: Auto-generate columns
 sidebar_label: enableAutoColumns
 ---
 
-# Auto-generate columns (X27)
+# Auto-generate columns
 
 Prop `enableAutoColumns` — engine behaviour, default `false`.
 
@@ -21,7 +21,7 @@ Pass `columns={[]}` and turn this on: the engine samples the first rows, infers 
 (number / boolean / date, else text) and a humanized header. The moment you pass real `columns`,
 they win and this is ignored.
 
-```tsx
+```tsx no-check
 <BstTableMui data={rows} columns={[]} getRowId={(r) => r.id} enableAutoColumns />
 ```
 
@@ -49,11 +49,11 @@ Tune it with the `autoColumns` option (`sampleRows`, `include`, `exclude`, `head
 | Since | v0.40.0 |
 | Settings sheet | Columns |
 
-Auto-generate columns from data (X27) — when **no `columns` are supplied** (an empty array), infer them from the row data: one column per key found in a sample of rows, with the cell type guessed from the value (number / boolean / date / text) and a humanized header. Ignored the moment `columns` is non-empty, so explicit columns always win. Tune via `autoColumns`. Default: false.
+Auto-generate columns from data — when **no `columns` are supplied** (an empty array), infer them from the row data: one column per key found in a sample of rows, with the cell type guessed from the value (number / boolean / date / text) and a humanized header. Ignored the moment `columns` is non-empty, so explicit columns always win. Tune via `autoColumns`. Default: false.
 
 ## Enable it
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}

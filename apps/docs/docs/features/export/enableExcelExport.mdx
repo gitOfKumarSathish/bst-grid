@@ -1,10 +1,10 @@
 ---
 id: enableExcelExport
-title: Excel export (X2)
+title: Excel export
 sidebar_label: enableExcelExport
 ---
 
-# Excel export (X2)
+# Excel export
 
 Prop `enableExcelExport` — engine behaviour, default `true`.
 
@@ -41,11 +41,11 @@ item; produces a real `.xlsx` (hand-built store-only ZIP + SpreadsheetML, numeri
 | Since | v0.34.0 |
 | Settings sheet | Export |
 
-Excel `.xlsx` export sub-toggle (X2). `false` hides the Excel menu item and makes `runtime.exportExcel()` a no-op. Needs `enableExport`. Default: true.
+Excel `.xlsx` export sub-toggle. `false` hides the Excel menu item and makes `runtime.exportExcel` a no-op. Needs `enableExport`. Default: true.
 
 ## Enable it
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}

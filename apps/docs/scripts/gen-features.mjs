@@ -86,17 +86,45 @@ const code = (s) => '`' + s + '`'
 const codeCell = (s) => '`' + String(s).replace(/\|/g, '\\|') + '`' // pipe-safe inside table cells
 const fmDefault = (d) => (d === 'true' ? 'on' : d === 'false' ? 'off' : d)
 
+// ---- spec-code hygiene (P1) -----------------------------------------------
+// Spec / roadmap codes (C2, I4, X8, K1/K2, §12, "Phase 5") are Bst-Table's internal
+// requirement IDs. They belong in the "Spec coverage" block (with the legend below),
+// NOT in titles or lead-in prose where they read as jargon.
+// Titles: drop a trailing "(…)" that starts with a code, e.g. "Find (X8)" → "Find",
+// "Per-column edit lock (F3, runtime)" → "Per-column edit lock".
+const cleanFeature = (name) => String(name || '').replace(/\s*\([A-Z]\d[^)]*\)\s*$/, '').trim()
+// Prose: drop only parentheticals whose ENTIRE content is codes / phase refs — so
+// "(X8)" and "(Phase 5, X1–X3)" go, but "(an object implies enabled, §12)" (real
+// words) is left intact.
+function stripSpecCodes(s) {
+  if (!s) return s
+  return String(s)
+    .replace(/\s*\(([^)]*)\)/g, (m, inner) => {
+      const residue = inner
+        .replace(/\bPhase\s*\d+/gi, '')
+        .replace(/[§A-Z]?\d[\w.]*/g, '')
+        .replace(/[\s,/–—-]+/g, '')
+      return residue === '' ? '' : m
+    })
+    .replace(/[ \t]{2,}/g, ' ')
+    .trim()
+}
+const SPEC_LEGEND =
+  "> **Spec codes** (`A1`, `C2`, `X8`, …) are Bst-Table's internal requirement IDs from the " +
+  'capability matrix; `P0`–`P2` mark the delivery phase. They are traceability tags, not part of ' +
+  'the public API.'
+
 // ---- per-page render ------------------------------------------------------
 function renderPage(f) {
   const L = []
   const isChrome = f.layer === 'chrome'
   L.push('---')
   L.push(`id: ${f.flag}`)
-  L.push(`title: ${f.feature.replace(/:/g, ' -')}`)
+  L.push(`title: ${cleanFeature(f.feature).replace(/:/g, ' -')}`)
   L.push(`sidebar_label: ${f.flag}`)
   L.push('---')
   L.push('')
-  L.push(`# ${mdxSafe(f.feature)}`)
+  L.push(`# ${mdxSafe(cleanFeature(f.feature))}`)
   L.push('')
   L.push(`Prop \`${f.flag}\` — ${isChrome ? 'adapter chrome' : 'engine behaviour'}, `
     + `default \`${f.default}\`.`)
@@ -122,12 +150,14 @@ function renderPage(f) {
   if (f.since) L.push(`| Since | v${f.since} |`)
   if (f.group) L.push(`| Settings sheet | ${f.group} |`)
   L.push('')
-  if (f.doc) { L.push(mdxSafe(f.doc)); L.push('') }
+  if (f.doc) { L.push(mdxSafe(stripSpecCodes(f.doc))); L.push('') }
 
-  // Enable it
+  // Enable it — an intentional fragment (undeclared rows/columns focus attention on
+  // the flag), so it is `no-check`: docs:snippets skips it. The flag NAME is already
+  // corpus-verified (dumped from the engine types), so nothing is lost by skipping.
   L.push('## Enable it')
   L.push('')
-  L.push('```tsx')
+  L.push('```tsx no-check')
   if (isChrome) {
     const req = RULES[f.flag]?.requires?.[0]
     L.push('<BstTableMui')
@@ -181,6 +211,8 @@ function renderPage(f) {
   if (leaves.length) {
     L.push('## Spec coverage')
     L.push('')
+    L.push(SPEC_LEGEND)
+    L.push('')
     for (const leaf of leaves) {
       const badge = leaf.status === 'built' ? '✅ built' : leaf.status === 'partial' ? '🟡 partial' : '❌ not built'
       L.push(`- **${leaf.id} · ${mdxSafe(leaf.title)}** — ${badge}. ${mdxSafe(leaf.notes)}`)
@@ -220,7 +252,7 @@ for (const [name, slug, blurb] of GROUPS) {
     `# ${name}`, '', blurb, '',
     ...(groupOverview ? [groupOverview, ''] : []),
     '| Feature | Flag | Default |', '| --- | --- | --- |',
-    ...items.map((f) => `| [${mdxSafe(f.feature, { inTableCell: true })}](./${f.flag}) | ${code(f.flag)} | ${code(f.default)} |`),
+    ...items.map((f) => `| [${mdxSafe(cleanFeature(f.feature), { inTableCell: true })}](./${f.flag}) | ${code(f.flag)} | ${code(f.default)} |`),
     '',
   ].join('\n')
   writeFileSync(join(dir, 'index.mdx'), idx)

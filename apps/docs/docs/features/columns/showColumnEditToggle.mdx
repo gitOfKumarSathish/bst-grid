@@ -1,10 +1,10 @@
 ---
 id: showColumnEditToggle
-title: Per-column edit lock (F3, runtime)
+title: Per-column edit lock
 sidebar_label: showColumnEditToggle
 ---
 
-# Per-column edit lock (F3, runtime)
+# Per-column edit lock
 
 Prop `showColumnEditToggle` — adapter chrome, default `false`.
 
@@ -41,7 +41,7 @@ Adds a per-column **lock / unlock** (✏️) control to the columns menu that ov
 
 ## Enable it
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}
@@ -57,5 +57,7 @@ Adds a per-column **lock / unlock** (✏️) control to the columns menu that ov
 - **Requires** `enableEditing` to be on — this flag is a no-op otherwise.
 
 ## Spec coverage
+
+> **Spec codes** (`A1`, `C2`, `X8`, …) are Bst-Table's internal requirement IDs from the capability matrix; `P0`–`P2` mark the delivery phase. They are traceability tags, not part of the public API.
 
 - **F3 · Disable column** — ✅ built. P3 — meta.disabled

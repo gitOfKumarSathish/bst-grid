@@ -8,7 +8,7 @@ and taller as the page size grows.
 Caps the scroll box to a bounded height and scrolls the body under a **sticky header + filter row**.
 Height is `--bst-max-height` (default 440px), or set it: `boolean | { maxHeight, maxRows }`.
 
-```tsx
+```tsx no-check
 <BstTableMui data={rows} columns={columns} getRowId={(r) => r.id}
   enableStickyHeader={{ maxRows: 12 }} />
 ```

@@ -43,7 +43,7 @@ try {
 // features.json — every corpus feature, in the shape gen-features / gen-reference
 // read. Optional fields (mapsTo, group, doc, related, requirements, since) are
 // included when present; JSON.stringify drops the ones that are undefined.
-const features = corpus.features.map((f) => ({
+const rawFeatures = corpus.features.map((f) => ({
   flag: f.flag,
   feature: f.feature,
   layer: f.layer,
@@ -58,6 +58,31 @@ const features = corpus.features.map((f) => ({
   requirements: f.requirements,
   since: f.since,
 }))
+
+// Dedupe TOGGLE flags. A few §12 rows document a *mode* of an existing flag with a
+// compound flag string (e.g. `enableEditing: { mode: 'batch' }`), which the corpus
+// reduces to the base flag — yielding a SECOND toggle entry for that flag whose
+// name / mapsTo describe the mode, not the flag. gen-features writes one page per
+// flag, so the later entry silently overwrote the base page (the `enableEditing`
+// page showed "Batch editing + single-call save" instead of "Inline editing", with
+// the batch `Maps to` — batch mode has its own flag, `enableBatchEditing`). Keep the
+// FIRST (canonical) entry per flag and merge any later duplicate's spec
+// `requirements` into it so the coverage matrix keeps every leaf. Non-toggle rows
+// (cellMeta, `meta.type`, …) legitimately share a key and pass through untouched.
+const canonicalByFlag = new Map()
+const features = []
+for (const f of rawFeatures) {
+  if (f.kind === 'toggle' && f.flag) {
+    const canonical = canonicalByFlag.get(f.flag)
+    if (canonical) {
+      canonical.requirements = [...new Set([...(canonical.requirements || []), ...(f.requirements || [])])]
+      console.warn(`dump-corpus — folded duplicate toggle "${f.feature}" into canonical \`${f.flag}\` ("${canonical.feature}")`)
+      continue
+    }
+    canonicalByFlag.set(f.flag, f)
+  }
+  features.push(f)
+}
 
 // cells.json — every cell type, including the per-field cellMeta detail.
 const cells = corpus.cellTypes.map((c) => ({

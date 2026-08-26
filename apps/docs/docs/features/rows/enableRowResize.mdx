@@ -1,10 +1,10 @@
 ---
 id: enableRowResize
-title: Row resize (G2)
+title: Row resize
 sidebar_label: enableRowResize
 ---
 
-# Row resize (G2)
+# Row resize
 
 Prop `enableRowResize` — engine behaviour, default `false`.
 
@@ -45,11 +45,11 @@ end-user can switch it on without developer wiring.
 | Since | v0.25.0 |
 | Settings sheet | Rows |
 
-Row resizing (G2) — drag the bottom edge of any row to set its height; the whole row's cells grow/shrink and content is clipped when shorter. Per-row heights are local UI state (double-click a row's handle to reset it). Opt-in. Default false. Column resize is separate (`enableColumnResizing`).
+Row resizing — drag the bottom edge of any row to set its height; the whole row's cells grow/shrink and content is clipped when shorter. Per-row heights are local UI state (double-click a row's handle to reset it). Opt-in. Default false. Column resize is separate (`enableColumnResizing`).
 
 ## Enable it
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}
@@ -60,5 +60,7 @@ Row resizing (G2) — drag the bottom edge of any row to set its height; the who
 > Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
 
 ## Spec coverage
+
+> **Spec codes** (`A1`, `C2`, `X8`, …) are Bst-Table's internal requirement IDs from the capability matrix; `P0`–`P2` mark the delivery phase. They are traceability tags, not part of the public API.
 
 - **G2 · Row & column resizing** — ✅ built. column resize (P3) + row resize v0.25.0 (enableRowResize — drag a row edge to set its height, double-click to reset)

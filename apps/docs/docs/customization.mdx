@@ -17,7 +17,7 @@ Add `showSettings` and a **gear icon** appears in the toolbar. Clicking it opens
 Drawer in the MUI skin, a dependency-free slide-over in shadcn — where the user toggles the grid's
 features on and off, **per table**, persisted to their browser's `localStorage`.
 
-```tsx
+```tsx no-check
 // Same API in both skins.
 <BstTableMui    data={rows} columns={columns} getRowId={(r) => r.id} showSettings />
 <BstTableShadcn data={rows} columns={columns} getRowId={(r) => r.id} showSettings />
@@ -77,7 +77,7 @@ The settings sheet customizes *features*; **`gridState`** persists the *view* �
 visibility and pinning, plus sort, filters, grouping and pagination — so a user's arrangement
 survives a reload. One line seeds it from storage and keeps it in sync:
 
-```tsx
+```tsx no-check
 <BstTableMui data={rows} columns={columns} getRowId={(r) => r.id} gridState={{ key: 'people' }} />
 ```
 
@@ -94,7 +94,7 @@ the sheet**. The settings sheet can't silently miss a feature.
 
 Both skins share one pure model via `useBstSettings`, so you can render the sheet in your own UI:
 
-```tsx
+```tsx no-check
 const { props: effective, model } = useBstSettings(props, { persistKey: 'people' })
 const table = useBstTable(effective)  // enable* / show* now reflect the user's choices
 // model = { items, groups, overrideCount, reset, storageKey }

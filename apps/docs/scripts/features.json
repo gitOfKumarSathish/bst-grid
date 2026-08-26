@@ -278,7 +278,11 @@
     "related": [
       "enableEditing"
     ],
-    "requirements": [],
+    "requirements": [
+      "C2",
+      "I2",
+      "I4"
+    ],
     "since": "0.2.0"
   },
   {
@@ -1220,27 +1224,6 @@
       "F3"
     ],
     "since": "0.27.0"
-  },
-  {
-    "flag": "enableEditing",
-    "feature": "Batch editing + single-call save (C2/I2/I4)",
-    "layer": "engine",
-    "kind": "toggle",
-    "type": "EditingOptions + callback",
-    "default": "— (opt-in)",
-    "status": "✅ done",
-    "mapsTo": "third editing mode: EVERY edit/paste stays an unsaved draft; runtime.getChangeSet() (old→new + formatted text), revertCell/revertRow, formatValue. onSave(event) fires once per save action (commitAll/commitRowSession) with { changes, rows[].patch, next } — ONE batched API call, never per cell/row/column; a rejected onSave keeps every draft. Mode is settings-toggleable via enableBatchEditing (next rows)",
-    "group": "Editing",
-    "doc": "Inline editing feature. `boolean | EditingOptions`. Default: false (opt-in).",
-    "related": [
-      "onSave"
-    ],
-    "requirements": [
-      "C2",
-      "I2",
-      "I4"
-    ],
-    "since": "0.2.0"
   },
   {
     "flag": "showChangesSheet",

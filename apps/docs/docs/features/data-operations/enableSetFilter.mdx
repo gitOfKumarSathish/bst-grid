@@ -1,10 +1,10 @@
 ---
 id: enableSetFilter
-title: Set Filter (X4)
+title: Set Filter
 sidebar_label: enableSetFilter
 ---
 
-# Set Filter (X4)
+# Set Filter
 
 Prop `enableSetFilter` — engine behaviour, default `false`.
 
@@ -44,11 +44,11 @@ force or opt out with `meta.filter: 'set'` / `'condition'`.
 | Since | v0.35.0 |
 | Settings sheet | Data operations |
 
-Set Filter (X4) — an Excel-style **checklist of distinct values** per column, rendered in the per-column filter row. When on, categorical columns (`singleSelect` / `multiSelect` / `radio` / `boolean`) use the checklist; any column can force it via `meta.filter: 'set'` or opt out via `meta.filter: 'condition'`. Needs `enableColumnFilters` + the filter row (`enableColumnFilterRow`) to be visible. Default: false.
+Set Filter — an Excel-style **checklist of distinct values** per column, rendered in the per-column filter row. When on, categorical columns (`singleSelect` / `multiSelect` / `radio` / `boolean`) use the checklist; any column can force it via `meta.filter: 'set'` or opt out via `meta.filter: 'condition'`. Needs `enableColumnFilters` + the filter row (`enableColumnFilterRow`) to be visible. Default: false.
 
 ## Enable it
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}

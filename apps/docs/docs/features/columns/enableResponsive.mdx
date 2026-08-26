@@ -1,10 +1,10 @@
 ---
 id: enableResponsive
-title: Responsive column hiding (G4)
+title: Responsive column hiding
 sidebar_label: enableResponsive
 ---
 
-# Responsive column hiding (G4)
+# Responsive column hiding
 
 Prop `enableResponsive` — engine behaviour, default `false`.
 
@@ -43,11 +43,11 @@ user's manual hides are respected.
 | Since | v0.22.0 |
 | Settings sheet | Columns |
 
-Responsive column hiding (G4) — when the grid is too narrow to fit its columns, hide the lowest-priority ones (per `meta.responsivePriority`, higher = kept longer) until they fit; restore them as it widens. Only auto-hidden columns are restored, so it never fights a manual hide. No-op under `fitColumns`. Default: false.
+Responsive column hiding — when the grid is too narrow to fit its columns, hide the lowest-priority ones (per `meta.responsivePriority`, higher = kept longer) until they fit; restore them as it widens. Only auto-hidden columns are restored, so it never fights a manual hide. No-op under `fitColumns`. Default: false.
 
 ## Enable it
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}
@@ -68,5 +68,7 @@ Responsive column hiding (G4) — when the grid is too narrow to fit its columns
 - **Conflicts with** `fitColumns` — responsive hiding is a no-op under `fitColumns`.
 
 ## Spec coverage
+
+> **Spec codes** (`A1`, `C2`, `X8`, …) are Bst-Table's internal requirement IDs from the capability matrix; `P0`–`P2` mark the delivery phase. They are traceability tags, not part of the public API.
 
 - **G4 · Responsive** — ✅ built. v0.22.0 — enableResponsive + meta.responsivePriority (hide low-priority when narrow)

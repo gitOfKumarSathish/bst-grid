@@ -48,11 +48,11 @@ so both skins get it with no extra chrome.
 | Since | v0.3.0 |
 | Settings sheet | Selection & clipboard |
 
-Cell / range selection + keyboard navigation (Phase 3). Click / Shift-click to select a range; Arrow / Shift+Arrow / Tab / Home / End / Ctrl+A to move the active cell; Enter / F2 to edit. Default: false (opt-in).
+Cell / range selection + keyboard navigation. Click / Shift-click to select a range; Arrow / Shift+Arrow / Tab / Home / End / Ctrl+A to move the active cell; Enter / F2 to edit. Default: false (opt-in).
 
 ## Enable it
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}
@@ -63,5 +63,7 @@ Cell / range selection + keyboard navigation (Phase 3). Click / Shift-click to s
 > Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
 
 ## Spec coverage
+
+> **Spec codes** (`A1`, `C2`, `X8`, …) are Bst-Table's internal requirement IDs from the capability matrix; `P0`–`P2` mark the delivery phase. They are traceability tags, not part of the public API.
 
 - **F2 · Disable row** — ✅ built. P2 — rowDisabled

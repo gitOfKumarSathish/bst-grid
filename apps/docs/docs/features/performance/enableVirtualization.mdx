@@ -1,10 +1,10 @@
 ---
 id: enableVirtualization
-title: Row virtualization (D1)
+title: Row virtualization
 sidebar_label: enableVirtualization
 ---
 
-# Row virtualization (D1)
+# Row virtualization
 
 Prop `enableVirtualization` — engine behaviour, default `false`.
 
@@ -20,7 +20,7 @@ the viewport (plus a small overscan), keeping the DOM bounded no matter the row 
 Backed by `@tanstack/react-virtual`. `boolean | { overscan, estimateRowSize, estimateColumnSize }`.
 It also bounds the scroll box, so `enableStickyHeader` isn't needed alongside it.
 
-```tsx
+```tsx no-check
 <BstTableMui data={rows} columns={columns} getRowId={(r) => r.id}
   enableVirtualization={{ overscan: 8 }} />
 ```
@@ -48,11 +48,11 @@ It also bounds the scroll box, so `enableStickyHeader` isn't needed alongside it
 | Since | v0.33.0 |
 | Settings sheet | Performance |
 
-Row virtualization (D1) — render only the rows inside the scroll viewport (plus overscan), so a 10k / 1M-row grid stays fast with a bounded DOM. Pass `true`, or an object to tune it (`{ overscan, estimateRowSize, estimateColumnSize }` — an object implies enabled, §12). Opt-in. Default false. The scroll box needs a bounded height — one is applied by default and can be overridden via `styles.root`. **Yields to** master-detail, grouping, cell spanning and row pinning (the grid renders un-windowed when one of those is on). Built on `@tanstack/react-virtual`.
+Row virtualization — render only the rows inside the scroll viewport (plus overscan), so a 10k / 1M-row grid stays fast with a bounded DOM. Pass `true`, or an object to tune it (`{ overscan, estimateRowSize, estimateColumnSize }` — an object implies enabled, §12). Opt-in. Default false. The scroll box needs a bounded height — one is applied by default and can be overridden via `styles.root`. **Yields to** master-detail, grouping, cell spanning and row pinning (the grid renders un-windowed when one of those is on). Built on `@tanstack/react-virtual`.
 
 ## Enable it
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}
@@ -77,5 +77,7 @@ Row virtualization (D1) — render only the rows inside the scroll viewport (plu
 - Paints only the visible rows for large datasets. Object form tunes `overscan` / `estimateRowSize` / `estimateColumnSize`. Needs a bounded scroll-box height (applied by default; override via `styles.root`).
 
 ## Spec coverage
+
+> **Spec codes** (`A1`, `C2`, `X8`, …) are Bst-Table's internal requirement IDs from the capability matrix; `P0`–`P2` mark the delivery phase. They are traceability tags, not part of the public API.
 
 - **D1 · Row & column virtualization** — ✅ built. enableVirtualization (+ enableColumnVirtualization) on @tanstack/react-virtual — windowed rows (dynamic measure) + columns, sticky header, bounded DOM; yields to master-detail / grouping / cell spanning / row pinning. Tested (virtualization.test.tsx)

@@ -1,10 +1,10 @@
 ---
 id: enableRowNumbers
-title: Row-number column (X9)
+title: Row-number column
 sidebar_label: enableRowNumbers
 ---
 
-# Row-number column (X9)
+# Row-number column
 
 Prop `enableRowNumbers` — engine behaviour, default `false`.
 
@@ -45,11 +45,11 @@ order.
 | Since | v0.40.0 |
 | Settings sheet | Columns |
 
-Row-number column (X9) — a leading, non-interactive `#` column showing each row's 1-based position in the **current view** (continuous across pages; reflects sort + filter). It never sorts, filters, hides, resizes, reorders or pins, and stays out of the columns menu / filter row / export. Header defaults to `#` — override with `rowNumberHeader`. Default: false.
+Row-number column — a leading, non-interactive `#` column showing each row's 1-based position in the **current view** (continuous across pages; reflects sort + filter). It never sorts, filters, hides, resizes, reorders or pins, and stays out of the columns menu / filter row / export. Header defaults to `#` — override with `rowNumberHeader`. Default: false.
 
 ## Enable it
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}

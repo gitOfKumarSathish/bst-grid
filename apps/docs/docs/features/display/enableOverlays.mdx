@@ -1,10 +1,10 @@
 ---
 id: enableOverlays
-title: Loading / error overlays (X23)
+title: Loading / error overlays
 sidebar_label: enableOverlays
 ---
 
-# Loading / error overlays (X23)
+# Loading / error overlays
 
 Prop `enableOverlays` — engine behaviour, default `true`.
 
@@ -45,11 +45,11 @@ server-wired grid gets this for free. Replace the content with `renderLoadingOve
 | Since | v0.40.0 |
 | Settings sheet | Display |
 
-Loading / error overlays (X23) — render a formal overlay over the grid while `loading` is true or when `error` is set, instead of leaving the body blank or stale. On by default so a grid wired to a server `DataSource` (`useBstDataSource`, which reports `loading`/`error`) shows them for free; set `false` to suppress the overlays and manage those states yourself. Feed the state via `loading` / `error`; customize via `overlayText`, `renderLoadingOverlay`, `renderErrorOverlay`. Default: true.
+Loading / error overlays — render a formal overlay over the grid while `loading` is true or when `error` is set, instead of leaving the body blank or stale. On by default so a grid wired to a server `DataSource` (`useBstDataSource`, which reports `loading`/`error`) shows them for free; set `false` to suppress the overlays and manage those states yourself. Feed the state via `loading` / `error`; customize via `overlayText`, `renderLoadingOverlay`, `renderErrorOverlay`. Default: true.
 
 ## Enable it
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}

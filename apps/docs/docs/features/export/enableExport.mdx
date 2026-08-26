@@ -1,10 +1,10 @@
 ---
 id: enableExport
-title: Export — CSV/Excel/print (X1–X3)
+title: Export — CSV/Excel/print
 sidebar_label: enableExport
 ---
 
-# Export — CSV/Excel/print (X1–X3)
+# Export — CSV/Excel/print
 
 Prop `enableExport` — engine behaviour, default `false`.
 
@@ -43,11 +43,11 @@ matches the screen.
 | Since | v0.34.0 |
 | Settings sheet | Export |
 
-Export (Phase 5, X1–X3) — download the grid as **CSV** / **Excel** (`.xlsx`) or open a **print** view. `true` enables all three; pass a &#123;@link BstExportOptions&#125; object to choose formats and set the file name / row scope (an object implies enabled, §12). Opt-in. Default false. Adapters render an "Export" toolbar menu (`showExport`); drive it programmatically via `runtime.exportCsv()` / `runtime.exportExcel()` / `runtime.printTable()`. **Dependency-free** — the `.xlsx` is a hand-built OOXML package, no `exceljs`.
+Export — download the grid as **CSV** / **Excel** (`.xlsx`) or open a **print** view. `true` enables all three; pass a &#123;@link BstExportOptions&#125; object to choose formats and set the file name / row scope (an object implies enabled, §12). Opt-in. Default false. Adapters render an "Export" toolbar menu (`showExport`); drive it programmatically via `runtime.exportCsv` / `runtime.exportExcel` / `runtime.printTable`. **Dependency-free** — the `.xlsx` is a hand-built OOXML package, no `exceljs`.
 
 ## Enable it
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}

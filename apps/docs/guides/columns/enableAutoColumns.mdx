@@ -9,7 +9,7 @@ Pass `columns={[]}` and turn this on: the engine samples the first rows, infers 
 (number / boolean / date, else text) and a humanized header. The moment you pass real `columns`,
 they win and this is ignored.
 
-```tsx
+```tsx no-check
 <BstTableMui data={rows} columns={[]} getRowId={(r) => r.id} enableAutoColumns />
 ```
 

@@ -8,7 +8,7 @@ yourself.
 `enableUndoRedo` snapshots the data on each committed change and replays through the **same**
 `onDataChange` path when the user undoes or redoes, so your state stays the single source of truth:
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}

@@ -1,10 +1,10 @@
 ---
 id: enableMultiFilter
-title: Multi-filter (X11)
+title: Multi-filter
 sidebar_label: enableMultiFilter
 ---
 
-# Multi-filter (X11)
+# Multi-filter
 
 Prop `enableMultiFilter` — engine behaviour, default `false`.
 
@@ -45,11 +45,11 @@ stacked in the filter row and a row must satisfy **all** of them (AND). It store
 | Since | v0.39.0 |
 | Settings sheet | Data operations |
 
-Multi-filter (X11) — **stack several filter types on one column**. A column opts in with `meta.filter` as an array (e.g. `['condition', 'set']`), which renders the listed filters **stacked** in its filter row; a row must satisfy **all** of them (AND). Needs `enableColumnFilters` + `enableColumnFilterRow` (and `enableSetFilter` for a `'set'` part). Default: false.
+Multi-filter — **stack several filter types on one column**. A column opts in with `meta.filter` as an array (e.g. `['condition', 'set']`), which renders the listed filters **stacked** in its filter row; a row must satisfy **all** of them (AND). Needs `enableColumnFilters` + `enableColumnFilterRow` (and `enableSetFilter` for a `'set'` part). Default: false.
 
 ## Enable it
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}

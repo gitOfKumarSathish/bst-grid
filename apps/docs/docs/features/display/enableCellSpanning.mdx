@@ -1,10 +1,10 @@
 ---
 id: enableCellSpanning
-title: Cell spanning (A5)
+title: Cell spanning
 sidebar_label: enableCellSpanning
 ---
 
-# Cell spanning (A5)
+# Cell spanning
 
 Prop `enableCellSpanning` — engine behaviour, default `false`.
 
@@ -44,11 +44,11 @@ to span contiguous equal values in a column. Covered cells are skipped in render
 | Since | v0.12.0 |
 | Settings sheet | Display |
 
-Cell spanning (A5) — merge body cells across columns and/or rows. Opt-in. Default false. Declare spans via `meta.rowSpan: 'group'` (auto-merge equal values in a column) and/or the `getCellSpan` callback below.
+Cell spanning — merge body cells across columns and/or rows. Opt-in. Default false. Declare spans via `meta.rowSpan: 'group'` (auto-merge equal values in a column) and/or the `getCellSpan` callback below.
 
 ## Enable it
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}
@@ -66,5 +66,7 @@ Cell spanning (A5) — merge body cells across columns and/or rows. Opt-in. Defa
 | `getCellSpan or meta.rowSpan` | spanning is opt-in per cell; without either nothing merges |
 
 ## Spec coverage
+
+> **Spec codes** (`A1`, `C2`, `X8`, …) are Bst-Table's internal requirement IDs from the capability matrix; `P0`–`P2` mark the delivery phase. They are traceability tags, not part of the public API.
 
 - **A5 · Inline charts / cell spanning** — ✅ built. v0.12.0 spanning (enableCellSpanning, col+row) · charts = M1

@@ -1,10 +1,10 @@
 ---
 id: enableContextMenu
-title: Context menu (X6)
+title: Context menu
 sidebar_label: enableContextMenu
 ---
 
-# Context menu (X6)
+# Context menu
 
 Prop `enableContextMenu` — engine behaviour, default `false`.
 
@@ -21,7 +21,7 @@ A dependency-free popup at the cursor. Default items adapt to what's on: Copy / 
 column (with clipboard), Export CSV / Excel (with export), Autosize column. Reshape it entirely with
 `getContextMenuItems(ctx)` (spread `ctx.defaultItems` to extend).
 
-```tsx
+```tsx no-check
 enableContextMenu
 getContextMenuItems={(ctx) => [...ctx.defaultItems, { label: 'Flag row', onSelect: () => flag(ctx.row) }]}
 ```
@@ -50,11 +50,11 @@ getContextMenuItems={(ctx) => [...ctx.defaultItems, { label: 'Flag row', onSelec
 | Since | v0.36.0 |
 | Settings sheet | Selection & clipboard |
 
-Right-click context menu (X6) — a menu at the cursor with default actions (Copy · Copy row · Copy column while clipboard is on; Export CSV / Excel while export is on; Autosize column) plus any items returned by `getContextMenuItems`. If the resolved item list is empty the native browser menu is left alone. Default: false.
+Right-click context menu — a menu at the cursor with default actions (Copy · Copy row · Copy column while clipboard is on; Export CSV / Excel while export is on; Autosize column) plus any items returned by `getContextMenuItems`. If the resolved item list is empty the native browser menu is left alone. Default: false.
 
 ## Enable it
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}

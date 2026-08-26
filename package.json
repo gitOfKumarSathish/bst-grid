@@ -26,6 +26,7 @@
     "docs:api": "npm --prefix apps/docs run gen:api",
     "docs:gen": "npm --prefix apps/docs run gen:docs",
     "docs:check": "npm --prefix apps/docs run check:docs",
+    "docs:snippets": "npm --prefix apps/docs run check:snippets",
     "docs:sync": "npm run docs:gen && npm run docs:check",
     "docs:build": "npm run build -w @bloomskill/table-engine && npm run build -w @bloomskill/table-mcp && npm run docs:api && npm run docs:sync",
     "docs:verify": "npm run docs:sync && git diff --exit-code -- apps/docs/docs apps/docs/scripts || (echo '\\n✗ docs are stale — a feature changed without regenerating. Run: npm run docs:build  then commit apps/docs.' && exit 1)",

@@ -1,10 +1,10 @@
 ---
 id: enableTypeToEdit
-title: Type-to-edit (C5/C6)
+title: Type-to-edit
 sidebar_label: enableTypeToEdit
 ---
 
-# Type-to-edit (C5/C6)
+# Type-to-edit
 
 Prop `enableTypeToEdit` — engine behaviour, default `false`.
 
@@ -22,7 +22,7 @@ character**, overwriting the old value via the cell type's `parse` (so text and 
 work). **Enter** commits and moves the active cell **down**; **Tab** commits and moves **right**
 (Shift reverses each).
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}
@@ -60,7 +60,7 @@ Type-to-edit — spreadsheet-style data entry layered on cell selection + editin
 
 ## Enable it
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}
@@ -76,6 +76,8 @@ Type-to-edit — spreadsheet-style data entry layered on cell selection + editin
 - Type on a selected cell to overwrite (seeded via the cell type `parse`); Enter commits & moves down, Tab commits & moves right (Shift reverses). No-op without both prerequisites.
 
 ## Spec coverage
+
+> **Spec codes** (`A1`, `C2`, `X8`, …) are Bst-Table's internal requirement IDs from the capability matrix; `P0`–`P2` mark the delivery phase. They are traceability tags, not part of the public API.
 
 - **C5 · Shortcuts (arrows/undo-redo)** — ✅ built. P3 — nav + enableUndoRedo
 - **C6 · Tab nav (skip/wrap)** — ✅ built. P3

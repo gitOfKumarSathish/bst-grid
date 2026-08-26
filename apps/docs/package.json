@@ -12,7 +12,8 @@
     "gen:reference": "cd scripts && node gen-reference.mjs ../docs",
     "gen:docs": "npm run gen:corpus && npm run gen:features && npm run gen:reference",
     "gen:api": "cd scripts && node extract-api.mjs",
-    "check:docs": "cd scripts && node check-docs-coverage.mjs ../docs"
+    "check:docs": "cd scripts && node check-docs-coverage.mjs ../docs",
+    "check:snippets": "cd scripts && node check-snippets.mjs"
   },
   "dependencies": {
     "@codesandbox/sandpack-react": "^2.20.0",

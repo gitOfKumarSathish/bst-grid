@@ -10,7 +10,7 @@ per-cell, and leaving it unset follows `enableEditing.mode`. In batch mode every
 becomes an unsaved **draft**; nothing reaches your backend until an explicit save fires **`onSave`
 once** with the whole change-set:
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}

@@ -1,0 +1,214 @@
+---
+id: recipes
+title: Recipes
+sidebar_label: Recipes
+sidebar_position: 1.2
+slug: /recipes
+---
+
+# Recipes
+
+Complete, copy-pasteable components for the four things people wire up first. Each is a whole file —
+imports included — and every one is compiled against the published packages by our docs build, so it
+will type-check in your project too.
+
+## Server-side data (sort / filter / paginate on the backend)
+
+For large tables, run sort, filter and pagination on the server. Wrap your fetch in a
+**`DataSource`** with `createServerDataSource`, drive it with **`useBstDataSource`**, and spread the
+returned `tableProps` — they set `manualSorting` / `manualFiltering` / `manualPagination` and
+`rowCount` for you, so the grid's normal chrome (sort headers, filter row, search box, pagination
+bar) drives the backend unchanged.
+
+```tsx
+import { useMemo } from 'react'
+import { BstTableMui } from '@bloomskill/table-mui'
+import { createServerDataSource, useBstDataSource } from '@bloomskill/table-engine'
+import type { BstTableColumn, DataSourceQuery } from '@bloomskill/table-engine'
+import '@bloomskill/table-engine/styles.css'
+
+type Order = { id: string; customer: string; total: number }
+
+const columns: BstTableColumn<Order>[] = [
+  { id: 'customer', accessorKey: 'customer', header: 'Customer' },
+  { id: 'total', accessorKey: 'total', header: 'Total', meta: { type: 'number' } },
+]
+
+export default function Orders() {
+  // Memoise the source so useBstDataSource doesn't refetch on every render.
+  const source = useMemo(
+    () =>
+      createServerDataSource<Order>(async (query: DataSourceQuery, signal) => {
+        const params = new URLSearchParams({
+          offset: String(query.offset),
+          limit: String(query.limit),
+          sort: query.sort.map((s) => `${s.id}:${s.desc ? 'desc' : 'asc'}`).join(','),
+          q: query.quickFilter ?? '',
+        })
+        const res = await fetch(`/api/orders?${params}`, { signal })
+        const body = (await res.json()) as { rows: Order[]; total: number }
+        // totalCount is the count across ALL pages — it drives the page count.
+        return { rows: body.rows, totalCount: body.total }
+      }),
+    [],
+  )
+
+  const ds = useBstDataSource(source, { pageSize: 25 })
+
+  return <BstTableMui columns={columns} getRowId={(r) => r.id} {...ds.tableProps} />
+}
+```
+
+`ds.tableProps` also carries `loading` and `error`, so the loading and error overlays below work for
+free on a server-driven grid. Grouping and row expansion are **client-only** — don't turn them on in
+server mode.
+
+## Save edits to an API (batch mode, one request)
+
+Turn on **batch editing** and every edit becomes an unsaved draft until the user hits **Save** in the
+review sheet. `onSave` then fires **once** with the whole change set — make a single request from it.
+The `BstSaveEvent` gives you the edits three ways: `changes` (flat, cell-wise), `rows[].patch` (a
+ready-made per-row PATCH body), and `next` (the full next data array). If `onSave` **throws**,
+Bst-Table keeps every draft so the user can fix the error and retry.
+
+```tsx
+import { useState } from 'react'
+import { BstTableMui } from '@bloomskill/table-mui'
+import type { BstTableColumn, BstSaveEvent } from '@bloomskill/table-engine'
+import '@bloomskill/table-engine/styles.css'
+
+type Row = { id: string; name: string; email: string }
+
+const columns: BstTableColumn<Row>[] = [
+  { id: 'name', accessorKey: 'name', header: 'Name', meta: { editable: true } },
+  { id: 'email', accessorKey: 'email', header: 'Email', meta: { editable: true } },
+]
+
+export default function EditableGrid({ initial }: { initial: Row[] }) {
+  const [rows, setRows] = useState<Row[]>(initial)
+  const [error, setError] = useState<string | null>(null)
+
+  async function save(event: BstSaveEvent<Row>) {
+    setError(null)
+    try {
+      // ONE request for the whole batch — rows[].patch is field -> new value per row.
+      const res = await fetch('/api/rows', {
+        method: 'PATCH',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(event.rows.map((r) => ({ id: r.rowId, patch: r.patch }))),
+      })
+      if (!res.ok) throw new Error(`Save failed (${res.status})`)
+      setRows(event.next) // server confirmed — adopt the drafts locally
+    } catch (e) {
+      // Re-throw so Bst-Table keeps the drafts; the user can retry after fixing.
+      setError((e as Error).message)
+      throw e
+    }
+  }
+
+  return (
+    <>
+      {error ? <p role="alert">{error}</p> : null}
+      <BstTableMui
+        data={rows}
+        columns={columns}
+        getRowId={(r) => r.id}
+        enableEditing={{ mode: 'batch' }}
+        showChangesSheet
+        onSave={save}
+      />
+    </>
+  )
+}
+```
+
+## Loading, empty and error states
+
+The overlays are **on by default** (`enableOverlays`). Feed the grid `loading` and `error` and it
+shows a spinner or the error message over the body; an **empty `data` array** renders the built-in
+"No rows" state — you don't wire that one up. `overlayText` overrides the labels.
+
+```tsx
+import { useEffect, useState } from 'react'
+import { BstTableMui } from '@bloomskill/table-mui'
+import type { BstTableColumn } from '@bloomskill/table-engine'
+import '@bloomskill/table-engine/styles.css'
+
+type Row = { id: string; name: string }
+
+const columns: BstTableColumn<Row>[] = [{ id: 'name', accessorKey: 'name', header: 'Name' }]
+
+export default function AsyncGrid() {
+  const [rows, setRows] = useState<Row[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
+
+  useEffect(() => {
+    let live = true
+    setLoading(true)
+    fetch('/api/rows')
+      .then((r) => r.json() as Promise<Row[]>)
+      .then((data) => {
+        if (live) {
+          setRows(data)
+          setError(null)
+        }
+      })
+      .catch((e) => live && setError(e as Error))
+      .finally(() => live && setLoading(false))
+    return () => {
+      live = false
+    }
+  }, [])
+
+  return (
+    <BstTableMui
+      data={rows}
+      columns={columns}
+      getRowId={(r) => r.id}
+      loading={loading}
+      error={error}
+      overlayText={{ loading: 'Loading rows…' }}
+    />
+  )
+}
+```
+
+## A custom cell (`columnDef.cell`)
+
+Reach for one of the 17 [built-in cell types](./cell-types/index.mdx) first (via `meta.type`). When
+you need something they don't cover, drop to TanStack's **`columnDef.cell`** — it receives the cell
+context, so `row.original` is your typed row:
+
+```tsx
+import { BstTableMui } from '@bloomskill/table-mui'
+import type { BstTableColumn } from '@bloomskill/table-engine'
+import '@bloomskill/table-engine/styles.css'
+
+type Repo = { id: string; name: string; url: string; stars: number }
+
+const columns: BstTableColumn<Repo>[] = [
+  { id: 'stars', accessorKey: 'stars', header: 'Stars', meta: { type: 'number' } },
+  {
+    id: 'repo',
+    accessorKey: 'name',
+    header: 'Repository',
+    // A fully custom renderer — anything the built-in cell types don't do.
+    cell: ({ row }) => (
+      <a href={row.original.url} target="_blank" rel="noreferrer">
+        {row.original.name} ↗
+      </a>
+    ),
+  },
+]
+
+export default function Repos({ rows }: { rows: Repo[] }) {
+  return <BstTableMui data={rows} columns={columns} getRowId={(r) => r.id} />
+}
+```
+
+## More
+
+- [Feature Guides](./features/index.mdx) — every `enable*` / `show*` flag with when-and-why prose.
+- [API Reference](./api/index.mdx) — `useBstDataSource`, `DataSource`, `BstSaveEvent` and every export.
+- [Migration](./migration.mdx) — porting from another grid.

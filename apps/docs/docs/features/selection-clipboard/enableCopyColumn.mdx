@@ -1,10 +1,10 @@
 ---
 id: enableCopyColumn
-title: Copy column (H3)
+title: Copy column
 sidebar_label: enableCopyColumn
 ---
 
-# Copy column (H3)
+# Copy column
 
 Prop `enableCopyColumn` — engine behaviour, default `true`.
 
@@ -41,11 +41,11 @@ choke point — the keyboard gesture **and** the menu button — copying the col
 | Since | v0.27.0 |
 | Settings sheet | Selection & clipboard |
 
-Copy a whole **column** across all pages (H3) — the Ctrl/Cmd+Space gesture and the Columns-menu "Copy column" button. A sub-toggle of clipboard; set `false` to disable column-copy while keeping the rest of the clipboard. Default: true.
+Copy a whole **column** across all pages — the Ctrl/Cmd+Space gesture and the Columns-menu "Copy column" button. A sub-toggle of clipboard; set `false` to disable column-copy while keeping the rest of the clipboard. Default: true.
 
 ## Enable it
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}
@@ -61,5 +61,7 @@ Copy a whole **column** across all pages (H3) — the Ctrl/Cmd+Space gesture and
 - Defaults to ON — set false to disable Ctrl/⌘+Space column copy while keeping the rest of the clipboard.
 
 ## Spec coverage
+
+> **Spec codes** (`A1`, `C2`, `X8`, …) are Bst-Table's internal requirement IDs from the capability matrix; `P0`–`P2` mark the delivery phase. They are traceability tags, not part of the public API.
 
 - **H3 · Copy column** — ✅ built. fixed — runtime.copyColumn / Ctrl+Space selects the whole column and copies all pages (pre-pagination, filter+sort order); copyRow/Shift+Space too. Server-tier export rides the Phase-4 foundation

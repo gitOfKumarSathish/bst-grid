@@ -16,7 +16,7 @@ theme onto the grid — and you can override any part with plain CSS.
 `@bloomskill/table-mui` reads your MUI theme automatically. Wrap the grid in a `ThemeProvider` and
 the toolbar, controls and grid body follow it — dark mode included.
 
-```tsx
+```tsx no-check
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 
 <ThemeProvider theme={createTheme({ palette: { mode: 'dark' } })}>
@@ -37,7 +37,7 @@ required, just import the stylesheet. To adopt your app's design tokens instead,
 `theme="inherit"`: the grid re-points every variable at your host shadcn tokens (`--background`,
 `--primary`, `--border`, `--ring`, `--radius`, font).
 
-```tsx
+```tsx no-check
 // self-contained zinc palette (default)
 <BstTableShadcn data={rows} columns={columns} getRowId={(r) => r.id} />
 
@@ -51,6 +51,12 @@ required, just import the stylesheet. To adopt your app's design tokens instead,
 />
 ```
 
+The shadcn skin, live — its self-contained zinc palette in dark mode, and inline editing:
+
+<BstSandbox example="shadcn-dark" />
+
+<BstSandbox example="shadcn-editing" />
+
 **Dark mode** follows your ambient `.dark` class automatically (next-themes / shadcn). Force it
 with `dark={true}` or `dark={false}`.
 
@@ -59,7 +65,7 @@ with `dark={true}` or `dark={false}`.
 The engine exposes styling slots that layer **on top of** the built-in `bst-*` classes — they
 never replace them, so your CSS builds on the theme rather than forking the renderer.
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}

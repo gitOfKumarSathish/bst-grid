@@ -1,10 +1,10 @@
 ---
 id: enableCsvExport
-title: CSV export (X1)
+title: CSV export
 sidebar_label: enableCsvExport
 ---
 
-# CSV export (X1)
+# CSV export
 
 Prop `enableCsvExport` — engine behaviour, default `true`.
 
@@ -40,11 +40,11 @@ output is RFC-4180 with a UTF-8 BOM (so Excel opens it cleanly).
 | Since | v0.34.0 |
 | Settings sheet | Export |
 
-CSV export sub-toggle (X1). `false` hides the CSV menu item and makes `runtime.exportCsv()` a no-op, while keeping Excel/Print. Needs `enableExport`. Default: true.
+CSV export sub-toggle. `false` hides the CSV menu item and makes `runtime.exportCsv` a no-op, while keeping Excel/Print. Needs `enableExport`. Default: true.
 
 ## Enable it
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}

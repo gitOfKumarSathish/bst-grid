@@ -64,7 +64,11 @@ function renderDoc(doc) {
     if (i < parts.length) {
       const lang = parts[i++] || 'tsx'
       const seg = (parts[i++] || '').trim()
-      out.push('```' + lang + '\n' + seg + '\n```')
+      // These come from the engine's TSDoc `@example` blocks — illustrative fragments
+      // (often compressed to one line), not standalone modules. Tag tsx/jsx `no-check`
+      // so docs:snippets skips them; their true source is packages/engine, off-limits here.
+      const meta = lang === 'tsx' || lang === 'jsx' ? ' no-check' : ''
+      out.push('```' + lang + meta + '\n' + seg + '\n```')
     }
   }
   return out.join('\n\n')
@@ -104,7 +108,7 @@ function genCells() {
       `| Value shape | ${codeCell(c.valueShape)} |`,
       `| Editable | ${mdxSafe(c.editable, { inTableCell: true })} |`,
       `| Key \`cellMeta\` | ${mdxSafe(c.cellMeta, { inTableCell: true })} |`, '',
-      '## Use it', '', '```tsx',
+      '## Use it', '', '```tsx no-check',
       'const columns: BstTableColumn<Row>[] = [',
       `  { id: 'x', accessorKey: 'x', header: 'X', meta: { type: '${c.type}'${c.cellMeta && c.cellMeta !== '—' ? ', /* cellMeta below */' : ''} } },`,
       ']', '```', '')

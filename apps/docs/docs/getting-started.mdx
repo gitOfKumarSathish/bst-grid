@@ -68,13 +68,17 @@ export function People({ rows }: { rows: Person[] }) {
 
 The shadcn skin is identical, with one extra stylesheet:
 
-```tsx
+```tsx no-check
 import { BstTableShadcn } from '@bloomskill/table-shadcn'
 import '@bloomskill/table-engine/styles.css'
 import '@bloomskill/table-shadcn/styles.css'   // shadcn skin needs both
 
 <BstTableShadcn data={rows} columns={columns} getRowId={(r) => r.id} dark />
 ```
+
+The shadcn skin, live — same `data` and `columns`, sorting and pagination included:
+
+<BstSandbox example="shadcn-data-operations" />
 
 :::tip Always pass `getRowId`
 Selection, editing and clipboard target rows **by id**. Passing `getRowId` keeps them correct
@@ -94,6 +98,8 @@ Not on either? The engine is headless — `useBstTable` renders with your own ma
 
 ## Next steps
 
+- [Installation](./installation.mdx) — exact packages, CSS imports, Next.js / Vite setup, troubleshooting.
+- [Recipes](./recipes.mdx) — complete apps: server data, save-to-API, loading / empty / error, custom cells.
 - [Feature Guides](./features/index.mdx) — every `enable*` / `show*` flag, with when-and-why prose.
 - [Cell Types](./cell-types/index.mdx) — the 17 built-in `meta.type` renderers/editors.
 - [API Reference](./api/index.mdx) — every engine export with real signatures.

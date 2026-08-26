@@ -8,7 +8,7 @@ the viewport (plus a small overscan), keeping the DOM bounded no matter the row 
 Backed by `@tanstack/react-virtual`. `boolean | { overscan, estimateRowSize, estimateColumnSize }`.
 It also bounds the scroll box, so `enableStickyHeader` isn't needed alongside it.
 
-```tsx
+```tsx no-check
 <BstTableMui data={rows} columns={columns} getRowId={(r) => r.id}
   enableVirtualization={{ overscan: 8 }} />
 ```

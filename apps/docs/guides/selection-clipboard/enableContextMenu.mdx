@@ -9,7 +9,7 @@ A dependency-free popup at the cursor. Default items adapt to what's on: Copy / 
 column (with clipboard), Export CSV / Excel (with export), Autosize column. Reshape it entirely with
 `getContextMenuItems(ctx)` (spread `ctx.defaultItems` to extend).
 
-```tsx
+```tsx no-check
 enableContextMenu
 getContextMenuItems={(ctx) => [...ctx.defaultItems, { label: 'Flag row', onSelect: () => flag(ctx.row) }]}
 ```

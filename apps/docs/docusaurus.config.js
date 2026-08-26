@@ -25,6 +25,9 @@ module.exports = {
   organizationName: 'gitOfKumarSathish', // GitHub user/org that owns the repo
   projectName: 'bst-grid', // repo name
   deploymentBranch: 'gh-pages', // branch the built static site is pushed to
+  // Exposed to client components (e.g. BstSandbox) so the live-demo dependency pins
+  // track version.ini — a release can't leave them stale. Read from version.ini above.
+  customFields: { bstVersion: version },
   onBrokenLinks: 'warn',
   markdown: { hooks: { onBrokenMarkdownLinks: 'warn', onBrokenMarkdownImages: 'warn' } },
   presets: [

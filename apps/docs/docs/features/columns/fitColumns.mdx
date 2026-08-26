@@ -1,10 +1,10 @@
 ---
 id: fitColumns
-title: Fit columns to viewport (G3)
+title: Fit columns to viewport
 sidebar_label: fitColumns
 ---
 
-# Fit columns to viewport (G3)
+# Fit columns to viewport
 
 Prop `fitColumns` — engine behaviour, default `false`.
 
@@ -43,11 +43,11 @@ It's a pure render overlay — it never mutates your column-sizing model.
 | Since | v0.20.0 |
 | Settings sheet | Columns |
 
-Fit-to-viewport layout (G3) — size columns to the container so there is **no horizontal scroll**. The data columns share the available width in proportion to their own sizes (utility columns stay fixed); manual column resizing is suppressed while this is on. Default: false.
+Fit-to-viewport layout — size columns to the container so there is **no horizontal scroll**. The data columns share the available width in proportion to their own sizes (utility columns stay fixed); manual column resizing is suppressed while this is on. Default: false.
 
 ## Enable it
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}
@@ -63,5 +63,7 @@ Fit-to-viewport layout (G3) — size columns to the container so there is **no h
 - **Conflicts with** `enableResponsive` — responsive hiding is a no-op under `fitColumns`.
 
 ## Spec coverage
+
+> **Spec codes** (`A1`, `C2`, `X8`, …) are Bst-Table's internal requirement IDs from the capability matrix; `P0`–`P2` mark the delivery phase. They are traceability tags, not part of the public API.
 
 - **G3 · Auto layout** — ✅ built. fixed layout + total-size + fitColumns fit-to-viewport

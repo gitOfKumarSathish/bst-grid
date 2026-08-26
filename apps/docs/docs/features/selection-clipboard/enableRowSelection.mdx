@@ -44,11 +44,11 @@ selected-count chip and Clear.
 | Since | v0.5.0 |
 | Settings sheet | Selection & clipboard |
 
-Row selection (Phase 3) — a leading checkbox column with header "select all" (indeterminate when partial) and per-row checkboxes. Maps to v9 `enableRowSelection`; state lives in `table.state.rowSelection`, keyed by `getRowId`. Read it via `table.getSelectedRowModel()`. Default: false (opt-in).
+Row selection — a leading checkbox column with header "select all" (indeterminate when partial) and per-row checkboxes. Maps to v9 `enableRowSelection`; state lives in `table.state.rowSelection`, keyed by `getRowId`. Read it via `table.getSelectedRowModel`. Default: false (opt-in).
 
 ## Enable it
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}

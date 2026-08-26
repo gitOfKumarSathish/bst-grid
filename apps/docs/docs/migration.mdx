@@ -41,7 +41,7 @@ Instead of a bespoke renderer per column, pick a built-in **cell type** with `me
 configure it through `cellMeta`; drop to `columnDef.cell` only for something the built-ins don't
 cover.
 
-```tsx
+```tsx no-check
 const columns: BstTableColumn<Row>[] = [
   { id: 'name',   accessorKey: 'name',    header: 'Name' },
   { id: 'status', accessorKey: 'status',  header: 'Status',
@@ -63,7 +63,7 @@ turn them off with `enableSorting={false}` etc., or reach for the advanced piece
 
 These default **off** — opt in per grid:
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}

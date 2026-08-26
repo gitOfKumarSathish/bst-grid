@@ -1,10 +1,10 @@
 ---
 id: showFilterBuilder
-title: Filter builder UI (E3)
+title: Filter builder UI
 sidebar_label: showFilterBuilder
 ---
 
-# Filter builder UI (E3)
+# Filter builder UI
 
 Prop `showFilterBuilder` — adapter chrome, default `false`.
 
@@ -45,7 +45,7 @@ Combine it with `enableColumnFilterRow` for a second, inline per-column row.
 
 ## Enable it
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}
@@ -61,5 +61,7 @@ Combine it with `enableColumnFilterRow` for a second, inline per-column row.
 - **Requires** `enableColumnFilters` to be on — this flag is a no-op otherwise.
 
 ## Spec coverage
+
+> **Spec codes** (`A1`, `C2`, `X8`, …) are Bst-Table's internal requirement IDs from the capability matrix; `P0`–`P2` mark the delivery phase. They are traceability tags, not part of the public API.
 
 - **E3 · Advanced filtering** — ✅ built. P3 — filter builder + bstCondition

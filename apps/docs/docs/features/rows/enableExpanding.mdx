@@ -1,10 +1,10 @@
 ---
 id: enableExpanding
-title: Master-detail (A4)
+title: Master-detail
 sidebar_label: enableExpanding
 ---
 
-# Master-detail (A4)
+# Master-detail
 
 Prop `enableExpanding` — engine behaviour, default `false`.
 
@@ -42,11 +42,11 @@ expanded one. Control which rows can open with `getRowCanExpand`.
 | Since | v0.13.0 |
 | Settings sheet | Rows |
 
-Master-detail (A4) — a leading expander column; clicking it reveals a detail panel row rendered by `renderDetail`. Opt-in. Default false. Built on v9's `rowExpandingFeature`.
+Master-detail — a leading expander column; clicking it reveals a detail panel row rendered by `renderDetail`. Opt-in. Default false. Built on v9's `rowExpandingFeature`.
 
 ## Enable it
 
-```tsx
+```tsx no-check
 <BstTableMui
   data={rows}
   columns={columns}
@@ -69,5 +69,7 @@ Master-detail (A4) — a leading expander column; clicking it reveals a detail p
 - Optionally narrow which rows expand with `getRowCanExpand`.
 
 ## Spec coverage
+
+> **Spec codes** (`A1`, `C2`, `X8`, …) are Bst-Table's internal requirement IDs from the capability matrix; `P0`–`P2` mark the delivery phase. They are traceability tags, not part of the public API.
 
 - **A4 · Nested / master-detail** — ✅ built. v0.13.0 — enableExpanding + renderDetail
