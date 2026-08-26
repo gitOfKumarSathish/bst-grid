@@ -38,11 +38,11 @@ this project uses [Semantic Versioning](https://semver.org).
   (SSR-safe via `BrowserOnly`). At least one per feature group + both editing modes (10 total).
 - **Guide placement** — the hand-written partials now inject under a `## Guide` heading **before**
   the generated reference tables (was after), with `###` sub-sections — matching the docs spec.
-- **Stricter neutral-naming** — `verify:naming` now also bans `Material React Table` / `MRT`
-  (previously only ag-Grid, MUI X DataGrid and the `AG#` roadmap IDs were caught), so the
-  no-competitor-names policy is **enforced**, not merely followed. The Migration guide is a
-  fully-neutral "coming from any grid" concept map + five-step porting checklist — the soft
-  references ("DataGrid", "Pro / Premium / Enterprise tiers") were removed; no product is named.
+- **Stricter neutral-naming** — `verify:naming` now bans two further third-party grid product names
+  (a React table library and its acronym) in addition to those already caught, so the
+  no-competitor-names policy is **enforced**, not just followed (see `scripts/verify-naming.mjs` for
+  the list). The Migration guide is now a fully-neutral "coming from any grid" concept map +
+  five-step porting checklist, with the remaining soft references removed; no product is named.
 
 ## [0.42.0] — 2026-08-24
 
