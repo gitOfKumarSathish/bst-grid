@@ -127,10 +127,20 @@ export interface ExampleEntry {
   files: Array<{ path: string; code: string }>
 }
 
+/** One released version, from a `CHANGELOG.md` `## [x.y.z] — date` heading. */
+export interface VersionEntry {
+  /** The `x.y.z` version. */
+  version: string
+  /** The release date (`YYYY-MM-DD`) if the changelog heading carried one. */
+  date?: string
+}
+
 /** The complete generated knowledge base. */
 export interface BstCorpus {
   /** The `version.ini` version these packages/docs were generated from. */
   version: string
+  /** Released versions parsed from `CHANGELOG.md`, newest first (for `bst_list_versions`). */
+  versions: VersionEntry[]
   /** Full ISO-8601 timestamp of when the corpus was generated. */
   generatedAt: string
   /** Human-readable list of the source kinds the corpus was extracted from. */

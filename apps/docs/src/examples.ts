@@ -246,3 +246,103 @@ export default function App() {
 `
 }
 for (const [t, d] of Object.entries(CELL_DEMO_DATA)) EXAMPLES['cell-' + t] = cellDemo(d)
+
+// ---- distinct-feature demos ------------------------------------------------
+const FEAT_HEAD = `import React from 'react'
+import { BstTableMui } from '@bloomskill/table-mui'
+import type { BstTableColumn } from '@bloomskill/table-engine'
+import '@bloomskill/table-engine/styles.css'
+type Row = { id: string; name: string; team: string; role: string; score: number }
+const seed: Row[] = [
+  { id: '1', name: 'Ada Lovelace',    team: 'Platform', role: 'Engineer',  score: 92 },
+  { id: '2', name: 'Alan Turing',     team: 'Research', role: 'Scientist', score: 88 },
+  { id: '3', name: 'Grace Hopper',    team: 'Platform', role: 'Engineer',  score: 95 },
+  { id: '4', name: 'Katherine J.',    team: 'Research', role: 'Analyst',   score: 90 },
+  { id: '5', name: 'Edsger Dijkstra', team: 'Platform', role: 'Architect', score: 84 },
+]
+const columns: BstTableColumn<Row>[] = [
+  { id: 'name', accessorKey: 'name', header: 'Name' },
+  { id: 'team', accessorKey: 'team', header: 'Team' },
+  { id: 'role', accessorKey: 'role', header: 'Role' },
+  { id: 'score', accessorKey: 'score', header: 'Score', sortFn: 'basic' },
+]
+`
+
+EXAMPLES['feat-conditional'] = `import React from 'react'
+import { BstTableMui } from '@bloomskill/table-mui'
+import type { BstTableColumn } from '@bloomskill/table-engine'
+import '@bloomskill/table-engine/styles.css'
+type Deal = { id: string; company: string; amount: number; stage: string; daysOpen: number }
+const data: Deal[] = [
+  { id: '1', company: 'Acme Corp', amount: 82000, stage: 'Won',        daysOpen: 12 },
+  { id: '2', company: 'Globex',    amount: 14500, stage: 'Negotiation', daysOpen: 41 },
+  { id: '3', company: 'Initech',   amount: 56000, stage: 'Proposal',    daysOpen: 8 },
+  { id: '4', company: 'Umbrella',  amount: 4200,  stage: 'Lost',        daysOpen: 63 },
+  { id: '5', company: 'Soylent',   amount: 71000, stage: 'Won',        daysOpen: 5 },
+]
+const columns: BstTableColumn<Deal>[] = [
+  { id: 'company', accessorKey: 'company', header: 'Company' },
+  { id: 'amount', accessorKey: 'amount', header: 'Amount', meta: { type: 'number', cellMeta: { currency: 'USD' } } },
+  { id: 'stage', accessorKey: 'stage', header: 'Stage' },
+  { id: 'daysOpen', accessorKey: 'daysOpen', header: 'Days open', meta: { type: 'number' } },
+]
+export default function App() {
+  return (
+    <BstTableMui data={data} columns={columns} getRowId={(r) => r.id} pagination={false}
+      conditionalFormats={[
+        { scope: 'cell', columnId: 'amount', when: { op: 'gt', value: 50000 }, style: { color: '#16a34a', fontWeight: 700 } },
+        { scope: 'row', columnId: 'daysOpen', when: { op: 'gt', value: 30 }, style: { background: '#fef2f2' } },
+        { scope: 'row', columnId: 'stage', when: { op: 'equals', value: 'Won' }, style: { background: '#f0fdf4' } },
+      ]} />
+  )
+}
+`
+
+EXAMPLES['feat-master'] = FEAT_HEAD + `export default function App() {
+  return (
+    <BstTableMui data={seed} columns={columns} getRowId={(r) => r.id}
+      enableExpanding getRowCanExpand={() => true}
+      renderDetail={(row) => (
+        <div style={{ padding: 14, background: '#f8fafc' }}>
+          Detail for <b>{row.original.name}</b> — {row.original.role} on the {row.original.team} team, score {row.original.score}.
+        </div>
+      )} />
+  )
+}
+`
+
+EXAMPLES['feat-grouping'] = FEAT_HEAD + `export default function App() {
+  return (
+    <BstTableMui data={seed} columns={columns} getRowId={(r) => r.id}
+      enableGrouping initialState={{ grouping: ['team'], expanded: true }} />
+  )
+}
+`
+
+EXAMPLES['feat-filterbuilder'] = FEAT_HEAD + `export default function App() {
+  return (
+    <BstTableMui data={seed} columns={columns} getRowId={(r) => r.id}
+      showFilterBuilder enableColumnFilterRow />
+  )
+}
+`
+
+EXAMPLES['feat-undoredo'] = FEAT_HEAD + `const editable = columns.map((c) => c.id === 'score' ? { ...c, meta: { type: 'number', editable: true } } : c)
+export default function App() {
+  const [rows, setRows] = React.useState(seed)
+  return (
+    <BstTableMui data={rows} columns={editable} getRowId={(r) => r.id}
+      enableEditing enableUndoRedo showUndoRedo onDataChange={setRows} />
+  )
+}
+`
+
+EXAMPLES['feat-rowactions'] = FEAT_HEAD + `const withAction: BstTableColumn<Row>[] = [...columns, { id: 'actions', accessorKey: 'id', header: 'Actions', meta: { type: 'action' } }]
+export default function App() {
+  const [rows, setRows] = React.useState(seed)
+  return (
+    <BstTableMui data={rows} columns={withAction} getRowId={(r) => r.id}
+      enableEditing enableRowActions showAddRow onDataChange={setRows} />
+  )
+}
+`

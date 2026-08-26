@@ -5,6 +5,7 @@ import { registerCellTypeTool } from './cells.js'
 import { registerExampleTool } from './examples.js'
 import { registerFeatureTool } from './features.js'
 import { registerScaffoldTool } from './scaffold.js'
+import { registerListVersionsTool } from './versions.js'
 import { registerSearchTool } from './search.js'
 import { registerValidateTool } from './validate.js'
 import { registerVersionTool } from './version.js'
@@ -22,4 +23,5 @@ export function registerTools(server: McpServer, corpus: BstCorpus): void {
   registerValidateTool(server, corpus)
   registerScaffoldTool(server, corpus)
   registerVersionTool(server, corpus)
+  registerListVersionsTool(server, corpus)
 }

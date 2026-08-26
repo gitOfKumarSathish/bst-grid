@@ -4,7 +4,7 @@ Complete guide to [`@bloomskill/table-mcp`](../packages/mcp/README.md): the MCP 
 teaches AI coding agents how to use Bst-Table.
 
 - **What it is:** a [Model Context Protocol](https://modelcontextprotocol.io) server exposing
-  8 tools, 4 prompts and `bst://` resources over stdio.
+  9 tools, 4 prompts and `bst://` resources over stdio.
 - **Why it exists:** no language model has seen Bst-Table, so asked to "build a Bst-Table grid"
   an agent emits some **other grid library's** code — the libraries this project replaces.
   The server gives the agent accurate, version-pinned knowledge instead.
@@ -340,9 +340,9 @@ Expected tail:
 
 ```text
 prompts/list → 4
-tools/call → 13
+tools/call → 14
   ✓ …
-all good — 8 tools, 13 calls
+all good — 9 tools, 14 calls
 ```
 
 **Inside a client** — ask it something only this server can answer correctly:
@@ -378,6 +378,7 @@ version it shipped in (`since`); pass a project's installed version to `bst_get_
 | `bst_scaffold_grid` | Generate a complete component with dependencies pre-wired. | `{ "adapter": "mui", "features": ["editing","clipboard"], "columns": [{ "id": "name" }] }` |
 | `bst_validate_config` | Lint a grid config for unmet dependencies + invented props. | `{ "code": "<BstTableMui showSearch enableGlobalFilter={false} />" }` |
 | `bst_detect_version` | Compare a project's installed version to what the server documents. | `{ "path": "/abs/project" }` |
+| `bst_list_versions` | List the released version history (from the changelog), documented one marked. | `{}` |
 
 ### What the checker catches
 

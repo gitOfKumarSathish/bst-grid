@@ -1,6 +1,24 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { compareSemver } from '../semver.js'
+import type { VersionEntry } from '../types.js'
+
+/**
+ * Parses the released versions from `CHANGELOG.md` — every `## [x.y.z] — date`
+ * heading — newest first. `## [Unreleased]` carries no version and is skipped.
+ * Feeds `bst_list_versions`, so an agent can see the release history and the
+ * gap between a project's version and the latest without leaving the tool.
+ */
+export function extractVersions(repoRoot: string): VersionEntry[] {
+  const changelog = readFileSync(join(repoRoot, 'CHANGELOG.md'), 'utf8')
+  const out: VersionEntry[] = []
+  for (const line of changelog.split('\n')) {
+    // `## [0.43.0] — 2026-08-26` (em dash or hyphen; date optional).
+    const m = line.match(/^##\s*\[(\d+\.\d+\.\d+)\]\s*(?:[—–-]\s*(\d{4}-\d{2}-\d{2}))?/)
+    if (m?.[1]) out.push(m[2] ? { version: m[1], date: m[2] } : { version: m[1] })
+  }
+  return out.sort((a, b) => compareSemver(b.version, a.version))
+}
 
 /**
  * Builds a "first shipped in" lookup from `CHANGELOG.md`.

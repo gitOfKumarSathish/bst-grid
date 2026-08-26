@@ -35,6 +35,7 @@ const CALLS = [
   ['bst_detect_version', { path: PKG_ROOT }, 'npm install @bloomskill/table-engine'],
   ['bst_validate_config', { code: "<BstTableMui data={rows} columns={cols} showSearch enableGlobalFilter={false} />" }, 'showSearch'],
   ['bst_scaffold_grid', { adapter: 'mui', features: ['editing', 'clipboard'], columns: [{ id: 'name', type: 'text' }] }, 'BstTableMui'],
+  ['bst_list_versions', {}, 'released versions'],
 ]
 
 let failures = 0

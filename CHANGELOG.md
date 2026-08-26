@@ -10,6 +10,17 @@ this project uses [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+## [0.44.0] — 2026-08-26
+
+### Added — MCP server: `bst_list_versions` (9th tool)
+- New **`bst_list_versions`** tool lists the released version history — parsed from `CHANGELOG.md`
+  into the corpus (`versions`, via `extractVersions` in `src/generate/since.ts`), newest first with
+  dates and the documented version marked. Gives an agent upgrade / migration context, pairing with
+  `bst_detect_version` and `bst_get_feature({ installedVersion })`. It stays honest about the offline
+  model — this server documents exactly one version per corpus; another version needs its own pinned
+  install (`npx @bloomskill/table-mcp@<version>`). Brings the tool count to 9; smoke + the two parity
+  tests updated accordingly.
+
 ## [0.43.0] — 2026-08-26
 
 ### Added — MCP server (`@bloomskill/table-mcp`): structured output, completions & version-awareness

@@ -15,6 +15,7 @@ import { extractRequirements } from './coverage.js'
 import { docSources, extractDocs } from './docs.js'
 import { extractExamples } from './examples.js'
 import { extractFeatures } from './features.js'
+import { extractVersions } from './since.js'
 
 /**
  * Concrete inputs that aren't markdown docs but still shape the corpus — the
@@ -51,6 +52,7 @@ export async function generateCorpus(repoRoot: string): Promise<BstCorpus> {
 
   return {
     version: readVersionIni(repoRoot),
+    versions: extractVersions(repoRoot),
     // Full ISO timestamp (not just the date) so the freshness guard can compare
     // it to source mtimes at sub-day resolution. Set here, after every extractor
     // has finished reading, so it is strictly newer than every source's mtime.

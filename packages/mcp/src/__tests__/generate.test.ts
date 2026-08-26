@@ -6,7 +6,7 @@ import { findRepoRoot } from '../constants.js'
 import { classifyFlag, extractTsDoc, primaryFlag, requirementIdsFrom } from '../generate/features.js'
 import { docSources } from '../generate/docs.js'
 import { findStaleSources } from '../generate/freshness.js'
-import { buildShipVersionLookup } from '../generate/since.js'
+import { buildShipVersionLookup, extractVersions } from '../generate/since.js'
 import { codeSpans, parseTable, sections, slugify, stripMd } from '../generate/md.js'
 import { buildSearchIndex } from '../search/index.js'
 import { compareSemver } from '../semver.js'
@@ -149,6 +149,24 @@ describeCorpus('generated corpus', () => {
     const sinceOf = buildShipVersionLookup(repoRoot as string)
     expect(sinceOf('enableFind')).toMatch(/^\d+\.\d+\.\d+$/)
     expect(sinceOf('__not_a_real_flag__')).toBeUndefined()
+  })
+
+  /** `bst_list_versions` reads the release history straight from the corpus. */
+  it('carries the released version history, newest first, with the documented one present', () => {
+    expect(c.versions.length).toBeGreaterThan(1)
+    for (const v of c.versions) expect(v.version).toMatch(/^\d+\.\d+\.\d+$/)
+    // Sorted descending (newest first).
+    for (let i = 1; i < c.versions.length; i++) {
+      expect(compareSemver(c.versions[i - 1].version, c.versions[i].version)).toBeGreaterThan(0)
+    }
+    // The version this corpus documents is one of the released versions.
+    expect(c.versions.some((v) => v.version === c.version)).toBe(true)
+  })
+
+  it('parses versions with dates from CHANGELOG headings', () => {
+    const versions = extractVersions(repoRoot as string)
+    expect(versions[0]?.version).toMatch(/^\d+\.\d+\.\d+$/)
+    expect(versions.some((v) => /^\d{4}-\d{2}-\d{2}$/.test(v.date ?? ''))).toBe(true)
   })
 
   /**

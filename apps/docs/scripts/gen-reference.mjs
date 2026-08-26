@@ -10,6 +10,8 @@ import { join } from 'node:path'
 
 const OUT = process.argv[2] || 'apps/docs/docs'
 const CELLS = JSON.parse(readFileSync('cells.json', 'utf8'))
+// Cell types that have a captured screenshot + live demo (see apps/docs/src/examples.ts).
+const CELL_DEMOS = new Set(['text', 'longText', 'number', 'dateTime', 'boolean', 'singleSelect', 'multiSelect', 'radio', 'hyperlink', 'files', 'sparkline', 'kpi', 'qr', 'barcode', 'richText'])
 const API = JSON.parse(readFileSync('api-sigs.json', 'utf8'))
 const REQS = JSON.parse(readFileSync('requirements.json', 'utf8'))
 const FEATURES = JSON.parse(readFileSync('features.json', 'utf8'))
@@ -73,8 +75,9 @@ function genCells() {
 
   for (const c of CELLS) {
     const L = ['---', `id: ${c.type}`, `title: ${c.type}`, `sidebar_label: ${c.type}`, '---', '',
-      `# \`${c.type}\``, '', mdxSafe(c.renders) + '.', '',
-      '## At a glance', '', '| | |', '| --- | --- |',
+      `# \`${c.type}\``, '', mdxSafe(c.renders) + '.', '']
+    if (CELL_DEMOS.has(c.type)) L.push(`![The ${c.type} cell rendered in a Bst-Table grid](/img/cell-${c.type}.png)`, '', `<BstSandbox example="cell-${c.type}" />`, '')
+    L.push('## At a glance', '', '| | |', '| --- | --- |',
       `| Renders | ${mdxSafe(c.renders, { inTableCell: true })} |`,
       `| Value shape | ${codeCell(c.valueShape)} |`,
       `| Editable | ${mdxSafe(c.editable, { inTableCell: true })} |`,
@@ -82,7 +85,7 @@ function genCells() {
       '## Use it', '', '```tsx',
       'const columns: BstTableColumn<Row>[] = [',
       `  { id: 'x', accessorKey: 'x', header: 'X', meta: { type: '${c.type}'${c.cellMeta && c.cellMeta !== '—' ? ', /* cellMeta below */' : ''} } },`,
-      ']', '```', '']
+      ']', '```', '')
     if (c.cellMetaDetail) { L.push('## `cellMeta` options', '', mdxSafe(dropSelfAnchors(c.cellMetaDetail)), '') }
     writeFileSync(join(dir, `${c.type}.mdx`), L.join('\n'))
   }

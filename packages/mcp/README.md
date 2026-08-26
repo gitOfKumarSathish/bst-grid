@@ -109,6 +109,7 @@ live / WebSocket merge (I5) isn't built.
 | `bst_scaffold_grid` | A complete, compiling component from a feature list + column list. |
 | `bst_validate_config` | Lints a config for unknown props, unmet dependencies, inert options and capabilities that don't exist. |
 | `bst_detect_version` | Which `@bloomskill/table-*` versions a project has, vs. what this server documents. |
+| `bst_list_versions` | The released version history (from the changelog) with the documented one marked — for upgrade/migration context. |
 
 **Prompts** (slash commands in most clients) — `bst-quick-start` (new grid) · `bst-add-feature`
 (switch a capability on, dependencies included) · `bst-new-cell-type` (author a custom
