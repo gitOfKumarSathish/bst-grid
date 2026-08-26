@@ -1,0 +1,14 @@
+### When to use it
+
+Dates, times, or timestamps that should render and edit with a real picker instead of free text.
+
+### How it works
+
+Reads an ISO `string` or a `Date` and formats it locale-aware. `cellMeta.variant` selects date /
+time / datetime; editing opens the native picker. The original value is preserved on save.
+
+### Options
+
+- `cellMeta.variant` — `'date'` | `'time'` | `'datetime'`.
+- `meta.format` (`Intl.DateTimeFormatOptions`) and `meta.locale` for custom formatting.
+- `cellMeta.required` — reject an empty value.

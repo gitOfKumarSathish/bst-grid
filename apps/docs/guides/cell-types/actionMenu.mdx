@@ -1,17 +1,3 @@
----
-id: actionMenu
-title: actionMenu
-sidebar_label: actionMenu
----
-
-# `actionMenu`
-
-compact ⋯ kebab → actions popup.
-
-<BstSandbox example="cell-actionMenu" />
-
-## Guide
-
 ### When to use it
 
 The compact alternative to `action`: one kebab (⋯) button that opens the row's actions in a popup —
@@ -27,20 +13,3 @@ Escape, or scroll.
 
 - Reuses `meta.actions` and the edit session, so like `action` it needs `enableRowActions` (plus
   `enableEditing` for edit/save).
-
-## At a glance
-
-| | |
-| --- | --- |
-| Renders | compact ⋯ kebab → actions popup |
-| Value shape | `—` |
-| Editable | — |
-| Key `cellMeta` | via meta.actions |
-
-## Use it
-
-```tsx
-const columns: BstTableColumn<Row>[] = [
-  { id: 'x', accessorKey: 'x', header: 'X', meta: { type: 'actionMenu', /* cellMeta below */ } },
-]
-```

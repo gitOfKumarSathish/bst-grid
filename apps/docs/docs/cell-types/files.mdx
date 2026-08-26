@@ -12,6 +12,25 @@ image thumbnail / PDF thumbnail (pdfThumbnail) / icon + name · click to preview
 
 <BstSandbox example="cell-files" />
 
+## Guide
+
+### When to use it
+
+Attachments on a row — images, PDFs, or any document.
+
+### How it works
+
+Reads `FileRef[]` (`{ name, url, thumbnailUrl?, contentType? }`) and renders thumbnails, or a
+file-type icon plus the name. Click a file to preview — images inline, PDFs in the browser's native
+viewer. The adapters' popup editor adds and removes files.
+
+### Options
+
+- `cellMeta.onUpload` / `cellMeta.onDelete` — wire a real backend; without them a local object URL
+  keeps preview working offline.
+- `cellMeta.pdfThumbnail` — render page 1 of a PDF as a thumbnail (inject a pdf.js renderer).
+- `cellMeta.preview`, `cellMeta.accept`.
+
 ## At a glance
 
 | | |

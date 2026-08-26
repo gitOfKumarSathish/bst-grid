@@ -1,0 +1,14 @@
+### When to use it
+
+The default for any short, single-line string — names, labels, SKUs, statuses stored as free text.
+
+### How it works
+
+Reads the raw string on one line; overflow truncates with an ellipsis and the full value shows as a
+hover tooltip. Editing swaps in a text input. The stored value is a plain `string`.
+
+### Options
+
+- `cellMeta.required` — reject an empty value on save.
+- `cellMeta.pattern` — validate and input-mask against a preset (`email`, `pan`, `gstin`, …) or a
+  `RegExp`; see the ERP field formats.

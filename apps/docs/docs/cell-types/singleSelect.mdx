@@ -12,6 +12,22 @@ badge (color · icon · avatar).
 
 <BstSandbox example="cell-singleSelect" />
 
+## Guide
+
+### When to use it
+
+A value from a fixed set — status, priority, category, owner — shown as a coloured badge.
+
+### How it works
+
+Reads a single option `value` and renders its badge (colour · icon · avatar, from `meta.options`).
+Editing opens a searchable dropdown. Stored as the option's `string` value (or `null`).
+
+### Options
+
+- `meta.options` — `[{ value, label, color?, icon?, avatar? }]` drives both the read badge and the
+  edit dropdown.
+
 ## At a glance
 
 | | |

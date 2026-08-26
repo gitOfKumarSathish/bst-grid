@@ -12,6 +12,21 @@ inline SVG line / area / bar.
 
 <BstSandbox example="cell-sparkline" />
 
+## Guide
+
+### When to use it
+
+An inline trend — a mini chart of a series in a single cell, with no charting library.
+
+### How it works
+
+Reads a `number[]` (or a `'1,2,3'` string) and draws a dependency-free inline-SVG chart. Read-only.
+
+### Options
+
+- `cellMeta.variant` — `'line'` (default) | `'area'` | `'bar'`.
+- `cellMeta.color`, `width`, `height`, `min`, `max`, `showValue`.
+
 ## At a glance
 
 | | |

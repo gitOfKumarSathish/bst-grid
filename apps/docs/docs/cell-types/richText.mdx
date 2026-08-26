@@ -12,6 +12,22 @@ sanitized-HTML preview or formatted.
 
 <BstSandbox example="cell-richText" />
 
+## Guide
+
+### When to use it
+
+Formatted text — bold, italics, lists — stored as HTML.
+
+### How it works
+
+Reads an HTML `string`. By default it shows a safe one-line plain-text preview; set
+`cellMeta.render: 'html'` to show the sanitized formatted content. The adapters open a toolbar +
+popup editor, and input is sanitized in both directions.
+
+### Options
+
+- `cellMeta.render` — `'text'` (default, safe plain preview) | `'html'` (formatted).
+
 ## At a glance
 
 | | |

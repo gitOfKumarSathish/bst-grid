@@ -14,11 +14,11 @@ _Verified against the corpus + working tree on 2026-08-26. Everything below is c
 | **Corpus capabilities** | **90** | generated reference page each ✅ |
 | ↳ `enable*` / `show*` toggle flags | **61** | page **+ prose guide each** ✅ (0 without a guide) |
 | ↳ config props / cell-meta / notes | 29 | on the relevant feature / cell / API page |
-| Cell types | **17** | page each ✅ (15 with a standalone image + live demo) |
+| Cell types | **17** | page **+ prose guide + live demo each** ✅ (15 also have a standalone screenshot) |
 | ↳ cellMeta sub-options | 38 | on each cell page |
 | Engine API exports | **262** | page each ✅ (fn · hooks · iface · type · const) |
 | Spec-coverage leaves | **58** | coverage matrix ✅ |
-| Prose guides (hand-written) | **71** | 62 flag guides + 9 group overviews |
+| Prose guides (hand-written) | **88** | 62 flag guides + 9 group overviews + 17 cell-type guides |
 | Generated pages | 90 | 72 feature + 18 cell + API + coverage |
 | **Live Sandpack demos** | **~34** | headline flags + 15 cells + 6 features + showcase + dark |
 | **Screenshots** | **33** | see breakdown below |
@@ -69,11 +69,12 @@ Coverage gate (`check-docs-coverage.mjs`) is **green** — every flag, cell and 
 
 ## MISSING / BACKLOG ⬜ (pick up in future chats)
 
-1. **`action` / `actionMenu` standalone cell images** — the **only 2** of the 17 cell types without their
-   own screenshot (they need row-action wiring to render). Both ARE shown in the row-actions feature shot.
-   _Add individual demos only if you want strict per-cell parity._
-2. **Prose layer for Cell Types (17) and API Reference (262)** — complete *generated* reference exists, but
-   no hand-written "when/why" prose like the 61 flag guides have. _Extend the injection to cell/API pages._
+1. **`action` / `actionMenu` standalone screenshots** — the only 2 cell types still without a static PNG
+   (no headless-capture tooling for them). They now have their own **live Sandpack demos + prose**, so the
+   pages are no longer bare — only the static screenshot is outstanding.
+2. **Prose layer for API Reference (262)** — the API-export pages still have no hand-written "when/why"
+   prose. _Extend the guide injection to API pages._ (Cell Types are now **done** — a "when to use / how it
+   works / gotchas" guide for all 17 in `guides/cell-types/`, injected under `## Guide` like the flag guides.)
 3. **~7 more distinct-feature images (optional)** — captured 6; not yet imaged: `density toggle, sticky
    header, row pinning, context menu, set filter, multi-filter, status-bar aggregates`.
 4. **Animated hero GIF** — only a static hero exists. Needs a screen recording of the live grid.

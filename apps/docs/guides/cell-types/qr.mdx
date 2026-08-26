@@ -1,0 +1,13 @@
+### When to use it
+
+A scannable QR code generated from a value — a URL, SKU, or token.
+
+### How it works
+
+Reads a `string` and renders a dependency-free inline-SVG QR (byte mode, versions 1–10). Editing
+swaps in a text input and the code re-renders live.
+
+### Options
+
+- `cellMeta.ecLevel` — error-correction level `'L'` | `'M'` (default) | `'Q'` | `'H'`.
+- `cellMeta.size`, `cellMeta.margin`.

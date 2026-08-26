@@ -346,3 +346,24 @@ export default function App() {
   )
 }
 `
+
+// Per-cell demos for the two action cell types — they render a row's edit session,
+// so they need enableEditing + enableRowActions and can't use the generic cellDemo.
+EXAMPLES['cell-action'] = FEAT_HEAD + `const withActionCol: BstTableColumn<Row>[] = [...columns, { id: 'actions', accessorKey: 'id', header: 'Actions', meta: { type: 'action' } }]
+export default function App() {
+  const [rows, setRows] = React.useState(seed)
+  return (
+    <BstTableMui data={rows} columns={withActionCol} getRowId={(r) => r.id}
+      enableEditing enableRowActions onDataChange={setRows} pagination={false} />
+  )
+}
+`
+EXAMPLES['cell-actionMenu'] = FEAT_HEAD + `const withMenuCol: BstTableColumn<Row>[] = [...columns, { id: 'actions', accessorKey: 'id', header: 'Actions', meta: { type: 'actionMenu' } }]
+export default function App() {
+  const [rows, setRows] = React.useState(seed)
+  return (
+    <BstTableMui data={rows} columns={withMenuCol} getRowId={(r) => r.id}
+      enableEditing enableRowActions onDataChange={setRows} pagination={false} />
+  )
+}
+`

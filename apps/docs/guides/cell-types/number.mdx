@@ -1,0 +1,16 @@
+### When to use it
+
+Any numeric value — quantities, money, percentages, scores — that should render with locale-aware
+formatting while storing the raw number.
+
+### How it works
+
+Reads a `number` (or `null`) and formats it via `Intl.NumberFormat`. Editing swaps in a number
+input; the raw number is stored and formatting is display-only, so sorting and maths stay correct.
+
+### Options
+
+- `cellMeta.currency` (e.g. `'USD'`) with `cellMeta.precision` — money formatting.
+- `cellMeta.useGrouping` — thousands separators.
+- `meta.format` (`'currency'` / `'percent'` / `Intl.NumberFormatOptions`) and `meta.locale` for finer control.
+- `cellMeta.required`, `cellMeta.pattern` — validation.

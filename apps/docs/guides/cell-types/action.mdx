@@ -1,17 +1,3 @@
----
-id: action
-title: action
-sidebar_label: action
----
-
-# `action`
-
-inline Edit / Save / Copy / Delete buttons.
-
-<BstSandbox example="cell-action" />
-
-## Guide
-
 ### When to use it
 
 A row's controls — edit, save, duplicate, delete — as inline buttons in a dedicated column.
@@ -26,20 +12,3 @@ value of its own. Pin it last so it stays put while the other columns scroll.
 
 - Needs `enableRowActions` (and `enableEditing` for edit/save) — the buttons act on the edit session.
 - For a compact, single-button alternative, use `actionMenu`.
-
-## At a glance
-
-| | |
-| --- | --- |
-| Renders | inline Edit / Save / Copy / Delete buttons |
-| Value shape | `—` |
-| Editable | — |
-| Key `cellMeta` | via meta.actions |
-
-## Use it
-
-```tsx
-const columns: BstTableColumn<Row>[] = [
-  { id: 'x', accessorKey: 'x', header: 'X', meta: { type: 'action', /* cellMeta below */ } },
-]
-```

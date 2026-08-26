@@ -1,0 +1,13 @@
+### When to use it
+
+Several values from a set — tags, labels, skills — shown as chips.
+
+### How it works
+
+Reads a `string[]` and renders one chip per value; extras fold into a `+N more`. Editing opens a
+checkbox dropdown. Shares the `meta.options` shape with `singleSelect`.
+
+### Options
+
+- `cellMeta.maxChips` — cap the chips shown before `+N more` (default `3`).
+- `cellMeta.fitChips` — width-aware: fit as many chips as the column width allows, folding the rest.

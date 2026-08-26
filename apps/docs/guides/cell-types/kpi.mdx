@@ -1,0 +1,14 @@
+### When to use it
+
+A headline metric with movement — MRR, churn, conversion — a value plus its trend.
+
+### How it works
+
+Reads a `number`, or `{ value, delta?, data? }`, and renders the value, a coloured delta chip, and
+an optional mini-sparkline. Number formatting from `meta` applies. Read-only.
+
+### Options
+
+- `cellMeta.deltaPercent` — show the delta as a percentage.
+- `cellMeta.invertDelta` — treat *down* as good (e.g. churn, cost).
+- `cellMeta.sparkWidth`.

@@ -5,16 +5,31 @@
  *   inputs : cells.json, api-sigs.json, requirements.json, features.json
  *   output : <OUT>/cell-types/**, <OUT>/api/**, <OUT>/coverage.mdx
  */
-import { readFileSync, writeFileSync, mkdirSync, rmSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync, mkdirSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
 
 const OUT = process.argv[2] || 'apps/docs/docs'
 const CELLS = JSON.parse(readFileSync('cells.json', 'utf8'))
-// Cell types that have a captured screenshot + live demo (see apps/docs/src/examples.ts).
-const CELL_DEMOS = new Set(['text', 'longText', 'number', 'dateTime', 'boolean', 'singleSelect', 'multiSelect', 'radio', 'hyperlink', 'files', 'sparkline', 'kpi', 'qr', 'barcode', 'richText'])
+// Cell types that have a live Sandpack demo (see apps/docs/src/examples.ts). A
+// static screenshot is added separately, only when the PNG actually exists —
+// action/actionMenu have a demo but no screenshot.
+const CELL_DEMOS = new Set(['text', 'longText', 'number', 'dateTime', 'boolean', 'singleSelect', 'multiSelect', 'radio', 'hyperlink', 'files', 'sparkline', 'kpi', 'qr', 'barcode', 'richText', 'action', 'actionMenu'])
 const API = JSON.parse(readFileSync('api-sigs.json', 'utf8'))
 const REQS = JSON.parse(readFileSync('requirements.json', 'utf8'))
 const FEATURES = JSON.parse(readFileSync('features.json', 'utf8'))
+
+// Hand-written prose partials injected into the generated cell pages (mirrors the
+// feature-guide "human quality layer"). Live OUTSIDE the generated tree so
+// regeneration never clobbers them; a missing partial is simply skipped.
+const GUIDES = join(OUT, '..', 'guides')
+const STATIC_IMG = join(OUT, '..', 'static', 'img')
+function readGuide(rel) {
+  try {
+    return readFileSync(join(GUIDES, rel), 'utf8').replace(/^---\n[\s\S]*?\n---\n/, '').trim()
+  } catch {
+    return ''
+  }
+}
 
 // ---- MDX safety (escape stray <,{,},| outside inline code) ----------------
 function mdxSafe(s, { inTableCell = false } = {}) {
@@ -76,7 +91,10 @@ function genCells() {
   for (const c of CELLS) {
     const L = ['---', `id: ${c.type}`, `title: ${c.type}`, `sidebar_label: ${c.type}`, '---', '',
       `# \`${c.type}\``, '', mdxSafe(c.renders) + '.', '']
-    if (CELL_DEMOS.has(c.type)) L.push(`![The ${c.type} cell rendered in a Bst-Table grid](/img/cell-${c.type}.png)`, '', `<BstSandbox example="cell-${c.type}" />`, '')
+    if (existsSync(join(STATIC_IMG, `cell-${c.type}.png`))) L.push(`![The ${c.type} cell rendered in a Bst-Table grid](/img/cell-${c.type}.png)`, '')
+    if (CELL_DEMOS.has(c.type)) L.push(`<BstSandbox example="cell-${c.type}" />`, '')
+    const guide = readGuide(join('cell-types', `${c.type}.mdx`))
+    if (guide) L.push('## Guide', '', guide, '')
     L.push('## At a glance', '', '| | |', '| --- | --- |',
       `| Renders | ${mdxSafe(c.renders, { inTableCell: true })} |`,
       `| Value shape | ${codeCell(c.valueShape)} |`,
