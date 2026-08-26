@@ -78,7 +78,7 @@ npm install @bloomskill/table-engine react react-dom
 
 ## Quick start
 
-> ▶ **[Open in StackBlitz](https://stackblitz.com/github/gitOfKumarSathish/bst-grid/tree/main/examples/quick-start?file=src%2FApp.tsx)** — live and editable, no install.
+> ▶ **[Try it live](https://gitofkumarsathish.github.io/bst-grid/docs/getting-started)** — editable in your browser, no install.
 
 ```tsx
 import { useBstTable, BstTable, type BstTableColumn } from '@bloomskill/table-engine'
@@ -113,29 +113,19 @@ export function People() {
 
 ---
 
-## Live examples
+## Examples
 
-Each example imports the **published** package from npm — the same code you'd write. Source lives in
-[`examples/`](../../examples). Open one in **StackBlitz** (runs Vite in your browser — instant preview),
-or run it locally:
+**Every feature and cell type has a live, editable demo** on the
+**[documentation site](https://gitofkumarsathish.github.io/bst-grid/docs/features)** — tweak the code
+and watch the grid update, right in the browser, no install.
+
+Prefer a full, cloneable project? Seven standalone starters live in [`examples/`](../../examples)
+(`quick-start`, `editing`, `cell-types`, `conditional-formatting`, `cell-spanning`, `server-mode`,
+`field-formats`). Run one locally:
 
 ```bash
-cd examples/quick-start   # or editing · cell-types · conditional-formatting · cell-spanning · server-mode · field-formats
-npm install && npm run dev
+cd examples/quick-start && npm install && npm run dev
 ```
-
-| Example | Shows | Run it |
-| --- | --- | --- |
-| **Quick start** | Sortable + paginated grid | [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/gitOfKumarSathish/bst-grid/tree/main/examples/quick-start?file=src%2FApp.tsx) |
-| **Editing & validation** | Inline editing · validation · selects · row actions | [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/gitOfKumarSathish/bst-grid/tree/main/examples/editing?file=src%2FApp.tsx) |
-| **Cell types** | sparkline · KPI · badges · chips · boolean · barcode | [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/gitOfKumarSathish/bst-grid/tree/main/examples/cell-types?file=src%2FApp.tsx) |
-| **Conditional formatting** | Value-driven cell/row colours | [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/gitOfKumarSathish/bst-grid/tree/main/examples/conditional-formatting?file=src%2FApp.tsx) |
-| **Cell spanning** | Merged cells via `meta.rowSpan: 'group'` | [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/gitOfKumarSathish/bst-grid/tree/main/examples/cell-spanning?file=src%2FApp.tsx) |
-| **Server mode** | `useBstDataSource` — server-style sort/filter/paginate over 5k rows | [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/gitOfKumarSathish/bst-grid/tree/main/examples/server-mode?file=src%2FApp.tsx) |
-| **Field formats** | ERP validation + masks via `cellMeta.pattern` — Aadhaar · PAN · GSTIN · IBAN · card | [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/gitOfKumarSathish/bst-grid/tree/main/examples/field-formats?file=src%2FApp.tsx) |
-
-> StackBlitz builds the project on open; a brief blank preview just means it's still installing.
-> Running locally (above) is always instant and is the guaranteed path.
 
 ---
 
@@ -286,7 +276,7 @@ const columns: BstTableColumn<Person>[] = [
 
 ### Cell types
 
-> ▶ **[See every cell type live](https://stackblitz.com/github/gitOfKumarSathish/bst-grid/tree/main/examples/cell-types?file=src%2FApp.tsx)** on StackBlitz.
+> ▶ **[See every cell type live](https://gitofkumarsathish.github.io/bst-grid/docs/cell-types)** — editable demos, no install.
 
 Pick the renderer + editor with **`meta.type`**. Read renderers are dependency-free and run on the
 hot path; the MUI / shadcn adapters supply richer **editors** for the same types via their presets.
@@ -689,7 +679,7 @@ Built-in `sortFn`s: `basic` · `alphanumeric` · `datetime`. Built-in `filterFn`
 
 ## Editing and validation
 
-> ▶ **[Run it live](https://stackblitz.com/github/gitOfKumarSathish/bst-grid/tree/main/examples/editing?file=src%2FApp.tsx)** on StackBlitz.
+> ▶ **[Run it live](https://gitofkumarsathish.github.io/bst-grid/docs/features/editing/enableEditing)** — editable demo, no install.
 
 **Use it.** Editing is opt-in and controlled: pass `enableEditing` + an `onDataChange` handler that
 owns `data`. Columns opt in per-column with `meta.editable` and pick an editor with `meta.type`.
@@ -1112,7 +1102,7 @@ return <BstTableMui data={rows} columns={columns} getRowId={(r) => r.id} {...tab
 
 ## Conditional formatting
 
-> ▶ **[Run it live](https://stackblitz.com/github/gitOfKumarSathish/bst-grid/tree/main/examples/conditional-formatting?file=src%2FApp.tsx)** on StackBlitz.
+> ▶ **[Run it live](https://gitofkumarsathish.github.io/bst-grid/docs/features/display/enableConditionalFormatting)** — editable demo, no install.
 
 **Use it.** `conditionalFormats` is a declarative array of rules that colour cells/rows by value (K3),
 or blank a cell (F5). Presence is the opt-in; `enableConditionalFormatting` (default on) is the runtime
@@ -1139,7 +1129,7 @@ them at runtime with `<BstConditionalFormatBuilder>` (adapters host it behind a 
 
 ## Cell spanning
 
-> ▶ **[Run it live](https://stackblitz.com/github/gitOfKumarSathish/bst-grid/tree/main/examples/cell-spanning?file=src%2FApp.tsx)** on StackBlitz.
+> ▶ **[Run it live](https://gitofkumarsathish.github.io/bst-grid/docs/features/display/enableCellSpanning)** — editable demo, no install.
 
 **Use it.** `enableCellSpanning` merges body cells across **columns and rows**.
 
@@ -1360,7 +1350,7 @@ model in the DOM.
 
 ## Server mode (DataSource)
 
-> ▶ **[Run it live](https://stackblitz.com/github/gitOfKumarSathish/bst-grid/tree/main/examples/server-mode?file=src%2FApp.tsx)** on StackBlitz (5k rows, runs offline via `createClientDataSource`).
+> ▶ **[See the server-mode recipe](https://gitofkumarsathish.github.io/bst-grid/docs/recipes)** — or clone [`examples/server-mode`](../../examples/server-mode) (5k rows, runs offline via `createClientDataSource`).
 
 **Use it.** By default the grid sorts/filters/paginates the full `data` array in memory. For large
 datasets (10k–1M rows) let the server do it: wrap your fetch in a `DataSource` and drive it with
