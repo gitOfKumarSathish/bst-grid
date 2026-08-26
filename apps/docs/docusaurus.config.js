@@ -44,6 +44,24 @@ module.exports = {
       }),
     ],
   ],
+  // Offline local full-text search (no Algolia / external service / API key) — builds
+  // a search index at build time and adds a search box to the navbar. Works on GitHub
+  // Pages and offline, matching the site's self-contained, dependency-free ethos.
+  themes: [
+    [
+      require.resolve('@easyops-cn/docusaurus-search-local'),
+      /** @type {import('@easyops-cn/docusaurus-search-local').PluginOptions} */
+      ({
+        hashed: true, // cache-bust the index across releases
+        indexBlog: false, // no blog on this site
+        docsRouteBasePath: '/docs',
+        highlightSearchTermsOnTargetPage: true, // highlight the match on the opened page
+        explicitSearchResultPath: true, // show the page path in each result
+        searchResultLimits: 8,
+        searchBarShortcutHint: true, // shows the ⌘K / Ctrl-K hint
+      }),
+    ],
+  ],
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
