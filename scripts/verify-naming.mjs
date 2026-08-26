@@ -27,6 +27,8 @@ const BANNED = [
   { re: /\bAG\d{1,2}\b/, why: 'retired roadmap ID scheme — use X1–X29' },
   { re: /\bAG tier\b/i, why: 'third-party licensing tier column' },
   { re: /mui[ -]?x[ -]?data[ -]?grid/i, why: 'third-party grid product name' },
+  { re: /material[ -]?react[ -]?table/i, why: 'third-party grid product name' },
+  { re: /\bMRT\b/, why: 'third-party grid product abbreviation' },
 ]
 
 /** Paths exempt from the scan (binary, vendored, or lockfile noise). */

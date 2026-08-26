@@ -8,30 +8,43 @@ slug: /migration
 
 # Migrating to Bst-Table
 
-Coming from another React data grid? The concepts map closely — Bst-Table just splits them into a
-headless **engine** (`enable*` behaviour) and a **skin** (`show*` chrome). This page maps the ideas
-you already know onto Bst-Table's API.
+Already using a React data grid? The concepts carry over — Bst-Table just splits them into a headless
+**engine** (`enable*` behaviour) and a **skin** (`show*` chrome). This page maps the ideas that
+*every* grid shares onto Bst-Table's API, so you can port a grid without a rewrite. The vocabulary
+below is deliberately generic — it applies whatever you're coming from.
 
 ## Concept map
 
-| You're used to… | In Bst-Table |
+| What your current grid gives you | In Bst-Table |
 | --- | --- |
-| `columns` with `field` / `accessor` | `columns: BstTableColumn[]` with `accessorKey` + `id` |
-| A custom cell renderer per column | `meta.type` (built-in cell types) or `columnDef.cell` |
-| `getRowId` / row keys | `getRowId={(r) => r.id}` — required for selection & editing |
-| A `<DataGrid>` mega-component with dozens of props | one skin component + per-instance `enable*` / `show*` flags |
-| Pro / Premium / Enterprise tiers | everything is MIT / Apache — no gated features |
+| Column definitions (a field + a header) | `columns: BstTableColumn[]` — `accessorKey` + `id` + `header` |
+| A custom cell renderer per column | a built-in `meta.type` (17 of them), or `columnDef.cell` for anything custom |
+| A stable row id / key getter | `getRowId={(r) => r.id}` — required for selection & editing |
+| One big grid component with dozens of props | one skin component + per-instance `enable*` / `show*` flags |
+| Sorting & column-filter state | `enableSorting` / `enableColumnFilters` (on by default) |
+| A global quick-filter / search box | `enableGlobalFilter` + `showSearch` |
+| A row-selection model (checkboxes) | `enableRowSelection` + `showSelectionInfo` |
+| Range / cell selection + copy-paste | `enableCellSelection` + `enableClipboard` |
+| Inline / row / bulk editing | `enableEditing={{ mode }}` (cell / row / batch) |
+| Frozen / pinned columns & rows | `enableColumnPinning` / `enableRowPinning` |
+| Master-detail / expandable rows | `enableExpanding` + `renderDetail` |
+| Grouping with aggregates | `enableGrouping` (+ a column `aggregationFn`) |
+| Column resize / reorder / show-hide | `enableColumnResizing` / `enableColumnOrdering` / `enableHiding` |
+| Virtualized / windowed rows | `enableVirtualization` |
+| Server-side (lazy) data operations | a `DataSource` in manual mode (`useBstDataSource`) |
+| CSV / Excel / print export | `enableExport` + `showExport` |
+| Theme tokens & dark mode | the MUI theme, or shadcn `theme="inherit"` |
 
 ## Columns & cells
 
-Instead of a bespoke renderer per column, pick a built-in **cell type** by `meta.type` (17 of them
-— text, number, date, select, files, sparkline, KPI, …) and configure it with `cellMeta`. Drop to
-`columnDef.cell` only when you need something custom.
+Instead of a bespoke renderer per column, pick a built-in **cell type** with `meta.type` and
+configure it through `cellMeta`; drop to `columnDef.cell` only for something the built-ins don't
+cover.
 
 ```tsx
 const columns: BstTableColumn<Row>[] = [
-  { id: 'name',   accessorKey: 'name',   header: 'Name' },
-  { id: 'status', accessorKey: 'status', header: 'Status',
+  { id: 'name',   accessorKey: 'name',    header: 'Name' },
+  { id: 'status', accessorKey: 'status',  header: 'Status',
     meta: { type: 'singleSelect', options: STATUSES } },
   { id: 'trend',  accessorKey: 'history', header: 'Trend',
     meta: { type: 'sparkline' } },
@@ -42,10 +55,9 @@ See [Cell Types](./cell-types/index.mdx) for the full set.
 
 ## Data operations
 
-Sorting, filtering, global search, grouping and pagination are engine features and mostly default
-**on**. Turn them off with `enableSorting={false}` etc., or reach for the advanced pieces
-(`enableSetFilter`, `enableMultiFilter`) when you need them. See [Data
-operations](./features/data-operations/index.mdx).
+Sorting, filtering, search, grouping and pagination are engine features and mostly default **on** —
+turn them off with `enableSorting={false}` etc., or reach for the advanced pieces (`enableSetFilter`,
+`enableMultiFilter`) when you need them. See [Data operations](./features/data-operations/index.mdx).
 
 ## Selection, editing & clipboard
 
@@ -64,22 +76,37 @@ These default **off** — opt in per grid:
 />
 ```
 
-The whole [Editing](./features/editing/index.mdx) and [Selection &
-clipboard](./features/selection-clipboard/index.mdx) sections cover the details.
+Details in [Editing](./features/editing/index.mdx) and
+[Selection & clipboard](./features/selection-clipboard/index.mdx).
 
-## Server-side data (large datasets)
+## Large / server-side data
 
-For big tables, run sort/filter/paginate on the server with a **DataSource** and manual mode, and
+For big tables, run sort / filter / paginate on the server behind a **DataSource** in manual mode and
 turn on virtualization — the grid API stays the same, only the data source changes. See
 [Performance](./features/performance/index.mdx).
 
 ## Styling
 
-Map your existing theme with [Styling & Theming](./theming.mdx): the MUI skin follows your MUI
-theme, the shadcn skin adopts your design tokens with `theme="inherit"`, and CSS slots
+Map your existing look with [Styling & Theming](./theming.mdx): the MUI skin follows your MUI theme,
+the shadcn skin adopts your design tokens via `theme="inherit"`, and the CSS slots
 (`classNames` / `styles`) cover the rest.
 
-:::tip Let your agent do it
-If you use an AI coding assistant, connect the [MCP server](./ai-agents.mdx) first — it can
-scaffold the equivalent Bst-Table grid and validate the config for you.
+## Port it in five steps
+
+1. **Columns** — translate your column list to `BstTableColumn[]` (`accessorKey` + `header`) and pick
+   a `meta.type` per column.
+2. **Row id** — add `getRowId` so selection and editing target rows by id, not index.
+3. **Turn on what you need** — flip the `enable*` / `show*` flags for the features your old grid had
+   (use the concept map above).
+4. **Wire data changes** — `onDataChange` for inline edits, or a single `onSave` for a batched write.
+5. **Theme** — match your app with the MUI theme or shadcn tokens.
+
+## Why the switch is worth it
+
+Master-detail, range selection, clipboard and export ship under **MIT / Apache** — no per-seat
+licensing and no paid tiers gating features. You build on the headless engine you already control.
+
+:::tip Let your agent do the port
+If you use an AI coding assistant, connect the [MCP server](./ai-agents.mdx) first — it can scaffold
+the equivalent Bst-Table grid and validate the config for you.
 :::
