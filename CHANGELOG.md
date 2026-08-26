@@ -10,6 +10,8 @@ this project uses [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+## [0.45.0] — 2026-08-26
+
 ### Added
 
 - **Reconcile the backend's response back into the grid (I4).** `onSave` may now **return** a
