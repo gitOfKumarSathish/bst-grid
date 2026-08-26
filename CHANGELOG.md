@@ -10,6 +10,24 @@ this project uses [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+### Added — MCP server (`@bloomskill/table-mcp`): structured output + argument completions
+- **`outputSchema` on all 8 tools** — each tool already returned `structuredContent`; that payload is
+  now validated against a declared output schema and advertised in `tools/list`, so an MCP client can
+  consume results as typed, machine-readable data instead of re-parsing prose. Shared
+  `FindingSchema` / `ValidationReportSchema` fragments (`src/tools/shared.ts`) keep
+  `bst_validate_config` and the scaffolder's built-in self-check in one declared shape. Multi-shape
+  tools (`bst_get_feature`, `bst_get_api`, `bst_get_example`) use optional/`passthrough` branches so
+  every response path validates without dropping fields.
+- **Argument completions** — `bst-quick-start`'s `adapter` (mui / shadcn / engine),
+  `bst-add-feature`'s `feature` (the real flag registry), and the `bst://example/{name}` resource
+  variable now autocomplete to real names via MCP's completions capability, so a name is picked from
+  the corpus rather than guessed. `bst-migrate`'s `from` is intentionally left free-text (naming
+  guard: no competitor product names anywhere in the tree).
+- No grid engine/adapter code or capability changed; corpus, tools, resources and prompts are
+  otherwise unchanged. Verified with `npm run mcp` (build + parity guards + stdio smoke + 28-component
+  scaffold typecheck) plus a direct check of both no-arg listing paths and all three completions
+  against the built server.
+
 ### Added — Documentation site (`apps/docs`)
 - **Docusaurus documentation site** under `apps/docs` — the generated reference for Bst-Table:
   59 feature-flag pages (9 groups), 17 cell types, 261 engine API exports (signatures read from the
@@ -43,6 +61,10 @@ this project uses [Semantic Versioning](https://semver.org).
   no-competitor-names policy is **enforced**, not just followed (see `scripts/verify-naming.mjs` for
   the list). The Migration guide is now a fully-neutral "coming from any grid" concept map +
   five-step porting checklist, with the remaining soft references removed; no product is named.
+- **Deploy-ready + hero image** — `apps/docs` is isolated from the npm workspace (`apps/*` →
+  `apps/demo`) so a Cloudflare / CI install is clean and fast, with a pinned Node version
+  (`.node-version`). A real captured **hero screenshot** leads Getting Started (`static/img/`), and
+  the live-example chrome is trimmed (`showOpenInCodeSandbox` / refresh off).
 
 ## [0.42.0] — 2026-08-24
 

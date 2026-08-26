@@ -60,3 +60,25 @@ code. (Run `docs:api` / `docs:build` after building the engine to also refresh t
 | Domain | `bst-grid.pages.dev` (set in `docusaurus.config.js` → `url`) |
 
 `npm run build` produces the static site in `build/`; `npm run serve` previews that build locally.
+
+## Media (screenshots / hero)
+
+Images aren't captured automatically — drop files in `static/img/` and reference them by an
+**absolute** path (`/img/<name>`); Docusaurus serves everything under `static/` at the site root.
+
+Suggested shots:
+
+| File | Referenced from | Capture |
+| --- | --- | --- |
+| `hero.png` / `hero.gif` | top of `docs/getting-started.mdx` | a populated grid, sorting / editing live |
+| `editing.png` | `guides/editing/enableEditing.mdx` | a cell mid-edit |
+| `selection.png` | `guides/selection-clipboard/enableCellSelection.mdx` | a selected range |
+| `theming.png` | `docs/theming.mdx` | the MUI vs shadcn skins |
+
+Add one by pasting Markdown where you want it — feature-guide shots go in the matching
+`guides/<group>/<flag>.mdx` partial (which is injected into the generated page):
+
+    ![A Bst-Table grid with inline editing](/img/hero.png)
+
+Capture them from `npm run start` (or the demo app) with any screenshot tool; record a hero GIF the
+same way. Nothing references these files yet, so the build stays green until you add them.

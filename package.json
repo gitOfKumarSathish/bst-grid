@@ -6,7 +6,7 @@
   "description": "Bst-Table POC — headless TanStack v9 engine (@bloomskill/table-engine) with swappable MUI and shadcn/Radix style adapters. Proves portability + two-adapter styling.",
   "workspaces": [
     "packages/*",
-    "apps/*"
+    "apps/demo"
   ],
   "scripts": {
     "build": "npm run build -w @bloomskill/table-engine && npm run build -w @bloomskill/table-mui && npm run build -w @bloomskill/table-shadcn && npm run build -w @bloomskill/table-mcp",

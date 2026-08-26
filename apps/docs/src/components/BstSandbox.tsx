@@ -19,7 +19,13 @@ export default function BstSandbox({ example, code, height = 460 }: Props) {
           <Sandpack
             template="react-ts"
             theme="auto"
-            options={{ editorHeight: height, showLineNumbers: true, showTabs: false }}
+            options={{
+              editorHeight: height,
+              showLineNumbers: true,
+              showTabs: false,
+              showOpenInCodeSandbox: false,
+              showRefreshButton: false,
+            }}
             customSetup={{
               dependencies: {
                 '@bloomskill/table-engine': '^0.41.0',
