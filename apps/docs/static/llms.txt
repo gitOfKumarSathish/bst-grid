@@ -1,0 +1,125 @@
+# Bst-Table
+
+> A headless React data grid: a TanStack Table v9 engine with swappable Material UI and shadcn/Radix skins. MIT/Apache only — no per-seat licensing. Pass data + columns for sorting, search, pagination and column controls out of the box; opt into editing, selection, clipboard and export with per-instance flags.
+
+This is the AI-readable index. Full plain-text docs: https://gitofkumarsathish.github.io/bst-grid/llms-full.txt
+
+## Guides
+
+- [Getting Started](https://gitofkumarsathish.github.io/bst-grid/docs/getting-started): Bst-Table is a React data grid: a headless engine (@bloomskill/table-engine, built on TanStack Table v9) with swappable style skins. Pick a skin, p…
+- [Installation](https://gitofkumarsathish.github.io/bst-grid/docs/installation): Bst-Table is a headless engine (@bloomskill/table-engine) plus a style skin. You install the engine, one skin, and that skin's peer libraries — the…
+- [Recipes](https://gitofkumarsathish.github.io/bst-grid/docs/recipes): Complete, copy-pasteable components for the four things people wire up first. Each is a whole file — imports included — and every one is compiled a…
+- [Settings & Customization](https://gitofkumarsathish.github.io/bst-grid/docs/customization): A Bst-Table grid is customizable two ways. Developers wire features per instance with enable (engine behaviour) and show (adapter chrome) flags. An…
+- [Styling & Theming](https://gitofkumarsathish.github.io/bst-grid/docs/theming): Bst-Table renders its body from CSS variables (--bst-table-), so each skin can map your app's theme onto the grid — and you can override any part w…
+- [Migrating to Bst-Table](https://gitofkumarsathish.github.io/bst-grid/docs/migration): Already using a React data grid? The concepts carry over — Bst-Table just splits them into a headless engine (enable behaviour) and a skin (show ch…
+- [AI Agents & MCP](https://gitofkumarsathish.github.io/bst-grid/docs/ai-agents): No language model was trained on Bst-Table. Ask a coding agent to "build a Bst-Table grid with batch editing" and it will confidently write some ot…
+
+## Feature Guides
+
+- [Feature Guides](https://gitofkumarsathish.github.io/bst-grid/docs/features): Every Bst-Table capability is a per-instance flag: enable = engine behaviour, show = adapter chrome. Data features default on; heavy features defau…
+- [Columns](https://gitofkumarsathish.github.io/bst-grid/docs/features/columns): Show/hide, resize, pin, reorder and size columns.
+- [Auto-generate columns](https://gitofkumarsathish.github.io/bst-grid/docs/features/columns/enableAutoColumns): Prop enableAutoColumns — engine behaviour, default false.
+- [Per-column filter row ("dual filter")](https://gitofkumarsathish.github.io/bst-grid/docs/features/columns/enableColumnFilterRow): Prop enableColumnFilterRow — engine behaviour, default false.
+- [Column reordering](https://gitofkumarsathish.github.io/bst-grid/docs/features/columns/enableColumnOrdering): Prop enableColumnOrdering — engine behaviour, default false.
+- [Column pinning](https://gitofkumarsathish.github.io/bst-grid/docs/features/columns/enableColumnPinning): Prop enableColumnPinning — engine behaviour, default false.
+- [Column resizing](https://gitofkumarsathish.github.io/bst-grid/docs/features/columns/enableColumnResizing): Prop enableColumnResizing — engine behaviour, default true.
+- [Column visibility](https://gitofkumarsathish.github.io/bst-grid/docs/features/columns/enableHiding): Prop enableHiding — engine behaviour, default true.
+- [Responsive column hiding](https://gitofkumarsathish.github.io/bst-grid/docs/features/columns/enableResponsive): Prop enableResponsive — engine behaviour, default false.
+- [Row-number column](https://gitofkumarsathish.github.io/bst-grid/docs/features/columns/enableRowNumbers): Prop enableRowNumbers — engine behaviour, default false.
+- [Fit columns to viewport](https://gitofkumarsathish.github.io/bst-grid/docs/features/columns/fitColumns): Prop fitColumns — engine behaviour, default false.
+- [Per-column edit lock](https://gitofkumarsathish.github.io/bst-grid/docs/features/columns/showColumnEditToggle): Prop showColumnEditToggle — adapter chrome, default false.
+- [Columns menu](https://gitofkumarsathish.github.io/bst-grid/docs/features/columns/showColumnsMenu): Prop showColumnsMenu — adapter chrome, default true.
+- [Data operations](https://gitofkumarsathish.github.io/bst-grid/docs/features/data-operations): Sorting, filtering, search, pagination and grouping.
+- [Column filters](https://gitofkumarsathish.github.io/bst-grid/docs/features/data-operations/enableColumnFilters): Prop enableColumnFilters — engine behaviour, default true.
+- [Find](https://gitofkumarsathish.github.io/bst-grid/docs/features/data-operations/enableFind): Prop enableFind — engine behaviour, default false.
+- [Global filter](https://gitofkumarsathish.github.io/bst-grid/docs/features/data-operations/enableGlobalFilter): Prop enableGlobalFilter — engine behaviour, default true.
+- [Grouping](https://gitofkumarsathish.github.io/bst-grid/docs/features/data-operations/enableGrouping): Prop enableGrouping — engine behaviour, default false.
+- [Multi-filter](https://gitofkumarsathish.github.io/bst-grid/docs/features/data-operations/enableMultiFilter): Prop enableMultiFilter — engine behaviour, default false.
+- [Set Filter](https://gitofkumarsathish.github.io/bst-grid/docs/features/data-operations/enableSetFilter): Prop enableSetFilter — engine behaviour, default false.
+- [Sorting](https://gitofkumarsathish.github.io/bst-grid/docs/features/data-operations/enableSorting): Prop enableSorting — engine behaviour, default true.
+- [Pagination (logic)](https://gitofkumarsathish.github.io/bst-grid/docs/features/data-operations/pagination): Prop pagination — engine behaviour, default true.
+- [Find button](https://gitofkumarsathish.github.io/bst-grid/docs/features/data-operations/showFind): Prop showFind — adapter chrome, default follows enableFind.
+- [Pagination bar](https://gitofkumarsathish.github.io/bst-grid/docs/features/data-operations/showPagination): Prop showPagination — adapter chrome, default true.
+- [Global search box](https://gitofkumarsathish.github.io/bst-grid/docs/features/data-operations/showSearch): Prop showSearch — adapter chrome, default true.
+- [Display](https://gitofkumarsathish.github.io/bst-grid/docs/features/display): Density, conditional formatting, overlays and status bar.
+- [Cell spanning](https://gitofkumarsathish.github.io/bst-grid/docs/features/display/enableCellSpanning): Prop enableCellSpanning — engine behaviour, default false.
+- [Conditional formatting runtime toggle](https://gitofkumarsathish.github.io/bst-grid/docs/features/display/enableConditionalFormatting): Prop enableConditionalFormatting — engine behaviour, default true.
+- [Loading / error overlays](https://gitofkumarsathish.github.io/bst-grid/docs/features/display/enableOverlays): Prop enableOverlays — engine behaviour, default true.
+- [Density toggle](https://gitofkumarsathish.github.io/bst-grid/docs/features/display/showDensityToggle): Prop showDensityToggle — adapter chrome, default false.
+- [Filter builder UI](https://gitofkumarsathish.github.io/bst-grid/docs/features/display/showFilterBuilder): Prop showFilterBuilder — adapter chrome, default false.
+- [Format builder UI](https://gitofkumarsathish.github.io/bst-grid/docs/features/display/showFormatBuilder): Prop showFormatBuilder — adapter chrome, default false.
+- [Status bar](https://gitofkumarsathish.github.io/bst-grid/docs/features/display/showStatusBar): Prop showStatusBar — adapter chrome, default false.
+- [Editing](https://gitofkumarsathish.github.io/bst-grid/docs/features/editing): Inline, row and batch editing, validation and undo/redo.
+- [Batch-editing runtime switch](https://gitofkumarsathish.github.io/bst-grid/docs/features/editing/enableBatchEditing): Prop enableBatchEditing — engine behaviour, default — (follows enableEditing.mode).
+- [Inline editing](https://gitofkumarsathish.github.io/bst-grid/docs/features/editing/enableEditing): Prop enableEditing — engine behaviour, default false.
+- [Log committed cell edits (debug)](https://gitofkumarsathish.github.io/bst-grid/docs/features/editing/enableEditLog): Prop enableEditLog — engine behaviour, default false.
+- [Row add/delete/duplicate](https://gitofkumarsathish.github.io/bst-grid/docs/features/editing/enableRowActions): Prop enableRowActions — engine behaviour, default false.
+- [Type-to-edit](https://gitofkumarsathish.github.io/bst-grid/docs/features/editing/enableTypeToEdit): Prop enableTypeToEdit — engine behaviour, default false.
+- [Undo/redo](https://gitofkumarsathish.github.io/bst-grid/docs/features/editing/enableUndoRedo): Prop enableUndoRedo — engine behaviour, default false.
+- [Validation](https://gitofkumarsathish.github.io/bst-grid/docs/features/editing/enableValidation): Prop enableValidation — engine behaviour, default false.
+- [Add-row button](https://gitofkumarsathish.github.io/bst-grid/docs/features/editing/showAddRow): Prop showAddRow — adapter chrome, default follows enableRowActions.
+- [Review-changes sheet](https://gitofkumarsathish.github.io/bst-grid/docs/features/editing/showChangesSheet): Prop showChangesSheet — adapter chrome, default follows mode: 'batch'.
+- [Save/Discard bar](https://gitofkumarsathish.github.io/bst-grid/docs/features/editing/showSaveBar): Prop showSaveBar — adapter chrome, default follows enableEditing.
+- [Undo/Redo buttons](https://gitofkumarsathish.github.io/bst-grid/docs/features/editing/showUndoRedo): Prop showUndoRedo — adapter chrome, default follows enableUndoRedo.
+- [Export](https://gitofkumarsathish.github.io/bst-grid/docs/features/export): CSV, Excel and print output.
+- [CSV export](https://gitofkumarsathish.github.io/bst-grid/docs/features/export/enableCsvExport): Prop enableCsvExport — engine behaviour, default true.
+- [Excel export](https://gitofkumarsathish.github.io/bst-grid/docs/features/export/enableExcelExport): Prop enableExcelExport — engine behaviour, default true.
+- [Export — CSV/Excel/print](https://gitofkumarsathish.github.io/bst-grid/docs/features/export/enableExport): Prop enableExport — engine behaviour, default false.
+- [Print](https://gitofkumarsathish.github.io/bst-grid/docs/features/export/enablePrint): Prop enablePrint — engine behaviour, default true.
+- [Export menu](https://gitofkumarsathish.github.io/bst-grid/docs/features/export/showExport): Prop showExport — adapter chrome, default follows enableExport.
+- [Performance](https://gitofkumarsathish.github.io/bst-grid/docs/features/performance): Virtualization and infinite scroll for large datasets.
+- [Column virtualization](https://gitofkumarsathish.github.io/bst-grid/docs/features/performance/enableColumnVirtualization): Prop enableColumnVirtualization — engine behaviour, default false.
+- [Row virtualization](https://gitofkumarsathish.github.io/bst-grid/docs/features/performance/enableVirtualization): Prop enableVirtualization — engine behaviour, default false.
+- [Rows](https://gitofkumarsathish.github.io/bst-grid/docs/features/rows): Selection, expansion, pinning, sizing and sticky header.
+- [Auto row height](https://gitofkumarsathish.github.io/bst-grid/docs/features/rows/enableAutoRowHeight): Prop enableAutoRowHeight — engine behaviour, default false.
+- [Master-detail](https://gitofkumarsathish.github.io/bst-grid/docs/features/rows/enableExpanding): Prop enableExpanding — engine behaviour, default false.
+- [Row pinning](https://gitofkumarsathish.github.io/bst-grid/docs/features/rows/enableRowPinning): Prop enableRowPinning — engine behaviour, default false.
+- [Row resize](https://gitofkumarsathish.github.io/bst-grid/docs/features/rows/enableRowResize): Prop enableRowResize — engine behaviour, default false.
+- [Sticky-header viewport](https://gitofkumarsathish.github.io/bst-grid/docs/features/rows/enableStickyHeader): Prop enableStickyHeader — engine behaviour, default false.
+- [Selection & clipboard](https://gitofkumarsathish.github.io/bst-grid/docs/features/selection-clipboard): Cell/range selection and Excel-like copy/paste.
+- [Cell/range selection + keyboard nav](https://gitofkumarsathish.github.io/bst-grid/docs/features/selection-clipboard/enableCellSelection): Prop enableCellSelection — engine behaviour, default false.
+- [Clipboard (copy/paste)](https://gitofkumarsathish.github.io/bst-grid/docs/features/selection-clipboard/enableClipboard): Prop enableClipboard — engine behaviour, default false.
+- [Context menu](https://gitofkumarsathish.github.io/bst-grid/docs/features/selection-clipboard/enableContextMenu): Prop enableContextMenu — engine behaviour, default false.
+- [Copy column](https://gitofkumarsathish.github.io/bst-grid/docs/features/selection-clipboard/enableCopyColumn): Prop enableCopyColumn — engine behaviour, default true.
+- [Copy row](https://gitofkumarsathish.github.io/bst-grid/docs/features/selection-clipboard/enableCopyRow): Prop enableCopyRow — engine behaviour, default true.
+- [Row selection](https://gitofkumarsathish.github.io/bst-grid/docs/features/selection-clipboard/enableRowSelection): Prop enableRowSelection — engine behaviour, default false.
+- [Selected-count chip](https://gitofkumarsathish.github.io/bst-grid/docs/features/selection-clipboard/showSelectionInfo): Prop showSelectionInfo — adapter chrome, default follows enableRowSelection.
+- [Toolbar & chrome](https://gitofkumarsathish.github.io/bst-grid/docs/features/toolbar-chrome): General adapter chrome — toolbar, settings sheet, shortcuts.
+- [Runtime settings sheet](https://gitofkumarsathish.github.io/bst-grid/docs/features/toolbar-chrome/showSettings): Prop showSettings — adapter chrome, default false.
+- [Keyboard-shortcuts overlay](https://gitofkumarsathish.github.io/bst-grid/docs/features/toolbar-chrome/showShortcuts): Prop showShortcuts — adapter chrome, default false.
+- [Toolbar (whole)](https://gitofkumarsathish.github.io/bst-grid/docs/features/toolbar-chrome/showToolbar): Prop showToolbar — adapter chrome, default true.
+
+## Cell Types
+
+- [Cell Types](https://gitofkumarsathish.github.io/bst-grid/docs/cell-types): A column's renderer + editor is chosen by meta.type. 17 built-in types ship, all dependency-free inline SVG, extensible via the cell-type registry.
+- [action](https://gitofkumarsathish.github.io/bst-grid/docs/cell-types/action): inline Edit / Save / Copy / Delete buttons.
+- [actionMenu](https://gitofkumarsathish.github.io/bst-grid/docs/cell-types/actionMenu): compact ⋯ kebab → actions popup.
+- [barcode](https://gitofkumarsathish.github.io/bst-grid/docs/cell-types/barcode): inline-SVG Code 128.
+- [boolean](https://gitofkumarsathish.github.io/bst-grid/docs/cell-types/boolean): check ✓ / muted dash.
+- [dateTime](https://gitofkumarsathish.github.io/bst-grid/docs/cell-types/dateTime): date / time / datetime.
+- [files](https://gitofkumarsathish.github.io/bst-grid/docs/cell-types/files): image thumbnail / PDF thumbnail (pdfThumbnail) / icon + name · click to preview (image inline, PDF native viewer).
+- [hyperlink](https://gitofkumarsathish.github.io/bst-grid/docs/cell-types/hyperlink): anchor.
+- [kpi](https://gitofkumarsathish.github.io/bst-grid/docs/cell-types/kpi): value + trend delta chip + mini-spark.
+- [longText](https://gitofkumarsathish.github.io/bst-grid/docs/cell-types/longText): clamped multi-line text.
+- [multiSelect](https://gitofkumarsathish.github.io/bst-grid/docs/cell-types/multiSelect): chips + +N more overflow.
+- [number](https://gitofkumarsathish.github.io/bst-grid/docs/cell-types/number): locale number / currency / percent.
+- [qr](https://gitofkumarsathish.github.io/bst-grid/docs/cell-types/qr): inline-SVG QR code (byte mode, v1–10).
+- [radio](https://gitofkumarsathish.github.io/bst-grid/docs/cell-types/radio): badge.
+- [richText](https://gitofkumarsathish.github.io/bst-grid/docs/cell-types/richText): sanitized-HTML preview or formatted.
+- [singleSelect](https://gitofkumarsathish.github.io/bst-grid/docs/cell-types/singleSelect): badge (color · icon · avatar).
+- [sparkline](https://gitofkumarsathish.github.io/bst-grid/docs/cell-types/sparkline): inline SVG line / area / bar.
+- [text](https://gitofkumarsathish.github.io/bst-grid/docs/cell-types/text): single-line text, ellipsis + title tooltip.
+
+## API Reference
+
+- [API Reference](https://gitofkumarsathish.github.io/bst-grid/docs/api): Every public export of @bloomskill/table-engine (262 symbols), with signatures read from the built .d.ts — so they match what the compiler accepts.
+- [Constants](https://gitofkumarsathish.github.io/bst-grid/docs/api/constants): Exported constants and registries.
+- [Functions](https://gitofkumarsathish.github.io/bst-grid/docs/api/functions): Standalone helpers and factories.
+- [Hooks](https://gitofkumarsathish.github.io/bst-grid/docs/api/hooks): React hooks — the engine entry points.
+- [Interfaces](https://gitofkumarsathish.github.io/bst-grid/docs/api/interfaces): Option bags, props and shape contracts.
+- [Other](https://gitofkumarsathish.github.io/bst-grid/docs/api/other): Everything else.
+- [Types](https://gitofkumarsathish.github.io/bst-grid/docs/api/types): Type aliases and unions.
+
+## Reference
+
+- [Feature Coverage & Roadmap](https://gitofkumarsathish.github.io/bst-grid/docs/coverage): Requirement-by-requirement status across 58 spec leaves: 55 built, 2 partial, 1 not built. Honest status, straight from the spec matrix.

@@ -91,7 +91,8 @@ packages, 115 intentional fragments tagged `no-check`) ✅ · **Installation** +
 **static SSR `<CodeBlock>` above every Sandpack** (example code now in the server-rendered HTML) ✅ ·
 **shadcn examples** in `examples.ts` (was 0) ✅ · **spec codes out of feature titles** + a Spec-coverage
 legend ✅ · **`enableEditing` page mis-map fixed** (dedupe in `dump-corpus` → "Inline editing") ✅ ·
-**real server-rendered landing page** (`src/pages/index.js`) ✅ · **Sandpack pin driven by `version.ini`** ✅.
+**real server-rendered landing page** (`src/pages/index.js`) ✅ · **Sandpack pin driven by `version.ini`** ✅ ·
+**`llms.txt` + `llms-full.txt`** for AI tools (`scripts/dump-llms.mjs`, generated into `static/` during `gen:docs`) ✅.
 
 **Earlier** (was on this list): **deployed live on GitHub Pages**
 (`https://gitofkumarsathish.github.io/bst-grid/`) ✅ · **merged to `main`** + branch deleted ✅ ·

@@ -10,7 +10,8 @@
     "gen:corpus": "cd scripts && node dump-corpus.mjs",
     "gen:features": "cd scripts && node gen-features.mjs ../docs",
     "gen:reference": "cd scripts && node gen-reference.mjs ../docs",
-    "gen:docs": "npm run gen:corpus && npm run gen:features && npm run gen:reference",
+    "gen:llms": "cd scripts && node dump-llms.mjs",
+    "gen:docs": "npm run gen:corpus && npm run gen:features && npm run gen:reference && npm run gen:llms",
     "gen:api": "cd scripts && node extract-api.mjs",
     "check:docs": "cd scripts && node check-docs-coverage.mjs ../docs",
     "check:snippets": "cd scripts && node check-snippets.mjs"
