@@ -111,11 +111,45 @@ npm test               # engine unit + adapter integration tests (Vitest/jsdom)
 npm run demo           # start the Vite demo (both skins) at http://localhost:5173
 npm run verify:portability   # pack tarballs, install into a fresh external app, build + test
 npm run mcp            # MCP server gate: stdio smoke test + scaffolded-output typecheck
+
+# Documentation site (Docusaurus) — isolated from the workspace, so install separately.
+# Full steps in the "Documentation site" section below.
+( cd apps/docs && npm install --no-workspaces && npm run start )   # docs → http://localhost:3000
 ```
 
 The suite is **35 test files / ~245 tests** (32 engine · 1 MUI · 2 shadcn) covering every
 feature area — editing, validation, selection, clipboard, spanning, grouping, DataSource,
 settings, styling and the adapters' chrome.
+
+## Documentation site (Docusaurus)
+
+The full documentation — generated **feature guides**, all **17 cell types**, the **API reference**
+and a **coverage matrix**, plus hand-written guides and **live, runnable examples with labelled
+screenshots** — is a **[Docusaurus](https://docusaurus.io) app** in [`apps/docs`](apps/docs).
+
+It is kept **out of the npm workspaces** on purpose, so its React 18 / Docusaurus dependencies never
+clash with the monorepo's React 19. Because of that, install it **on its own** with `--no-workspaces`
+(a plain `npm install` at the repo root will *not* set it up):
+
+```bash
+cd apps/docs
+npm install --no-workspaces   # first time only — installs Docusaurus, isolated from the root workspace
+npm run start                 # dev server with live reload
+```
+
+Then open **http://localhost:3000** in your browser to read the docs. To build and preview the
+production site instead:
+
+```bash
+npm run build     # static site → apps/docs/build/
+npm run serve     # serve that build locally to preview it
+```
+
+The reference pages are **generated from the source of truth** (the MCP corpus + the engine's typed
+`.d.ts`), so they never drift from the code — `npm run gen:docs` regenerates them and
+`npm run check:docs` is the coverage gate. The regenerate pipeline, the Cloudflare Pages deploy
+settings and the screenshot/media notes all live in the **[docs README](apps/docs/README.md)**. The
+published site is at **[bst-grid.pages.dev](https://bst-grid.pages.dev)**.
 
 ## Using the packages (consumer view)
 
