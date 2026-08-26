@@ -1,0 +1,105 @@
+---
+id: customization
+title: Settings & Customization
+sidebar_position: 2
+---
+
+# Settings & Customization
+
+A Bst-Table grid is customizable **two ways**. Developers wire features per instance with `enable*`
+(engine behaviour) and `show*` (adapter chrome) flags. And **end-users** can flip those same features
+on and off **at runtime — with no code —** through the **settings sheet**. This page covers the
+runtime side: what the settings sheet is, how to turn it on, and exactly what a user can customize.
+
+## The settings sheet — `showSettings`
+
+Add `showSettings` and a **gear icon** appears in the toolbar. Clicking it opens a side sheet — a
+Drawer in the MUI skin, a dependency-free slide-over in shadcn — where the user toggles the grid's
+features on and off, **per table**, persisted to their browser's `localStorage`.
+
+```tsx
+// Same API in both skins.
+<BstTableMui    data={rows} columns={columns} getRowId={(r) => r.id} showSettings />
+<BstTableShadcn data={rows} columns={columns} getRowId={(r) => r.id} showSettings />
+```
+
+### Live example
+
+Open the gear (⚙) in the toolbar and toggle features — the grid updates live:
+
+<BstSandbox example="feat-settings" />
+
+## What a user can customize
+
+The sheet groups every per-instance toggle, mirroring the engine's settings registry:
+
+| Group | Toggles a user can flip |
+| --- | --- |
+| **Data operations** | Sorting · Global search · Column filters · Pagination · Row grouping |
+| **Columns** | Resize · Show / hide · Pin · Reorder · Per-column filter row · Fit to width · Responsive |
+| **Rows** | Master-detail · Pin rows · Resize rows |
+| **Editing** | Inline editing · Validation · Add / delete rows · Undo / redo |
+| **Selection & clipboard** | Row selection · Cell selection · Copy & paste · Copy column · Copy row |
+| **Display** | Cell spanning · Conditional formatting · Filter builder · Format builder · Density |
+| **Performance** | Row virtualization · Column virtualization |
+
+**Which toggles appear:** default-on data features, plus any feature the developer has provisioned.
+A user can turn a provisioned feature off and back on, but **can't** switch on something the grid
+isn't wired for — with **seven deliberate exceptions** that are *always* shown so they're always
+available on demand: **Row grouping, Copy column, Copy row, Per-column filter row, Conditional
+formatting, Row virtualization, Column virtualization**. (For instance, a user can switch on
+virtualization themselves when a grid grows large, or turn on the format builder to create
+conditional-formatting rules at runtime even on a grid that shipped none.)
+
+## Configure the sheet — `BstSettingsOptions`
+
+Pass an object instead of `true` to tune it:
+
+```ts
+showSettings?: boolean | BstSettingsOptions
+
+interface BstSettingsOptions {
+  features?: BstSettingKey[]  // restrict the sheet to these toggles (registry order)
+  title?: string              // sheet heading (default "Table settings")
+  persistKey?: string         // localStorage key (default: derived from the column ids)
+  persist?: boolean           // persist the user's choices to localStorage (default true)
+  search?: boolean            // show a filter box (default: auto, once the list is long)
+}
+```
+
+- **Per table** — each grid's choices are saved under `bst-table:settings:<persistKey | derived>`.
+  Set `persistKey` to disambiguate two grids that have identical columns.
+- **Curate** the visible list with `features`, or set `persist: false` for a session-only sheet.
+
+## Saved views — `gridState`
+
+The settings sheet customizes *features*; **`gridState`** persists the *view* — column order, size,
+visibility and pinning, plus sort, filters, grouping and pagination — so a user's arrangement
+survives a reload. One line seeds it from storage and keeps it in sync:
+
+```tsx
+<BstTableMui data={rows} columns={columns} getRowId={(r) => r.id} gridState={{ key: 'people' }} />
+```
+
+The two persist separately — feature toggles under `bst-table:settings:<key>`, the view under
+`bst-table:state:<key>` — each with its own reset.
+
+## It can never fall behind the engine
+
+`BstSettingKey` is **derived from the engine's toggle type**, and the sheet's metadata is typed
+`Record<BstSettingKey, …>` — so **adding a new engine toggle fails the build until it's registered in
+the sheet**. The settings sheet can't silently miss a feature.
+
+## Build your own — the headless hook
+
+Both skins share one pure model via `useBstSettings`, so you can render the sheet in your own UI:
+
+```tsx
+const { props: effective, model } = useBstSettings(props, { persistKey: 'people' })
+const table = useBstTable(effective)  // enable* / show* now reflect the user's choices
+// model = { items, groups, overrideCount, reset, storageKey }
+```
+
+Also exported: `applySettingsOverrides(props, overrides)` (a pure merge) and `BST_SETTINGS_REGISTRY`
+(the ordered toggle metadata). For the full flag list, see the [Feature Guides](/docs/features); for
+the toolbar button itself, the [`showSettings`](/docs/features/toolbar-chrome/showSettings) page.
