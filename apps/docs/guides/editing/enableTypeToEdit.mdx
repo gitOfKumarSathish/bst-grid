@@ -1,0 +1,29 @@
+### When to use it
+
+Give power users **spreadsheet-style data entry** — start typing on a selected cell to overwrite
+it, then Enter / Tab to commit and move on. No double-click required.
+
+### How it works
+
+On a selected (not-yet-editing) cell, a printable keystroke opens the editor **seeded with that
+character**, overwriting the old value via the cell type's `parse` (so text and number cells both
+work). **Enter** commits and moves the active cell **down**; **Tab** commits and moves **right**
+(Shift reverses each).
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  getRowId={(r) => r.id}
+  enableEditing
+  enableCellSelection
+  enableTypeToEdit
+/>
+```
+
+### Gotchas
+
+- **Requires both `enableEditing` and `enableCellSelection`** — a no-op without them.
+- It only seeds editors that expose `parse` (text / number) and ignores keys the cell type can't
+  represent (a letter typed into a number cell).
+- Commit-and-move routes through the normal commit path — there's no separate write.

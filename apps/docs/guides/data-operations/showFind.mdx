@@ -1,0 +1,13 @@
+### When to use it
+
+Add a **Find** button to the toolbar so users can open the find bar by click, not only with
+⌘/Ctrl+F.
+
+### How it works
+
+Pure chrome — it renders the toolbar button that opens the find bar, and follows `enableFind`.
+
+### Gotchas
+
+- **No-op without `enableFind`** — chrome never turns on the behaviour, it only exposes it.
+- The ⌘/Ctrl+F shortcut works whether or not the button is shown.

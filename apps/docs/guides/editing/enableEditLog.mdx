@@ -1,0 +1,16 @@
+### When to use it
+
+Debugging edits — see every committed cell change in the console without wiring a handler.
+
+### How it works
+
+A debug companion to the **`onCellCommit`** callback. With `enableEditLog` on and no handler
+supplied, every cell commit that writes through — an inline edit saved on Enter / blur, or each cell
+of a paste — is `console.log`ged as a `BstCellEdit` (old → new, formatted text, the row).
+
+### Gotchas
+
+- Needs `enableEditing`.
+- An `onCellCommit` handler **takes precedence** and silences the log, so you never get a double
+  signal — for production, wire `onCellCommit` instead of relying on the log.
+- Deferred `row` / `batch` modes still batch through `onSave`.

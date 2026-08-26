@@ -1,0 +1,29 @@
+### When to use it
+
+Let users **find and jump between matches** inside the grid (⌘/Ctrl+F) — like the browser's find —
+**without removing any rows**. Reach for it when the surrounding rows still matter and filtering them
+away would lose context.
+
+### How it works
+
+`enableFind` adds an in-grid find bar that **highlights every match and steps between them**
+(Next / Prev, "n of m"). ⌘/Ctrl+F opens it; Enter / F3 cycle forward, Shift reverses; Esc closes.
+Pass an object to configure it:
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  getRowId={(r) => r.id}
+  enableFind={{ caseSensitive: false, scope: 'view' }}
+  showFind
+/>
+```
+
+An object implies enabled. Add `showFind` for a toolbar button — the shortcut works either way.
+
+### Gotchas
+
+- **Distinct from global search** (`enableGlobalFilter`): Find **hides nothing** — it highlights and
+  jumps; global search *removes* non-matching rows.
+- Matching runs over the visible cell text; `scope: 'all'` looks beyond the current page.
