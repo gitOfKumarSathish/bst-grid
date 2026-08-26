@@ -2,7 +2,9 @@ import { describe, test, expect, vi } from 'vitest'
 import { render, screen, fireEvent, within, act } from '@testing-library/react'
 import * as React from 'react'
 import { useBstGrid, BstTable } from '../index'
-import type { BstRuntime, BstSaveEvent, BstTableColumn } from '../index'
+import type { BstRuntime, BstSaveEvent, BstSaveResult, BstTableColumn } from '../index'
+
+type SaveReturn = void | BstSaveResult<Person> | Promise<void | BstSaveResult<Person>>
 
 type Person = { id: string; name: string; age: number | null; active: boolean }
 
@@ -25,7 +27,7 @@ const columns: BstTableColumn<Person>[] = [
 let rt: BstRuntime<Person>
 
 function Grid(props: {
-  onSave?: (e: BstSaveEvent<Person>) => void | Promise<void>
+  onSave?: (e: BstSaveEvent<Person>) => SaveReturn
   enableValidation?: boolean
   enableClipboard?: boolean
   enableEditing?: boolean | { mode: 'cell' | 'row' | 'batch' }
@@ -201,5 +203,98 @@ describe('enableBatchEditing — the runtime mode switch (settings sheet)', () =
     editCell('Charlie', 'Charlotte')
     expect(dataJson()[0].name).toBe('Charlie') // deferred as a draft
     expect(rt.store.getState().drafts['1::name']).toBe('Charlotte')
+  })
+})
+
+describe('I4 — reconciling the server response back into the grid', () => {
+  test('onSave returning `applied` adopts the SERVER value, not what was typed', async () => {
+    // The server normalises the name to upper-case AND stamps `age` the user never touched.
+    const onSave = vi.fn(
+      (): BstSaveResult<Person> => ({ applied: [{ rowId: '1', values: { name: 'CHARLOTTE', age: 99 } }] }),
+    )
+    render(<Grid onSave={onSave} />)
+    editCell('Charlie', 'Charlotte') // user typed "Charlotte"
+
+    let ok = false
+    await act(async () => {
+      ok = await rt.commitAll()
+    })
+    expect(ok).toBe(true)
+    expect(dataJson()[0].name).toBe('CHARLOTTE') // server's value wins over the typed one
+    expect(dataJson()[0].age).toBe(99) // a field the user never edited, applied from the server
+    expect(Object.keys(rt.store.getState().dirtyCells)).toHaveLength(0) // committed, drafts cleared
+  })
+
+  test('a `failed` cell keeps its draft + error; accepted cells commit; commitAll → false', async () => {
+    const onSave = vi.fn(
+      (): BstSaveResult<Person> => ({ failed: [{ rowId: '1', columnId: 'name', error: 'Name already taken' }] }),
+    )
+    render(<Grid onSave={onSave} />)
+    editCell('Charlie', 'Charlotte') // row 1 name — will be rejected
+    editCell('25', '26') // row 2 age — will be accepted
+
+    let ok = true
+    await act(async () => {
+      ok = await rt.commitAll()
+    })
+    expect(ok).toBe(false) // not fully saved
+    // rejected cell: draft kept, upstream untouched, error surfaced (validation-error UI)
+    expect(dataJson()[0].name).toBe('Charlie')
+    expect(rt.store.getState().drafts['1::name']).toBe('Charlotte')
+    expect(rt.store.getState().cellErrors['1::name']?.[0]?.message).toBe('Name already taken')
+    // accepted cell: committed, draft cleared
+    expect(dataJson()[1].age).toBe(26)
+    expect(rt.store.getState().drafts['2::age']).toBeUndefined()
+  })
+
+  test('a row-level `failed` (no columnId) keeps + flags every edited cell in that row', async () => {
+    const onSave = (): BstSaveResult<Person> => ({ failed: [{ rowId: '1', error: 'Row rejected by server' }] })
+    render(<Grid onSave={onSave} />)
+    editCell('Charlie', 'Charlotte') // row 1 name
+    editCell('30', '31') // row 1 age
+
+    let ok = true
+    await act(async () => {
+      ok = await rt.commitAll()
+    })
+    expect(ok).toBe(false)
+    expect(dataJson()[0].name).toBe('Charlie') // both kept
+    expect(rt.store.getState().drafts['1::name']).toBe('Charlotte')
+    expect(rt.store.getState().drafts['1::age']).toBe(31)
+    expect(rt.store.getState().cellErrors['1::name']?.[0]?.message).toBe('Row rejected by server')
+    expect(rt.store.getState().cellErrors['1::age']?.[0]?.message).toBe('Row rejected by server')
+  })
+
+  test('applied + failed together: server values land while failures stay as drafts', async () => {
+    const onSave = (): BstSaveResult<Person> => ({
+      applied: [{ rowId: '2', values: { age: 26 } }],
+      failed: [{ rowId: '1', columnId: 'name', error: 'taken' }],
+    })
+    render(<Grid onSave={onSave} />)
+    editCell('Charlie', 'Charlotte') // fails
+    editCell('25', '26') // applied
+
+    let ok = true
+    await act(async () => {
+      ok = await rt.commitAll()
+    })
+    expect(ok).toBe(false)
+    expect(dataJson()[1].age).toBe(26) // applied from the server
+    expect(rt.store.getState().drafts['1::name']).toBe('Charlotte') // failed → draft kept
+    expect(rt.store.getState().drafts['2::age']).toBeUndefined() // applied → draft cleared
+  })
+
+  test('returning nothing is unchanged: every draft commits with the typed value', async () => {
+    const onSave = vi.fn<() => void>() // resolves with undefined
+    render(<Grid onSave={onSave} />)
+    editCell('Charlie', 'Charlotte')
+
+    let ok = false
+    await act(async () => {
+      ok = await rt.commitAll()
+    })
+    expect(ok).toBe(true)
+    expect(dataJson()[0].name).toBe('Charlotte') // typed value committed (backward-compatible)
+    expect(Object.keys(rt.store.getState().dirtyCells)).toHaveLength(0)
   })
 })

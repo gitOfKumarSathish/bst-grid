@@ -16,7 +16,7 @@ _Verified against the corpus + working tree on 2026-08-26. Everything below is c
 | ↳ config props / cell-meta / notes | 29 | on the relevant feature / cell / API page |
 | Cell types | **17** | page **+ prose guide + live demo + standalone screenshot each** ✅ (all 17 imaged) |
 | ↳ cellMeta sub-options | 38 | on each cell page |
-| Engine API exports | **262** | page each ✅ (fn · hooks · iface · type · const) |
+| Engine API exports | **263** | page each ✅ (fn · hooks · iface · type · const) |
 | Spec-coverage leaves | **58** | coverage matrix ✅ |
 | Prose guides (hand-written) | **88** | 62 flag guides + 9 group overviews + 17 cell-type guides |
 | Generated pages | 90 | 72 feature + 18 cell + API + coverage |
@@ -31,7 +31,7 @@ Coverage gate (`check-docs-coverage.mjs`) is **green** — every flag, cell and 
 ## DONE ✅
 
 ### Generated reference (Phase 1)
-- 90-capability reference: 72 feature-flag pages (9 groups) · 18 cell-type pages · 262 API-export pages ·
+- 90-capability reference: 72 feature-flag pages (9 groups) · 18 cell-type pages · 263 API-export pages ·
   58-leaf coverage matrix — all generated from the MCP corpus + engine `.d.ts`.
 - **Never hand-edit** the generated pages — edit the corpus source / the `guides/` partials and regenerate.
 - Build-time gate fails CI if any flag / cell / export is undocumented.
@@ -74,7 +74,7 @@ Coverage gate (`check-docs-coverage.mjs`) is **green** — every flag, cell and 
 
 ## MISSING / BACKLOG ⬜ (pick up in future chats)
 
-1. **Prose layer for API Reference (262)** — the API-export pages still have no hand-written "when/why"
+1. **Prose layer for API Reference (263)** — the API-export pages still have no hand-written "when/why"
    prose. _Extend the guide injection to API pages._ (Cell Types are **done** — a guide for all 17 in
    `guides/cell-types/`; feature flags all have guides too.)
 2. **Animated hero GIF** — only a static hero exists. Needs a screen recording of the live grid.

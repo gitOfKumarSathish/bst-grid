@@ -1027,7 +1027,12 @@ export default function App() {
             granularity, one request either way (a rejected call keeps every draft).{' '}
             <b>New:</b> open the ⚙ settings → <i>Editing</i> → <b>Batch editing</b> to switch the
             whole mode off/on at runtime (<code>enableBatchEditing</code>) — off = per-cell
-            commits + plain save bar, on = drafts + Review &amp; save.
+            commits + plain save bar, on = drafts + Review &amp; save.{' '}
+            <b>I4 — reconcile the response:</b> this <code>onSave</code> RETURNS a{' '}
+            <code>BstSaveResult</code>, so the simulated server <b>normalises every accepted name to
+            Title Case</b> (type <code>alice</code> → the grid shows <b>Alice</b>, the server's value)
+            and <b>rejects a row named "Taken"</b> (its draft stays, with the server's error) — the
+            other rows still save.
             {lastSave && (
               <>
                 {' '}Last save: <b>{lastSave}</b>.
@@ -1046,10 +1051,25 @@ export default function App() {
             onSave={async (e) => {
               // Simulates the single backend request (e.g. a row-wise batch PATCH).
               await new Promise((r) => setTimeout(r, 600));
+              // I4 — reconcile the "server" response back into the grid: reject any
+              // row named "Taken", and normalise every accepted name to Title Case so
+              // the grid adopts the server-authoritative value (not what was typed).
+              const applied: Array<{ rowId: string; values: Partial<Person> }> = [];
+              const failed: Array<{ rowId: string; columnId?: string; error: string }> = [];
+              for (const r of e.rows) {
+                const name = String(r.updated?.name ?? '').trim();
+                if (/^taken$/i.test(name)) {
+                  failed.push({ rowId: r.rowId, columnId: 'name', error: 'That name is already taken (server).' });
+                } else if (name) {
+                  const titled = name.replace(/\b\w/g, (c) => c.toUpperCase());
+                  if (titled !== name) applied.push({ rowId: r.rowId, values: { name: titled } });
+                }
+              }
               setLastSave(
-                `1 call · ${e.changes.length} change${e.changes.length === 1 ? '' : 's'} across ` +
-                  `${e.rows.length} row${e.rows.length === 1 ? '' : 's'}`,
+                `1 call · ${e.changes.length} change${e.changes.length === 1 ? '' : 's'} · ` +
+                  `${applied.length} normalised by server · ${failed.length} rejected`,
               );
+              return { applied, failed };
             }}
             changesRowLabel={(row) => row?.name ?? 'New row'}
             pagination={{ pageSize: 8 }}

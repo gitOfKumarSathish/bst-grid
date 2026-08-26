@@ -8,7 +8,7 @@ import type { BstFormatRule } from './formatting.js'
 import type { VirtualizationOptions } from './virtualization.js'
 import type { BstStickyHeaderOptions } from './stickyHeader.js'
 import type { BstExportOptions } from './export.js'
-import type { BstCellEdit, BstSaveEvent, CommitPolicy, SaveTrigger } from './runtime.js'
+import type { BstCellEdit, BstSaveEvent, BstSaveResult, CommitPolicy, SaveTrigger } from './runtime.js'
 
 /** A Bst-Table column definition, pre-bound to the engine's feature set. */
 export type BstTableColumn<TData extends RowData> = ColumnDef<BstTableFeatures, TData, any>
@@ -432,8 +432,16 @@ export interface UseBstTableOptions<TData extends RowData> extends BstTableEngin
    * draft**, so a failed API call loses nothing and the user can retry. Pairs
    * with `enableEditing: { mode: 'batch' }`, where every edit defers until the
    * explicit save.
+   *
+   * **Reconcile the response (I4):** optionally RETURN a {@link BstSaveResult} to
+   * apply the server's authoritative values back into the grid and flag partial
+   * failures — `applied` rows adopt the server's values (IDs, timestamps,
+   * recomputed fields) and clear, `failed` rows/cells keep their draft + show an
+   * error. Returning nothing keeps the default (every draft commits as typed).
    */
-  onSave?: (event: BstSaveEvent<TData>) => void | Promise<void>
+  onSave?: (
+    event: BstSaveEvent<TData>,
+  ) => void | BstSaveResult<TData> | Promise<void | BstSaveResult<TData>>
   /**
    * Per-cell commit hook — the inline counterpart to `onSave`. Fires **once per
    * committed cell** the moment an edit writes through: an inline edit saved on

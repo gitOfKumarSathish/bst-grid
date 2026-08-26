@@ -91,6 +91,34 @@ export interface BstSaveEvent<TData> {
   next: TData[]
 }
 
+/**
+ * What an `onSave` handler may RETURN to reconcile the backend's response back
+ * into the grid (I4). It is the resolved *value* of the save promise — think
+ * `Promise.allSettled`, not resolve-vs-reject: **throwing** still aborts the whole
+ * save and keeps every draft, while **returning** this settles each row/cell.
+ *
+ * - Return **nothing** → today's behaviour: every draft commits with the typed values.
+ * - Return a result → `applied` rows adopt the server's authoritative values and
+ *   their drafts clear; `failed` rows/cells keep their draft and show an error;
+ *   every other changed row commits with its local value.
+ */
+export interface BstSaveResult<TData> {
+  /**
+   * Rows the server accepted, each with the server's official values (a full or
+   * PARTIAL row) merged onto the grid row — so IDs, timestamps, recomputed or
+   * normalised fields display what was actually stored. These rows' drafts clear.
+   * Key by the same `rowId` the save event used (a new row's temporary id maps to
+   * the server row here, so its real id lands in `values`).
+   */
+  applied?: Array<{ rowId: string; values: Partial<TData> }>
+  /**
+   * Rows/cells the server rejected. Their drafts are KEPT and the `error` is shown
+   * on the cell(s) (reusing the validation-error UI). Omit `columnId` for a
+   * whole-row failure — the error then flags every edited cell in that row.
+   */
+  failed?: Array<{ rowId: string; columnId?: string; error: string }>
+}
+
 /** A visual (paint-order) coordinate for a cell — row + column index. */
 export interface VisualIndex {
   r: number
@@ -191,7 +219,9 @@ export interface RuntimeCtx<TData extends RowData> {
   onDataChange?: (next: TData[]) => void
   /** Batched save hook — ONE call per save action with the full change set.
    *  A rejection aborts the save and keeps every draft (nothing is lost). */
-  onSave?: (event: BstSaveEvent<TData>) => void | Promise<void>
+  onSave?: (
+    event: BstSaveEvent<TData>,
+  ) => void | BstSaveResult<TData> | Promise<void | BstSaveResult<TData>>
   /** Per-cell commit hook — fires once per cell as an immediate edit/paste writes
    *  through (the inline counterpart to `onSave`). */
   onCellCommit?: (change: BstCellEdit<TData>) => void
@@ -757,30 +787,87 @@ export function createRuntime<TData extends RowData>(
     return { changes: edits, rows: Array.from(rowsById.values()), next }
   }
 
+  /** Overlay the server's authoritative values (I4 `applied`) onto rows by rowId. */
+  const applyServerValues = (
+    rows: TData[],
+    applied: Array<{ rowId: string; values: Partial<TData> }>,
+  ): TData[] => {
+    if (!applied.length) return rows
+    const byId = new Map(applied.map((a) => [a.rowId, a.values]))
+    return rows.map((row, i) => {
+      const vals = byId.get(ctx.getRowId(row, i))
+      return vals ? ({ ...(row as object), ...(vals as object) } as TData) : row
+    })
+  }
+
   /**
    * Flush a batch of drafts upstream as ONE write. With `onSave` set, the whole
    * batch is announced through it FIRST (a single call — the one backend request;
    * never per cell/row/column) and awaited: a rejection aborts the save and keeps
-   * every draft, so a failed API call loses nothing. Only after it resolves is the
-   * data committed (`onDataChange`) and the drafts cleared.
+   * every draft, so a failed API call loses nothing.
+   *
+   * `onSave` may RETURN a `BstSaveResult` to reconcile the backend's response (I4):
+   * `applied` rows adopt the server's authoritative values, `failed` rows/cells keep
+   * their draft + show the error, and every other change commits with its local
+   * value. Returning nothing commits every change as typed (the default). Resolves
+   * `true` only when nothing failed.
    */
   const saveChanges = async (
     changes: Array<{ rowId: string; columnId: string; value: unknown }>,
   ): Promise<boolean> => {
-    if (changes.length) {
-      if (ctx.onSave) {
-        try {
-          await ctx.onSave(buildSaveEvent(changes))
-        } catch {
-          return false
-        }
-        // Recompute from the CURRENT data — an external update (I5) may have
-        // landed while the save call was in flight.
-        if (ctx.onDataChange) commitData(applyChanges(changes))
-      } else {
-        persist(changes)
+    if (changes.length && ctx.onSave) {
+      let result: void | BstSaveResult<TData>
+      try {
+        result = await ctx.onSave(buildSaveEvent(changes))
+      } catch {
+        return false // rejected → abort the whole save, keep every draft
       }
+      // Reconcile the server's response (I4). Split accepted vs rejected.
+      const failedCells = new Set<string>()
+      const failedRows = new Set<string>()
+      const cellError = new Map<string, string>()
+      const rowError = new Map<string, string>()
+      for (const f of result?.failed ?? []) {
+        if (f.columnId) {
+          const k = cellKey(f.rowId, f.columnId)
+          failedCells.add(k)
+          cellError.set(k, f.error)
+        } else {
+          failedRows.add(f.rowId)
+          rowError.set(f.rowId, f.error)
+        }
+      }
+      const isFailed = (ch: { rowId: string; columnId: string }) =>
+        failedRows.has(ch.rowId) || failedCells.has(cellKey(ch.rowId, ch.columnId))
+      const committed = changes.filter((ch) => !isFailed(ch))
+
+      // Commit the accepted changes, then overlay the server's authoritative values.
+      if (ctx.onDataChange) {
+        let next = applyChanges(committed)
+        if (result?.applied?.length) next = applyServerValues(next, result.applied)
+        commitData(next)
+      }
+      // Clear drafts for accepted cells; KEEP the rejected ones as dirty drafts.
+      set((s) => {
+        let next: InteractionState = s
+        for (const ch of committed) next = clearCellDraft(next, ch.rowId, ch.columnId)
+        return { ...next, editingCell: null, rowSession: null }
+      })
+      // Surface the server's error on each kept (rejected) cell — same UI as validation.
+      for (const ch of changes) {
+        const k = cellKey(ch.rowId, ch.columnId)
+        const msg = failedCells.has(k)
+          ? cellError.get(k)
+          : failedRows.has(ch.rowId)
+            ? rowError.get(ch.rowId)
+            : undefined
+        if (msg != null) applyErrors(ch.rowId, ch.columnId, [{ level: 'error', message: msg }])
+      }
+      return !(result?.failed && result.failed.length)
     }
+
+    // No `onSave` (or nothing to save): persist locally + clear every draft (unchanged).
+    if (changes.length) persist(changes)
     set((s) => {
       let next: InteractionState = s
       for (const ch of changes) next = clearCellDraft(next, ch.rowId, ch.columnId)

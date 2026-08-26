@@ -317,6 +317,7 @@ export type {
   BstCellEdit,
   BstRowChange,
   BstSaveEvent,
+  BstSaveResult,
   CellAccess,
   SaveTrigger,
   CommitPolicy,

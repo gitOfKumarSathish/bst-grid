@@ -89,4 +89,4 @@ Inline editing feature. `boolean | EditingOptions`. Default: false (opt-in).
 
 - **C2 · Save on Enter/Blur/Explicit** — ✅ built. P2
 - **I2 · Cell events + deferred save** — ✅ built. P2 (C2≡I2)
-- **I4 · Backend updates → cells/rows/grid** — 🟡 partial. change-set half done v0.30.0 — batch mode's runtime.getChangeSet() + one onSave(&#123; changes, rows[].patch, next &#125;) per save action, with a rejected save keeping every draft; reconciling the backend's response back into cells/rows (server-authoritative values, partial failures) not built
+- **I4 · Backend updates → cells/rows/grid** — ✅ built. both halves done. Send: batch mode's runtime.getChangeSet() + one onSave(&#123; changes, rows[].patch, next &#125;) per save action (v0.30.0), a rejected save keeping every draft. Reconcile: onSave may RETURN a BstSaveResult — applied rows adopt the server's authoritative values (IDs, timestamps, normalised/recomputed fields), failed rows/cells keep their draft + show the error (partial success); returning nothing commits every draft as typed
