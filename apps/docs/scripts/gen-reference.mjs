@@ -14,6 +14,9 @@ const CELLS = JSON.parse(readFileSync('cells.json', 'utf8'))
 // static screenshot is added separately, only when the PNG actually exists —
 // action/actionMenu have a demo but no screenshot.
 const CELL_DEMOS = new Set(['text', 'longText', 'number', 'dateTime', 'boolean', 'singleSelect', 'multiSelect', 'radio', 'hyperlink', 'files', 'sparkline', 'kpi', 'qr', 'barcode', 'richText', 'action', 'actionMenu'])
+// Cell types with no dedicated screenshot but pictured in a feature shot — reuse it.
+// (`action` renders the inline edit/delete buttons shown in the row-actions image.)
+const CELL_IMG_ALIAS = { action: 'feat-rowactions' }
 const API = JSON.parse(readFileSync('api-sigs.json', 'utf8'))
 const REQS = JSON.parse(readFileSync('requirements.json', 'utf8'))
 const FEATURES = JSON.parse(readFileSync('features.json', 'utf8'))
@@ -91,7 +94,8 @@ function genCells() {
   for (const c of CELLS) {
     const L = ['---', `id: ${c.type}`, `title: ${c.type}`, `sidebar_label: ${c.type}`, '---', '',
       `# \`${c.type}\``, '', mdxSafe(c.renders) + '.', '']
-    if (existsSync(join(STATIC_IMG, `cell-${c.type}.png`))) L.push(`![The ${c.type} cell rendered in a Bst-Table grid](/img/cell-${c.type}.png)`, '')
+    const cellImg = existsSync(join(STATIC_IMG, `cell-${c.type}.png`)) ? `cell-${c.type}` : CELL_IMG_ALIAS[c.type]
+    if (cellImg && existsSync(join(STATIC_IMG, `${cellImg}.png`))) L.push(`![The ${c.type} cell rendered in a Bst-Table grid](/img/${cellImg}.png)`, '')
     if (CELL_DEMOS.has(c.type)) L.push(`<BstSandbox example="cell-${c.type}" />`, '')
     const guide = readGuide(join('cell-types', `${c.type}.mdx`))
     if (guide) L.push('## Guide', '', guide, '')
