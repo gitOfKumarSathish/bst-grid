@@ -1,0 +1,85 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  # Lets you re-run the whole pipeline (incl. the docs deploy) by hand.
+  workflow_dispatch:
+
+# Least-privilege by default. Only the deploy job widens its own scope (below).
+permissions:
+  contents: read
+
+jobs:
+  # ── Continuous integration ───────────────────────────────────────────────
+  # Runs on every push to main AND every pull request. Unchanged from the old
+  # verify.yml — it stays the required status check.
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # verify:naming uses `git ls-files`
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      # Naming guard runs AFTER the build so it also scans the publish payload
+      # (packages/*/dist) — the scope that let a stale artifact ship once before.
+      - run: npm run verify:naming
+      - run: npm test
+      - run: npm run mcp
+      # Docs are generated from the MCP corpus (features/cell-types/coverage) — a
+      # feature added without regenerating them fails here. Runs after the build
+      # so the corpus is fresh; dependency-free (no docusaurus/TS5 install needed).
+      - run: npm run docs:verify
+
+  # ── Build the Docusaurus site ────────────────────────────────────────────
+  # Only for real pushes to main (or a manual run) — never a PR — and only once
+  # `verify` is green, so a failing build/test/stale-docs never reaches Pages.
+  build-docs:
+    needs: verify
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/docs # docs are a standalone app, not an npm workspace
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: apps/docs/.node-version # currently Node 20
+          cache: npm
+          cache-dependency-path: apps/docs/package-lock.json
+      # apps/docs has its own lockfile, so `npm ci` here installs only the docs
+      # deps — no root/workspace build required.
+      - run: npm ci
+      - run: npm run build # docusaurus build → apps/docs/build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          # Path is relative to the repo root, not to working-directory.
+          path: apps/docs/build
+
+  # ── Publish to GitHub Pages ──────────────────────────────────────────────
+  deploy-docs:
+    needs: build-docs
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    # Scoped here so `verify`/`build-docs` never hold Pages/OIDC write tokens.
+    permissions:
+      pages: write
+      id-token: write
+    # One live deployment at a time; don't cancel an in-flight publish — queue
+    # behind it so a half-published site is never left behind.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
