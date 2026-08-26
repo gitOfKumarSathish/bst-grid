@@ -50,16 +50,24 @@ npm run docs:sync     # regenerate + gate (no API re-extract)
 docs and fails if any flag / cell type / export is undocumented — the docs can't drift from the
 code. (Run `docs:api` / `docs:build` after building the engine to also refresh the API signatures.)
 
-## Deploy (Cloudflare Pages)
+## Deploy (GitHub Pages)
+
+Configured in `docusaurus.config.js`: `url: https://gitofkumarsathish.github.io`,
+`baseUrl: /bst-grid/`, `organizationName: gitOfKumarSathish`, `projectName: bst-grid`,
+`deploymentBranch: gh-pages`.
 
 | Setting | Value |
 | --- | --- |
 | Root directory | `apps/docs` |
-| Build command | `npm install --no-workspaces && npm run build` |
-| Build output | `build` |
-| Domain | `bst-grid.pages.dev` (set in `docusaurus.config.js` → `url`) |
+| Install | `npm install --no-workspaces` |
+| Build | `npm run build` → static site in `build/` (served under `/bst-grid/`) |
+| Publish branch | `gh-pages` |
+| Live URL | `https://gitofkumarsathish.github.io/bst-grid/` |
 
-`npm run build` produces the static site in `build/`; `npm run serve` previews that build locally.
+Publish by pushing the built `build/` to the **`gh-pages`** branch — Docusaurus's built-in deploy
+(`GIT_USER=<github-user> npx docusaurus deploy` from `apps/docs`), or a GitHub Actions workflow — then
+enable **repo → Settings → Pages → Source: `gh-pages` / root**. `npm run serve` previews the
+production build locally before publishing.
 
 ## Media (screenshots / hero)
 

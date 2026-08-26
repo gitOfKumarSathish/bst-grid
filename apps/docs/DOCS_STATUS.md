@@ -1,7 +1,7 @@
 # Bst-Table Docs — Status & Backlog
 
 Single source of truth for **what is in the documentation site** (`apps/docs/`) and **what is still
-missing**. Paste this into a new chat to resume without re-explaining. Branch: `docs/add-docusaurus-site`.
+missing**. Paste this into a new chat to resume without re-explaining. Branch: `main` (the docs work is merged; the old `docs/add-docusaurus-site` branch was deleted).
 
 _Verified against the corpus + working tree on 2026-08-26. Everything below is committed + pushed._
 
@@ -67,7 +67,7 @@ Coverage gate (`check-docs-coverage.mjs`) is **green** — every flag, cell and 
 - Coverage gate wired; **`verify:naming` hardened** — the build fails on any third-party grid product name,
   its abbreviations, or licensing-tier ids. Positioning stays positive (MIT/Apache-only, no per-seat licensing).
 - **`docs:sync` wired into `version:patch|minor|major`** — docs regenerate + gate runs on every bump.
-- **Cloudflare-ready**: `apps/docs` isolated from the workspace, `.node-version` pinned, `npm ci && npm run build` verified on Node 20.
+- **Live on GitHub Pages**: served at `https://gitofkumarsathish.github.io/bst-grid/` (config `deploymentBranch: gh-pages`, `baseUrl: /bst-grid/`); `apps/docs` isolated from the workspace, `.node-version` pinned.
 - API corpus re-extractable via `docs:api` (needs typescript@5).
 
 ---
@@ -78,18 +78,17 @@ Coverage gate (`check-docs-coverage.mjs`) is **green** — every flag, cell and 
    prose. _Extend the guide injection to API pages._ (Cell Types are **done** — a guide for all 17 in
    `guides/cell-types/`; feature flags all have guides too.)
 2. **Animated hero GIF** — only a static hero exists. Needs a screen recording of the live grid.
-3. **Actual Cloudflare Pages deploy** — needs the Cloudflare account. Settings are in `apps/docs/README.md`
-   (root `apps/docs`, build `npm run build`, output `build`, domain `bst-grid.pages.dev`).
-4. **Merge `docs/add-docusaurus-site` → `main`** — the branch holds everything above.
-5. **Guides for any NEW flags** from future corpus re-dumps — the last re-dump grew the corpus to 90 and
+3. **Guides for any NEW flags** from future corpus re-dumps — the last re-dump grew the corpus to 90 and
    every toggle is now covered; a future flag needs a new `guides/<group>/<flag>.mdx` (the gate will flag it).
-6. **Sandpack dep pins** in `src/components/BstSandbox.tsx` load the **published 0.41.0**; features newer
+4. **Sandpack dep pins** in `src/components/BstSandbox.tsx` load the **published 0.41.0**; features newer
    than that (e.g. `enableFind`@0.42.0) can't render live until 0.42.0+ is published — bump the pins then.
    (Their **screenshots** are already captured from `apps/demo`, so the pages aren't bare.)
 
-**Recently completed** (was on this list): `action`/`actionMenu` cell screenshots ✅ · the 24 distinct-feature
-screenshots (pinning, selection, filters, status bar, find, context menu, overlays, spanning, …) ✅ ·
-a live demo on every feature page ✅ · Mac/Windows keyboard-shortcuts reference ✅.
+**Recently completed** (was on this list): **deployed live on GitHub Pages**
+(`https://gitofkumarsathish.github.io/bst-grid/`) ✅ · **merged to `main`** + branch deleted ✅ ·
+`action`/`actionMenu` cell screenshots ✅ · the 24 distinct-feature screenshots (pinning, selection,
+filters, status bar, find, context menu, overlays, spanning, …) ✅ · a live demo on every feature page ✅ ·
+Mac/Windows keyboard-shortcuts reference ✅.
 
 > **Per-flag screenshots (61) were deliberately skipped** — most flags render as the same grid, so the group
 > + cell + feature images cover the actual visual variety. This is a choice, not a gap.
@@ -110,7 +109,8 @@ npm run check:docs    # coverage gate (must stay green)
 npm run docs:build    # re-extract API (needs typescript@5) → regenerate → gate
 ```
 
-Deploy: connect the repo to Cloudflare Pages → root dir `apps/docs`, build `npm run build`, output `build`.
+Deploy: **live on GitHub Pages** at `https://gitofkumarsathish.github.io/bst-grid/` — build `apps/docs`
+(`npm run build`) → publish `build/` to the `gh-pages` branch (details in `apps/docs/README.md`).
 
 ---
 

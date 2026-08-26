@@ -17,7 +17,7 @@ master-detail, range selection or clipboard.
 Full per-package docs live in each package README. Start with the
 **[engine README](packages/engine/README.md)** — it documents every option, cell type and feature.
 
-**📚 Documentation site:** [bst-grid.pages.dev](https://bst-grid.pages.dev) — generated feature
+**📚 Documentation site:** [gitofkumarsathish.github.io/bst-grid](https://gitofkumarsathish.github.io/bst-grid/) — generated feature
 guides, cell types, API reference and a coverage matrix, plus hand-written guides, built from this
 repo's corpus (source in [`apps/docs`](apps/docs)). Run it locally with
 `cd apps/docs && npm install --no-workspaces && npm run start`.
@@ -137,7 +137,7 @@ npm install --no-workspaces   # first time only — installs Docusaurus, isolate
 npm run start                 # dev server with live reload
 ```
 
-Then open **http://localhost:3000** in your browser to read the docs. To build and preview the
+Then open **<http://localhost:3000>** in your browser to read the docs. To build and preview the
 production site instead:
 
 ```bash
@@ -147,9 +147,9 @@ npm run serve     # serve that build locally to preview it
 
 The reference pages are **generated from the source of truth** (the MCP corpus + the engine's typed
 `.d.ts`), so they never drift from the code — `npm run gen:docs` regenerates them and
-`npm run check:docs` is the coverage gate. The regenerate pipeline, the Cloudflare Pages deploy
+`npm run check:docs` is the coverage gate. The regenerate pipeline, the GitHub Pages deploy
 settings and the screenshot/media notes all live in the **[docs README](apps/docs/README.md)**. The
-published site is at **[bst-grid.pages.dev](https://bst-grid.pages.dev)**.
+published site is at **[gitofkumarsathish.github.io/bst-grid](https://gitofkumarsathish.github.io/bst-grid/)**.
 
 ## Using the packages (consumer view)
 
@@ -236,13 +236,18 @@ No engine change required.
 
 ## Not built yet
 
-The genuinely open items are **live / WebSocket merge** (I5 — for now, push updates by replacing
-`data`), **reconciling a backend's response back into cells** (I4 — server-authoritative values /
-partial failures; the batch change-set + single-call `onSave` half is done), and an **in-cell PDF
-thumbnail** render (B5 — needs `pdf.js`; file preview already opens PDFs in the browser's native
-viewer). Row/column **virtualization** (D1) + **infinite scroll** (A2) and the file
-**upload / view / delete** DataSource verbs (I3) all shipped in **0.33.0**. See
-[`COVERAGE.md`](COVERAGE.md) and [`Plan.md`](Plan.md).
+The core spec is **55 / 58 built**. The genuinely open items are **live / WebSocket merge** (I5 — for
+now, push updates by replacing `data`) and the second half of **backend reconciliation** (I4 —
+applying a server's authoritative response and partial failures back into cells; the batch change-set
+
+- single-call `onSave` half is done). Proving the **1M-row migration tier** (A6) end-to-end is the
+remaining scale milestone. On the extended roadmap, **integrated range charts** (X15), **formula
+columns** (X17) and a full **accessibility / ARIA audit** (X20) are still in progress.
+
+Everything else in the core B-series has **shipped** — including the in-cell **PDF thumbnail** (B5,
+page 1 via `pdf.js`), row/column **virtualization** (D1), **infinite scroll** (A2) and the file
+**upload / view / delete** DataSource verbs (I3). See [`COVERAGE.md`](COVERAGE.md) and
+[`Plan.md`](Plan.md) for the full matrix.
 
 ## License
 
