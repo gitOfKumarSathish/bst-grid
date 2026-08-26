@@ -14,7 +14,7 @@ type Props = { example?: string; code?: string; height?: number }
 export default function BstSandbox({ example, code, height = 460 }: Props) {
   const source = (code ?? (example ? EXAMPLES[example] : '') ?? '').trim()
   // The docs can be deployed after a version bump but before that version is published.
-  // Resolve the registry's latest tag so Sandpack never requests an unpublished workspace
+  // Use npm's dist-tag "latest" so Sandpack never requests an unpublished workspace
   // version (its resolver otherwise reports the opaque "null.match" dependency error).
   const publishedVersion = 'latest'
   return (
