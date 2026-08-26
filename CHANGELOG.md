@@ -10,6 +10,17 @@ this project uses [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+### Added
+
+- **Reconcile the backend's response back into the grid (I4).** `onSave` may now **return** a
+  `BstSaveResult<TData>` — `applied` rows adopt the server's authoritative values (ids, timestamps,
+  normalised or recomputed fields; a full or partial row is merged, so a new row's temporary id maps
+  to its real id), and `failed` rows/cells keep their draft and surface the server's error (partial
+  success — `commitAll()` resolves `false` when anything failed, so the review sheet stays open on the
+  rejects). Returning nothing is unchanged (every draft commits with the typed value). Additive, no
+  API break; new export `BstSaveResult`. This closes the second half of I4 (the change-set +
+  single-call `onSave` send half landed in v0.30.0) — COVERAGE.md I4 → ✅.
+
 ## [0.44.0] — 2026-08-26
 
 ### Added — MCP server: `bst_list_versions` (9th tool)
@@ -25,6 +36,13 @@ this project uses [Semantic Versioning](https://semver.org).
 - Corrected stale counts in `packages/mcp/README.md` and `docs/mcp-server.md` (API exports 150 → 262,
   example apps six → seven, indexed READMEs five → six) and added a `generate.test.ts` parity guard
   that pins every quoted count to the generated corpus, so the prose can't drift again.
+
+### Docs — package READMEs + npm discoverability
+- Every package README now links to the live **documentation site**
+  (`https://gitofkumarsathish.github.io/bst-grid/`) — a docs badge plus a guide / reference index —
+  and the MUI / shadcn feature lists drop the internal `Phase` / `X##` codes for a cleaner npm page.
+- Expanded the npm `keywords` and rewrote the `description` on all four packages for search
+  discoverability. Metadata only — no behaviour change.
 
 ## [0.43.0] — 2026-08-26
 

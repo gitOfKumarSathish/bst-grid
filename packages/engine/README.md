@@ -2,6 +2,7 @@
 
 [![npm](https://img.shields.io/npm/v/@bloomskill/table-engine.svg)](https://www.npmjs.com/package/@bloomskill/table-engine)
 [![license](https://img.shields.io/npm/l/@bloomskill/table-engine.svg)](./LICENSE)
+[![docs](https://img.shields.io/badge/docs-online-2ea44f.svg)](https://gitofkumarsathish.github.io/bst-grid/)
 
 The **headless engine** for Bst-Table — a small, UI-agnostic React data grid built on
 [TanStack Table v9](https://tanstack.com/table/latest). It ships the correct state engine
@@ -13,6 +14,16 @@ component-library styling**, so you pair it with a skin:
 - 🪶 **Two lightweight deps** — `@tanstack/react-table` + `@tanstack/react-virtual`; `react` / `react-dom` are peers.
 - 🎛 **Every feature is a toggle** — data features on by default, heavy features opt-in.
 - 🛰️ **One grid, every scale** — the same component runs client-side or against a server `DataSource` (1M rows).
+
+## 📚 Documentation
+
+Full guides, a complete API reference and **live, editable demos** are on the docs site — **[gitofkumarsathish.github.io/bst-grid](https://gitofkumarsathish.github.io/bst-grid/)**:
+
+| Guide | Reference | More |
+| :-- | :-- | :-- |
+| [Getting Started](https://gitofkumarsathish.github.io/bst-grid/docs/getting-started) | [Feature Guides](https://gitofkumarsathish.github.io/bst-grid/docs/features) | [Styling & Theming](https://gitofkumarsathish.github.io/bst-grid/docs/theming) |
+| [Installation](https://gitofkumarsathish.github.io/bst-grid/docs/installation) | [Cell Types](https://gitofkumarsathish.github.io/bst-grid/docs/cell-types) | [AI Agents & MCP](https://gitofkumarsathish.github.io/bst-grid/docs/ai-agents) |
+| [Recipes](https://gitofkumarsathish.github.io/bst-grid/docs/recipes) | [API Reference](https://gitofkumarsathish.github.io/bst-grid/docs/api) | [Coverage & Roadmap](https://gitofkumarsathish.github.io/bst-grid/docs/coverage) |
 
 ---
 
@@ -616,7 +627,7 @@ means *passing the object implies enabled*.
 | `onDataChange` | `(next: TData[]) => void` | — | Controlled write-back on edit/add/delete/duplicate. |
 | `onCellCommit` | `(change: BstCellEdit<TData>) => void` | — | Per-cell commit hook — the inline counterpart to `onSave`. Fires once per committed cell (Enter/blur in `cell` mode, or per pasted cell) with the single old → new edit. |
 | `enableEditLog` | `boolean` | `false` | Debug: `console.log` each committed cell edit when no `onCellCommit`. Needs `enableEditing`. |
-| `onSave` | `(event: BstSaveEvent) => void \| Promise<void>` | — | Batched save hook — **one call per save action**. Rejecting keeps every draft. |
+| `onSave` | `(event: BstSaveEvent) => void \| BstSaveResult \| Promise<…>` | — | Batched save hook — **one call per save action**. Rejecting keeps every draft; **returning a `BstSaveResult`** reconciles the server's response — apply authoritative values + flag partial failures (I4). |
 
 **Selection & access control**
 
@@ -765,6 +776,30 @@ const { table, runtime } = useBstGrid<Task>({
   saves, so both deferred modes share one contract. Plain cell mode has no drafts → use `onDataChange`.
 - **Let end-users switch it** — `enableBatchEditing` overrides the mode at runtime; it's the toggle
   the [settings sheet](#runtime-settings-sheet) exposes under **Editing → Batch editing**.
+
+**Reconcile the server's response (I4).** `onSave` may **return** a `BstSaveResult` to fold the
+backend's answer back into the grid — think `Promise.allSettled`, not resolve-vs-reject: *throwing*
+still aborts the whole save, while *returning* settles each row.
+
+```tsx
+onSave: async ({ rows }) => {
+  const res = await api.batchUpdate(rows.map((r) => ({ id: r.rowId, ...r.patch })))
+  return {
+    // accepted rows — the grid adopts the server's OFFICIAL values (ids, timestamps,
+    // recomputed/normalised fields), not what was typed; these drafts clear:
+    applied: res.saved.map((r) => ({ rowId: r.id, values: r })),
+    // rejected rows/cells — draft KEPT + error shown (omit columnId for a whole-row
+    // failure); every other changed row still commits:
+    failed: res.errors.map((e) => ({ rowId: e.id, columnId: e.field, error: e.message })),
+  }
+}
+```
+
+- **Return nothing** → the default: every draft commits with the typed value (backward-compatible).
+- **`applied`** → those rows adopt the server's `values` (a full or **partial** row, merged), so the
+  grid shows what was actually stored — no drift. A new row's temporary id maps to the real id here.
+- **`failed`** → those rows/cells keep their draft and light up with the `error` (the validation-error
+  UI). `commitAll()` resolves `false` when anything failed, so the review sheet stays open on them.
 
 ## Selection, keyboard and clipboard
 
@@ -1470,7 +1505,7 @@ preview fallback. New exports: `createFileHandlers`, types `BstFileRef`, `DataSo
 
 **Runtime / store** — `createRuntime` · `createInteractionStore` · `createStore` · `useStoreSelector` ·
 `arrayEqual` · `cellKey` · `splitCellKey` · `runValidators` · `hasBlockingError` + types `BstRuntime`,
-`RuntimeCtx`, `CellChange`, `BstCellEdit`, `BstRowChange`, `BstSaveEvent`, `CellAccess`, `CellRef`,
+`RuntimeCtx`, `CellChange`, `BstCellEdit`, `BstRowChange`, `BstSaveEvent`, `BstSaveResult`, `CellAccess`, `CellRef`,
 `SaveTrigger`, `CommitPolicy`, `VisualIndex`, `MoveActiveOptions`, `InteractionState`,
 `InteractionStore`, `Store`.
 

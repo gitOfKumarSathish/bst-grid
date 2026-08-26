@@ -30,11 +30,19 @@
   "keywords": [
     "mcp",
     "model-context-protocol",
-    "bst-table",
+    "ai",
+    "ai-agent",
+    "llm",
+    "claude",
+    "cursor",
+    "codegen",
+    "scaffold",
+    "react",
+    "table",
     "data-grid",
     "tanstack-table",
-    "claude",
-    "ai"
+    "typescript",
+    "bst-table"
   ],
   "scripts": {
     "build": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && tsc -p tsconfig.json && node ./dist/generate/run.js",

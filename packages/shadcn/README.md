@@ -2,6 +2,7 @@
 
 [![npm](https://img.shields.io/npm/v/@bloomskill/table-shadcn.svg)](https://www.npmjs.com/package/@bloomskill/table-shadcn)
 [![license](https://img.shields.io/npm/l/@bloomskill/table-shadcn.svg)](./LICENSE)
+[![docs](https://img.shields.io/badge/docs-online-2ea44f.svg)](https://gitofkumarsathish.github.io/bst-grid/)
 
 The **shadcn / Radix skin** for Bst-Table. Wraps the headless
 [`@bloomskill/table-engine`](https://www.npmjs.com/package/@bloomskill/table-engine)
@@ -13,26 +14,36 @@ design tokens and dark mode, and the toolbar icons come from your own icon libra
 Same data and columns as the [MUI skin](https://www.npmjs.com/package/@bloomskill/table-mui),
 so you can switch skins without changing your data code.
 
+## 📚 Documentation
+
+Full guides, a complete API reference and **live, editable demos** (this skin included) are on the docs site — **[gitofkumarsathish.github.io/bst-grid](https://gitofkumarsathish.github.io/bst-grid/)**:
+
+| Guide | Reference | More |
+| :-- | :-- | :-- |
+| [Getting Started](https://gitofkumarsathish.github.io/bst-grid/docs/getting-started) | [Feature Guides](https://gitofkumarsathish.github.io/bst-grid/docs/features) | [Styling & Theming](https://gitofkumarsathish.github.io/bst-grid/docs/theming) |
+| [Installation](https://gitofkumarsathish.github.io/bst-grid/docs/installation) | [Cell Types](https://gitofkumarsathish.github.io/bst-grid/docs/cell-types) | [AI Agents & MCP](https://gitofkumarsathish.github.io/bst-grid/docs/ai-agents) |
+| [Recipes](https://gitofkumarsathish.github.io/bst-grid/docs/recipes) | [API Reference](https://gitofkumarsathish.github.io/bst-grid/docs/api) | [Coverage & Roadmap](https://gitofkumarsathish.github.io/bst-grid/docs/coverage) |
+
 ## Features
 
 - 🧱 **Drop-in shadcn-style grid** — one `<BstTableShadcn />` component.
 - 🎛 **Radix DropdownMenu** column-visibility menu; shadcn-style search & pagination.
-- ✏️ **Editing (Phase 2)** at MUI parity — native-control editors for the full B-series, a dependency-free **modal** for long-text & file popups (the **files** modal adds **click-to-preview** — images inline · PDFs in the native viewer — and configurable **upload/delete** via `cellMeta.onUpload`/`onDelete`; read cells show image thumbnails and, with `cellMeta.pdfThumbnail` + a `<BstPdfThumbnailerProvider>` (pdf.js), an in-cell **PDF page-1 thumbnail**), **Add row** button + unsaved **Save / Discard** bar, inline error rings. Wired via `createShadcnPreset()`.
-- ⌨️ **Selection · keyboard nav · clipboard (Phase 3)** — pass `enableCellSelection` / `enableClipboard`; range selection, Arrow/Tab/Home/End navigation, and copy/paste (TSV) come from the shared grid body, no extra chrome required. The **Columns menu** gains a **Copy-column** button (the pluggable `copy` icon) per column — copies the whole column across **all pages** (also Ctrl/Cmd+Space). Whole-column and whole-row copy are sub-toggles: **`enableCopyColumn`** / **`enableCopyRow`** (both default `true`; Shift+Space copies a row).
-- ☑️ **Row selection (Phase 3)** — `enableRowSelection` renders a checkbox column (header select-all + per-row) and a toolbar "{n} selected" badge + Clear (`showSelectionInfo`).
-- ↩️ **Undo/redo (Phase 3)** — `enableUndoRedo` adds toolbar Undo/Redo buttons (`showUndoRedo`) wired to the engine's edit history (Ctrl/Cmd+Z / Ctrl/Cmd+Y also work).
-- 📌 **Layout chrome (Phase 3)** — `enableColumnPinning` / `enableColumnOrdering` add pin + move controls to the Radix columns menu; `showDensityToggle` cycles row-height density; **`enableRowResize`** lets users drag a row's bottom edge to set its height (double-click to reset). **`showColumnEditToggle`** adds a per-column **edit lock/unlock** (✏️) so an end-user can make an editable column read-only at runtime (requires `enableEditing`).
+- ✏️ **Editing** at MUI parity — native-control editors for the full B-series, a dependency-free **modal** for long-text & file popups (the **files** modal adds **click-to-preview** — images inline · PDFs in the native viewer — and configurable **upload/delete** via `cellMeta.onUpload`/`onDelete`; read cells show image thumbnails and, with `cellMeta.pdfThumbnail` + a `<BstPdfThumbnailerProvider>` (pdf.js), an in-cell **PDF page-1 thumbnail**), **Add row** button + unsaved **Save / Discard** bar, inline error rings. Wired via `createShadcnPreset()`.
+- ⌨️ **Selection · keyboard nav · clipboard** — pass `enableCellSelection` / `enableClipboard`; range selection, Arrow/Tab/Home/End navigation, and copy/paste (TSV) come from the shared grid body, no extra chrome required. The **Columns menu** gains a **Copy-column** button (the pluggable `copy` icon) per column — copies the whole column across **all pages** (also Ctrl/Cmd+Space). Whole-column and whole-row copy are sub-toggles: **`enableCopyColumn`** / **`enableCopyRow`** (both default `true`; Shift+Space copies a row).
+- ☑️ **Row selection** — `enableRowSelection` renders a checkbox column (header select-all + per-row) and a toolbar "{n} selected" badge + Clear (`showSelectionInfo`).
+- ↩️ **Undo/redo** — `enableUndoRedo` adds toolbar Undo/Redo buttons (`showUndoRedo`) wired to the engine's edit history (Ctrl/Cmd+Z / Ctrl/Cmd+Y also work).
+- 📌 **Layout chrome** — `enableColumnPinning` / `enableColumnOrdering` add pin + move controls to the Radix columns menu; `showDensityToggle` cycles row-height density; **`enableRowResize`** lets users drag a row's bottom edge to set its height (double-click to reset). **`showColumnEditToggle`** adds a per-column **edit lock/unlock** (✏️) so an end-user can make an editable column read-only at runtime (requires `enableEditing`).
 - 👁️ **Hide / show columns** — with `enableHiding` (on by default) the **Columns menu** gives each column an **eye / eye-off** toggle (the pluggable `eye` / `eyeOff` icon slots) beside the pin/reorder/copy/edit controls — the one-click per-column hide affordance, alongside the existing visibility checkmark. The runtime settings sheet exposes the same capability as **Show / hide columns**.
-- 📤 **Export (Phase 5)** — `enableExport` adds a toolbar **Export** menu (`showExport`, a Radix dropdown) — download **CSV**, download **Excel** (`.xlsx`) or **print** — built on the engine's dependency-free serializers (no `exceljs`). Per-format sub-toggles `enableCsvExport` / `enableExcelExport` / `enablePrint`.
-- 🔎 **Set Filter (Phase 6, X4)** — `enableSetFilter` gives categorical columns an Excel-style **checklist of distinct values** in the filter row (search · select-all/clear · counts · (Blanks)); needs `enableColumnFilterRow`.
-- 🔎 **Multi-filter (X11)** — `enableMultiFilter` lets a column **stack filter types** via an array `meta.filter` (e.g. `['condition', 'set']`): the filters render stacked in the row and a row must satisfy all of them (AND). Needs `enableColumnFilterRow`.
-- 📊 **Status bar (Phase 6, X5)** — `showStatusBar` adds a footer with total / filtered row counts and, when a cell range is selected, the **sum / avg / min / max / count** of its numeric cells.
-- 🔎 **Find (X8)** — `enableFind` adds an in-grid **find bar** (toolbar find button `showFind`, or ⌘/Ctrl+F) that **highlights matches and jumps between them** (Next / Prev · "n / m") **without hiding rows** — distinct from global search, which filters non-matches out.
-- 🔢 **Row numbers · auto-columns · overlays (X9 / X27 / X23)** — engine features inherited by this skin: `enableRowNumbers` adds a leading `#` column (numbering the current view); `enableAutoColumns` infers columns from the data when you pass `columns={[]}`; `enableOverlays` (on by default) shows loading / error overlays fed by `loading` / `error` (which `useBstDataSource` provides). All three are in the ⚙ settings sheet.
-- 🔎 **Filter builder (Phase 3, E3)** — `showFilterBuilder` adds a "Filters (n)" button + a panel with per-column condition rows (operator-aware). Add `enableColumnFilterRow` for a second, inline per-column filter row; drag a header to reorder, drag its edge to resize.
-- 🎨 **Conditional-format builder (K3)** — `showFormatBuilder` adds a "Formats (n)" button that opens/closes a panel hosting `<BstConditionalFormatBuilder>`: end-users add / edit / delete `conditionalFormats` rules at runtime (uncontrolled local state by default; pass `onConditionalFormatsChange` to own the rules). Hidden while `enableConditionalFormatting` is off.
+- 📤 **Export** — `enableExport` adds a toolbar **Export** menu (`showExport`, a Radix dropdown) — download **CSV**, download **Excel** (`.xlsx`) or **print** — built on the engine's dependency-free serializers (no `exceljs`). Per-format sub-toggles `enableCsvExport` / `enableExcelExport` / `enablePrint`.
+- 🔎 **Set Filter** — `enableSetFilter` gives categorical columns an Excel-style **checklist of distinct values** in the filter row (search · select-all/clear · counts · (Blanks)); needs `enableColumnFilterRow`.
+- 🔎 **Multi-filter** — `enableMultiFilter` lets a column **stack filter types** via an array `meta.filter` (e.g. `['condition', 'set']`): the filters render stacked in the row and a row must satisfy all of them (AND). Needs `enableColumnFilterRow`.
+- 📊 **Status bar** — `showStatusBar` adds a footer with total / filtered row counts and, when a cell range is selected, the **sum / avg / min / max / count** of its numeric cells.
+- 🔎 **Find** — `enableFind` adds an in-grid **find bar** (toolbar find button `showFind`, or ⌘/Ctrl+F) that **highlights matches and jumps between them** (Next / Prev · "n / m") **without hiding rows** — distinct from global search, which filters non-matches out.
+- 🔢 **Row numbers · auto-columns · overlays** — engine features inherited by this skin: `enableRowNumbers` adds a leading `#` column (numbering the current view); `enableAutoColumns` infers columns from the data when you pass `columns={[]}`; `enableOverlays` (on by default) shows loading / error overlays fed by `loading` / `error` (which `useBstDataSource` provides). All three are in the ⚙ settings sheet.
+- 🔎 **Filter builder** — `showFilterBuilder` adds a "Filters (n)" button + a panel with per-column condition rows (operator-aware). Add `enableColumnFilterRow` for a second, inline per-column filter row; drag a header to reorder, drag its edge to resize.
+- 🎨 **Conditional-format builder** — `showFormatBuilder` adds a "Formats (n)" button that opens/closes a panel hosting `<BstConditionalFormatBuilder>`: end-users add / edit / delete `conditionalFormats` rules at runtime (uncontrolled local state by default; pass `onConditionalFormatsChange` to own the rules). Hidden while `enableConditionalFormatting` is off.
 - ⚙️ **Settings sheet** — `showSettings` adds a gear that opens a dependency-free right-side **sheet** (shadcn "Sheet" style) where end-users flip this grid's features on/off at runtime (**per table**), saved to `localStorage`. Only provisioned features appear — e.g. turn **Copy & paste** off to disable clipboard, no code change. Honours `dark`.
-- 💾 **Grid state save/restore (X21)** — `gridState={{ key: 'orders' }}` persists this grid's **view** (sort · filter · column order/size/visibility/pinning · grouping) to `localStorage` and restores it on the next mount — a per-user view that survives reloads, in one prop. For **manual save**, pass `persist: false` and turn on `showSettings`: a **Save view** button (plus **Reset view**) appears at the bottom of the settings sheet, so the user saves the arrangement on demand instead of on every change. The sheet's two halves persist **separately**: the feature toggles at the top save **automatically** (`bst-table:settings:<key>`), while the **Saved view** section at the bottom (present only with `gridState`) covers sort / filters / column layout under its own key — in manual mode it saves **on click**. Each half has its own Reset, and the sheet labels which is which.
+- 💾 **Grid state save/restore** — `gridState={{ key: 'orders' }}` persists this grid's **view** (sort · filter · column order/size/visibility/pinning · grouping) to `localStorage` and restores it on the next mount — a per-user view that survives reloads, in one prop. For **manual save**, pass `persist: false` and turn on `showSettings`: a **Save view** button (plus **Reset view**) appears at the bottom of the settings sheet, so the user saves the arrangement on demand instead of on every change. The sheet's two halves persist **separately**: the feature toggles at the top save **automatically** (`bst-table:settings:<key>`), while the **Saved view** section at the bottom (present only with `gridState`) covers sort / filters / column layout under its own key — in manual mode it saves **on click**. Each half has its own Reset, and the sheet labels which is which.
 - ⌨️ **Keyboard-shortcuts overlay** — `showShortcuts` adds a **"?" button** (also opens on the `?` key) → a theme-aware overlay listing the keyboard shortcuts **active on this grid** (grouped · searchable · ⌘/Ctrl-aware; force with `showShortcuts={{ platform: 'mac' }}`); it shows only what's wired (selection / clipboard / editing / undo).
 - 🧹 **Leaner toolbar** — **Add row** sits in a footer bar under the table, and **Undo/Redo · Density · Formats** collapse into a single **"⋯ More"** menu (Radix `DropdownMenu`).
 - 🗂️ **Review-changes sheet** — with `enableEditing={{ mode: 'batch' }}` every edit stays an unsaved draft; the toolbar shows **"{n} unsaved" + Review & save**, opening a sheet that lists each edit (**row · column · old → new**) with per-change revert and the final **Save** — which fires **ONE** `onSave` call for the whole batch (cell-wise `changes`, row-wise `rows[].patch`, or grid-wise `next`), never a request per cell. A failed call keeps every draft. End-users can switch batch mode on/off themselves from the ⚙ settings sheet ("Editing" → **Batch editing**, `enableBatchEditing`).
@@ -55,7 +66,7 @@ so you can switch skins without changing your data code.
   (sampled `canvas.measureText`, clamped to `minSize`/`maxSize`). Pair `enableResponsive` with
   `meta.responsivePriority` to drop low-priority columns on narrow screens, or use `fitColumns` to
   remove horizontal scrolling entirely.
-- 🚀 **Virtualization + infinite scroll (D1/A2)** — `enableVirtualization` (+ `enableColumnVirtualization`)
+- 🚀 **Virtualization + infinite scroll** — `enableVirtualization` (+ `enableColumnVirtualization`)
   windows rows/columns so a 20k-row grid stays at 60fps with a bounded DOM; `useBstInfiniteDataSource`
   + `onReachEnd` append on scroll. Both flow through the adapter unchanged. (Virtualization yields to
   master-detail / grouping / spanning / row-pinning.)
@@ -104,7 +115,7 @@ export function People({ rows }: { rows: Person[] }) {
 }
 ```
 
-### Editing (Phase 2)
+### Editing
 
 Same API as every skin — opt into editing and own the data with `onDataChange`:
 
@@ -310,11 +321,11 @@ Plus the shadcn-only chrome props:
 | `showFind` | `boolean` | follows `enableFind` | Show the toolbar find button — opens the in-grid find bar (highlight + jump; ⌘/Ctrl+F also opens it). Requires `enableFind`. |
 | `showStatusBar` | `boolean` | `false` | Show the status-bar footer — row counts + sum/avg/min/max/count of the selected range. |
 | `showColumnEditToggle` | `boolean` | `false` | Add a per-column **edit lock/unlock** (✏️) to the Radix columns menu, so an end-user can make an editable column read-only at runtime. Requires `enableEditing`. |
-| `showFilterBuilder` | `boolean` | `false` | Show the Filters button + filter-builder panel (E3). |
-| `showFormatBuilder` | `boolean` | `false` | Show the Formats button + conditional-format builder panel (K3). Needs `enableConditionalFormatting` (default on). |
+| `showFilterBuilder` | `boolean` | `false` | Show the Filters button + filter-builder panel. |
+| `showFormatBuilder` | `boolean` | `false` | Show the Formats button + conditional-format builder panel. Needs `enableConditionalFormatting` (default on). |
 | `onConditionalFormatsChange` | `(rules) => void` | — | Own the builder's rule edits (controlled mode); omit for local, uncontrolled edits. |
 | `showSettings` | `boolean \| BstSettingsOptions` | `false` | Gear → a right-side settings **sheet** of per-table feature toggles, persisted to `localStorage`. Object form: `{ features?, title?, persistKey?, persist? }`. |
-| `gridState` | `BstGridStateOptions` | — | **Grid-state save/restore (X21).** `{ key: 'orders' }` persists this grid's **view** — sort · filter · column order/size/visibility/pinning · grouping — to `localStorage` and restores it on the next mount (seeds `initialState` + writes changes back, debounced). Full options: `{ key, storage?, persist?, debounceMs?, include?, exclude? }`. Distinct from `showSettings` (which toggles *features*). With `showSettings` on, the settings-sheet footer gains a **Reset view** button, and — in **manual mode** (`persist: false`) — a **Save view** button, so the user persists the arrangement on click instead of automatically. |
+| `gridState` | `BstGridStateOptions` | — | **Grid-state save/restore.** `{ key: 'orders' }` persists this grid's **view** — sort · filter · column order/size/visibility/pinning · grouping — to `localStorage` and restores it on the next mount (seeds `initialState` + writes changes back, debounced). Full options: `{ key, storage?, persist?, debounceMs?, include?, exclude? }`. Distinct from `showSettings` (which toggles *features*). With `showSettings` on, the settings-sheet footer gains a **Reset view** button, and — in **manual mode** (`persist: false`) — a **Save view** button, so the user persists the arrangement on click instead of automatically. |
 | `pageSizeOptions` | `(number \| 'all')[]` | `[5,10,20,50]` | Rows-per-page choices. Include `'all'` (e.g. `[10, 25, 50, 'all']`) for an **All** entry that shows every filtered row — pairs well with `enableStickyHeader` (show all rows, scroll inside a fixed box). |
 | `className` | `string` | — | Custom class on the outer card (added after `sc-card` / `sc-dark`). |
 | `style` | `CSSProperties` | — | Inline style on the outer card. |
