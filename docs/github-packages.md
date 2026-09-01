@@ -30,9 +30,17 @@ npm i @bloomskill/table-engine @bloomskill/table-mui
 
 ## How it runs
 
-`.github/workflows/publish-github-packages.yml` mirrors the release on a
-published GitHub Release, on a `release-*` / `v*` tag push, or on demand via
-**Actions → publish-github-packages → Run workflow**. It authenticates with the
+`.github/workflows/publish-github-packages.yml` mirrors the release **when a
+version bump lands on main** — it watches `version.ini`, which is the single
+source of truth for the version and is only ever rewritten by `npm run
+version:*`. So it fires exactly once per release, with no tag to remember, and
+stays quiet on ordinary merges.
+
+That file-watching trigger is the reason it isn't simply "on every push to
+main": a version can only be published once, so a mirror that ran on every merge
+would attempt to republish the same version and fail. Cutting a GitHub Release
+also mirrors, and **Actions → publish-github-packages → Run workflow** re-runs it
+by hand (after a failed publish, say). It authenticates with the
 built-in `GITHUB_TOKEN` (via `permissions: packages: write`), so **there is no
 secret to configure** — nothing to set up before the first run.
 

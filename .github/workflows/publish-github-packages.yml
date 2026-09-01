@@ -12,15 +12,19 @@ name: publish-github-packages
 # the built-in GITHUB_TOKEN and so needs no secret.
 
 on:
-  # Fires when you publish a GitHub Release.
+  # The main path: a version bump landing on main. `version.ini` is the single
+  # source of truth for the version and is only ever rewritten by
+  # `npm run version:*`, so this fires exactly once per release — no tag to
+  # remember, and no run on ordinary merges (a publish can only happen once per
+  # version, unlike a deploy, so "on every push to main" would just fail).
+  push:
+    branches: [main]
+    paths:
+      - version.ini
+  # Cutting a formal GitHub Release mirrors too.
   release:
     types: [published]
-  # …and on a release tag pushed directly (the repo tags as `release-<n>`).
-  push:
-    tags:
-      - 'release-*'
-      - 'v*'
-  # Lets you fill the Packages section by hand, without cutting a release.
+  # Manual re-run, e.g. after a failed publish or to backfill.
   workflow_dispatch:
 
 permissions:

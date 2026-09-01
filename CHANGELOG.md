@@ -18,7 +18,11 @@ this project uses [Semantic Versioning](https://semver.org).
   (`@gitofkumarsathish/table-*`) — GitHub requires the npm scope to match the account that owns the
   repo, so the `@bloomskill/*` names cannot be used there. **npmjs.com remains the distribution
   channel**: GitHub Packages has no anonymous read, so even these public packages need a token to
-  install. Runs on a published Release, a `release-*`/`v*` tag, or on demand; authenticates with the
+  install. **Runs automatically when a version bump lands on main** — the workflow watches
+  `version.ini` (the version's single source of truth, rewritten only by `npm run version:*`), so it
+  fires exactly once per release with no tag to remember and stays quiet on ordinary merges. It is
+  deliberately not "on every push to main": a version can be published only once, so that would fail
+  on every merge. Also runs on a published Release or manual dispatch; authenticates with the
   built-in `GITHUB_TOKEN`, so no secret to configure. Manual equivalent: `npm run release:ghp`.
   Rationale and consumer setup in `docs/github-packages.md`.
 
