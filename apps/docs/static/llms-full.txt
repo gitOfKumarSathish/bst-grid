@@ -2370,7 +2370,7 @@ to span contiguous equal values in a column. Covered cells are skipped in render
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `boolean` |
 | Default | `false` |
-| Maps to | custom render feature — colSpan and rowSpan; covered cells skipped (Plan.md §2.7a; no v9 feature in 9.1.2) |
+| Maps to | custom render feature — colSpan and rowSpan; covered cells skipped (Plan.md §2.7a). v9 does ship cellSpanningFeature (9.1.2, in stockFeatures) — we deliberately keep ours: it is fused with the virtualization bypass (virtualizationBypassReason) and the meta.rowSpan:'group' contiguity rules. Do not re-plan this from "v9 lacks it" |
 | Status | ✅ done |
 | Since | v0.12.0 |
 | Settings sheet | Display |
@@ -4633,7 +4633,7 @@ so both skins get it with no extra chrome.
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `boolean` |
 | Default | `false` |
-| Maps to | custom feature |
+| Maps to | custom feature — v9 ships cellSelectionFeature, but ours stays: it is fused with keyboard nav, clipboard, type-to-edit, find, the context menu, notes (Shift+F2), the floating action bar and selection stats. Swapping the state layer would re-plumb all of them |
 | Status | ✅ done (Phase 3) |
 | Since | v0.3.0 |
 | Settings sheet | Selection & clipboard |

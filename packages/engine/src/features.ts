@@ -27,16 +27,22 @@ import {
   columnResizingFeature,
   sortFn_basic,
   sortFn_alphanumeric,
+  sortFn_alphanumericCaseSensitive,
   sortFn_datetime,
   sortFn_text,
+  sortFn_textCaseSensitive,
   filterFn_includesString,
   filterFn_inNumberRange,
   aggregationFn_sum,
   aggregationFn_count,
   aggregationFn_mean,
+  aggregationFn_median,
   aggregationFn_min,
   aggregationFn_max,
   aggregationFn_extent,
+  aggregationFn_first,
+  aggregationFn_last,
+  aggregationFn_unique,
   aggregationFn_uniqueCount,
 } from '@tanstack/react-table'
 import type { BstColumnMeta } from './registry/types.js'
@@ -76,6 +82,10 @@ export const bstTableFeatures = tableFeatures({
     // comparison is inconsistent, so null-containing string columns never sorted
     // (#5).
     text: sortFn_text,
+    // Case-sensitive variants: the default fns fold case, so "Zoe" and "adam"
+    // sort as if lowercase. These order uppercase before lowercase instead.
+    alphanumericCaseSensitive: sortFn_alphanumericCaseSensitive,
+    textCaseSensitive: sortFn_textCaseSensitive,
   },
   filterFns: {
     includesString: filterFn_includesString,
@@ -88,9 +98,18 @@ export const bstTableFeatures = tableFeatures({
     sum: aggregationFn_sum,
     count: aggregationFn_count,
     mean: aggregationFn_mean,
+    // Median resists outliers, so it reads better than `mean` on skewed columns
+    // (salary, duration) where one extreme row drags the average.
+    median: aggregationFn_median,
     min: aggregationFn_min,
     max: aggregationFn_max,
     extent: aggregationFn_extent,
+    // Representative-value aggregations: `first`/`last` surface one row's value
+    // for a column that is constant within the group; `unique` lists the
+    // distinct values (vs `uniqueCount`, which only counts them).
+    first: aggregationFn_first,
+    last: aggregationFn_last,
+    unique: aggregationFn_unique,
     uniqueCount: aggregationFn_uniqueCount,
   },
   // Type-only slot: types `columnDef.meta` as BstColumnMeta for every column,

@@ -674,8 +674,9 @@ means *passing the object implies enabled*.
 | `state` | `object` | Controlled `{ sorting, columnFilters, globalFilter, pagination }`. |
 | `on*Change` | `(updater) => void` | Controlled-state callbacks — `onSortingChange` · `onColumnFiltersChange` · `onGlobalFilterChange` · `onPaginationChange` · `onGroupingChange` · `onExpandedChange`. |
 
-Built-in `sortFn`s: `basic` · `alphanumeric` · `datetime`. Built-in `filterFn`s: `includesString` ·
-`inNumberRange` · `bstCondition` (the operator-aware default).
+Built-in `sortFn`s: `basic` · `alphanumeric` · `datetime` · `text` · `alphanumericCaseSensitive` ·
+`textCaseSensitive`. Built-in `filterFn`s: `includesString` · `inNumberRange` · `bstCondition` (the
+operator-aware default).
 
 ---
 
@@ -1011,7 +1012,9 @@ return (
 ### Sorting
 
 On by default (`enableSorting`). Set a column's `sortFn` to a built-in (`basic` · `alphanumeric` ·
-`datetime`) or a custom function; multi-sort is supported (Shift-click headers in the adapters).
+`datetime` · `text`) or a custom function; multi-sort is supported (Shift-click headers in the
+adapters). The default fns fold case — `alphanumericCaseSensitive` and `textCaseSensitive` order
+uppercase before lowercase instead.
 
 ### Pagination
 
@@ -1036,8 +1039,11 @@ const table = useBstTable<Sale>({
 })
 ```
 
-**Customize.** A column aggregates by declaring `aggregationFn`: `'sum' | 'count' | 'mean' | 'min' |
-'max' | 'extent' | 'uniqueCount'`. Adapters add a group toggle (▤) in the columns menu. Built on v9's
+**Customize.** A column aggregates by declaring `aggregationFn`: `'sum' | 'count' | 'mean' | 'median' |
+'min' | 'max' | 'extent' | 'first' | 'last' | 'unique' | 'uniqueCount'`. Prefer `median` over `mean`
+on a skewed column (salary, duration) where one extreme row drags the average; `first`/`last` surface
+one row's value for a column that is constant within the group, and `unique` lists the distinct values
+where `uniqueCount` only counts them. Adapters add a group toggle (▤) in the columns menu. Built on v9's
 `columnGroupingFeature` + `rowAggregationFeature`. *(Client mode — at 1M rows group server-side.)*
 
 ## Column layout

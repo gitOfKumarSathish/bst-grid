@@ -372,7 +372,7 @@
     "type": "boolean",
     "default": "false",
     "status": "✅ done (Phase 3)",
-    "mapsTo": "custom feature",
+    "mapsTo": "custom feature — v9 ships cellSelectionFeature, but ours stays: it is fused with keyboard nav, clipboard, type-to-edit, find, the context menu, notes (Shift+F2), the floating action bar and selection stats. Swapping the state layer would re-plumb all of them",
     "group": "Selection & clipboard",
     "doc": "Cell / range selection + keyboard navigation (Phase 3). Click / Shift-click to select a range; Arrow / Shift+Arrow / Tab / Home / End / Ctrl+A to move the active cell; Enter / F2 to edit. Default: false (opt-in).",
     "related": [
@@ -711,7 +711,7 @@
     "type": "boolean",
     "default": "false",
     "status": "✅ done",
-    "mapsTo": "custom render feature — colSpan and rowSpan; covered cells skipped (Plan.md §2.7a; no v9 feature in 9.1.2)",
+    "mapsTo": "custom render feature — colSpan and rowSpan; covered cells skipped (Plan.md §2.7a). v9 does ship cellSpanningFeature (9.1.2, in stockFeatures) — we deliberately keep ours: it is fused with the virtualization bypass (virtualizationBypassReason) and the meta.rowSpan:'group' contiguity rules. Do not re-plan this from \"v9 lacks it\"",
     "group": "Display",
     "doc": "Cell spanning (A5) — merge body cells across columns and/or rows. Opt-in. Default false. Declare spans via `meta.rowSpan: 'group'` (auto-merge equal values in a column) and/or the `getCellSpan` callback below.",
     "related": [

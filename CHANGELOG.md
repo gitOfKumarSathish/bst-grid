@@ -10,6 +10,27 @@ this project uses [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+### Added — more of v9's stock fn registries
+
+- **Case-sensitive sort fns.** `sortFn: 'alphanumericCaseSensitive'` and `'textCaseSensitive'` are now
+  registered. The existing fns fold case, so `"Zoe"` and `"adam"` sort as if lowercase; these order
+  uppercase before lowercase instead. There was previously no way to sort case-sensitively.
+
+- **Four more aggregation fns:** `median`, `first`, `last`, `unique`. Prefer `median` over `mean` on a
+  skewed column (salary, duration) where a single extreme row drags the average; `first`/`last`
+  surface one row's value for a column that is constant within a group; `unique` lists the distinct
+  values where `uniqueCount` only counts them. The grouping demo now shows **Salary (med)** beside
+  **Salary (Σ)** so the difference is visible.
+
+### Fixed
+
+- **`CLAUDE.md` §12 said v9 has no cell-spanning feature.** It does — `cellSpanningFeature` ships in
+  9.1.2 as part of `stockFeatures`, as does `cellSelectionFeature`. Both rows now record that we
+  *deliberately* keep our own implementations (spanning is fused with the virtualization bypass;
+  selection with keyboard nav, clipboard, type-to-edit, find, the context menu, notes and the floating
+  action bar) rather than implying v9 lacks them, so the decision is not re-planned from a false
+  premise.
+
 ### Fixed — release infrastructure (no package behaviour change)
 
 - **`docs:verify` now watches `apps/docs/static`.** The gate diffed only `apps/docs/docs` and

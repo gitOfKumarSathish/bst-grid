@@ -86,6 +86,12 @@ const groupColumns: BstTableColumn<Person>[] = [
     meta: { type: 'number', align: 'right', cellMeta: { currency: 'USD', precision: 0 } },
   },
   {
+    // Same accessor as Salary (Σ) on purpose: median next to sum/mean shows what
+    // an outlier salary does to each. Median ignores it; mean does not.
+    id: 'salaryMedian', accessorKey: 'salary', header: 'Salary (med)', aggregationFn: 'median',
+    meta: { type: 'number', align: 'right', cellMeta: { currency: 'USD', precision: 0 } },
+  },
+  {
     id: 'age', accessorKey: 'age', header: 'Age (avg)', aggregationFn: 'mean',
     meta: { type: 'number', align: 'right' },
   },
