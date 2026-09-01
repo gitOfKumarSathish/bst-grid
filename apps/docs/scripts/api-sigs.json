@@ -140,7 +140,7 @@
   {
     "symbol": "BstColumnMeta",
     "kind": "interface",
-    "signature": "export interface BstColumnMeta<TData extends RowData = any, TValue = any> {\n    /** Selects the CellType from the registry. Default: `'text'`. */\n    type?: string;\n    /** Free-form settings passed through to the CellType (precision, variant, …). */\n    cellMeta?: Record<string, unknown>;\n    /** Force inline vs popup editing for this column (overrides the CellType default). */\n    editMode?: 'inline' | 'popup';\n    /** Whether this column is editable — static or per-row. Default: `false`. */\n    editable?: boolean | ((row: TData) => boolean);\n    /**\n     * Access control (F3 column / F4 cell). Disable interaction for this column —\n     * `true` disables the whole column; a predicate disables per row/cell. A\n     * disabled cell is never editable and renders in a muted style; it cascades\n     * under the grid `disabled` + `rowDisabled` options and overrides `editable`.\n     * Selection + copy still work on a disabled cell.\n     */\n    disabled?: boolean | ((row: TData) => boolean);\n    /** Options for option-based cells (singleSelect / multiSelect / radio). */\n    options?: BstOption[];\n    /**\n     * Per-column filter UI in the filter row (X4 / X11). With `enableSetFilter` on,\n     * `'set'` forces the **Set Filter** (a checklist of distinct values) for this\n     * column, and `'condition'` opts back into the default operator input. When\n     * unset, categorical columns (`singleSelect` / `multiSelect` / `radio` /\n     * `boolean`) use the Set Filter and the rest use the condition input.\n     *\n     * **Multi-filter (X11):** an **array** (e.g. `['condition', 'set']`) **s\n  // …truncated",
+    "signature": "export interface BstColumnMeta<TData extends RowData = any, TValue = any> {\n    /** Selects the CellType from the registry. Default: `'text'`. */\n    type?: string;\n    /** Free-form settings passed through to the CellType (precision, variant, …). */\n    cellMeta?: Record<string, unknown>;\n    /** Force inline vs popup editing for this column (overrides the CellType default). */\n    editMode?: 'inline' | 'popup';\n    /** Whether this column is editable — static or per-row. Default: `false`. */\n    editable?: boolean | ((row: TData) => boolean);\n    /**\n     * Access control (F3 column / F4 cell). Disable interaction for this column —\n     * `true` disables the whole column; a predicate disables per row/cell. A\n     * disabled cell is never editable and renders in a muted style; it cascades\n     * under the grid `disabled` + `rowDisabled` options and overrides `editable`.\n     * Selection + copy still work on a disabled cell.\n     */\n    disabled?: boolean | ((row: TData) => boolean);\n    /** Whether notes / comments are allowed on this column. Defaults to true when enableNotes is on. */\n    notesAllowed?: boolean;\n    /** Options for option-based cells (singleSelect / multiSelect / radio). */\n    options?: BstOption[];\n    /**\n     * Per-column filter UI in the filter row (X4 / X11). With `enableSetFilter` on,\n     * `'set'` forces the **Set Filter** (a checklist of distinct values) for this\n     * column, and `'condition'` opts back into the default operator input. When\n     * unset, categorical columns (`singleSelect` / `multiSelect` / `radio` /\n     * `boolean`) use the \n  // …truncated",
     "doc": "Per-column meta the registry + features read. Authored on `columnDef.meta` and typed via the `columnMeta` slot on `tableFeatures` (no global declaration merging — Plan.md §2.1). All fields optional; `type` defaults to `'text'`."
   },
   {
@@ -232,6 +232,18 @@
     "kind": "interface",
     "signature": "export interface BstFindOptions {\n    /** Match case. Default: false (case-insensitive). */\n    caseSensitive?: boolean;\n    /**\n     * Which rows Find searches: `'view'` = the rows currently in the view (the\n     * active page / virtual window), `'all'` = every row across all pages\n     * (pre-pagination). Default: `'view'`.\n     */\n    scope?: 'view' | 'all';\n}",
     "doc": "Configuration for Find (X8) — the object form of `enableFind`."
+  },
+  {
+    "symbol": "BstFloatingActionBarOptions",
+    "kind": "interface",
+    "signature": "export interface BstFloatingActionBarOptions {\n    /** Optional custom position: 'bottom-center' | 'bottom-right' | 'top-center'. Default: 'bottom-center'. */\n    position?: 'bottom-center' | 'bottom-right' | 'top-center';\n}",
+    "doc": "Options for Floating Selection Action Bar (`enableFloatingActionBar`)."
+  },
+  {
+    "symbol": "BstFloatingActionsContext",
+    "kind": "interface",
+    "signature": "export interface BstFloatingActionsContext<TData extends RowData = any> {\n    /** Selected row models. */\n    selectedRows: Array<{\n        id: string;\n        original: TData;\n    }>;\n    /** Count of selected rows. */\n    count: number;\n    /** Clear current selection. */\n    clearSelection: () => void;\n    /** Copy selected rows to clipboard as TSV. */\n    copySelected: () => void;\n    /** Delete selected rows (if row actions enabled). */\n    deleteSelected?: () => void;\n    /** Export selected rows (if export enabled). */\n    exportSelected?: () => void;\n}",
+    "doc": "Context handed to `renderFloatingActions`."
   },
   {
     "symbol": "BstFormatBuilderColumn",
@@ -336,6 +348,42 @@
     "doc": "Props to spread into the grid to run it in infinite (append) server mode."
   },
   {
+    "symbol": "BstNoteEditor",
+    "kind": "function",
+    "signature": "export declare function BstNoteEditor({ rowId, columnId, initialText, anchorRect, onSave, onDelete, onClose, placeholder, }: BstNoteEditorProps): React.JSX.Element;",
+    "doc": "Resizable popover editor for cell notes / comments. Closes on Escape or outside click, saves on Save button or Ctrl/Cmd+Enter."
+  },
+  {
+    "symbol": "BstNoteEditorProps",
+    "kind": "interface",
+    "signature": "export interface BstNoteEditorProps {\n    rowId: string;\n    columnId: string;\n    initialText: string;\n    anchorRect: DOMRect | null;\n    onSave: (text: string) => void;\n    onDelete?: () => void;\n    onClose: () => void;\n    placeholder?: string;\n}",
+    "doc": ""
+  },
+  {
+    "symbol": "BstNotePopover",
+    "kind": "function",
+    "signature": "export declare function BstNotePopover({ note, anchorRect, onEdit }: BstNotePopoverProps): React.JSX.Element | null;",
+    "doc": "Read-only floating tooltip/popover when hovering over a cell with a note."
+  },
+  {
+    "symbol": "BstNotePopoverProps",
+    "kind": "interface",
+    "signature": "export interface BstNotePopoverProps {\n    note: string;\n    anchorRect: DOMRect | null;\n    onEdit?: () => void;\n}",
+    "doc": ""
+  },
+  {
+    "symbol": "BstNoteSaveEvent",
+    "kind": "interface",
+    "signature": "export interface BstNoteSaveEvent {\n    rowId: string;\n    columnId: string;\n    note: string | undefined;\n    prevNote: string | undefined;\n}",
+    "doc": "Event payload emitted on note save/delete."
+  },
+  {
+    "symbol": "BstNotesOptions",
+    "kind": "interface",
+    "signature": "export interface BstNotesOptions {\n    /** Optional placeholder for the note editor. */\n    placeholder?: string;\n    /** Whether notes can be edited on a given cell. Defaults to true. */\n    canEditNote?: (rowId: string, columnId: string, currentNote?: string) => boolean;\n}",
+    "doc": "Options for cell notes / comments (`enableNotes`)."
+  },
+  {
     "symbol": "BstOption",
     "kind": "interface",
     "signature": "export interface BstOption {\n    value: string;\n    label?: string;\n    /** Swatch / badge color (any CSS color). */\n    color?: string;\n    /** Leading icon node (adapter-provided). */\n    icon?: React.ReactNode;\n    /** Avatar / image URL rendered as a small circle. */\n    avatar?: string;\n    /** Free-form image URL. */\n    image?: string;\n    description?: string;\n    disabled?: boolean;\n}",
@@ -374,8 +422,8 @@
   {
     "symbol": "BstRuntime",
     "kind": "interface",
-    "signature": "export interface BstRuntime<TData extends RowData> {\n    store: InteractionStore;\n    updateCtx: (ctx: RuntimeCtx<TData>) => void;\n    reset: () => void;\n    /** Open the find bar (highlights matches; never hides rows). */\n    openFind: () => void;\n    /** Close the find bar and clear all match highlights. */\n    closeFind: () => void;\n    /** Set the query and recompute matches (the cursor resets to the first match). */\n    setFindQuery: (query: string) => void;\n    /** Recompute matches for the current query after a view / data change, keeping\n     *  the cursor on the same cell when it survives (else clamping to the first). */\n    refreshFind: () => void;\n    /** Advance the cursor to the next match (wraps). */\n    findNext: () => void;\n    /** Move the cursor to the previous match (wraps). */\n    findPrev: () => void;\n    /** Resolved save triggers (`enter`/`blur`/`explicit`). The inline editor\n     *  consults these before auto-committing on Enter or blur. */\n    saveOn: SaveTrigger[];\n    /** Open the inline editor. `seed` (type-to-edit) is the opening draft so the\n     *  first keystroke overwrites the value; omit for a plain edit on the value. */\n    startEditing: (rowId: string, columnId: string, seed?: unknown) => void;\n    cancelEditing: () => void;\n    setDraft: (rowId: string, columnId: string, value: unknown) => void;\n    commitCell: (rowId: string, columnId: string, value: unknown) => void;\n    beginRowSession: (rowId: string) => void;\n    commitRowSession: (rowId: string) => Promise<boolean>;\n    cancelRowSession: () => void;\n    /** Persist every outstandin\n  // …truncated",
-    "doc": "Open the find bar (highlights matches; never hides rows)."
+    "signature": "export interface BstRuntime<TData extends RowData> {\n    store: InteractionStore;\n    updateCtx: (ctx: RuntimeCtx<TData>) => void;\n    reset: () => void;\n    /** Get the note text for a cell, or undefined if no note exists. */\n    getNote: (rowId: string, columnId: string) => string | undefined;\n    /** Set or delete a cell's note. */\n    setNote: (rowId: string, columnId: string, note: string | undefined) => void;\n    /** Delete a cell's note. */\n    deleteNote: (rowId: string, columnId: string) => void;\n    /** Open the note editor popover for a cell. */\n    openNoteEditor: (rowId: string, columnId: string) => void;\n    /** Close the note editor popover. */\n    closeNoteEditor: () => void;\n    /** Check if a cell has a non-empty note. */\n    hasNote: (rowId: string, columnId: string) => boolean;\n    /** Check if notes are allowed on a cell. */\n    isNoteAllowed: (rowId: string, columnId: string) => boolean;\n    /** Open the find bar (highlights matches; never hides rows). */\n    openFind: () => void;\n    /** Close the find bar and clear all match highlights. */\n    closeFind: () => void;\n    /** Set the query and recompute matches (the cursor resets to the first match). */\n    setFindQuery: (query: string) => void;\n    /** Recompute matches for the current query after a view / data change, keeping\n     *  the cursor on the same cell when it survives (else clamping to the first). */\n    refreshFind: () => void;\n    /** Advance the cursor to the next match (wraps). */\n    findNext: () => void;\n    /** Move the cursor to the previous match (wraps). */\n    findPrev: () => voi\n  // …truncated",
+    "doc": "Get the note text for a cell, or undefined if no note exists."
   },
   {
     "symbol": "BstRuntimeHandle",
@@ -1514,7 +1562,7 @@
   {
     "symbol": "UseBstTableOptions",
     "kind": "interface",
-    "signature": "export interface UseBstTableOptions<TData extends RowData> extends BstTableEngineToggles {\n    data: TData[];\n    columns: BstTableColumn<TData>[];\n    /** Stable row identity — required for editing/selection; strongly recommended always. */\n    getRowId?: (row: TData, index: number) => string;\n    /** Extra initial state merged over engine defaults (sorting, filters, …). */\n    initialState?: Record<string, unknown>;\n    /** Sort server-side — the grid renders `data` as-is (no client sort). */\n    manualSorting?: boolean;\n    /** Filter server-side — the grid renders `data` as-is (no client filter). */\n    manualFiltering?: boolean;\n    /** Paginate server-side — `data` is the current page; set `rowCount`. */\n    manualPagination?: boolean;\n    /** Group server-side. */\n    manualGrouping?: boolean;\n    /** Total rows across all pages (server mode) — drives the page count. */\n    rowCount?: number;\n    /** Explicit page count (alternative to `rowCount`). */\n    pageCount?: number;\n    /** Disable TanStack's automatic page-index reset (server mode manages it). */\n    autoResetPageIndex?: boolean;\n    /** Controlled table state (partial) — `{ sorting, columnFilters, globalFilter, pagination }`. */\n    state?: Record<string, unknown>;\n    /** Controlled-state change callbacks (server mode). Each receives a TanStack updater. */\n    onSortingChange?: (updater: any) => void;\n    onColumnFiltersChange?: (updater: any) => void;\n    onGlobalFilterChange?: (updater: any) => void;\n    onPaginationChange?: (updater: any) => void;\n    onGroupingChange?: (updater: any) => void;\n    onEx\n  // …truncated",
+    "signature": "export interface UseBstTableOptions<TData extends RowData> extends BstTableEngineToggles {\n    data: TData[];\n    columns: BstTableColumn<TData>[];\n    /** Stable row identity — required for editing/selection; strongly recommended always. */\n    getRowId?: (row: TData, index: number) => string;\n    /** Extra initial state merged over engine defaults (sorting, filters, …). */\n    initialState?: Record<string, unknown>;\n    /** Initial or controlled cell notes map, keyed by cell key (`${rowId}:${columnId}`). */\n    notes?: Record<string, string>;\n    /** Fired whenever the cell notes collection changes. */\n    onNotesChange?: (notes: Record<string, string>) => void;\n    /** Fired when an individual cell note is saved or deleted. */\n    onNoteSave?: (event: BstNoteSaveEvent) => void;\n    /** Sort server-side — the grid renders `data` as-is (no client sort). */\n    manualSorting?: boolean;\n    /** Filter server-side — the grid renders `data` as-is (no client filter). */\n    manualFiltering?: boolean;\n    /** Paginate server-side — `data` is the current page; set `rowCount`. */\n    manualPagination?: boolean;\n    /** Group server-side. */\n    manualGrouping?: boolean;\n    /** Total rows across all pages (server mode) — drives the page count. */\n    rowCount?: number;\n    /** Explicit page count (alternative to `rowCount`). */\n    pageCount?: number;\n    /** Disable TanStack's automatic page-index reset (server mode manages it). */\n    autoResetPageIndex?: boolean;\n    /** Controlled table state (partial) — `{ sorting, columnFilters, globalFilter, pagination }`. */\n    state?: Re\n  // …truncated",
     "doc": "Stable row identity — required for editing/selection; strongly recommended always."
   },
   {

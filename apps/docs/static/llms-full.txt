@@ -837,15 +837,15 @@ URL: https://gitofkumarsathish.github.io/bst-grid/docs/features
 
 # Feature Guides
 
-Every Bst-Table capability is a per-instance flag: `enable*` = engine behaviour, `show*` = adapter chrome. Data features default on; heavy features default off. 62 feature toggles across 9 groups.
+Every Bst-Table capability is a per-instance flag: `enable*` = engine behaviour, `show*` = adapter chrome. Data features default on; heavy features default off. 65 feature toggles across 9 groups.
 
 | Group | Features |
 | --- | --- |
 | [Data operations](./data-operations/index.mdx) | 11 |
 | [Columns](./columns/index.mdx) | 11 |
 | [Rows](./rows/index.mdx) | 5 |
-| [Editing](./editing/index.mdx) | 11 |
-| [Selection & clipboard](./selection-clipboard/index.mdx) | 7 |
+| [Editing](./editing/index.mdx) | 12 |
+| [Selection & clipboard](./selection-clipboard/index.mdx) | 9 |
 | [Display](./display/index.mdx) | 7 |
 | [Performance](./performance/index.mdx) | 2 |
 | [Export](./export/index.mdx) | 5 |
@@ -2839,6 +2839,7 @@ result. Start with `enableEditing`, then layer the rest.
 | [Batch-editing runtime switch](./enableBatchEditing) | `enableBatchEditing` | `— (follows enableEditing.mode)` |
 | [Inline editing](./enableEditing) | `enableEditing` | `false` |
 | [Log committed cell edits (debug)](./enableEditLog) | `enableEditLog` | `false` |
+| [Floating Row Quick-Actions](./enableFloatingRowActions) | `enableFloatingRowActions` | `false` |
 | [Row add/delete/duplicate](./enableRowActions) | `enableRowActions` | `false` |
 | [Type-to-edit](./enableTypeToEdit) | `enableTypeToEdit` | `false` |
 | [Undo/redo](./enableUndoRedo) | `enableUndoRedo` | `false` |
@@ -3092,6 +3093,45 @@ Log committed cell edits — a debug aid (the "Both"-mode companion to `onCellCo
 
 - **Requires** `enableEditing` to be on — this flag is a no-op otherwise.
 - Debug aid: console.logs each committed cell edit (old → new). If you pass an `onCellCommit` handler it takes precedence and this flag stays quiet — no double signal.
+
+
+================================================================================
+# Floating Row Quick-Actions
+URL: https://gitofkumarsathish.github.io/bst-grid/docs/features/editing/enableFloatingRowActions
+================================================================================
+
+# Floating Row Quick-Actions
+
+Prop `enableFloatingRowActions` — engine behaviour, default `false`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean` |
+| Default | `false` |
+| Maps to | custom — floating action pill on row hover with quick actions (Edit, Duplicate, Delete). In settings ("Editing"). Both skins inherit it |
+| Status | ✅ done |
+| Settings sheet | Editing |
+
+Floating Row Quick-Actions — renders a floating quick-action pill on row hover with actions to edit, duplicate, delete, or annotate. Default: false.
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableFloatingRowActions
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- Hovering over a row shows a floating quick-action pill at the right edge of the row.
 
 
 ================================================================================
@@ -4546,6 +4586,8 @@ so it respects validation and the change-set. All opt-in.
 | [Context menu](./enableContextMenu) | `enableContextMenu` | `false` |
 | [Copy column](./enableCopyColumn) | `enableCopyColumn` | `true` |
 | [Copy row](./enableCopyRow) | `enableCopyRow` | `true` |
+| [Floating Selection Action Bar](./enableFloatingActionBar) | `enableFloatingActionBar` | `false` |
+| [Cell notes / comments](./enableNotes) | `enableNotes` | `false` |
 | [Row selection](./enableRowSelection) | `enableRowSelection` | `false` |
 | [Selected-count chip](./showSelectionInfo) | `showSelectionInfo` | `follows enableRowSelection` |
 
@@ -4889,6 +4931,107 @@ Copy a whole **row** — the Shift+Space gesture / `runtime.copyRow`. A sub-togg
 > **Spec codes** (`A1`, `C2`, `X8`, …) are Bst-Table's internal requirement IDs from the capability matrix; `P0`–`P2` mark the delivery phase. They are traceability tags, not part of the public API.
 
 - **H2 · Copy row** — ✅ built. P3
+
+
+================================================================================
+# Floating Selection Action Bar
+URL: https://gitofkumarsathish.github.io/bst-grid/docs/features/selection-clipboard/enableFloatingActionBar
+================================================================================
+
+# Floating Selection Action Bar
+
+Prop `enableFloatingActionBar` — engine behaviour, default `false`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean \| BstFloatingActionBarOptions` |
+| Default | `false` |
+| Maps to | custom — floating action toolbar anchored at the bottom-center of the viewport when rows are selected; offers Copy, Delete, Export, Deselect, and custom actions. In settings ("Selection & clipboard"). Both skins inherit it |
+| Status | ✅ done |
+| Settings sheet | Selection & clipboard |
+
+Floating Selection Action Bar — renders a floating action bar at the bottom-center of the viewport whenever rows are selected (Copy, Delete, Export, Deselect, + custom actions). Default: false.
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableFloatingActionBar={/* boolean | BstFloatingActionBarOptions */}
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Options
+
+| Option | Notes |
+| --- | --- |
+| `BstFloatingActionBarOptions` | Related prop for this feature. |
+| `renderFloatingActions` | Related prop for this feature. |
+
+## Behavior & interactions
+
+- **Requires** `enableRowSelection` to be on — this flag is a no-op otherwise.
+- Renders a floating bottom action toolbar when rows are selected with actions to Copy, Delete, Export, or Deselect.
+
+
+================================================================================
+# Cell notes / comments
+URL: https://gitofkumarsathish.github.io/bst-grid/docs/features/selection-clipboard/enableNotes
+================================================================================
+
+# Cell notes / comments
+
+Prop `enableNotes` — engine behaviour, default `false`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean \| BstNotesOptions` |
+| Default | `false` |
+| Maps to | custom — attach annotations to individual cells without mutating row data. Cells with notes render a corner marker; hover shows a preview popover; Shift+F2 opens the resizable note editor; context menu has Add/Edit/Delete note. In settings ("Selection & clipboard", always shown). Both skins inherit it |
+| Status | ✅ done |
+| Settings sheet | Selection & clipboard |
+
+Cell notes / comments — attach annotations to individual cells without mutating row data. Cells with notes display a corner marker; hovering opens a popover; Shift+F2 or the context menu opens the resizable editor. Default: false.
+
+## Enable it
+
+```tsx
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableNotes={/* boolean | BstNotesOptions */}
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Options
+
+| Option | Notes |
+| --- | --- |
+| `BstNotesOptions` | Related prop for this feature. |
+| `notes` | Related prop for this feature. |
+| `onNotesChange` | Related prop for this feature. |
+| `onNoteSave` | Related prop for this feature. |
+
+## Behavior & interactions
+
+- Attach comments / annotations to cells without mutating row data. Cells with notes render a corner dog-ear marker; hover shows a preview popover; Shift+F2 opens the resizable note editor; context menu has Add/Edit/Delete note.
+
+## Spec coverage
+
+> **Spec codes** (`A1`, `C2`, `X8`, …) are Bst-Table's internal requirement IDs from the capability matrix; `P0`–`P2` mark the delivery phase. They are traceability tags, not part of the public API.
+
+- **F2 · Disable row** — ✅ built. P2 — rowDisabled
 
 
 ================================================================================
@@ -6190,13 +6333,13 @@ URL: https://gitofkumarsathish.github.io/bst-grid/docs/api
 
 # API Reference
 
-Every public export of `@bloomskill/table-engine` (263 symbols), with signatures read from the built `.d.ts` — so they match what the compiler accepts.
+Every public export of `@bloomskill/table-engine` (271 symbols), with signatures read from the built `.d.ts` — so they match what the compiler accepts.
 
 | Group | Exports |
 | --- | --- |
 | [Hooks](./hooks.mdx) | 10 |
-| [Functions](./functions.mdx) | 86 |
-| [Interfaces](./interfaces.mdx) | 102 |
+| [Functions](./functions.mdx) | 88 |
+| [Interfaces](./interfaces.mdx) | 108 |
 | [Types](./types.mdx) | 20 |
 | [Constants](./constants.mdx) | 43 |
 | [Other](./other.mdx) | 2 |
@@ -6580,6 +6723,22 @@ function BstFilterBuilder({ table, className, icons, }: {
     /** Body-icon overrides (uses the `remove` slot). */
     icons?: BstIconOverrides;
 }): React.JSX.Element;
+```
+
+## BstNoteEditor
+
+Resizable popover editor for cell notes / comments. Closes on Escape or outside click, saves on Save button or Ctrl/Cmd+Enter.
+
+```ts
+function BstNoteEditor({ rowId, columnId, initialText, anchorRect, onSave, onDelete, onClose, placeholder, }: BstNoteEditorProps): React.JSX.Element;
+```
+
+## BstNotePopover
+
+Read-only floating tooltip/popover when hovering over a cell with a note.
+
+```ts
+function BstNotePopover({ note, anchorRect, onEdit }: BstNotePopoverProps): React.JSX.Element | null;
 ```
 
 ## BstPdfThumbnailerProvider
@@ -7522,6 +7681,8 @@ interface BstColumnMeta<TData extends RowData = any, TValue = any> {
      * Selection + copy still work on a disabled cell.
      */
     disabled?: boolean | ((row: TData) => boolean);
+    /** Whether notes / comments are allowed on this column. Defaults to true when enableNotes is on. */
+    notesAllowed?: boolean;
     /** Options for option-based cells (singleSelect / multiSelect / radio). */
     options?: BstOption[];
     /**
@@ -7529,9 +7690,7 @@ interface BstColumnMeta<TData extends RowData = any, TValue = any> {
      * `'set'` forces the **Set Filter** (a checklist of distinct values) for this
      * column, and `'condition'` opts back into the default operator input. When
      * unset, categorical columns (`singleSelect` / `multiSelect` / `radio` /
-     * `boolean`) use the Set Filter and the rest use the condition input.
-     *
-     * **Multi-filter (X11):** an **array** (e.g. `['condition', 'set']`) **s
+     * `boolean`) use the 
   // …truncated
 ```
 
@@ -7703,6 +7862,41 @@ interface BstFindOptions {
      * (pre-pagination). Default: `'view'`.
      */
     scope?: 'view' | 'all';
+}
+```
+
+## BstFloatingActionBarOptions
+
+Options for Floating Selection Action Bar (`enableFloatingActionBar`).
+
+```ts
+interface BstFloatingActionBarOptions {
+    /** Optional custom position: 'bottom-center' | 'bottom-right' | 'top-center'. Default: 'bottom-center'. */
+    position?: 'bottom-center' | 'bottom-right' | 'top-center';
+}
+```
+
+## BstFloatingActionsContext
+
+Context handed to `renderFloatingActions`.
+
+```ts
+interface BstFloatingActionsContext<TData extends RowData = any> {
+    /** Selected row models. */
+    selectedRows: Array<{
+        id: string;
+        original: TData;
+    }>;
+    /** Count of selected rows. */
+    count: number;
+    /** Clear current selection. */
+    clearSelection: () => void;
+    /** Copy selected rows to clipboard as TSV. */
+    copySelected: () => void;
+    /** Delete selected rows (if row actions enabled). */
+    deleteSelected?: () => void;
+    /** Export selected rows (if export enabled). */
+    exportSelected?: () => void;
 }
 ```
 
@@ -7994,6 +8188,57 @@ interface BstInfiniteTableProps<TData> {
 }
 ```
 
+## BstNoteEditorProps
+
+```ts
+interface BstNoteEditorProps {
+    rowId: string;
+    columnId: string;
+    initialText: string;
+    anchorRect: DOMRect | null;
+    onSave: (text: string) => void;
+    onDelete?: () => void;
+    onClose: () => void;
+    placeholder?: string;
+}
+```
+
+## BstNotePopoverProps
+
+```ts
+interface BstNotePopoverProps {
+    note: string;
+    anchorRect: DOMRect | null;
+    onEdit?: () => void;
+}
+```
+
+## BstNoteSaveEvent
+
+Event payload emitted on note save/delete.
+
+```ts
+interface BstNoteSaveEvent {
+    rowId: string;
+    columnId: string;
+    note: string | undefined;
+    prevNote: string | undefined;
+}
+```
+
+## BstNotesOptions
+
+Options for cell notes / comments (`enableNotes`).
+
+```ts
+interface BstNotesOptions {
+    /** Optional placeholder for the note editor. */
+    placeholder?: string;
+    /** Whether notes can be edited on a given cell. Defaults to true. */
+    canEditNote?: (rowId: string, columnId: string, currentNote?: string) => boolean;
+}
+```
+
 ## BstOption
 
 Option for option-based cells — singleSelect / multiSelect / radio (overlap #12).
@@ -8058,13 +8303,27 @@ interface BstRowContext<TData extends RowData = any> {
 
 ## BstRuntime
 
-Open the find bar (highlights matches; never hides rows).
+Get the note text for a cell, or undefined if no note exists.
 
 ```ts
 interface BstRuntime<TData extends RowData> {
     store: InteractionStore;
     updateCtx: (ctx: RuntimeCtx<TData>) => void;
     reset: () => void;
+    /** Get the note text for a cell, or undefined if no note exists. */
+    getNote: (rowId: string, columnId: string) => string | undefined;
+    /** Set or delete a cell's note. */
+    setNote: (rowId: string, columnId: string, note: string | undefined) => void;
+    /** Delete a cell's note. */
+    deleteNote: (rowId: string, columnId: string) => void;
+    /** Open the note editor popover for a cell. */
+    openNoteEditor: (rowId: string, columnId: string) => void;
+    /** Close the note editor popover. */
+    closeNoteEditor: () => void;
+    /** Check if a cell has a non-empty note. */
+    hasNote: (rowId: string, columnId: string) => boolean;
+    /** Check if notes are allowed on a cell. */
+    isNoteAllowed: (rowId: string, columnId: string) => boolean;
     /** Open the find bar (highlights matches; never hides rows). */
     openFind: () => void;
     /** Close the find bar and clear all match highlights. */
@@ -8077,20 +8336,7 @@ interface BstRuntime<TData extends RowData> {
     /** Advance the cursor to the next match (wraps). */
     findNext: () => void;
     /** Move the cursor to the previous match (wraps). */
-    findPrev: () => void;
-    /** Resolved save triggers (`enter`/`blur`/`explicit`). The inline editor
-     *  consults these before auto-committing on Enter or blur. */
-    saveOn: SaveTrigger[];
-    /** Open the inline editor. `seed` (type-to-edit) is the opening draft so the
-     *  first keystroke overwrites the value; omit for a plain edit on the value. */
-    startEditing: (rowId: string, columnId: string, seed?: unknown) => void;
-    cancelEditing: () => void;
-    setDraft: (rowId: string, columnId: string, value: unknown) => void;
-    commitCell: (rowId: string, columnId: string, value: unknown) => void;
-    beginRowSession: (rowId: string) => void;
-    commitRowSession: (rowId: string) => Promise<boolean>;
-    cancelRowSession: () => void;
-    /** Persist every outstandin
+    findPrev: () => voi
   // …truncated
 ```
 
@@ -9212,6 +9458,12 @@ interface UseBstTableOptions<TData extends RowData> extends BstTableEngineToggle
     getRowId?: (row: TData, index: number) => string;
     /** Extra initial state merged over engine defaults (sorting, filters, …). */
     initialState?: Record<string, unknown>;
+    /** Initial or controlled cell notes map, keyed by cell key (`${rowId}:${columnId}`). */
+    notes?: Record<string, string>;
+    /** Fired whenever the cell notes collection changes. */
+    onNotesChange?: (notes: Record<string, string>) => void;
+    /** Fired when an individual cell note is saved or deleted. */
+    onNoteSave?: (event: BstNoteSaveEvent) => void;
     /** Sort server-side — the grid renders `data` as-is (no client sort). */
     manualSorting?: boolean;
     /** Filter server-side — the grid renders `data` as-is (no client filter). */
@@ -9227,14 +9479,7 @@ interface UseBstTableOptions<TData extends RowData> extends BstTableEngineToggle
     /** Disable TanStack's automatic page-index reset (server mode manages it). */
     autoResetPageIndex?: boolean;
     /** Controlled table state (partial) — `{ sorting, columnFilters, globalFilter, pagination }`. */
-    state?: Record<string, unknown>;
-    /** Controlled-state change callbacks (server mode). Each receives a TanStack updater. */
-    onSortingChange?: (updater: any) => void;
-    onColumnFiltersChange?: (updater: any) => void;
-    onGlobalFilterChange?: (updater: any) => void;
-    onPaginationChange?: (updater: any) => void;
-    onGroupingChange?: (updater: any) => void;
-    onEx
+    state?: Re
   // …truncated
 ```
 
@@ -9549,7 +9794,7 @@ Requirement-by-requirement status across 58 spec leaves: **56 built**, **1 parti
 | Leaf | Requirement | Status | Notes | Flags |
 | --- | --- | --- | --- | --- |
 | F1 | Disable grid | ✅ built | P2 — disabled | `disabled` |
-| F2 | Disable row | ✅ built | P2 — rowDisabled | `enableCellSelection`, `rowDisabled` |
+| F2 | Disable row | ✅ built | P2 — rowDisabled | `enableCellSelection`, `rowDisabled`, `enableNotes` |
 | F3 | Disable column | ✅ built | P3 — meta.disabled | `meta.disabled`, `showColumnEditToggle`, `enableFind` |
 | F4 | Disable cell | ✅ built | P3 — meta.disabled fn + cellDisabled | `meta.disabled`, `cellDisabled` |
 | F5 | Conditional visibility/render | ✅ built | v0.18.0 — conditionalFormats (hideContent + rule styling) | `conditionalFormats` |

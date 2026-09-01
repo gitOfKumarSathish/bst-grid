@@ -168,6 +168,8 @@ interface BstColumnMeta<TData extends RowData = any, TValue = any> {
      * Selection + copy still work on a disabled cell.
      */
     disabled?: boolean | ((row: TData) => boolean);
+    /** Whether notes / comments are allowed on this column. Defaults to true when enableNotes is on. */
+    notesAllowed?: boolean;
     /** Options for option-based cells (singleSelect / multiSelect / radio). */
     options?: BstOption[];
     /**
@@ -175,9 +177,7 @@ interface BstColumnMeta<TData extends RowData = any, TValue = any> {
      * `'set'` forces the **Set Filter** (a checklist of distinct values) for this
      * column, and `'condition'` opts back into the default operator input. When
      * unset, categorical columns (`singleSelect` / `multiSelect` / `radio` /
-     * `boolean`) use the Set Filter and the rest use the condition input.
-     *
-     * **Multi-filter (X11):** an **array** (e.g. `['condition', 'set']`) **s
+     * `boolean`) use the 
   // …truncated
 ```
 
@@ -349,6 +349,41 @@ interface BstFindOptions {
      * (pre-pagination). Default: `'view'`.
      */
     scope?: 'view' | 'all';
+}
+```
+
+## BstFloatingActionBarOptions
+
+Options for Floating Selection Action Bar (`enableFloatingActionBar`).
+
+```ts
+interface BstFloatingActionBarOptions {
+    /** Optional custom position: 'bottom-center' | 'bottom-right' | 'top-center'. Default: 'bottom-center'. */
+    position?: 'bottom-center' | 'bottom-right' | 'top-center';
+}
+```
+
+## BstFloatingActionsContext
+
+Context handed to `renderFloatingActions`.
+
+```ts
+interface BstFloatingActionsContext<TData extends RowData = any> {
+    /** Selected row models. */
+    selectedRows: Array<{
+        id: string;
+        original: TData;
+    }>;
+    /** Count of selected rows. */
+    count: number;
+    /** Clear current selection. */
+    clearSelection: () => void;
+    /** Copy selected rows to clipboard as TSV. */
+    copySelected: () => void;
+    /** Delete selected rows (if row actions enabled). */
+    deleteSelected?: () => void;
+    /** Export selected rows (if export enabled). */
+    exportSelected?: () => void;
 }
 ```
 
@@ -640,6 +675,57 @@ interface BstInfiniteTableProps<TData> {
 }
 ```
 
+## BstNoteEditorProps
+
+```ts
+interface BstNoteEditorProps {
+    rowId: string;
+    columnId: string;
+    initialText: string;
+    anchorRect: DOMRect | null;
+    onSave: (text: string) => void;
+    onDelete?: () => void;
+    onClose: () => void;
+    placeholder?: string;
+}
+```
+
+## BstNotePopoverProps
+
+```ts
+interface BstNotePopoverProps {
+    note: string;
+    anchorRect: DOMRect | null;
+    onEdit?: () => void;
+}
+```
+
+## BstNoteSaveEvent
+
+Event payload emitted on note save/delete.
+
+```ts
+interface BstNoteSaveEvent {
+    rowId: string;
+    columnId: string;
+    note: string | undefined;
+    prevNote: string | undefined;
+}
+```
+
+## BstNotesOptions
+
+Options for cell notes / comments (`enableNotes`).
+
+```ts
+interface BstNotesOptions {
+    /** Optional placeholder for the note editor. */
+    placeholder?: string;
+    /** Whether notes can be edited on a given cell. Defaults to true. */
+    canEditNote?: (rowId: string, columnId: string, currentNote?: string) => boolean;
+}
+```
+
 ## BstOption
 
 Option for option-based cells — singleSelect / multiSelect / radio (overlap #12).
@@ -704,13 +790,27 @@ interface BstRowContext<TData extends RowData = any> {
 
 ## BstRuntime
 
-Open the find bar (highlights matches; never hides rows).
+Get the note text for a cell, or undefined if no note exists.
 
 ```ts
 interface BstRuntime<TData extends RowData> {
     store: InteractionStore;
     updateCtx: (ctx: RuntimeCtx<TData>) => void;
     reset: () => void;
+    /** Get the note text for a cell, or undefined if no note exists. */
+    getNote: (rowId: string, columnId: string) => string | undefined;
+    /** Set or delete a cell's note. */
+    setNote: (rowId: string, columnId: string, note: string | undefined) => void;
+    /** Delete a cell's note. */
+    deleteNote: (rowId: string, columnId: string) => void;
+    /** Open the note editor popover for a cell. */
+    openNoteEditor: (rowId: string, columnId: string) => void;
+    /** Close the note editor popover. */
+    closeNoteEditor: () => void;
+    /** Check if a cell has a non-empty note. */
+    hasNote: (rowId: string, columnId: string) => boolean;
+    /** Check if notes are allowed on a cell. */
+    isNoteAllowed: (rowId: string, columnId: string) => boolean;
     /** Open the find bar (highlights matches; never hides rows). */
     openFind: () => void;
     /** Close the find bar and clear all match highlights. */
@@ -723,20 +823,7 @@ interface BstRuntime<TData extends RowData> {
     /** Advance the cursor to the next match (wraps). */
     findNext: () => void;
     /** Move the cursor to the previous match (wraps). */
-    findPrev: () => void;
-    /** Resolved save triggers (`enter`/`blur`/`explicit`). The inline editor
-     *  consults these before auto-committing on Enter or blur. */
-    saveOn: SaveTrigger[];
-    /** Open the inline editor. `seed` (type-to-edit) is the opening draft so the
-     *  first keystroke overwrites the value; omit for a plain edit on the value. */
-    startEditing: (rowId: string, columnId: string, seed?: unknown) => void;
-    cancelEditing: () => void;
-    setDraft: (rowId: string, columnId: string, value: unknown) => void;
-    commitCell: (rowId: string, columnId: string, value: unknown) => void;
-    beginRowSession: (rowId: string) => void;
-    commitRowSession: (rowId: string) => Promise<boolean>;
-    cancelRowSession: () => void;
-    /** Persist every outstandin
+    findPrev: () => voi
   // …truncated
 ```
 
@@ -1858,6 +1945,12 @@ interface UseBstTableOptions<TData extends RowData> extends BstTableEngineToggle
     getRowId?: (row: TData, index: number) => string;
     /** Extra initial state merged over engine defaults (sorting, filters, …). */
     initialState?: Record<string, unknown>;
+    /** Initial or controlled cell notes map, keyed by cell key (`${rowId}:${columnId}`). */
+    notes?: Record<string, string>;
+    /** Fired whenever the cell notes collection changes. */
+    onNotesChange?: (notes: Record<string, string>) => void;
+    /** Fired when an individual cell note is saved or deleted. */
+    onNoteSave?: (event: BstNoteSaveEvent) => void;
     /** Sort server-side — the grid renders `data` as-is (no client sort). */
     manualSorting?: boolean;
     /** Filter server-side — the grid renders `data` as-is (no client filter). */
@@ -1873,14 +1966,7 @@ interface UseBstTableOptions<TData extends RowData> extends BstTableEngineToggle
     /** Disable TanStack's automatic page-index reset (server mode manages it). */
     autoResetPageIndex?: boolean;
     /** Controlled table state (partial) — `{ sorting, columnFilters, globalFilter, pagination }`. */
-    state?: Record<string, unknown>;
-    /** Controlled-state change callbacks (server mode). Each receives a TanStack updater. */
-    onSortingChange?: (updater: any) => void;
-    onColumnFiltersChange?: (updater: any) => void;
-    onGlobalFilterChange?: (updater: any) => void;
-    onPaginationChange?: (updater: any) => void;
-    onGroupingChange?: (updater: any) => void;
-    onEx
+    state?: Re
   // …truncated
 ```
 

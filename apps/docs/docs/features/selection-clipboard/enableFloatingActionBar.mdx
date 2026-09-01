@@ -1,0 +1,46 @@
+---
+id: enableFloatingActionBar
+title: Floating Selection Action Bar
+sidebar_label: enableFloatingActionBar
+---
+
+# Floating Selection Action Bar
+
+Prop `enableFloatingActionBar` — engine behaviour, default `false`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean \| BstFloatingActionBarOptions` |
+| Default | `false` |
+| Maps to | custom — floating action toolbar anchored at the bottom-center of the viewport when rows are selected; offers Copy, Delete, Export, Deselect, and custom actions. In settings ("Selection & clipboard"). Both skins inherit it |
+| Status | ✅ done |
+| Settings sheet | Selection & clipboard |
+
+Floating Selection Action Bar — renders a floating action bar at the bottom-center of the viewport whenever rows are selected (Copy, Delete, Export, Deselect, + custom actions). Default: false.
+
+## Enable it
+
+```tsx no-check
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableFloatingActionBar={/* boolean | BstFloatingActionBarOptions */}
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Options
+
+| Option | Notes |
+| --- | --- |
+| `BstFloatingActionBarOptions` | Related prop for this feature. |
+| `renderFloatingActions` | Related prop for this feature. |
+
+## Behavior & interactions
+
+- **Requires** `enableRowSelection` to be on — this flag is a no-op otherwise.
+- Renders a floating bottom action toolbar when rows are selected with actions to Copy, Delete, Export, or Deselect.

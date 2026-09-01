@@ -1,0 +1,38 @@
+---
+id: enableFloatingRowActions
+title: Floating Row Quick-Actions
+sidebar_label: enableFloatingRowActions
+---
+
+# Floating Row Quick-Actions
+
+Prop `enableFloatingRowActions` — engine behaviour, default `false`.
+
+## Overview
+
+| | |
+| --- | --- |
+| Layer | `enable*` (engine, resolved in `useBstTable`) |
+| Type | `boolean` |
+| Default | `false` |
+| Maps to | custom — floating action pill on row hover with quick actions (Edit, Duplicate, Delete). In settings ("Editing"). Both skins inherit it |
+| Status | ✅ done |
+| Settings sheet | Editing |
+
+Floating Row Quick-Actions — renders a floating quick-action pill on row hover with actions to edit, duplicate, delete, or annotate. Default: false.
+
+## Enable it
+
+```tsx no-check
+<BstTableMui
+  data={rows}
+  columns={columns}
+  enableFloatingRowActions
+/>
+```
+
+> Swap `BstTableMui` for `BstTableShadcn` (and the CSS import) for the shadcn skin — same props.
+
+## Behavior & interactions
+
+- Hovering over a row shows a floating quick-action pill at the right edge of the row.

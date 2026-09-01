@@ -1517,6 +1517,62 @@
     "since": "0.40.0"
   },
   {
+    "flag": "enableNotes",
+    "feature": "Cell notes / comments",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean | BstNotesOptions",
+    "default": "false",
+    "status": "✅ done",
+    "mapsTo": "custom — attach annotations to individual cells without mutating row data. Cells with notes render a corner marker; hover shows a preview popover; Shift+F2 opens the resizable note editor; context menu has Add/Edit/Delete note. In settings (\"Selection & clipboard\", always shown). Both skins inherit it",
+    "group": "Selection & clipboard",
+    "doc": "Cell notes / comments — attach annotations to individual cells without mutating row data. Cells with notes display a corner marker; hovering opens a popover; Shift+F2 or the context menu opens the resizable editor. Default: false.",
+    "related": [
+      "enableNotes",
+      "BstNotesOptions",
+      "notes",
+      "onNotesChange",
+      "onNoteSave"
+    ],
+    "requirements": [
+      "F2"
+    ]
+  },
+  {
+    "flag": "enableFloatingActionBar",
+    "feature": "Floating Selection Action Bar",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean | BstFloatingActionBarOptions",
+    "default": "false",
+    "status": "✅ done",
+    "mapsTo": "custom — floating action toolbar anchored at the bottom-center of the viewport when rows are selected; offers Copy, Delete, Export, Deselect, and custom actions. In settings (\"Selection & clipboard\"). Both skins inherit it",
+    "group": "Selection & clipboard",
+    "doc": "Floating Selection Action Bar — renders a floating action bar at the bottom-center of the viewport whenever rows are selected (Copy, Delete, Export, Deselect, + custom actions). Default: false.",
+    "related": [
+      "enableFloatingActionBar",
+      "BstFloatingActionBarOptions",
+      "renderFloatingActions"
+    ],
+    "requirements": []
+  },
+  {
+    "flag": "enableFloatingRowActions",
+    "feature": "Floating Row Quick-Actions",
+    "layer": "engine",
+    "kind": "toggle",
+    "type": "boolean",
+    "default": "false",
+    "status": "✅ done",
+    "mapsTo": "custom — floating action pill on row hover with quick actions (Edit, Duplicate, Delete). In settings (\"Editing\"). Both skins inherit it",
+    "group": "Editing",
+    "doc": "Floating Row Quick-Actions — renders a floating quick-action pill on row hover with actions to edit, duplicate, delete, or annotate. Default: false.",
+    "related": [
+      "enableFloatingRowActions"
+    ],
+    "requirements": []
+  },
+  {
     "flag": "enableOverlays",
     "feature": "Loading / error overlays (X23)",
     "layer": "engine",

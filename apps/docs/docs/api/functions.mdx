@@ -86,6 +86,22 @@ function BstFilterBuilder({ table, className, icons, }: {
 }): React.JSX.Element;
 ```
 
+## BstNoteEditor
+
+Resizable popover editor for cell notes / comments. Closes on Escape or outside click, saves on Save button or Ctrl/Cmd+Enter.
+
+```ts
+function BstNoteEditor({ rowId, columnId, initialText, anchorRect, onSave, onDelete, onClose, placeholder, }: BstNoteEditorProps): React.JSX.Element;
+```
+
+## BstNotePopover
+
+Read-only floating tooltip/popover when hovering over a cell with a note.
+
+```ts
+function BstNotePopover({ note, anchorRect, onEdit }: BstNotePopoverProps): React.JSX.Element | null;
+```
+
 ## BstPdfThumbnailerProvider
 
 Provide a grid-wide PDF thumbnail renderer. Wrap your tables (any adapter) in it; columns with `cellMeta.pdfThumbnail: true` then render page-1 thumbnails.

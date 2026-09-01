@@ -53,6 +53,7 @@ This is the AI-readable index. Full plain-text docs: https://gitofkumarsathish.g
 - [Batch-editing runtime switch](https://gitofkumarsathish.github.io/bst-grid/docs/features/editing/enableBatchEditing): Prop enableBatchEditing — engine behaviour, default — (follows enableEditing.mode).
 - [Inline editing](https://gitofkumarsathish.github.io/bst-grid/docs/features/editing/enableEditing): Prop enableEditing — engine behaviour, default false.
 - [Log committed cell edits (debug)](https://gitofkumarsathish.github.io/bst-grid/docs/features/editing/enableEditLog): Prop enableEditLog — engine behaviour, default false.
+- [Floating Row Quick-Actions](https://gitofkumarsathish.github.io/bst-grid/docs/features/editing/enableFloatingRowActions): Prop enableFloatingRowActions — engine behaviour, default false.
 - [Row add/delete/duplicate](https://gitofkumarsathish.github.io/bst-grid/docs/features/editing/enableRowActions): Prop enableRowActions — engine behaviour, default false.
 - [Type-to-edit](https://gitofkumarsathish.github.io/bst-grid/docs/features/editing/enableTypeToEdit): Prop enableTypeToEdit — engine behaviour, default false.
 - [Undo/redo](https://gitofkumarsathish.github.io/bst-grid/docs/features/editing/enableUndoRedo): Prop enableUndoRedo — engine behaviour, default false.
@@ -82,6 +83,8 @@ This is the AI-readable index. Full plain-text docs: https://gitofkumarsathish.g
 - [Context menu](https://gitofkumarsathish.github.io/bst-grid/docs/features/selection-clipboard/enableContextMenu): Prop enableContextMenu — engine behaviour, default false.
 - [Copy column](https://gitofkumarsathish.github.io/bst-grid/docs/features/selection-clipboard/enableCopyColumn): Prop enableCopyColumn — engine behaviour, default true.
 - [Copy row](https://gitofkumarsathish.github.io/bst-grid/docs/features/selection-clipboard/enableCopyRow): Prop enableCopyRow — engine behaviour, default true.
+- [Floating Selection Action Bar](https://gitofkumarsathish.github.io/bst-grid/docs/features/selection-clipboard/enableFloatingActionBar): Prop enableFloatingActionBar — engine behaviour, default false.
+- [Cell notes / comments](https://gitofkumarsathish.github.io/bst-grid/docs/features/selection-clipboard/enableNotes): Prop enableNotes — engine behaviour, default false.
 - [Row selection](https://gitofkumarsathish.github.io/bst-grid/docs/features/selection-clipboard/enableRowSelection): Prop enableRowSelection — engine behaviour, default false.
 - [Selected-count chip](https://gitofkumarsathish.github.io/bst-grid/docs/features/selection-clipboard/showSelectionInfo): Prop showSelectionInfo — adapter chrome, default follows enableRowSelection.
 - [Toolbar & chrome](https://gitofkumarsathish.github.io/bst-grid/docs/features/toolbar-chrome): General adapter chrome — toolbar, settings sheet, shortcuts.
@@ -112,7 +115,7 @@ This is the AI-readable index. Full plain-text docs: https://gitofkumarsathish.g
 
 ## API Reference
 
-- [API Reference](https://gitofkumarsathish.github.io/bst-grid/docs/api): Every public export of @bloomskill/table-engine (263 symbols), with signatures read from the built .d.ts — so they match what the compiler accepts.
+- [API Reference](https://gitofkumarsathish.github.io/bst-grid/docs/api): Every public export of @bloomskill/table-engine (271 symbols), with signatures read from the built .d.ts — so they match what the compiler accepts.
 - [Constants](https://gitofkumarsathish.github.io/bst-grid/docs/api/constants): Exported constants and registries.
 - [Functions](https://gitofkumarsathish.github.io/bst-grid/docs/api/functions): Standalone helpers and factories.
 - [Hooks](https://gitofkumarsathish.github.io/bst-grid/docs/api/hooks): React hooks — the engine entry points.
