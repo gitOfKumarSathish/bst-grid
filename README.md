@@ -212,6 +212,10 @@ npm run release
 - npm can't republish a version — every release needs a bump. Full Definition-of-Done
   (demo + README + CHANGELOG + §12 registry + version) is in `CLAUDE.md` §13; the running log is
   [`CHANGELOG.md`](CHANGELOG.md).
+- **GitHub Packages** is mirrored automatically when the version bump lands on main (the workflow
+  watches `version.ini`), so the repo's *Packages* section is
+  populated — but install from **npm**, not the mirror: `npm.pkg.github.com` requires a token even
+  for public packages. See [`docs/github-packages.md`](docs/github-packages.md).
 
 > **Docs-in-sync rule (AI-assisted work).** "Commit and push" is a trigger to **sync the docs in the
 > same commit** — never commit code alone. Before committing any change, update the pieces it touches:

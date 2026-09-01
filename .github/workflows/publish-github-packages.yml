@@ -1,0 +1,60 @@
+name: publish-github-packages
+
+# Mirrors the @bloomskill/table-* release to GitHub Packages so the four
+# packages show up under the repository's "Packages" section.
+#
+# npmjs.com remains the real distribution channel — npm.pkg.github.com has no
+# anonymous read, so even these public packages need a token to install. See
+# docs/github-packages.md for the full rationale and the consumer setup.
+#
+# Publishing to npmjs.com is still the manual `npm run release` (it needs an
+# OTP); this workflow only handles the GitHub mirror, which authenticates with
+# the built-in GITHUB_TOKEN and so needs no secret.
+
+on:
+  # The main path: a version bump landing on main. `version.ini` is the single
+  # source of truth for the version and is only ever rewritten by
+  # `npm run version:*`, so this fires exactly once per release — no tag to
+  # remember, and no run on ordinary merges (a publish can only happen once per
+  # version, unlike a deploy, so "on every push to main" would just fail).
+  push:
+    branches: [main]
+    paths:
+      - version.ini
+  # Cutting a formal GitHub Release mirrors too.
+  release:
+    types: [published]
+  # Manual re-run, e.g. after a failed publish or to backfill.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write # required to publish to npm.pkg.github.com
+
+# Never let two mirror runs publish the same version concurrently.
+concurrency:
+  group: publish-github-packages
+  cancel-in-progress: false
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          # Writes the .npmrc that points the mirror scope at GitHub Packages
+          # and reads NODE_AUTH_TOKEN below.
+          registry-url: https://npm.pkg.github.com
+          scope: '@${{ github.repository_owner }}'
+      - run: npm ci
+      # dist/ is what gets published, and it is not committed — build first.
+      - run: npm run build
+      # Same guard the CI workflow runs post-build: never publish a payload
+      # that names a third-party grid product.
+      - run: npm run verify:naming
+      - run: node scripts/publish-github-packages.mjs
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

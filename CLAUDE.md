@@ -731,7 +731,11 @@ needs a version bump.)
    Every package's `build` now wipes `dist/` first. The guard runs in three places: **`npm run
    verify:naming`** (manual / release flow), a **pre-push hook** (`.githooks/pre-push`, installed by
    `npm install` via the root `prepare` script — `--no-verify` bypasses in an emergency), and **CI**
-   (`.github/workflows/verify.yml`, which runs it *after* the build so `dist/` is in scope).
+   (`.github/workflows/ci.yml`, which runs it *after* the build so `dist/` is in scope).
+   The hook **resolves node itself** (nvm / fnm / volta / asdf, then the usual system paths): git runs
+   hooks without your shell profile, so `command -v node` is empty there even when node works in your
+   terminal, and the hook used to exit 0 on that — silently passing on every push. It now **fails**
+   when node cannot be found, because a guard that cannot run must not report success.
    A fourth, **manual** check covers what is already on npm: **`npm run verify:published`** downloads
    every published version of all four packages and scans the tarballs with the same rules. It needs
    network, so it is deliberately not in CI — run it before a naming-related release decision.
@@ -773,6 +777,18 @@ because its corpus documents exactly the release it ships with.
 4. npm run version:patch      # or version:minor / version:major (bumps version.ini + all 3 pkgs)
 5. npm run mcp                # MCP DoD gate: build + tests (parity guards) + stdio smoke + scaffold typecheck (see §13 note below)
 6. npm run release            # build + publish all four (engine FIRST — adapters peer-depend on it)
+7. # commit the bump + push to main — the version.ini change triggers the GitHub Packages mirror
 ```
 Semver: **patch** = fix/docs · **minor** = new backward-compatible feature (most new flags) ·
 **major** = breaking change. Record every release in `CHANGELOG.md`.
+
+**GitHub Packages mirror.** Step 6 publishes to npmjs.com, which is what consumers install. The
+repo's **Packages** section reads a different registry (`npm.pkg.github.com`) and would otherwise
+stay empty, so `.github/workflows/publish-github-packages.yml` mirrors each release there
+automatically **when the `version:*` bump lands on main** — the workflow watches `version.ini`, so it
+fires exactly once per release with no extra step (also on a published Release, or manual dispatch;
+no secret needed — it uses `GITHUB_TOKEN`). It is deliberately *not* "on every push to main": a
+version publishes only once, so that would just fail on every merge.
+GitHub requires the npm scope to match the repo owner, so the mirror is named
+`@gitofkumarsathish/table-*`, and GitHub Packages has no anonymous read — **keep pointing users at
+npm**, never at the mirror. Manual run: `npm run release:ghp`. See `docs/github-packages.md`.

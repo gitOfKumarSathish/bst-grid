@@ -10,6 +10,33 @@ this project uses [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+### Fixed — release infrastructure (no package behaviour change)
+
+- **The pre-push naming guard actually runs now.** `.githooks/pre-push` gave up and exited **0**
+  whenever `command -v node` came back empty — and git runs hooks without loading your shell profile,
+  so a version-manager node (nvm, fnm, volta, asdf) is never on PATH there even though node works
+  fine in your terminal. The result: one of the three enforcement points named in `CLAUDE.md` §13 was
+  silently passing on every push. The hook now resolves node itself (version-manager install roots,
+  newest version first, then the usual system paths) and **fails** if it genuinely cannot find one,
+  because a guard that cannot run must not report success. `--no-verify` still bypasses. Also
+  corrects the §13 reference to the CI workflow, which is `ci.yml` (`verify.yml` was renamed).
+
+### Added — release infrastructure (no package behaviour change)
+
+- **Mirror releases to GitHub Packages** so the repository's *Packages* section is no longer
+  empty. New `scripts/publish-github-packages.mjs` + `.github/workflows/publish-github-packages.yml`
+  republish each release to `npm.pkg.github.com` under the owner scope
+  (`@gitofkumarsathish/table-*`) — GitHub requires the npm scope to match the account that owns the
+  repo, so the `@bloomskill/*` names cannot be used there. **npmjs.com remains the distribution
+  channel**: GitHub Packages has no anonymous read, so even these public packages need a token to
+  install. **Runs automatically when a version bump lands on main** — the workflow watches
+  `version.ini` (the version's single source of truth, rewritten only by `npm run version:*`), so it
+  fires exactly once per release with no tag to remember and stays quiet on ordinary merges. It is
+  deliberately not "on every push to main": a version can be published only once, so that would fail
+  on every merge. Also runs on a published Release or manual dispatch; authenticates with the
+  built-in `GITHUB_TOKEN`, so no secret to configure. Manual equivalent: `npm run release:ghp`.
+  Rationale and consumer setup in `docs/github-packages.md`.
+
 ## [0.45.0] — 2026-08-26
 
 ### Added
