@@ -8,12 +8,59 @@
 # Installed automatically by `npm install` (root "prepare" script sets
 # core.hooksPath=.githooks). Bypass in a genuine emergency with --no-verify.
 
-if ! command -v node >/dev/null 2>&1; then
-  echo "pre-push: node not on PATH — skipping verify:naming (run 'npm run verify:naming' manually)" >&2
-  exit 0
-fi
+# Find node ourselves. Git runs hooks with a bare environment and does NOT load
+# your shell profile, so a version manager (nvm, fnm, volta, asdf) that puts
+# node on PATH from .bashrc/.zshrc leaves `command -v node` empty here — even
+# though node works fine in your terminal. This hook used to give up and exit 0
+# in that case, which meant it silently passed on every push instead of guarding
+# anything.
+resolve_node() {
+  if command -v node >/dev/null 2>&1; then
+    command -v node
+    return 0
+  fi
 
-node "$(git rev-parse --show-toplevel)/scripts/verify-naming.mjs" || {
+  # Version managers keep one directory per installed version. Prefer the
+  # newest; `sort -V` is not everywhere, so fall back to reverse-lexical.
+  for root in \
+    "${NVM_DIR:-$HOME/.nvm}/versions/node" \
+    "$HOME/.local/share/fnm/node-versions" \
+    "$HOME/.asdf/installs/nodejs"
+  do
+    [ -d "$root" ] || continue
+    versions="$(ls -1 "$root" 2>/dev/null | sort -Vr 2>/dev/null)"
+    [ -n "$versions" ] || versions="$(ls -1r "$root" 2>/dev/null)"
+    for v in $versions; do
+      # fnm nests the install one level deeper than nvm/asdf do.
+      for candidate in "$root/$v/bin/node" "$root/$v/installation/bin/node"; do
+        if [ -x "$candidate" ]; then
+          echo "$candidate"
+          return 0
+        fi
+      done
+    done
+  done
+
+  # Single-path installs.
+  for candidate in "$HOME/.volta/bin/node" /usr/local/bin/node /opt/homebrew/bin/node; do
+    if [ -x "$candidate" ]; then
+      echo "$candidate"
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+NODE="$(resolve_node)" || {
+  echo "" >&2
+  echo "pre-push BLOCKED — node not found, so the neutral-naming guard could not run." >&2
+  echo "  A guard that cannot run must not report success, so this is a failure, not a skip." >&2
+  echo "  Install node (or put it on PATH) and retry, or push with --no-verify." >&2
+  exit 1
+}
+
+"$NODE" "$(git rev-parse --show-toplevel)/scripts/verify-naming.mjs" || {
   echo "" >&2
   echo "pre-push BLOCKED — fix the references above, or push with --no-verify if you truly must." >&2
   exit 1

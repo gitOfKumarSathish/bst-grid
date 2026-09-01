@@ -10,6 +10,17 @@ this project uses [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+### Fixed — release infrastructure (no package behaviour change)
+
+- **The pre-push naming guard actually runs now.** `.githooks/pre-push` gave up and exited **0**
+  whenever `command -v node` came back empty — and git runs hooks without loading your shell profile,
+  so a version-manager node (nvm, fnm, volta, asdf) is never on PATH there even though node works
+  fine in your terminal. The result: one of the three enforcement points named in `CLAUDE.md` §13 was
+  silently passing on every push. The hook now resolves node itself (version-manager install roots,
+  newest version first, then the usual system paths) and **fails** if it genuinely cannot find one,
+  because a guard that cannot run must not report success. `--no-verify` still bypasses. Also
+  corrects the §13 reference to the CI workflow, which is `ci.yml` (`verify.yml` was renamed).
+
 ### Added — release infrastructure (no package behaviour change)
 
 - **Mirror releases to GitHub Packages** so the repository's *Packages* section is no longer

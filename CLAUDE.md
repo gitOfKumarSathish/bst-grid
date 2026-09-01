@@ -729,7 +729,11 @@ needs a version bump.)
    Every package's `build` now wipes `dist/` first. The guard runs in three places: **`npm run
    verify:naming`** (manual / release flow), a **pre-push hook** (`.githooks/pre-push`, installed by
    `npm install` via the root `prepare` script — `--no-verify` bypasses in an emergency), and **CI**
-   (`.github/workflows/verify.yml`, which runs it *after* the build so `dist/` is in scope).
+   (`.github/workflows/ci.yml`, which runs it *after* the build so `dist/` is in scope).
+   The hook **resolves node itself** (nvm / fnm / volta / asdf, then the usual system paths): git runs
+   hooks without your shell profile, so `command -v node` is empty there even when node works in your
+   terminal, and the hook used to exit 0 on that — silently passing on every push. It now **fails**
+   when node cannot be found, because a guard that cannot run must not report success.
    A fourth, **manual** check covers what is already on npm: **`npm run verify:published`** downloads
    every published version of all four packages and scans the tarballs with the same rules. It needs
    network, so it is deliberately not in CI — run it before a naming-related release decision.
