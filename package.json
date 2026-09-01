@@ -31,7 +31,8 @@
     "docs:build": "npm run build -w @bloomskill/table-engine && npm run build -w @bloomskill/table-mcp && npm run docs:api && npm run docs:sync",
     "docs:verify": "npm run docs:sync && git diff --exit-code -- apps/docs/docs apps/docs/scripts || (echo '\\n✗ docs are stale — a feature changed without regenerating. Run: npm run docs:build  then commit apps/docs.' && exit 1)",
     "release:preflight": "npm whoami || (echo 'npm publish will fail: not authenticated (npm token missing/expired). Run: npm login  (or put a valid //registry.npmjs.org/:_authToken in ~/.npmrc), then re-run: npm run release' && exit 1)",
-    "release": "npm run release:preflight && npm run build && npm publish -w @bloomskill/table-engine && npm publish -w @bloomskill/table-mui && npm publish -w @bloomskill/table-shadcn && npm publish -w @bloomskill/table-mcp"
+    "release": "npm run release:preflight && npm run build && npm publish -w @bloomskill/table-engine && npm publish -w @bloomskill/table-mui && npm publish -w @bloomskill/table-shadcn && npm publish -w @bloomskill/table-mcp",
+    "release:ghp": "npm run build && node scripts/publish-github-packages.mjs"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.0",

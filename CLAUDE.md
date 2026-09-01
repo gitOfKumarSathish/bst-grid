@@ -774,3 +774,11 @@ because its corpus documents exactly the release it ships with.
 ```
 Semver: **patch** = fix/docs · **minor** = new backward-compatible feature (most new flags) ·
 **major** = breaking change. Record every release in `CHANGELOG.md`.
+
+**GitHub Packages mirror.** Step 6 publishes to npmjs.com, which is what consumers install. The
+repo's **Packages** section reads a different registry (`npm.pkg.github.com`) and would otherwise
+stay empty, so `.github/workflows/publish-github-packages.yml` mirrors each release there
+automatically (published Release, `release-*`/`v*` tag, or manual dispatch; no secret needed — it
+uses `GITHUB_TOKEN`). GitHub requires the npm scope to match the repo owner, so the mirror is named
+`@gitofkumarsathish/table-*`, and GitHub Packages has no anonymous read — **keep pointing users at
+npm**, never at the mirror. Manual run: `npm run release:ghp`. See `docs/github-packages.md`.

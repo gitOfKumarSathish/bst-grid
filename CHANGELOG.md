@@ -10,6 +10,18 @@ this project uses [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+### Added — release infrastructure (no package behaviour change)
+
+- **Mirror releases to GitHub Packages** so the repository's *Packages* section is no longer
+  empty. New `scripts/publish-github-packages.mjs` + `.github/workflows/publish-github-packages.yml`
+  republish each release to `npm.pkg.github.com` under the owner scope
+  (`@gitofkumarsathish/table-*`) — GitHub requires the npm scope to match the account that owns the
+  repo, so the `@bloomskill/*` names cannot be used there. **npmjs.com remains the distribution
+  channel**: GitHub Packages has no anonymous read, so even these public packages need a token to
+  install. Runs on a published Release, a `release-*`/`v*` tag, or on demand; authenticates with the
+  built-in `GITHUB_TOKEN`, so no secret to configure. Manual equivalent: `npm run release:ghp`.
+  Rationale and consumer setup in `docs/github-packages.md`.
+
 ## [0.45.0] — 2026-08-26
 
 ### Added
