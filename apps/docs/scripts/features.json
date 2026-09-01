@@ -1536,7 +1536,8 @@
     ],
     "requirements": [
       "F2"
-    ]
+    ],
+    "since": "0.46.0"
   },
   {
     "flag": "enableFloatingActionBar",
@@ -1554,7 +1555,8 @@
       "BstFloatingActionBarOptions",
       "renderFloatingActions"
     ],
-    "requirements": []
+    "requirements": [],
+    "since": "0.46.0"
   },
   {
     "flag": "enableFloatingRowActions",
@@ -1570,7 +1572,8 @@
     "related": [
       "enableFloatingRowActions"
     ],
-    "requirements": []
+    "requirements": [],
+    "since": "0.46.0"
   },
   {
     "flag": "enableOverlays",

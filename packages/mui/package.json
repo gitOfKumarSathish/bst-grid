@@ -1,6 +1,6 @@
 {
   "name": "@bloomskill/table-mui",
-  "version": "0.45.0",
+  "version": "0.46.0",
   "description": "Material UI (MUI) React data grid — a drop-in BstTableMui component with sorting, filtering, pagination, inline editing, selection, clipboard and CSV/Excel export; reads your MUI theme (light & dark). Built on the headless @bloomskill/table-engine. TypeScript, MIT.",
   "keywords": [
     "react",
@@ -53,14 +53,14 @@
   "peerDependencies": {
     "react": ">=18",
     "react-dom": ">=18",
-    "@bloomskill/table-engine": "^0.45.0",
+    "@bloomskill/table-engine": "^0.46.0",
     "@mui/material": ">=6",
     "@mui/icons-material": ">=6",
     "@emotion/react": ">=11",
     "@emotion/styled": ">=11"
   },
   "devDependencies": {
-    "@bloomskill/table-engine": "^0.45.0",
+    "@bloomskill/table-engine": "^0.46.0",
     "@mui/material": "^9.3.1",
     "@mui/icons-material": "^9.3.1",
     "@emotion/react": "^11.14.0",

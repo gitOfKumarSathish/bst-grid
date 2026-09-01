@@ -767,6 +767,9 @@ export default function App() {
     enableContextMenu: true, // X6: right-click a cell → Copy / Export / Autosize (+ getContextMenuItems)
     enableFind: true, // X8: ⌘/Ctrl+F (or the toolbar ⌕) → highlight + jump between matches (no rows hidden)
     enableRowNumbers: true, // X9: leading # column numbering the current view
+    enableNotes: true, // cell notes: dog-ear marker + hover preview; Shift+F2 to edit (also in the context menu)
+    enableFloatingActionBar: true, // tick some row checkboxes → floating bar (Copy / Delete / Export / Deselect)
+    enableFloatingRowActions: true, // hover a row → quick-action pill (Edit / Duplicate / Delete) at its right edge
     enableExpanding: true, // master-detail (A4): click ▸ for a detail panel
     renderDetail: (r: Person) => (
       <div

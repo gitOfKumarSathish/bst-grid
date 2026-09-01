@@ -10,6 +10,31 @@ this project uses [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+## [0.46.0] — 2026-09-01
+
+### Added
+
+- **Cell notes / comments (`enableNotes`).** Attach annotations to individual cells **without mutating
+  row data**. A cell carrying a note renders a corner dog-ear marker; hovering shows a preview
+  popover; **Shift+F2** opens a resizable note editor; the context menu gains Add / Edit / Delete
+  note. Notes are held outside the row model, so they survive sorting and filtering and never reach
+  `onSave`. Configure via `enableNotes: boolean | BstNotesOptions`, seed with `notes`, and observe
+  with `onNotesChange` / `onNoteSave`. Off by default; in the settings sheet under "Selection &
+  clipboard". Both skins inherit it.
+
+- **Floating selection action bar (`enableFloatingActionBar`).** When rows are selected, a floating
+  toolbar appears at the bottom-centre of the viewport offering Copy, Delete, Export and Deselect —
+  so bulk actions are reachable without travelling back to the toolbar. Extend or replace the buttons
+  with `renderFloatingActions`, or configure via `enableFloatingActionBar: boolean |
+  BstFloatingActionBarOptions`. Needs `enableRowSelection`. Off by default; in the settings sheet
+  under "Selection & clipboard". Both skins inherit it.
+
+- **Floating row quick-actions (`enableFloatingRowActions`).** Hovering a row surfaces a floating
+  action pill at its right edge with Edit, Duplicate and Delete, giving those actions no permanent
+  column width — the hover-overlay half of B10, complementary to the pinned `action` column and the
+  `actionMenu` kebab cell. Off by default; in the settings sheet under "Editing". Both skins inherit
+  it.
+
 ### Fixed — release infrastructure (no package behaviour change)
 
 - **The pre-push naming guard actually runs now.** `.githooks/pre-push` gave up and exited **0**

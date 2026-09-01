@@ -1,6 +1,6 @@
 {
   "name": "@bloomskill/table-engine",
-  "version": "0.45.0",
+  "version": "0.46.0",
   "description": "Headless React data-grid engine on TanStack Table v9 — sorting, filtering, pagination, grouping, inline editing, cell & row selection, clipboard, CSV/Excel export and virtualization. Pair with the MUI or shadcn skin, or stay fully headless. TypeScript, MIT.",
   "keywords": [
     "react",
