@@ -10,6 +10,14 @@ this project uses [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+### Fixed — release infrastructure (no package behaviour change)
+
+- **`docs:verify` now watches `apps/docs/static`.** The gate diffed only `apps/docs/docs` and
+  `apps/docs/scripts`, but doc generation also writes `llms.txt` and `llms-full.txt` into
+  `static/` — so a stale llms file was invisible to CI and could ship indefinitely. Verified by
+  committing a deliberately stale `llms.txt`: the widened gate blocks it, the previous one passed.
+  Taken from `ci/enforce-docs-gates`; that branch's separate `docs:snippets` CI step is not included.
+
 ## [0.46.0] — 2026-09-01
 
 ### Added
