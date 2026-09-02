@@ -1,4 +1,4 @@
-# Bst-Table — agent prompt (v0.47.0)
+# Bst-Table — agent prompt (v0.48.0)
 
 Build a React data grid with **Bst-Table**: the `@bloomskill/table-*` packages — a headless
 TanStack Table v9 engine with swappable Material UI and shadcn/Radix skins, MIT/Apache
@@ -21,7 +21,7 @@ does not exist is the most common way this goes wrong.
 Adapters peer-depend on the engine — install both, pinned to the same version:
 
 ```bash
-npm install @bloomskill/table-engine@0.47.0 @bloomskill/table-mui@0.47.0 @mui/material @emotion/react @emotion/styled
+npm install @bloomskill/table-engine@0.48.0 @bloomskill/table-mui@0.48.0 @mui/material @emotion/react @emotion/styled
 ```
 
 Always import `@bloomskill/table-engine/styles.css`; the shadcn skin additionally needs
@@ -105,7 +105,7 @@ cellTypes.register(myCellType)        // add a new id, or override an existing o
 // <BstTableMui cellTypes={cellTypes} … />
 ```
 
-## 6. Every flag that exists in v0.47.0
+## 6. Every flag that exists in v0.48.0
 
 Engine behaviour (`*` = on by default):
 

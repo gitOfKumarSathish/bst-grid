@@ -779,6 +779,10 @@ because its corpus documents exactly the release it ships with.
 4. npm run version:patch      # or version:minor / version:major (bumps version.ini + all 3 pkgs)
 5. npm run mcp                # MCP DoD gate: build + tests (parity guards) + stdio smoke + scaffold typecheck (see §13 note below)
 6. npm run release            # build + publish all four (engine FIRST — adapters peer-depend on it)
+   #  ↳ gated by verify:release-state — clean tree, HEAD *is* the version.ini bump commit, all 4
+   #    package.json in lockstep. release builds from the WORKING TREE, so without this a commit
+   #    landing after the bump ships under the old number (npm 0.47.0 gained a feature that
+   #    GitHub Packages 0.47.0 lacks, exactly this way). --allow-dirty bypasses for a re-publish.
 7. # commit the bump + push to main — the version.ini change triggers the GitHub Packages mirror
 ```
 Semver: **patch** = fix/docs · **minor** = new backward-compatible feature (most new flags) ·

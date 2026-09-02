@@ -10,6 +10,23 @@ this project uses [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+## [0.48.0] — 2026-09-02
+
+### Fixed — release integrity
+
+- **`npm run release` can no longer publish content that is not in the release commit.** The publish
+  builds from the **working tree**, so anything landing between the version bump and the publish ships
+  silently under the old number. This happened in **0.47.0**: the bump commit was mirrored to GitHub
+  Packages at 04:07 UTC, a feature commit landed at 04:10, and the npm publish at 05:30 built from the
+  newer tree — so npm's 0.47.0 contains the faceting change while GitHub Packages' 0.47.0 does not.
+  One version number, two different artifacts.
+
+  New `npm run verify:release-state` (`scripts/verify-release-state.mjs`), chained ahead of the
+  publish, refuses to release unless the working tree is clean, **HEAD is the commit that last touched
+  `version.ini`** (so nothing has landed since the bump), and all four `package.json` versions match
+  `version.ini`. It names the offending commits when it blocks. `--allow-dirty` bypasses it for a
+  deliberate re-publish after a partial failure.
+
 ### Changed
 
 - **The Set Filter checklist is now faceted (X4).** Its options previously came from the *core* row

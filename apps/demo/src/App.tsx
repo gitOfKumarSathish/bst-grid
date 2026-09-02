@@ -78,8 +78,11 @@ const spanColumns: BstTableColumn<SpanRowT>[] = [
 
 // Grouping (v0.15.0) — a column set with aggregates (sum salary, mean age).
 const groupColumns: BstTableColumn<Person>[] = [
-  { id: 'role', accessorKey: 'role', header: 'Role', meta: { type: 'text' } },
+  { id: 'role', accessorKey: 'role', header: 'Role', meta: { type: 'text', filter: 'set' } },
   { id: 'name', accessorKey: 'name', header: 'Name', meta: { type: 'text' } },
+  // Neither Role nor Plan declares `meta.options`, so their set-filter lists are
+  // built purely from the data — which is what makes the faceting visible here:
+  // filter Role to `admin` and Plan stops offering `ent` (no admin is on it).
   { id: 'plan', accessorKey: 'plan', header: 'Plan', meta: { type: 'text', filter: 'set' } },
   {
     id: 'salary', accessorKey: 'salary', header: 'Salary (Σ)', aggregationFn: 'sum',
@@ -1187,9 +1190,18 @@ export default function App() {
           <h3 style={{ margin: '0 0 8px' }}>Grouping (E4)</h3>
           <div style={{ ...box, marginBottom: 8 }}>
             <code>enableGrouping</code>: rows are grouped by <b>Role</b>, each header showing a{' '}
-            <b>salary total</b> (sum) and <b>average age</b> (mean) with a row count. Click a group's
-            ▸/▾ to collapse/expand; use the <b>Columns</b> menu's <b>▤</b> to group by a different
-            column (try <b>Plan</b>).
+            <b>salary total</b> (sum), a <b>median salary</b> and <b>average age</b> (mean) with a row
+            count. Click a group's ▸/▾ to collapse/expand; use the <b>Columns</b> menu's <b>▤</b> to
+            group by a different column (try <b>Plan</b>). <b>Salary (Σ)</b> beside{' '}
+            <b>Salary (med)</b> shows why the choice matters — the median ignores an outlier salary
+            that drags the sum/mean.
+            <br />
+            <b>Faceted set filters (X4) — try this:</b> in the filter row, set <b>Role</b> to{' '}
+            <i>admin</i> only, then open the <b>Plan</b> filter. It now offers just <i>free</i> and{' '}
+            <i>pro</i> — <i>ent</i> is gone, because no admin is on that plan. The list is built from
+            the rows passing every <i>other</i> column's filter, the way a spreadsheet does it. (In the
+            grids above, Role and Plan declare fixed <code>meta.options</code>, so there the whole
+            vocabulary always shows and only the <i>counts</i> react.)
           </div>
           <BstTableMui<Person>
             data={people}
@@ -1199,6 +1211,11 @@ export default function App() {
             initialState={{ grouping: ['role'] }}
             pagination={false}
             showSearch={false}
+            // Faceted set filters (X4): these columns declare no fixed options, so
+            // each list is derived from the rows that pass the OTHER filters.
+            enableColumnFilters
+            enableColumnFilterRow
+            enableSetFilter
           />
         </section>
 
