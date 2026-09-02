@@ -1,4 +1,5 @@
 import { ResourceTemplate, type McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
+import { buildAgentPrompt } from './agent-prompt.js'
 import { statusLabel } from './tools/shared.js'
 import type { BstCorpus } from './types.js'
 
@@ -8,6 +9,23 @@ import type { BstCorpus } from './types.js'
  * conversation without an agent having to call a tool for it.
  */
 export function registerResources(server: McpServer, corpus: BstCorpus): void {
+  server.registerResource(
+    'prompt',
+    'bst://prompt',
+    {
+      title: 'Bst-Table agent prompt',
+      description:
+        `The paste-anywhere briefing that teaches a model this API in one message: entry points, ` +
+        `the enable*/show* rule, all ${corpus.features.filter((f) => f.kind === 'toggle').length} ` +
+        `toggles, ${corpus.cellTypes.length} cell types and the dependencies that are easy to miss. ` +
+        `Attach it when handing work to a model that cannot reach these tools.`,
+      mimeType: 'text/markdown',
+    },
+    async (uri) => ({
+      contents: [{ uri: uri.href, mimeType: 'text/markdown', text: buildAgentPrompt(corpus) }],
+    }),
+  )
+
   server.registerResource(
     'coverage',
     'bst://coverage',

@@ -85,7 +85,9 @@ undo/redo · cell/range selection + keyboard nav · clipboard · **runtime setti
 **server DataSource** (`useBstDataSource` / `createClientDataSource` / `createServerDataSource`) ·
 **MCP server for AI agents** (`@bloomskill/table-mcp` — docs search, feature registry, config
 validation, grid scaffolding; its corpus is generated from this file among others, so coverage
-stays accurate for agents automatically).
+stays accurate for agents automatically) · **agent prompt** (the same corpus rendered as one
+paste-anywhere briefing — `bst://prompt`, `npx @bloomskill/table-mcp prompt`, `prompt.txt`, and the
+docs site's *Copy agent prompt* button — for assistants that don't speak MCP).
 
 ## Still open
 **Virtualization (D1) + infinite scroll (A2) — done:** `enableVirtualization` +

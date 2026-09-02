@@ -67,6 +67,18 @@ const { resourceTemplates = [] } = await client.listResourceTemplates().catch(()
 console.log(`\nresources/list → ${resources.length} static + ${resourceTemplates.length} templated`)
 for (const r of [...resources, ...resourceTemplates]) console.log(`  ✓ ${r.uri ?? r.uriTemplate}`)
 
+// Read the agent prompt over the wire — it is the one resource a human copies by
+// hand, so a broken render should fail here rather than on someone's clipboard.
+try {
+  const read = await client.readResource({ uri: 'bst://prompt' })
+  const text = (read.contents ?? []).map((c) => c.text ?? '').join('\n')
+  if (!text.includes('# Bst-Table — agent prompt')) fail('bst://prompt did not render the briefing')
+  else if (!/enableClipboard/.test(text)) fail('bst://prompt is missing the flag listing')
+  else console.log(`  ✓ read bst://prompt (${Math.round(text.length / 1024)} KB)`)
+} catch (error) {
+  fail(`bst://prompt threw: ${error.message}`)
+}
+
 const { prompts } = await client.listPrompts().catch(() => ({ prompts: [] }))
 console.log(`\nprompts/list → ${prompts.length}`)
 for (const p of prompts) console.log(`  ✓ ${p.name}`)

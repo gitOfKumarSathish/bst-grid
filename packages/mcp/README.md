@@ -11,6 +11,21 @@ cell type, exact type signatures, plus the ability to **scaffold** and **validat
 
 Works with **Claude Code · Cursor · VS Code (Copilot) · Claude Desktop** — anything that speaks MCP.
 
+**No MCP client? Copy the prompt.** One self-contained briefing — entry points, the `enable*` /
+`show*` rule, every flag in the release, all 17 cell types, and the dependencies that are easy to
+miss — small enough to paste at the top of any chat:
+
+```bash
+npx -y @bloomskill/table-mcp prompt          # print it
+npx -y @bloomskill/table-mcp prompt | pbcopy # …or straight to the clipboard
+```
+
+Also served as [`prompt.txt`](https://gitofkumarsathish.github.io/bst-grid/prompt.txt), behind the
+docs site's **Copy agent prompt** button, and readable over MCP as the `bst://prompt` resource. It
+is generated from the same corpus as the tools below, so its flag list is the real one for the
+version it ships with. The prompt is the floor; the server is the ceiling — with the server
+registered the agent can look anything up, instead of relying on one message.
+
 ---
 
 ## Quick start
@@ -115,7 +130,9 @@ live / WebSocket merge (I5) isn't built.
 (switch a capability on, dependencies included) · `bst-new-cell-type` (author a custom
 renderer/editor) · `bst-migrate` (port a table over from another grid library).
 
-**Resources** — `bst://coverage` · `bst://features` · `bst://cell-types` · `bst://example/{name}`.
+**Resources** — `bst://prompt` (the agent prompt above — attach it when handing work to a model
+that can't reach these tools) · `bst://coverage` · `bst://features` · `bst://cell-types` ·
+`bst://example/{name}`.
 
 **Structured output** — every tool returns machine-readable `structuredContent` validated against a
 declared `outputSchema` (advertised in `tools/list`), so a client can consume a result as typed data,

@@ -16,6 +16,27 @@ every cell type, exact type signatures, and the ability to scaffold and validate
 
 Works with anything that speaks MCP — Claude Code, Cursor, VS Code (Copilot), Claude Desktop.
 
+## No MCP? Copy the prompt
+
+Not every assistant speaks MCP, and sometimes you just want to paste something into a chat box.
+The **agent prompt** is that: one self-contained briefing — the entry points, the `enable*` /
+`show*` rule, every flag in this release, all the cell types, and the dependencies that are easy
+to miss — small enough to sit at the top of a conversation.
+
+<CopyPromptButton />
+
+It is **generated from the same corpus as this site and the MCP server**, so the flag list is the
+real one for the version it ships with. Fetch it however suits you:
+
+```bash
+curl -O https://gitofkumarsathish.github.io/bst-grid/prompt.txt   # the raw file
+npx -y @bloomskill/table-mcp prompt                               # print it locally
+```
+
+MCP clients can also read it as the `bst://prompt` resource, and attach it when handing work to a
+model that cannot reach the tools. The prompt is the floor; the server is the ceiling — with MCP
+registered, the agent can look anything up instead of relying on one message.
+
 ## Register the server
 
 Nothing to install first — `npx` fetches the package on first run.
@@ -44,7 +65,7 @@ only, or use `-s project` to write a `.mcp.json` your team gets on clone.
 
 ## What the agent gets
 
-The server exposes eight tools:
+The server exposes nine tools:
 
 | Tool | What it does |
 | --- | --- |
@@ -56,6 +77,7 @@ The server exposes eight tools:
 | `bst_scaffold_grid` | generate a working grid from a feature list |
 | `bst_validate_config` | check a grid config against the dependency rules |
 | `bst_detect_version` | resolve which release an API belongs to |
+| `bst_list_versions` | list the released versions, newest first |
 
 ## Why it stays correct
 
@@ -65,6 +87,7 @@ it flows into the MCP server automatically, so the agent's knowledge tracks the 
 release. It's the same guarantee these docs give: what you read is what the compiler accepts.
 
 :::tip
-These docs and the MCP server are two faces of one corpus. Humans read the [Feature
-Guides](./features/index.mdx); agents query `bst_get_feature`. Neither can drift from the code.
+These docs, the agent prompt and the MCP server are three faces of one corpus. Humans read the
+[Feature Guides](./features/index.mdx); agents query `bst_get_feature`; a chat box gets the
+prompt. None of them can drift from the code.
 :::

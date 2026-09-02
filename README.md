@@ -53,7 +53,7 @@ See [`COVERAGE.md`](COVERAGE.md) for the requirement-by-requirement status matri
 No model was trained on this library, so an agent asked for "a Bst-Table grid with batch editing"
 writes some other grid library's code — the APIs this project exists to replace.
 [`@bloomskill/table-mcp`](packages/mcp) closes that gap: an MCP server carrying searchable docs, the
-61-flag toggle registry, all 17 cell types, 150 API signatures, plus grid **scaffolding** and config
+65-flag toggle registry, all 17 cell types, 271 API signatures, plus grid **scaffolding** and config
 **validation**. Register it once, at user scope so it covers every project on the machine:
 
 ```bash
@@ -69,6 +69,19 @@ the tools up on its own:
 The component it returns **compiles**, with every flag dependency already satisfied. It also knows
 what *doesn't* exist here (`enableLiveUpdates` is not a flag) and which combinations fail
 silently (`showSearch` does nothing without `enableGlobalFilter`).
+
+**Not using an MCP client?** Copy the **agent prompt** instead — one self-contained briefing (entry
+points, the `enable*`/`show*` rule, every flag, all cell types, the dependencies that are easy to
+miss) sized to paste at the top of a chat. It is the same corpus, rendered as one message:
+
+```bash
+npx -y @bloomskill/table-mcp prompt
+```
+
+It is also the **Copy agent prompt** button on the [docs
+site](https://gitofkumarsathish.github.io/bst-grid/), the raw
+[`prompt.txt`](https://gitofkumarsathish.github.io/bst-grid/prompt.txt), and the `bst://prompt` MCP
+resource.
 
 Two properties make it trustworthy: the knowledge base is **generated from this repo at build
 time** — the §12 registry, `COVERAGE.md`, TSDoc, the built `.d.ts`, every README and example — so it

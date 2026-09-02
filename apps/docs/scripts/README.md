@@ -8,10 +8,13 @@ into `version:*` so docs regenerate on every release and can't drift.
 ## Pipeline
 
 1. Dump the MCP corpus → `features.json`, `cells.json`, `requirements.json`,
-   `rules.json`:
+   `rules.json` — plus the **agent prompt** in its two site shapes,
+   `prompt.json` (imported by `<CopyPromptButton>`) and `../static/prompt.txt`
+   (served at the site root):
    `node scripts/dump-corpus.mjs`  (reads `packages/mcp/dist/corpus.json` + the
-   built `RULES`; build the MCP package first so the corpus is current).
-   **This is automated** — `gen:docs` runs it first, so the four JSONs are never
+   built `RULES` and `buildAgentPrompt`; build the MCP package first so the
+   corpus is current).
+   **This is automated** — `gen:docs` runs it first, so these files are never
    hand-maintained and cannot drift from the code.
 2. Extract engine signatures from the built `.d.ts`:
    `node scripts/extract-api.mjs`  → `api-sigs.json`  (needs typescript@5.x)

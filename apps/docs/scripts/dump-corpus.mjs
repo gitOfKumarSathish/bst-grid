@@ -6,6 +6,13 @@
  * validation `RULES` into the four static JSON inputs the docs generators read:
  * `features.json`, `cells.json`, `requirements.json`, `rules.json`.
  *
+ * It also renders the **agent prompt** — the paste-anywhere briefing behind the
+ * site's "Copy agent prompt" button — in the two shapes the site needs:
+ * `scripts/prompt.json` (imported by the button component) and
+ * `static/prompt.txt` (served at the site root, so `curl` and any crawler can
+ * fetch it). Both come from `buildAgentPrompt(corpus)`, the same function behind
+ * the `bst://prompt` MCP resource and `npx @bloomskill/table-mcp prompt`.
+ *
  * Previously this step existed only as PROSE in README.md — so those four files
  * were hand-frozen snapshots that drifted from the code, and a new feature never
  * reached the docs until someone re-dumped them by hand. Now `npm run gen:docs`
@@ -19,19 +26,23 @@
  * Prerequisite: build the MCP package first so its corpus is current —
  *   npm run build -w @bloomskill/table-engine && npm run build -w @bloomskill/table-mcp
  */
-import { readFileSync, writeFileSync } from 'node:fs'
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
+import { createRequire } from 'node:module'
 
 const HERE = dirname(fileURLToPath(import.meta.url)) // apps/docs/scripts
 const ROOT = resolve(HERE, '../../..') // repo root
+const STATIC = resolve(HERE, '..', 'static')
 const CORPUS = resolve(ROOT, 'packages/mcp/dist/corpus.json')
 const RULES_JS = resolve(ROOT, 'packages/mcp/dist/rules.js')
+const PROMPT_JS = resolve(ROOT, 'packages/mcp/dist/agent-prompt.js')
 
-let corpus, RULES
+let corpus, RULES, buildAgentPrompt
 try {
   corpus = JSON.parse(readFileSync(CORPUS, 'utf8'))
   ;({ RULES } = await import(pathToFileURL(RULES_JS).href))
+  ;({ buildAgentPrompt } = await import(pathToFileURL(PROMPT_JS).href))
 } catch (err) {
   console.error(
     `dump-corpus — could not read the MCP corpus (${err instanceof Error ? err.message : String(err)}).\n` +
@@ -108,7 +119,23 @@ write('cells.json', cells)
 write('requirements.json', requirements)
 write('rules.json', RULES)
 
+// The agent prompt, rendered for the site. The base URL comes from the real
+// Docusaurus config so the lookup links point at wherever this build deploys;
+// falling back to the generator's own default if the config can't be read.
+let site
+try {
+  const cfg = createRequire(import.meta.url)('../docusaurus.config.js')
+  site = `${cfg.url}${cfg.baseUrl}`.replace(/\/+$/, '')
+} catch {
+  /* isolated run — buildAgentPrompt falls back to the published site */
+}
+const agentPrompt = buildAgentPrompt(corpus, site ? { site } : {})
+write('prompt.json', { version: corpus.version, prompt: agentPrompt })
+mkdirSync(STATIC, { recursive: true })
+writeFileSync(resolve(STATIC, 'prompt.txt'), agentPrompt)
+
 console.log(
   `dumped corpus v${corpus.version} → features(${features.length}) · cells(${cells.length}) · ` +
-    `requirements(${requirements.length}) · rules(${Object.keys(RULES).length})`,
+    `requirements(${requirements.length}) · rules(${Object.keys(RULES).length}) · ` +
+    `prompt(${Math.round(agentPrompt.length / 1024)} KB)`,
 )

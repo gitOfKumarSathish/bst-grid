@@ -2,6 +2,7 @@ import React from 'react';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
 import CodeBlock from '@theme/CodeBlock';
+import CopyPromptButton from '@site/src/components/CopyPromptButton';
 
 // A real, server-rendered landing page (replaces the old bare <Redirect>, which put
 // nothing into the static HTML). Everything here renders during Docusaurus's SSR, so
@@ -44,6 +45,33 @@ export default function Home() {
           <Link className="button button--secondary button--lg" to="/docs/features">
             Feature Guides
           </Link>
+        </div>
+
+        {/*
+          Building with an AI assistant is the common case now, and a cold prompt
+          produces another library's API — so the fix gets its own slot rather than
+          a fourth button nobody reads.
+        */}
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            gap: '1rem',
+            padding: '1.1rem 1.25rem',
+            margin: '1.75rem 0',
+            border: '1px solid var(--ifm-color-emphasis-300)',
+            borderRadius: 'var(--ifm-global-radius)',
+            background: 'var(--ifm-color-emphasis-100)',
+          }}
+        >
+          <CopyPromptButton variant="primary" />
+          <p style={{ flex: '1 1 22rem', margin: 0, fontSize: '0.95rem', lineHeight: 1.55 }}>
+            <strong>Using an AI coding assistant?</strong> No model was trained on Bst-Table, so a
+            cold prompt gets you some other grid's API. This hands it ours — entry points, every
+            flag, all 17 cell types, and the dependencies that are easy to miss. For a permanent
+            fix, register the <Link to="/docs/ai-agents">MCP server</Link>.
+          </p>
         </div>
 
         <h2>What you get</h2>

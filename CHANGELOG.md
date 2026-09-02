@@ -10,6 +10,41 @@ this project uses [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+## [0.47.0] — 2026-09-02
+
+### Added — the agent prompt ("copy prompt")
+
+- **One paste-anywhere briefing that teaches a model this API.** No model was trained on
+  Bst-Table, so a cold prompt produces some other grid library's props. The MCP server fixes that
+  properly, but it needs a client that speaks MCP — this is the zero-setup fallback: a single
+  self-contained message covering the three entry points, the `enable*` (behaviour) / `show*`
+  (chrome) rule, **every toggle in the release grouped by area**, all 17 cell types, the
+  dependency traps (editing needs `getRowId` + `onDataChange`; clipboard implies cell selection;
+  batch mode saves once through `onSave`), the open coverage gaps, and where to look anything up.
+
+- **Generated from the corpus, not hand-written** (`buildAgentPrompt`, exported from
+  `@bloomskill/table-mcp`), so the flag list is the real one for the version it ships with —
+  the same guarantee the docs site and the MCP tools give. One function renders four surfaces:
+
+  | Surface | How to get it |
+  | --- | --- |
+  | MCP resource | `bst://prompt` |
+  | CLI | `npx -y @bloomskill/table-mcp prompt` (pipe it to a clipboard) |
+  | Raw file | `prompt.txt` at the docs-site root |
+  | Docs site | the **Copy agent prompt** button (landing page + AI Agents page) |
+
+- **Guarded both ways.** `agent-prompt.test.ts` fails if the prompt omits any shipped toggle *or*
+  names a flag the corpus doesn't have — the parity discipline the settings sheet and the rule
+  table already use, applied to the one artifact whose whole job is to stop a model inventing API.
+  The MCP smoke test now reads `bst://prompt` over the wire, and `docs:verify` catches a stale
+  copy of the generated files.
+
+### Fixed
+
+- **AI Agents docs page** said the server exposes *eight* tools and omitted `bst_list_versions`
+  from the table; nine are registered. Root README's drifted counts (61 flags, 150 API
+  signatures) corrected to the real 65 and 271.
+
 ### Added — more of v9's stock fn registries
 
 - **Case-sensitive sort fns.** `sortFn: 'alphanumericCaseSensitive'` and `'textCaseSensitive'` are now

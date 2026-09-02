@@ -380,6 +380,23 @@ version it shipped in (`since`); pass a project's installed version to `bst_get_
 | `bst_detect_version` | Compare a project's installed version to what the server documents. | `{ "path": "/abs/project" }` |
 | `bst_list_versions` | List the released version history (from the changelog), documented one marked. | `{}` |
 
+### No client? The agent prompt
+
+Everything above needs a client that speaks MCP. When there isn't one — a plain chat box, a
+teammate's assistant, a code-review bot — hand the model the **agent prompt** instead: one
+self-contained briefing covering the entry points, the `enable*`/`show*` rule, every toggle in the
+release, all 17 cell types, and the dependency traps the checker below lints for.
+
+```bash
+npx -y @bloomskill/table-mcp prompt          # print it
+npx -y @bloomskill/table-mcp prompt | pbcopy # …or straight to the clipboard
+```
+
+It is also served as `prompt.txt` at the docs-site root (behind the **Copy agent prompt** button)
+and exposed here as the `bst://prompt` resource, so an MCP client can attach it when delegating to
+a model that can't reach these tools. Same corpus, same release — one message instead of nine
+tools.
+
 ### What the checker catches
 
 `bst_validate_config` exists because Bst-Table's two flag layers — `enable*` (engine behaviour)
