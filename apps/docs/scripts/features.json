@@ -1367,7 +1367,7 @@
     "type": "boolean",
     "default": "false",
     "status": "✅ done",
-    "mapsTo": "custom — Excel-style checklist of distinct values per column in the filter row (BstSetFilter: search · select-all/clear · counts · (Blanks)). Writes an {op:'set'} condition through the bstCondition filterFn. Categorical columns (select/multiSelect/radio/boolean) auto-eligible; meta.filter: 'set'/'condition' forces/opts out. Needs enableColumnFilters + enableColumnFilterRow. In settings (\"Data operations\", always shown)",
+    "mapsTo": "custom — Excel-style checklist of distinct values per column in the filter row (BstSetFilter: search · select-all/clear · counts · (Blanks)). Writes an {op:'set'} condition through the bstCondition filterFn. Faceted — options come from v9's columnFacetingFeature (rows passing every OTHER column's filter), so the list narrows as you filter elsewhere; the column's own selection is excluded so a selection can always be widened again. Categorical columns (select/multiSelect/radio/boolean) auto-eligible; meta.filter: 'set'/'condition' forces/opts out. Needs enableColumnFilters + enableColumnFilterRow. In settings (\"Data operations\", always shown)",
     "group": "Data operations",
     "doc": "Set Filter (X4) — an Excel-style **checklist of distinct values** per column, rendered in the per-column filter row. When on, categorical columns (`singleSelect` / `multiSelect` / `radio` / `boolean`) use the checklist; any column can force it via `meta.filter: 'set'` or opt out via `meta.filter: 'condition'`. Needs `enableColumnFilters` + the filter row (`enableColumnFilterRow`) to be visible. Default: false.",
     "related": [

@@ -767,6 +767,7 @@ export default function App() {
     showFilterBuilder: true, // per-column condition builder (E3)
     enableColumnFilterRow: true, // per-column filter inputs under the header ("dual filter")
     enableSetFilter: true, // X4: categorical columns (see role/plan) get a distinct-values checklist
+    //     …and it is faceted — filter Role, then reopen Plan: it only offers values the remaining rows have
     showStatusBar: true, // X5: footer — row counts + selection sum/avg/min/max
     enableAutoRowHeight: true, // X26: rows grow to fit wrapped content (browser-measured)
     enableStickyHeader: { maxRows: 12 }, // G3/G4: cap the body → sticky header + body scroll (try a bigger page size / "All")

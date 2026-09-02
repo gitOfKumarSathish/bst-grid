@@ -10,6 +10,20 @@ this project uses [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+### Changed
+
+- **The Set Filter checklist is now faceted (X4).** Its options previously came from the *core* row
+  model — every value in the dataset, regardless of what else was filtered. They now come from v9's
+  `columnFacetingFeature`: the rows that pass every **other** column's filter. So filtering Dept to
+  `Eng` makes the Plan checklist stop offering values no Eng row has, which is what a spreadsheet
+  does. A column's **own** selection is deliberately excluded from that set — otherwise ticking one
+  value would hide every unticked value and the selection could never be widened again.
+
+  Registers `columnFacetingFeature` plus the `facetedRowModel` / `facetedUniqueValues` /
+  `facetedMinMaxValues` factories. The row models are lazy, so a grid that never opens a set filter
+  computes nothing. `BstSetFilter` falls back to the core rows when a host builds a table without the
+  faceting feature, so a custom `features` set keeps working.
+
 ## [0.47.0] — 2026-09-02
 
 ### Added — the agent prompt ("copy prompt")

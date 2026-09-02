@@ -995,6 +995,11 @@ return (
   Force it on any column with `meta.filter: 'set'`, or off with `meta.filter: 'condition'`. It writes an
   `{ op: 'set' }` condition, so it composes with the builder and `bstCondition`. Needs
   `enableColumnFilters` **and** the filter row visible (`enableColumnFilterRow`).
+  The list is **faceted**: it offers the values found in the rows that pass every *other* column's
+  filter, so it narrows as you filter elsewhere (filter Dept to `Eng` and Plan stops offering values
+  no Eng row has). A column's *own* selection is excluded from that calculation — otherwise ticking one
+  value would hide the rest and you could never widen the selection again. Built on v9's
+  `columnFacetingFeature`.
 - **Multi-filter (X11)** — `enableMultiFilter` lets a column **stack several filter types**. Set its
   `meta.filter` to an **array** (e.g. `['condition', 'set']`) and the filter row shows those filters
   stacked; a row must satisfy **all** of them (AND). Stored as a compound

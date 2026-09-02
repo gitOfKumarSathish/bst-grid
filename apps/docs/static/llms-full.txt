@@ -2011,7 +2011,7 @@ force or opt out with `meta.filter: 'set'` / `'condition'`.
 | Layer | `enable*` (engine, resolved in `useBstTable`) |
 | Type | `boolean` |
 | Default | `false` |
-| Maps to | custom — Excel-style checklist of distinct values per column in the filter row (BstSetFilter: search · select-all/clear · counts · (Blanks)). Writes an {op:'set'} condition through the bstCondition filterFn. Categorical columns (select/multiSelect/radio/boolean) auto-eligible; meta.filter: 'set'/'condition' forces/opts out. Needs enableColumnFilters + enableColumnFilterRow. In settings ("Data operations", always shown) |
+| Maps to | custom — Excel-style checklist of distinct values per column in the filter row (BstSetFilter: search · select-all/clear · counts · (Blanks)). Writes an {op:'set'} condition through the bstCondition filterFn. Faceted — options come from v9's columnFacetingFeature (rows passing every OTHER column's filter), so the list narrows as you filter elsewhere; the column's own selection is excluded so a selection can always be widened again. Categorical columns (select/multiSelect/radio/boolean) auto-eligible; meta.filter: 'set'/'condition' forces/opts out. Needs enableColumnFilters + enableColumnFilterRow. In settings ("Data operations", always shown) |
 | Status | ✅ done |
 | Since | v0.35.0 |
 | Settings sheet | Data operations |

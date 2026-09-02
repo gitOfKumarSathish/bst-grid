@@ -11,6 +11,9 @@ import {
   createPaginatedRowModel,
   createExpandedRowModel,
   createGroupedRowModel,
+  createFacetedRowModel,
+  createFacetedUniqueValues,
+  createFacetedMinMaxValues,
   rowSortingFeature,
   columnFilteringFeature,
   globalFilteringFeature,
@@ -25,6 +28,7 @@ import {
   columnPinningFeature,
   columnSizingFeature,
   columnResizingFeature,
+  columnFacetingFeature,
   sortFn_basic,
   sortFn_alphanumeric,
   sortFn_alphanumericCaseSensitive,
@@ -65,6 +69,10 @@ export const bstTableFeatures = tableFeatures({
   columnPinningFeature,
   columnSizingFeature,
   columnResizingFeature,
+  // Faceting (X4 set filter): per-column value lists computed from the rows that
+  // pass every OTHER column's filter, so the checklist narrows as you filter
+  // elsewhere. Row models are lazy — nothing is computed until a facet is read.
+  columnFacetingFeature,
   // Client-side row models (swap for server-mode later — Plan.md §2.2)
   coreRowModel: createCoreRowModel(),
   sortedRowModel: createSortedRowModel(),
@@ -72,6 +80,9 @@ export const bstTableFeatures = tableFeatures({
   paginatedRowModel: createPaginatedRowModel(),
   expandedRowModel: createExpandedRowModel(),
   groupedRowModel: createGroupedRowModel(),
+  facetedRowModel: createFacetedRowModel(),
+  facetedUniqueValues: createFacetedUniqueValues(),
+  facetedMinMaxValues: createFacetedMinMaxValues(),
   // Fn registries — keys become valid `sortFn` / `filterFn` / `globalFilterFn` values
   sortFns: {
     basic: sortFn_basic,

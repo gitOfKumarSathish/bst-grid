@@ -48,13 +48,23 @@ const isBlank = (v: unknown): boolean =>
   v == null || v === '' || (Array.isArray(v) && v.length === 0)
 
 /** Distinct values for the column: declared `meta.options` first (stable order +
- *  labels), then any data value not covered, plus a "(Blanks)" bucket. */
+ *  labels), then any data value not covered, plus a "(Blanks)" bucket.
+ *
+ *  Counts come from v9's **faceted** row model — the rows passing every OTHER
+ *  column's filter — so the checklist narrows as you filter elsewhere, the way a
+ *  spreadsheet does. The column's own selection is deliberately excluded from
+ *  that set, otherwise ticking a value would hide every value you had not
+ *  ticked and you could never widen the selection again. */
 function computeOptions(column: any, table: any): BstSetFilterOption[] {
   const meta = (column.columnDef?.meta ?? {}) as {
     options?: Array<{ value: unknown; label?: string }>
     type?: string
   }
-  const rows = (table.getCoreRowModel?.()?.rows ?? []) as any[]
+  // Falls back to the core rows when the host table was built without
+  // `columnFacetingFeature` (a custom `features` set), so this stays usable.
+  const rows = (column.getFacetedRowModel?.()?.rows ??
+    table.getCoreRowModel?.()?.rows ??
+    []) as any[]
   const counts = new Map<string, number>()
   let blanks = 0
   for (const r of rows) {
